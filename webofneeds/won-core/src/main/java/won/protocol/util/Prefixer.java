@@ -140,6 +140,40 @@ public class Prefixer {
         return result;
     }
 
+    public static Model setPrefixes(Model model) {
+        Model modelWithPrefixes = RdfUtils.cloneModel(model);
+        StopWatch sw = new StopWatch();
+        sw.start();
+        modelWithPrefixes.getNsPrefixMap().keySet().stream().forEach(modelWithPrefixes::removeNsPrefix);
+        Set<String> prefixes = RdfUtils.toStatementStream(modelWithPrefixes).flatMap(Prefixer::getPrefixes)
+                        .collect(Collectors.toSet());
+        Map<String, String> defaultPrefixes = getPrefixes().getNsPrefixMap();
+        defaultPrefixes.entrySet().stream()
+                        .forEach(entry -> {
+                            if (prefixes.contains(entry.getValue())) {
+                                modelWithPrefixes.setNsPrefix(entry.getKey(), entry.getValue());
+                                prefixes.remove(entry.getValue());
+                            }
+                        });
+        final AtomicInteger cnt = new AtomicInteger(0);
+        Map<String, String> nodeSpecificPrefixes = new HashMap<>();
+        nodeSpecificPrefixes.put("event", "https://node.matchat.org/won/resource/event/");
+        nodeSpecificPrefixes.put("conn", "https://node.matchat.org/won/resource/connection/");
+        nodeSpecificPrefixes.put("atom", "https://node.matchat.org/won/resource/atom/");
+        nodeSpecificPrefixes.put("node", "https://node.matchat.org/won/");
+        nodeSpecificPrefixes.entrySet().stream().forEach(entry -> {
+            if (prefixes.contains(entry.getValue())) {
+                modelWithPrefixes.setNsPrefix(entry.getKey(), entry.getValue());
+                prefixes.remove(entry.getValue());
+            }
+        });
+        prefixes.removeAll(getBlacklist());
+        prefixes.stream()
+                        .forEach(prefix -> modelWithPrefixes.setNsPrefix("p" + cnt.getAndIncrement(), prefix));
+        sw.stop();
+        return modelWithPrefixes;
+    }
+
     private static Stream<String> getPrefixes(Statement stmt) {
         Set<String> prefixes = new HashSet<>();
         getUriPrefix(stmt.getSubject()).map(prefixes::add);

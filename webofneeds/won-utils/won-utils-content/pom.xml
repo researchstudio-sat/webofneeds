@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>won-utils</artifactId>
+        <groupId>at.researchstudio.sat</groupId>
+        <version>0.10-SNAPSHOT</version>
+    </parent>
+    <name>Utilities-Content</name>
+    <description>Utilities for authoring and reading atom/message content</description>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>won-utils-content</artifactId>
+    <properties>
+        <shacl2java.generate-sources.outputDir>${project.basedir}/target/generated-sources/shacl2java</shacl2java.generate-sources.outputDir>
+        <shacl2java.generate-test-sources.outputDir>${project.basedir}/target/generated-test-sources/shacl2java</shacl2java.generate-test-sources.outputDir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-utils-shacl2java</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <!-- avoid version clash between the transitive
+                         dependencies (httpclient and jena) -->
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- RDF STUFF -->
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-tdb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-shacl</artifactId>
+        </dependency>
+        <!-- TEST STUFF -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>shacl2java-generate-auth-classes</id>
+                        <!-- the phase should be 'generate-sources', and 'process-sources'
+                        for the next two plugins (right?), but that does not work.-->
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>won.shacl2java.Shacl2JavaSrcGenCommand</mainClass>
+                            <commandlineArgs>-p won.utils.content.model -o ${shacl2java.generate-sources.outputDir} ${project.basedir}/src/main/resources/shacl/won-content-shapes.ttl</commandlineArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-sources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${shacl2java.generate-sources.outputDir}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-sources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${shacl2java.generate-test-sources.outputDir}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>format-generated-sources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                        <configuration>
+                            <configFile>eclipse/formatter.xml</configFile>
+                            <encoding>UTF-8</encoding>
+                            <lineEnding>LF</lineEnding>
+                            <directories>
+                                <directory>${shacl2java.generate-sources.outputDir}</directory>
+                            </directories>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>format-generated-test-sources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                        <configuration>
+                            <configFile>eclipse/formatter.xml</configFile>
+                            <encoding>UTF-8</encoding>
+                            <lineEnding>LF</lineEnding>
+                            <directories>
+                                <directory>${shacl2java.generate-test-sources.outputDir}</directory>
+                            </directories>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

@@ -7,13 +7,14 @@
     under the License is distributed on an "AS IS" BASIS, ~ WITHOUT WARRANTIES 
     OR CONDITIONS OF ANY KIND, either express or implied. ~ See the License for 
     the specific language governing permissions and ~ limitations under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>at.researchstudio.sat</groupId>
     <artifactId>webofneeds</artifactId>
     <version>0.10-SNAPSHOT</version>
-    <description>Finding people to cooperate with. Protocol, not platform. Decentralized. Linked Data. Open Source.</description>
+    <description>Finding people to cooperate with. Protocol, not platform. Decentralized. Linked Data. Open Source.
+    </description>
     <url>https://github.com/researchstudio-sat/webofneeds</url>
     <developers>
         <developer>
@@ -96,31 +97,27 @@
             -Xlint:deprecation,fallthrough,finally,path,serial,unchecked
         </maven.compile.compilerargs>
         <compile.forked>false</compile.forked>
-        <java.source.version>1.8</java.source.version>
-        <java.target.version>1.8</java.target.version>
-        <surefire.skip>false</surefire.skip>
-        <surefire.failure.ignore>true</surefire.failure.ignore>
-        <surefire.reportformat>brief</surefire.reportformat>
-        <surefire.usefile>false</surefire.usefile>
+        <java.source.version>11</java.source.version>
+        <java.target.version>11</java.target.version>
         <dependencies.scope>compile</dependencies.scope>
         <!-- versions for various dependencies -->
         <aspectj.version>1.5.4</aspectj.version>
-        <bouncycastle.version>1.64</bouncycastle.version>
+        <bouncycastle.version>1.68</bouncycastle.version>
         <commons-collections.version>3.2.1</commons-collections.version>
+        <org.apache.commons.commons-collections4.version>4.4</org.apache.commons.commons-collections4.version>
         <commons-codec.version>1.15</commons-codec.version>
         <commons-io.version>2.4</commons-io.version>
         <de.uni_koblenz.aggrimm.icp.version>1.0.1</de.uni_koblenz.aggrimm.icp.version>
-        <camel.version>2.12.1</camel.version>
+        <org.apache.camel.version>3.7.0</org.apache.camel.version>
         <qpid.version>0.24</qpid.version>
-        <activemq.version>5.10.2</activemq.version>
+        <org.apache.activemq.version>5.16.0</org.apache.activemq.version>
         <activemq.conf>classpath:</activemq.conf>
-        <jms.version>1.1</jms.version>
-        <xbean.version>3.14</xbean.version>        <!-- Check later if it is really needed -->
+        <xbean.version>3.15</xbean.version>        <!-- Check later if it is really needed -->
         <siren.version>1.4</siren.version>
-        <cglib.version>2.2.2</cglib.version>
-        <com.google.guava.version>15.0</com.google.guava.version>
-        <ch.qos.logback.version>1.0.13</ch.qos.logback.version>
-        <com.fasterxml.classmate.version>1.0.0</com.fasterxml.classmate.version>
+        <cglib.version>3.3.0</cglib.version>
+        <com.google.guava.version>30.1-jre</com.google.guava.version>
+        <ch.qos.logback.version>1.2.3</ch.qos.logback.version>
+        <com.fasterxml.classmate.version>1.5.1</com.fasterxml.classmate.version>
         <com.github.rvesse.airline.version>2.8.0</com.github.rvesse.airline.version>
         <com.mchange.c3p0.version>0.9.5</com.mchange.c3p0.version>
         <io.github.classgraph.version>4.8.90</io.github.classgraph.version>
@@ -131,29 +128,28 @@
         <org.apache.jena.version>3.18.0-SNAPSHOT</org.apache.jena.version>
         <org.apache.jena-tdb.version>3.18.0-SNAPSHOT</org.apache.jena-tdb.version>
         <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
-        <org.hibernate.version>5.4.8.Final</org.hibernate.version>
-        <org.hibernate.hibernate-validator.version>5.4.3.Final</org.hibernate.hibernate-validator.version>
-        <org.javasimon.version>3.4.0</org.javasimon.version>
+        <org.hibernate.version>5.4.27.Final</org.hibernate.version>
+        <org.hibernate.hibernate-validator.version>6.1.6.Final</org.hibernate.hibernate-validator.version>
+        <org.javasimon.version>4.2.0</org.javasimon.version>
         <org.jboss.jandex.version>1.1.0.Final</org.jboss.jandex.version>
         <com.squareup.javapoet.version>1.13.0</com.squareup.javapoet.version>
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
-        <org.springframework.boot.version>1.5.17.RELEASE</org.springframework.boot.version>
-        <org.springframework.version>4.3.18.RELEASE</org.springframework.version>
-        <org.springframework.security.version>4.2.9.RELEASE</org.springframework.security.version>
-        <org.slf4j.version>1.6.6</org.slf4j.version>
+        <org.springframework.boot.version>2.4.1</org.springframework.boot.version>
+        <org.springframework.version>5.3.3</org.springframework.version>
+        <org.springframework.security.version>4.2.20.RELEASE</org.springframework.security.version>
+        <org.slf4j.version>1.7.30</org.slf4j.version>
         <org.testcontainers.version>1.15.1</org.testcontainers.version>
-        <org.hsqldb.version>2.5.0</org.hsqldb.version>
-        <postgresql.version>42.2.8</postgresql.version>
-        <flyway.version>4.0.3</flyway.version>
+        <org.hsqldb.version>2.5.1</org.hsqldb.version>
+        <postgresql.version>42.2.18</postgresql.version>
+        <flyway.version>7.5.0</flyway.version>
         <javax.servlet.jstl.version>1.2</javax.servlet.jstl.version>
-        <javax.validation.version>1.1.0.Final</javax.validation.version>
+        <javax.validation.version>2.0.1.Final</javax.validation.version>
         <mojoexec.version>1.3.2</mojoexec.version>
         <cargo.version>1.4.2</cargo.version>
         <jrebel.version>1.1.3</jrebel.version>
         <wagon.version>1.0-beta-3</wagon.version>
         <assembly.version>2.2</assembly.version>
         <net.sf.supercsv.version>2.1.0</net.sf.supercsv.version>
-        <jaxb.version>2.2.11</jaxb.version>
         <javax.activation.version>1.1.1</javax.activation.version>
         <javax.annotation.version>1.3.2</javax.annotation.version>
         <javax.jws.version>1.1</javax.jws.version>
@@ -164,17 +160,17 @@
             <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
-                <version>${jaxb.version}</version>
+                <version>2.3.1</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-core</artifactId>
-                <version>${jaxb.version}</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>${jaxb.version}</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>javax.activation</groupId>
@@ -214,37 +210,37 @@
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-core</artifactId>
-                <version>${camel.version}</version>
+                <version>${org.apache.camel.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-jms</artifactId>
-                <version>${camel.version}</version>
+                <version>${org.apache.camel.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-spring</artifactId>
-                <version>${camel.version}</version>
+                <version>${org.apache.camel.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-amqp</artifactId>
-                <version>${camel.version}</version>
+                <version>${org.apache.camel.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-camel</artifactId>
-                <version>${activemq.version}</version>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-activemq</artifactId>
+                <version>${org.apache.camel.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-pool</artifactId>
-                <version>${activemq.version}</version>
+                <version>${org.apache.activemq.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-broker</artifactId>
-                <version>${activemq.version}</version>
+                <version>${org.apache.activemq.version}</version>
             </dependency>
             <!-- xbean is required for ActiveMQ broker configuration in the 
                 spring xml file -->
@@ -256,12 +252,12 @@
             <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-kahadb-store</artifactId>
-                <version>${activemq.version}</version>
+                <version>${org.apache.activemq.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-amqp</artifactId>
-                <version>${activemq.version}</version>
+                <version>${org.apache.activemq.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.bouncycastle</groupId>
@@ -272,11 +268,6 @@
                         <artifactId>proton-jms</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>javax.jms</groupId>
-                <artifactId>jms</artifactId>
-                <version>${jms.version}</version>
             </dependency>
 
             <dependency>
@@ -299,14 +290,6 @@
                 <version>${org.apache.jena.version}</version>
                 <exclusions>
                     <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
                     </exclusion>
@@ -325,14 +308,6 @@
                 <artifactId>jena-shacl</artifactId>
                 <version>${org.apache.jena.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
@@ -353,14 +328,6 @@
                 <artifactId>jena-arq</artifactId>
                 <version>${org.apache.jena.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
@@ -384,14 +351,6 @@
                 <artifactId>jena-tdb</artifactId>
                 <version>${org.apache.jena-tdb.version}</version>
                 <exclusions>
-                    <exclusion>
-                        <artifactId>xml-apis</artifactId>
-                        <groupId>xml-apis</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>xerces</groupId>
-                        <artifactId>xercesImpl</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>log4j</groupId>
                         <artifactId>log4j</artifactId>
@@ -428,7 +387,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.8.11.2</version>
+                <version>2.12.1</version>
             </dependency>
 
             <!-- Signingframework - doesn't exist in the public repository -->
@@ -493,14 +452,12 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk15on</artifactId>
                 <version>${bouncycastle.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <!-- spring stuff -->
@@ -575,17 +532,17 @@
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-commons</artifactId>
-                <version>1.13.16.RELEASE</version>
+                <version>2.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-jpa</artifactId>
-                <version>1.11.3.RELEASE</version>
+                <version>2.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-mongodb</artifactId>
-                <version>1.10.3.RELEASE</version>
+                <version>3.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -692,11 +649,6 @@
                 <version>1.0.b2</version>
             </dependency>
             <dependency>
-                <groupId>xerces</groupId>
-                <artifactId>xercesImpl</artifactId>
-                <version>2.9.1</version>
-            </dependency>
-            <dependency>
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
                 <version>2.7.1</version>
@@ -768,6 +720,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${org.apache.commons.commons-collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
                 <artifactId>commons-email</artifactId>
                 <version>${org.apache.commons.email.version}</version>
             </dependency>
@@ -784,7 +741,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-pool2</artifactId>
-                <version>2.7.0</version>
+                <version>2.8.0</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.supercsv</groupId>
@@ -863,12 +820,6 @@
                 <artifactId>spring-test</artifactId>
                 <version>${org.springframework.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib</artifactId>
-                <version>${cglib.version}</version>
-                <!--<scope>test</scope> -->
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -973,6 +924,12 @@
                 <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
                 <version>${jjwt.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+            <!-- add DNS entries programmatically (required for won-integrationtest) -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dns-cache-manipulator</artifactId>
+                <version>1.5.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1101,11 +1058,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M5</version>
-                    <configuration>
-                        <reuseForks>false</reuseForks>
-                        <forkCount>0</forkCount>
-                        <useSystemClassLoader>false</useSystemClassLoader>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

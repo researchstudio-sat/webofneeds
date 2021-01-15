@@ -92,7 +92,7 @@ public class SourceGeneratorTests {
         Shapes shapes = loadShapes(testBaseFolder.createRelative("test3/shapes.ttl"));
         String outputDir = getOutputDir().getAbsolutePath();
         Shacl2JavaConfig config = Shacl2JavaConfig.builder()
-                        .packageName("test2")
+                        .packageName("test3")
                         .classNameRegexReplace("(Property)?Shape$", "")
                         .outputDir(outputDir).build();
         SourceGenerator gen = new SourceGenerator();

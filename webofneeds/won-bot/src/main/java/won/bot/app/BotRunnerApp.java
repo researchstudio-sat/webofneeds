@@ -12,7 +12,10 @@ package won.bot.app;
 
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.base.ScheduledTriggerBot;
@@ -24,14 +27,19 @@ import java.util.concurrent.TimeUnit;
  * Runs any bot by class name.
  */
 public class BotRunnerApp {
+    @Configuration
+    @ImportResource("classpath:/spring/app/botRunner.xml")
+    static class Config {
+    }
+
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
             System.err.println("arguments: [bot class name]");
             System.exit(1);
         }
         String botClass = args[0];
-        SpringApplication app = new SpringApplication("classpath:/spring/app/botRunner.xml");
-        app.setWebEnvironment(false);
+        SpringApplication app = new SpringApplication();
+        app.setWebApplicationType(WebApplicationType.NONE);
         ConfigurableApplicationContext applicationContext = app.run(args);
         Bot bot;
         // create a bot instance and auto-wire it

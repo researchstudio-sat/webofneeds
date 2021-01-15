@@ -10,8 +10,6 @@
  */
 package won.node.activemq;
 
-import java.lang.invoke.MethodHandles;
-import java.security.cert.X509Certificate;
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerFilter;
 import org.apache.activemq.broker.ConnectionContext;
@@ -22,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import won.cryptography.ssl.AliasFromFingerprintGenerator;
 import won.cryptography.ssl.AliasGenerator;
 import won.node.service.persistence.ActiveMQOwnerManagementService;
-import won.node.service.persistence.OwnerManagementService;
+
+import java.lang.invoke.MethodHandles;
+import java.security.cert.X509Certificate;
 
 /**
  * BrokerFilter implementation that authorizes consumers if their TLS
@@ -30,10 +30,10 @@ import won.node.service.persistence.OwnerManagementService;
  * to.
  */
 public class CertificateCheckingBrokerFilter extends BrokerFilter {
-    private final String queueNamePrefixToCheck;
-    private ActiveMQOwnerManagementService ownerManagementService;
-    private final AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final String queueNamePrefixToCheck;
+    private final AliasGenerator aliasGenerator = new AliasFromFingerprintGenerator();
+    private ActiveMQOwnerManagementService ownerManagementService;
 
     public CertificateCheckingBrokerFilter(final Broker next, String queueNamePrefixToCheck,
                     ActiveMQOwnerManagementService ownerManagementService) {
@@ -55,9 +55,10 @@ public class CertificateCheckingBrokerFilter extends BrokerFilter {
                 throw new SecurityException("could not perform access control check for consumer "
                                 + info.getConsumerId() + " and destination " + info.getDestination());
             }
-            if (!checkPassed)
+            if (!checkPassed) {
                 throw new SecurityException("consumer " + info.getConsumerId()
                                 + " not allowed to consume from destination " + info.getDestination());
+            }
             synchronized (this) {
                 if (!ownerManagementService
                                 .existsCamelEndpointForOwnerApplicationQueue(

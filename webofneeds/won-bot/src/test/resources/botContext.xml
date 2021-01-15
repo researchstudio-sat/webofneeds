@@ -15,16 +15,16 @@
   ~    limitations under the License.
   -->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
         http://www.springframework.org/schema/data/mongo
-        http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd">
+        http://www.springframework.org/schema/data/mongo/spring-mongo-3.0.xsd">
 
     <!-- MongoDB config -->
-    <mongo:mongo id="mongo" host="localhost" port="27017" />
+    <mongo:mongo-client id="mongo" host="localhost" port="27017"/>
 
     <import resource="classpath:spring/component/botContext/memoryBotContext.xml"/>
     <!-- We exclude mongoBotContext for now TODO: find a better strategy for embedded mongodb integration Testing -->

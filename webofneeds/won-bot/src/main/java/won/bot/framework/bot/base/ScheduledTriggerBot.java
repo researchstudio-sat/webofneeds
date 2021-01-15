@@ -12,6 +12,7 @@ package won.bot.framework.bot.base;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 
@@ -25,8 +26,10 @@ import java.util.concurrent.ScheduledFuture;
  */
 public abstract class ScheduledTriggerBot extends BaseBot {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    @Autowired(required = false)
     private TaskScheduler taskScheduler;
     private Executor insideSchedulerExecutor = new InsideSchedulerExecutor();
+    @Autowired(required = false)
     private Trigger trigger;
     private ScheduledFuture<?> scheduledExecution;
 

@@ -1,6 +1,6 @@
 # before docker build can be executed, the war file, the tomcat libs folder
 # and the conf directory have to be copied into this folder (done by maven build)
-FROM tomcat:9.0.16-jre8
+FROM tomcat:9.0.41-jdk11
 RUN apt-get update && apt-get install -y \
     vim \
     less \
@@ -49,7 +49,7 @@ RUN ${DEV_MODE} \
 #RUN ${DEV_MODE} && rm -rf /usr/local/tomcat/webapps/owner/WEB-INF/classes/*  || echo " ---| Step skipped (DEV_MODE=${DEV_MODE})"
 
 # add the bouncy castle libraries to the jre as well as to the java.security config (we need them in the jre, only tomcat lib folder doesn't work)
-ADD ./required-libs/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/
+ADD ./required-libs/* /usr/local/tomcat/lib/
 ADD ./jce/* /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/
 
 # add the webofneeds configuration files for the application

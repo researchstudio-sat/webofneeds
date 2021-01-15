@@ -1,25 +1,10 @@
 package won.node.camel.route.fixed;
 
-import static org.apache.camel.builder.PredicateBuilder.*;
-import static won.node.camel.WonNodeConstants.*;
-import static won.node.camel.service.WonCamelHelper.*;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.apache.camel.Exchange;
-import org.apache.camel.Expression;
-import org.apache.camel.LoggingLevel;
-import org.apache.camel.Predicate;
-import org.apache.camel.Processor;
+import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.node.camel.predicate.IsReactionAllowedPredicate;
 import won.node.camel.predicate.ShouldCallSocketImplForMessagePredicate;
 import won.protocol.message.WonMessage;
@@ -28,11 +13,85 @@ import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static org.apache.camel.builder.PredicateBuilder.*;
+import static won.node.camel.WonNodeConstants.*;
+import static won.node.camel.service.WonCamelHelper.*;
+
 /**
  * User: syim Date: 02.03.2015
  */
 public class WonMessageRoutes extends RouteBuilder {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    /**
+     * Matches if a message is found in the <code>MESSAGE_HEADER</code> or in the
+     * <code>ORIGINAL_MESSAGE_HEADER</code> whose
+     * <code>WonMessageType.causesOutgoingMessage()</code> method returns
+     * <code>true</code>.
+     *
+     * @author fkleedorfer
+     */
+    private Predicate causesOutgoingMessage = new CausesOutgoingMessage();
+    private Predicate isAllowedToReact = new IsReactionAllowedPredicate();
+    private Predicate shouldCallSocketImplForMessage = new ShouldCallSocketImplForMessagePredicate();
+    private Predicate shouldRespond = new Predicate() {
+        public boolean matches(Exchange exchange) {
+            WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
+            WonMessageType messageType = wonMessage.getMessageType();
+            return !messageType.isResponseMessage();
+        }
+    };
+    private Predicate shouldSendToOwner = new Predicate() {
+        public boolean matches(Exchange exchange) {
+            Boolean suppress = (Boolean) exchange.getIn().getHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER_HEADER);
+            if (suppress != null && suppress == true) {
+                return false;
+            }
+            return true;
+        }
+    };
+    private Predicate shouldSendToExternal = new Predicate() {
+        public boolean matches(Exchange exchange) {
+            Boolean suppress = (Boolean) exchange.getIn().getHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_NODE_HEADER);
+            if (suppress != null && suppress == true) {
+                return false;
+            }
+            return true;
+        }
+    };
+    private Predicate responseIsPresent = new Predicate() {
+        public boolean matches(Exchange exchange) {
+            WonMessage response = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.RESPONSE_HEADER);
+            return response != null && response.getMessageTypeRequired().isResponseMessage();
+        }
+    };
+    private Processor responseIntoMessageToSendHeader = new Processor() {
+        public void process(Exchange exchange) throws Exception {
+            putMessageToSend(exchange, getResponseRequired(exchange));
+        }
+    };
+    private Processor messageIntoMessageToSendHeader = new Processor() {
+        public void process(Exchange exchange) throws Exception {
+            putMessageToSend(exchange, getMessageRequired(exchange));
+        }
+    };
+    private Processor messageAndResponseIntoToSendHeader = new Processor() {
+        public void process(Exchange exchange) throws Exception {
+            WonMessage msg = getMessageRequired(exchange);
+            Optional<WonMessage> resp = getResponse(exchange);
+            if (resp.isPresent()) {
+                Dataset ds = msg.getCompleteDataset();
+                RdfUtils.addDatasetToDataset(ds, resp.get().getCompleteDataset());
+                msg = WonMessage.of(ds);
+            }
+            putMessageToSend(exchange, msg);
+        }
+    };
 
     @Override
     public void configure() throws Exception {
@@ -169,15 +228,8 @@ public class WonMessageRoutes extends RouteBuilder {
         from("activemq:queue:" + FROM_NODE_QUEUENAME
                         + "?concurrentConsumers=5&transacted=false&usePooledConnection=true")
                                         .routeId("activemq:queue:" + FROM_NODE_QUEUENAME)
-                                        .choice() // (won nodes register the same way as owner applications do)
-                                        /**/.when(header("methodName").isEqualTo("register"))
-                                        /**//**/.to("bean:ownerManagementService?method=registerOwnerApplication")
-                                        /**/.when(header("methodName").isEqualTo("getEndpoints"))
-                                        /**//**/.to("bean:queueManagementService?method=getEndpointsForOwnerApplication")
-                                        /**/.otherwise()
-                                        /**//**/.to("bean:wonMessageIntoCamelProcessor")
-                                        /**//**/.to("seda:msgFromExternal")
-                                        /**/.endChoice()
+                                        .to("bean:wonMessageIntoCamelProcessor")
+                                        .to("seda:msgFromExternal")
                                         .end();
         /**
          * Main 'fromExternal' route
@@ -325,29 +377,6 @@ public class WonMessageRoutes extends RouteBuilder {
                         .to("activemq:topic:" + TO_MATCHER_TOPIC + "?transacted=false&usePooledConnection=true");
     }
 
-    private class URIConstant implements Expression {
-        private URI uri;
-
-        public URIConstant(final URI uri) {
-            this.uri = uri;
-        }
-
-        @Override
-        public <T> T evaluate(final Exchange exchange, final Class<T> type) {
-            return type.cast(uri);
-        }
-    }
-
-    /**
-     * Matches if a message is found in the <code>MESSAGE_HEADER</code> or in the
-     * <code>ORIGINAL_MESSAGE_HEADER</code> whose
-     * <code>WonMessageType.causesOutgoingMessage()</code> method returns
-     * <code>true</code>.
-     * 
-     * @author fkleedorfer
-     */
-    private Predicate causesOutgoingMessage = new CausesOutgoingMessage();
-
     public static class CausesOutgoingMessage implements Predicate {
         @Override
         public boolean matches(Exchange exchange) {
@@ -361,59 +390,16 @@ public class WonMessageRoutes extends RouteBuilder {
         }
     }
 
-    private Predicate isAllowedToReact = new IsReactionAllowedPredicate();
-    private Predicate shouldCallSocketImplForMessage = new ShouldCallSocketImplForMessagePredicate();
-    private Predicate shouldRespond = new Predicate() {
-        public boolean matches(Exchange exchange) {
-            WonMessage wonMessage = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_HEADER);
-            WonMessageType messageType = wonMessage.getMessageType();
-            return !messageType.isResponseMessage();
+    private class URIConstant implements Expression {
+        private URI uri;
+
+        public URIConstant(final URI uri) {
+            this.uri = uri;
         }
-    };
-    private Predicate shouldSendToOwner = new Predicate() {
-        public boolean matches(Exchange exchange) {
-            Boolean suppress = (Boolean) exchange.getIn().getHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_OWNER_HEADER);
-            if (suppress != null && suppress == true) {
-                return false;
-            }
-            return true;
+
+        @Override
+        public <T> T evaluate(final Exchange exchange, final Class<T> type) {
+            return type.cast(uri);
         }
-    };
-    private Predicate shouldSendToExternal = new Predicate() {
-        public boolean matches(Exchange exchange) {
-            Boolean suppress = (Boolean) exchange.getIn().getHeader(WonCamelConstants.SUPPRESS_MESSAGE_TO_NODE_HEADER);
-            if (suppress != null && suppress == true) {
-                return false;
-            }
-            return true;
-        }
-    };
-    private Predicate responseIsPresent = new Predicate() {
-        public boolean matches(Exchange exchange) {
-            WonMessage response = (WonMessage) exchange.getIn().getHeader(WonCamelConstants.RESPONSE_HEADER);
-            return response != null && response.getMessageTypeRequired().isResponseMessage();
-        }
-    };
-    private Processor responseIntoMessageToSendHeader = new Processor() {
-        public void process(Exchange exchange) throws Exception {
-            putMessageToSend(exchange, getResponseRequired(exchange));
-        }
-    };
-    private Processor messageIntoMessageToSendHeader = new Processor() {
-        public void process(Exchange exchange) throws Exception {
-            putMessageToSend(exchange, getMessageRequired(exchange));
-        }
-    };
-    private Processor messageAndResponseIntoToSendHeader = new Processor() {
-        public void process(Exchange exchange) throws Exception {
-            WonMessage msg = getMessageRequired(exchange);
-            Optional<WonMessage> resp = getResponse(exchange);
-            if (resp.isPresent()) {
-                Dataset ds = msg.getCompleteDataset();
-                RdfUtils.addDatasetToDataset(ds, resp.get().getCompleteDataset());
-                msg = WonMessage.of(ds);
-            }
-            putMessageToSend(exchange, msg);
-        }
-    };
+    }
 }

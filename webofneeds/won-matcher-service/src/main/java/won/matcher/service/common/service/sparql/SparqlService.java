@@ -1,31 +1,6 @@
 package won.matcher.service.common.service.sparql;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.lang.invoke.MethodHandles;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -41,10 +16,18 @@ import org.apache.jena.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import won.protocol.util.RdfUtils;
+
+import java.io.*;
+import java.lang.invoke.MethodHandles;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Service to access of Sparql enpoint database to save or query linked data.
@@ -66,17 +49,16 @@ public class SparqlService {
     private ExecutorService executorService = Executors.newFixedThreadPool(5);
     // protected DatasetAccessor accessor;
 
+    public SparqlService(@Autowired String sparqlEndpoint) {
+        this.sparqlEndpoint = sparqlEndpoint;
+        // accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
+    }
+
     public static Dataset deserializeDataset(String serializedResource, Lang format) throws IOException {
         InputStream is = new ByteArrayInputStream(serializedResource.getBytes(StandardCharsets.UTF_8));
         Dataset ds = RdfUtils.toDataset(is, new RDFFormat(format));
         is.close();
         return ds;
-    }
-
-    @Autowired
-    public SparqlService(@Value("${uri.sparql.endpoint}") String sparqlEndpoint) {
-        this.sparqlEndpoint = sparqlEndpoint;
-        // accessor = DatasetAccessorFactory.createHTTP(sparqlEndpoint);
     }
 
     public String getSparqlEndpoint() {
@@ -115,8 +97,9 @@ public class SparqlService {
         } catch (IOException e) {
             logger.warn("Error making chunks of ntriples", e);
         }
-        if (chunks == null)
+        if (chunks == null) {
             return Optional.empty();
+        }
         for (String chunk : chunks) {
             query
                             .append("\nINSERT DATA { GRAPH ?g { ")

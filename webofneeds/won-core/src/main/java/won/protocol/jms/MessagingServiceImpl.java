@@ -1,17 +1,10 @@
 package won.protocol.jms;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.apache.camel.CamelContext;
-import org.apache.camel.CamelContextAware;
-import org.apache.camel.Endpoint;
-import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
-import org.apache.camel.ProducerTemplate;
-import org.apache.camel.impl.DefaultExchange;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.SettableFuture;
+import org.apache.camel.*;
 import org.apache.camel.spi.Synchronization;
+import org.apache.camel.support.DefaultExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -19,8 +12,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.SettableFuture;
+import java.lang.invoke.MethodHandles;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * User: LEIH-NB Date: 04.11.13
@@ -28,9 +22,9 @@ import com.google.common.util.concurrent.SettableFuture;
 @Component
 public class MessagingServiceImpl<T> implements ApplicationContextAware, MessagingService, CamelContextAware {
     private static final long DEFAULT_JMS_EXPIRATION_TIME = 0;
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private CamelContext camelContext;
     private ProducerTemplate producerTemplate;
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private ApplicationContext applicationContext;
 
     /**
@@ -48,11 +42,13 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
         // TODO: the method name shall be set in the header of the message.
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
         if (properties != null) {
-            if (properties.containsKey("methodName"))
+            if (properties.containsKey("methodName")) {
                 exchange.setProperty("methodName", properties.get("methodName"));
+            }
         }
-        if (headers != null)
+        if (headers != null) {
             exchange.getIn().setHeaders(headers);
+        }
         // exchange.getIn().getHeaders().put("CamelJmsRequestTimeout",DEFAULT_JMS_EXPIRATION_TIME);
         // exchange.setProperty("JMSExpiration",DEFAULT_JMS_EXPIRATION_TIME);
         exchange.getIn().setBody(body);
@@ -113,8 +109,9 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
             logger.debug("WIRETAP: headers size: " + headers.size());
             while (iter.hasNext()) {
                 Map.Entry pairs = (Map.Entry) iter.next();
-                if (pairs.getValue() != null)
+                if (pairs.getValue() != null) {
                     logger.debug("key: " + pairs.getKey() + " value: " + pairs.getValue());
+                }
             }
         }
     }
@@ -124,13 +121,16 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
         exchange.setPattern(ExchangePattern.InOnly);
         Endpoint ep = getCamelContext().getEndpoint(endpoint);
         if (properties != null) {
-            if (properties.containsKey("methodName"))
+            if (properties.containsKey("methodName")) {
                 exchange.setProperty("methodName", properties.get("methodName"));
-            if (properties.containsKey("protocol"))
+            }
+            if (properties.containsKey("protocol")) {
                 exchange.setProperty("protocol", properties.get("protocol"));
+            }
         }
-        if (headers != null)
+        if (headers != null) {
             exchange.getIn().setHeaders(headers);
+        }
         exchange.getIn().setBody(body);
         producerTemplate.send(ep, exchange);
         if (exchange.getException() != null) {
@@ -146,13 +146,13 @@ public class MessagingServiceImpl<T> implements ApplicationContextAware, Messagi
     }
 
     @Override
-    public void setCamelContext(CamelContext camelContext) {
-        this.camelContext = camelContext;
+    public CamelContext getCamelContext() {
+        return this.camelContext;
     }
 
     @Override
-    public CamelContext getCamelContext() {
-        return this.camelContext;
+    public void setCamelContext(CamelContext camelContext) {
+        this.camelContext = camelContext;
     }
 
     public void setProducerTemplate(ProducerTemplate producerTemplate) {

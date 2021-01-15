@@ -10,23 +10,14 @@
  */
 package won.owner.messaging;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.activemq.camel.component.ActiveMQComponent;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
+import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 import won.cryptography.ssl.MessagingContext;
 import won.owner.camel.routes.OwnerApplicationListenerRouteBuilder;
 import won.owner.camel.routes.OwnerProtocolDynamicRoutes;
@@ -37,10 +28,18 @@ import won.protocol.model.MessagingType;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * User: LEIH-NB Date: 28.01.14
  */
 public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelConfigurator {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private CamelContext camelContext;
     private MessagingContext messagingContext;
     @Autowired
@@ -49,7 +48,6 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     private ConnectionRepository connectionRepository;
     @Autowired
     private BrokerComponentFactory brokerComponentFactory;
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private BiMap<URI, String> endpointMap = HashBiMap.create();
     private Map<URI, String> startingComponentMap = new HashMap<>();
     private BiMap<URI, String> brokerComponentMap = HashBiMap.create();
@@ -135,8 +133,9 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
             activeMQComponent.setUsePooledConnection(true);
             camelContext.addComponent(brokerComponentName, activeMQComponent);
             logger.info("adding component with component name {}", brokerComponentName);
-            if (!brokerComponentMap.containsKey(brokerURI))
+            if (!brokerComponentMap.containsKey(brokerURI)) {
                 brokerComponentMap.put(brokerURI, brokerComponentName);
+            }
         }
     }
 
@@ -182,13 +181,13 @@ public class OwnerProtocolCamelConfiguratorImpl implements OwnerProtocolCamelCon
     }
 
     @Override
-    public void setCamelContext(CamelContext camelContext) {
-        this.camelContext = camelContext;
+    public CamelContext getCamelContext() {
+        return camelContext;
     }
 
     @Override
-    public CamelContext getCamelContext() {
-        return camelContext;
+    public void setCamelContext(CamelContext camelContext) {
+        this.camelContext = camelContext;
     }
 
     @Override

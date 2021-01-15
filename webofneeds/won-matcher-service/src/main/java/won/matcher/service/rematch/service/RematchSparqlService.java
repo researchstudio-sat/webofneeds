@@ -1,31 +1,14 @@
 package won.matcher.service.rematch.service;
 
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ParameterizedSparqlString;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.AtomEvent.TYPE;
 import won.matcher.service.common.event.BulkAtomEvent;
@@ -36,6 +19,16 @@ import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
 /**
  * Sparql service extended with methods for rematching
  * <p>
@@ -43,19 +36,18 @@ import won.protocol.util.linkeddata.LinkedDataSource;
  */
 @Component
 public class RematchSparqlService extends SparqlService {
-    int MAX_ATOMS_PER_REMATCH_BULK = 10;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String HTTP_HEADER_SEPARATOR = ", ";
+    int MAX_ATOMS_PER_REMATCH_BULK = 10;
     @Autowired
     LinkedDataSource linkedDataSource;
-
-    @Autowired
-    public RematchSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
-        super(sparqlEndpoint);
-    }
-
     @Autowired
     private CrawlConfig config;
+
+    @Autowired
+    public RematchSparqlService(@Autowired String sparqlEndpoint) {
+        super(sparqlEndpoint);
+    }
 
     /**
      * Update the message meta data about the crawling process using a separate

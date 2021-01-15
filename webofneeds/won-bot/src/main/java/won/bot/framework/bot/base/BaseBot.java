@@ -201,7 +201,7 @@ public abstract class BaseBot implements Bot {
     }
 
     @Qualifier("default")
-    @Autowired()
+    @Autowired(required = false)
     public void setAtomProducer(final AtomProducer atomProducer) {
         this.atomProducer = atomProducer;
     }

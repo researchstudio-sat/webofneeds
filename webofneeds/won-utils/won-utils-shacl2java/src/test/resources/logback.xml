@@ -24,7 +24,7 @@
         </encoder>
     </appender>
 
-    <logger name="won.shacl2java" level="DEBUG" />
+    <logger name="won.shacl2java" level="INFO" />
 
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="ERROR">

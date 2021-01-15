@@ -1,20 +1,19 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-<artifactId>won-parent-pom</artifactId>
-<relativePath>../won-parent-pom</relativePath>
-<groupId>at.researchstudio.sat</groupId>
-<version>0.10-SNAPSHOT</version>
-</parent>
-
-    <groupId>at.researchstudio.sat</groupId>
+        <artifactId>won-parent-pom</artifactId>
+        <relativePath>../won-parent-pom</relativePath>
+        <groupId>at.researchstudio.sat</groupId>
+        <version>0.10-SNAPSHOT</version>
+    </parent>
     <artifactId>won-node</artifactId>
     <version>0.10-SNAPSHOT</version>
     <name>Node</name>
+    <packaging>jar</packaging>
     <url>http://maven.apache.org</url>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -103,8 +102,8 @@
             <artifactId>camel-spring</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-camel</artifactId>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-activemq</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -136,13 +135,6 @@
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-
         <!-- TESTING -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -153,25 +145,25 @@
             <artifactId>junit</artifactId>
         </dependency>
         <dependency>
-        	<groupId>at.researchstudio.sat</groupId>
-        	<artifactId>won-utils-conversation</artifactId>
-        	<version>${project.version}</version>
-        	<scope>test</scope>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-utils-conversation</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
-       <dependency>
-       		<!--  introduced so we can use @MockBean -->
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-test</artifactId>
-		    <version>${org.springframework.boot.version}</version>
-		    <scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.camel</groupId>
-			<artifactId>camel-test</artifactId>
-			<version>${camel.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
+        <dependency>
+            <!--  introduced so we can use @MockBean -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${org.springframework.boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-test</artifactId>
+            <version>${org.apache.camel.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- HSQL STUFF -->
         <dependency>
@@ -196,16 +188,6 @@
         </dependency>
     </dependencies>
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
         <plugins>
             <plugin>
                 <groupId>net.revelc.code.formatter</groupId>
@@ -232,18 +214,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-surefire-plugin</artifactId>
-		        <configuration>
-		          <forkCount>1</forkCount>
-		          <threadCount>1</threadCount>
-		          <additionalClasspathElements>
-		            <additionalClasspathElement>${project.parent.parent.basedir}/target/required-libs/bcprov-jdk15on-1.64.jar</additionalClasspathElement>
-		            <additionalClasspathElement>${project.parent.parent.basedir}/target/required-libs/bcpkix-jdk15on-1.64.jar</additionalClasspathElement>
-		          </additionalClasspathElements>
-		        </configuration>
-	        </plugin>
 	   </plugins>
     </build>
 </project>

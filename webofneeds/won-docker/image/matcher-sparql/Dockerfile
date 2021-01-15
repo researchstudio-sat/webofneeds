@@ -3,7 +3,7 @@
 
 # use java as a base image
 # fix java version here until the following issue is resolved: https://github.com/researchstudio-sat/webofneeds/issues/1229
-FROM openjdk:8u121-jdk
+FROM openjdk:11-jdk-slim
 
 # add webofneeds default config env variables
 ENV WON_CONFIG_DIR=/usr/src/matcher-sparql/conf

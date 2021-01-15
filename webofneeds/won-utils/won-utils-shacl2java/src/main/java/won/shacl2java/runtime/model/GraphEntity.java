@@ -28,9 +28,27 @@ public class GraphEntity {
     }
 
     /**
+     * Create entity identified by the specified URI.
+     *
+     * @param uri
+     */
+    public GraphEntity(URI uri) {
+        this(uri.toString(), null);
+    }
+
+    /**
+     * Create entity identified by the specified node.
+     *
+     * @param node
+     */
+    public GraphEntity(Node node) {
+        this(node, null);
+    }
+
+    /**
      * Create entity identified by the specified URI attached to the specified
      * graph.
-     * 
+     *
      * @param uri
      */
     public GraphEntity(String uri, Graph graph) {
@@ -38,12 +56,12 @@ public class GraphEntity {
     }
 
     /**
-     * Create entity identified by the specified node.
-     * 
-     * @param node
+     * Create entity identified by the specified URI.
+     *
+     * @param uri
      */
-    public GraphEntity(Node node) {
-        this(node, null);
+    public GraphEntity(URI uri, Graph graph) {
+        this(uri.toString(), graph);
     }
 
     /**
@@ -91,6 +109,14 @@ public class GraphEntity {
     public void setNode(Node node) {
         requireEntityNodeKind(node);
         this.node = node;
+    }
+
+    public void setNode(String nodeUri) {
+        setNode(NodeFactory.createURI(nodeUri));
+    }
+
+    public void setNode(URI nodeUri) {
+        setNode(NodeFactory.createURI(nodeUri.toString()));
     }
 
     public Graph getGraph() {

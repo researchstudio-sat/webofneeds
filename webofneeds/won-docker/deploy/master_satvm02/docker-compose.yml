@@ -55,7 +55,7 @@ services:
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "activemq.broker.port=61612"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62916,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62916,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9016 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9016
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
@@ -95,7 +95,7 @@ services:
       - "email.from.won.password=$MAIL_PASS"
       - "email.from.won.smtp.host=$MAIL_HOST"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62917,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62917,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9017 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9017
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
@@ -143,7 +143,7 @@ services:
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "activemq.broker.port=61611"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62918,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62918,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9018 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9018
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
@@ -183,7 +183,7 @@ services:
       - "email.from.won.password=$MAIL_PASS"
       - "email.from.won.smtp.host=$MAIL_HOST"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62919,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62919,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9019 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9019
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
@@ -346,7 +346,7 @@ services:
       - "wonNodeController.wonNode.crawl=https://nodeblue.master.matchat.org/won/resource,https://nodegreen.master.matchat.org/won/resource"
       - "cluster.local.port=2551"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62920,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62920,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9020 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9020
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
@@ -384,7 +384,7 @@ services:
       - "matcher.solr.uri.solr.server=http://satvm02.researchstudio.at:8983/solr/"
       - "matcher.solr.uri.solr.server.public=http://satvm02.researchstudio.at:8983/solr/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62921,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62921,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9021 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9021
         -Djava.rmi.server.hostname=satvm02.researchstudio.at"
@@ -411,7 +411,7 @@ services:
 #      - "matcher.rescal.threshold=0.15"
 #      - "matcher.rescal.rank=10"
 #      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-#      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62922,server=y,suspend=n
+#      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62922,server=y,suspend=n
 #        -Dcom.sun.management.jmxremote.port=9022 -Dcom.sun.management.jmxremote.authenticate=false
 #        -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9022
 #        -Djava.rmi.server.hostname=satvm02.researchstudio.at"
@@ -435,7 +435,7 @@ services:
       - "matcher.sparql.uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
       - "matcher.sparql.uri.public=http://satvm02.researchstudio.at/sparql/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=62923,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62923,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9023 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9023
         -Djava.rmi.server.hostname=satvm05.researchstudio.at"

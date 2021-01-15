@@ -109,4 +109,11 @@ public class CollectionUtils {
         existing.addAll(values);
         map.put(key, existing);
     }
+
+    public static <T, A extends T, B extends T> Set<T> union(Set<A> left, Set<B> right) {
+        HashSet<T> union = new HashSet<>();
+        union.addAll(left);
+        union.addAll(right);
+        return union;
+    }
 }

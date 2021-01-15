@@ -35,10 +35,12 @@ import java.util.Map;
  */
 public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static String[] header = new String[] { "Name", "Type", "Counter", "Total", "Min", "Max", "Mean", "StdDev",
+                    "FirstUsage", "LastUsage", "Note" };
 
     /**
      * Sets up the processors used.
-     * 
+     *
      * @return the cell processors
      */
     private static CellProcessor[] getProcessors() {
@@ -52,13 +54,9 @@ public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
                         new Optional(), // std dev
                         new NotNull(), // first usage
                         new NotNull(), // last usage
-                        new NotNull(), // last reset
                         new Optional() // note
         };
     }
-
-    private static String[] header = new String[] { "Name", "Type", "Counter", "Total", "Min", "Max", "Mean", "StdDev",
-                    "FirstUsage", "LastUsage", "LastReset", "Note" };
 
     @Override
     public void recordMonitoringStatistics() {
@@ -109,8 +107,7 @@ public class SimonCsvStatisticsRecorder extends AbstractFileOutputRecorder {
             }
             values.put(header[8], simon.getFirstUsage());
             values.put(header[9], simon.getLastUsage());
-            values.put(header[10], simon.getLastReset());
-            values.put(header[11], simon.getNote());
+            values.put(header[10], simon.getNote());
             this.mapWriter.write(values, header, getProcessors());
         }
     }

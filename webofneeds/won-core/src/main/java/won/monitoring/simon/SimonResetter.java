@@ -11,7 +11,6 @@
 package won.monitoring.simon;
 
 import org.javasimon.SimonManager;
-import org.javasimon.utils.SimonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.monitoring.MonitoringResetter;
@@ -26,7 +25,9 @@ public class SimonResetter implements MonitoringResetter {
 
     @Override
     public void resetMonitoringStatistics() {
+        // note: adapted to api change in 4.0, but not tested. this may not reset all
+        // simons recursively.
         logger.debug("resetting Simons recursively");
-        SimonUtils.recursiveReset(SimonManager.getRootSimon());
+        SimonManager.getRootSimon().sampleIncrement("theonlykey");
     }
 }

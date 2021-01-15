@@ -16,33 +16,34 @@
 
 <configuration>
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- encoders are assigned the type
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-        <encoder>
-            <pattern>%d{d.M.yy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+		<encoder>
+			<pattern>%d{d.M.yy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+
+	</appender>
 
 	<!-- when debugging tests, start by setting this one to debug -->
-	<logger name="won.node.camel.processor.general.FailResponder" level="ERROR" />
+	<logger name="won.node.camel.processor.general.FailResponder" level="ERROR"/>
 
-	<logger name="org.springframework" level="ERROR" />
-	<logger name="won.node.WonMessageRoutesExternalInterceptedTest" level="ERROR" />
-	<logger name="won.node.WonMessageRoutesExternalRoutedTest" level="ERROR" />
-	<logger name="won.node.WonMessageRoutesTest" level="ERROR" />
-	<logger name="won" level="ERROR" />
+	<logger name="org.springframework" level="ERROR"/>
+	<logger name="won.node.WonMessageRoutesExternalInterceptedTest" level="ERROR"/>
+	<logger name="won.node.WonMessageRoutesExternalRoutedTest" level="ERROR"/>
+	<logger name="won.node.WonMessageRoutesTest" level="ERROR"/>
+	<logger name="won" level="ERROR"/>
 	<!-- if the CamelContext's 'trace' feature is enabled  (changes with camel version) -->
 	<logger name="org.apache.camel.processor.interceptor.Tracer" level="ERROR"/>
-	<logger name="won.node.camel.processor" level="ERROR" />
-	<logger name="won.node.service" level="ERROR" />
-	
-	<logger name="org.springframework.orm.jpa" level="WARN" />
-	<logger name="org.springframework.transaction" level="WARN" />
-	<logger name="org.hibernate.engine.transaction" level="WARN"/>	
-    
-    <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
-    <root level="ERROR">
-        <appender-ref ref="STDOUT"/>
-    </root>
+	<logger name="won.node.camel.processor" level="ERROR"/>
+	<logger name="won.node.service" level="ERROR"/>
+
+	<logger name="org.springframework.orm.jpa" level="WARN"/>
+	<logger name="org.springframework.transaction" level="WARN"/>
+	<logger name="org.hibernate.engine.transaction" level="WARN"/>
+
+	<!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
+	<root level="ERROR">
+		<appender-ref ref="STDOUT"/>
+	</root>
 </configuration>

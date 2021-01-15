@@ -29,6 +29,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.impl.LiteralImpl;
 import org.apache.jena.riot.other.G;
 import org.apache.jena.shacl.Shapes;
+import org.apache.jena.shacl.engine.constraint.*;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.vocabulary.RDF;
@@ -80,11 +81,9 @@ public class MainTypesGenerator implements TypesGenerator {
 
     @Override
     public Set<TypeSpec> generate() {
-        return StreamSupport
-                        .stream(Spliterators.spliteratorUnknownSize(shapes.iteratorAll(), Spliterator.ORDERED),
-                                        false)
+        return shapes.getShapeMap().values().stream()
+                        .filter(s -> s.isNodeShape() || looksLikeANodeShape(s))
                         .distinct()
-                        .filter(s -> s.isNodeShape())
                         .map(shape -> {
                             if (isAnonymousShape(shape)) {
                                 return null;
@@ -103,6 +102,18 @@ public class MainTypesGenerator implements TypesGenerator {
                         })
                         .filter(Objects::nonNull)
                         .collect(Collectors.toSet());
+    }
+
+    private boolean looksLikeANodeShape(Shape s) {
+        if (s.getConstraints().isEmpty()) {
+            return false;
+        }
+        return s.getConstraints().stream().anyMatch(
+                        c -> c instanceof ShXone
+                                        || c instanceof ShOr
+                                        || c instanceof ShAnd
+                                        || c instanceof ShNot
+                                        || c instanceof ClosedConstraint);
     }
 
     private static boolean isAnonymousShape(Shape shape) {
@@ -138,6 +149,13 @@ public class MainTypesGenerator implements TypesGenerator {
                                                         .build())
                         .addMethod(
                                         MethodSpec.constructorBuilder()
+                                                        .addParameter(ClassName.get(URI.class), "uri")
+                                                        .addParameter(ClassName.get(Graph.class), "graph")
+                                                        .addModifiers(PUBLIC)
+                                                        .addStatement("super(uri,graph)")
+                                                        .build())
+                        .addMethod(
+                                        MethodSpec.constructorBuilder()
                                                         .addParameter(ClassName.get(Node.class), "node")
                                                         .addModifiers(PUBLIC)
                                                         .addStatement("super(node)")
@@ -145,6 +163,12 @@ public class MainTypesGenerator implements TypesGenerator {
                         .addMethod(
                                         MethodSpec.constructorBuilder()
                                                         .addParameter(ClassName.get(String.class), "uri")
+                                                        .addModifiers(PUBLIC)
+                                                        .addStatement("super(uri)")
+                                                        .build())
+                        .addMethod(
+                                        MethodSpec.constructorBuilder()
+                                                        .addParameter(ClassName.get(URI.class), "uri")
                                                         .addModifiers(PUBLIC)
                                                         .addStatement("super(uri)")
                                                         .build())

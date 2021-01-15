@@ -7,14 +7,15 @@
     under the License is distributed on an "AS IS" BASIS, ~ WITHOUT WARRANTIES 
     OR CONDITIONS OF ANY KIND, either express or implied. ~ See the License for 
     the specific language governing permissions and ~ limitations under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-<artifactId>won-parent-pom</artifactId>
-<relativePath>../won-parent-pom</relativePath>
-<groupId>at.researchstudio.sat</groupId>
-<version>0.10-SNAPSHOT</version>
-</parent>
+		<artifactId>won-parent-pom</artifactId>
+		<relativePath>../won-parent-pom</relativePath>
+		<groupId>at.researchstudio.sat</groupId>
+		<version>0.10-SNAPSHOT</version>
+	</parent>
 	<artifactId>won-core</artifactId>
 	<version>0.10-SNAPSHOT</version>
 	<name>Core</name>
@@ -40,36 +41,27 @@
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
 				<artifactId>jaxb-api</artifactId>
-				<!-- <version>2.2.11</version> -->
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-core</artifactId>
-				<!-- <version>2.2.11</version> -->
 			</dependency>
 			<dependency>
 				<groupId>com.sun.xml.bind</groupId>
 				<artifactId>jaxb-impl</artifactId>
-				<!-- <version>2.2.11</version> -->
 			</dependency>
 			<dependency>
 				<groupId>javax.activation</groupId>
 				<artifactId>activation</artifactId>
-				<!-- <version>1.1.1</version> -->
 			</dependency>
 			<dependency>
 				<groupId>javax.annotation</groupId>
 				<artifactId>javax.annotation-api</artifactId>
-				<!-- <version>1.3.2</version> -->
 			</dependency>
 
 		<!-- /TEST openjdk12  -->
 
 		<!-- Messaging stuff -->
-		<dependency>
-			<groupId>javax.jms</groupId>
-			<artifactId>jms</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>javax.interceptor</groupId>
 			<artifactId>javax.interceptor-api</artifactId>
@@ -83,12 +75,12 @@
 			<artifactId>camel-spring</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-amqp</artifactId>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-activemq</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-camel</artifactId>
+			<artifactId>activemq-amqp</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -186,17 +178,15 @@
 			<groupId>org.apache.jena</groupId>
 			<artifactId>jena-tdb</artifactId>
 		</dependency>
+		<!-- jsonld should be covered by jena - if app still works, remove!
 		<dependency>
 			<groupId>com.github.jsonld-java</groupId>
 			<artifactId>jsonld-java</artifactId>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>xml-apis</groupId>
 			<artifactId>xml-apis</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>xalan</groupId>
@@ -224,11 +214,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -272,13 +257,11 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
 			<version>${bouncycastle.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
 			<version>${bouncycastle.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<!-- DB Migration -->
 		<dependency>

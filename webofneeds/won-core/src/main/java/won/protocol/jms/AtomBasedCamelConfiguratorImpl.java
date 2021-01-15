@@ -10,22 +10,20 @@
  */
 package won.protocol.jms;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
-import org.apache.activemq.camel.component.ActiveMQComponent;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.apache.camel.CamelContext;
 import org.apache.camel.RoutesBuilder;
+import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-
 import won.cryptography.ssl.MessagingContext;
 import won.protocol.exception.CamelConfigurationFailedException;
 import won.protocol.model.MessagingType;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 // import won.node.camel.routes.AtomProtocolDynamicRoutes;
 /**
@@ -34,14 +32,14 @@ import won.protocol.model.MessagingType;
  * can in the future be used to direct messages to the WoN node.
  */
 public abstract class AtomBasedCamelConfiguratorImpl implements AtomProtocolCamelConfigurator {
-    private BiMap<URI, String> endpointMap = HashBiMap.create();
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected BiMap<URI, String> brokerComponentMap = HashBiMap.create();
+    @Autowired
+    protected BrokerComponentFactory brokerComponentFactory;
+    private BiMap<URI, String> endpointMap = HashBiMap.create();
     private String componentName;
     private CamelContext camelContext;
     private MessagingContext messagingContext;
-    @Autowired
-    protected BrokerComponentFactory brokerComponentFactory;
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public synchronized String configureCamelEndpointForAtomUri(URI wonNodeURI, URI brokerUri,
@@ -97,18 +95,13 @@ public abstract class AtomBasedCamelConfiguratorImpl implements AtomProtocolCame
 
     protected abstract RoutesBuilder createRoutesBuilder(final String startingComponent, final URI brokerUri);
 
-    @Override
-    public void setCamelContext(CamelContext camelContext) {
-        this.camelContext = camelContext;
+    public MessagingContext getMessagingContext() {
+        return messagingContext;
     }
 
     @Override
     public void setMessagingContext(MessagingContext messagingContext) {
         this.messagingContext = messagingContext;
-    }
-
-    public MessagingContext getMessagingContext() {
-        return messagingContext;
     }
 
     @Override
@@ -117,16 +110,21 @@ public abstract class AtomBasedCamelConfiguratorImpl implements AtomProtocolCame
     }
 
     @Override
+    public void setCamelContext(CamelContext camelContext) {
+        this.camelContext = camelContext;
+    }
+
+    @Override
     public String getEndpoint(URI nodeUri) {
         return endpointMap.get(nodeUri);
     }
 
-    public void setComponentName(String componentName) {
-        this.componentName = componentName;
-    }
-
     public String getComponentName() {
         return componentName;
+    }
+
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
     }
 
     @Override

@@ -44,8 +44,8 @@ public class NameUtils {
     }
 
     public static String adderNameForFieldNameInPlural(String fieldNameInPlural) {
-        fieldNameInPlural = fieldNameInPlural.replaceAll("e?s$", "");
-        return "add" + fieldNameInPlural.substring(0, 1).toUpperCase() + fieldNameInPlural.substring(1);
+        String nameForm = singular(fieldNameInPlural);
+        return "add" + nameForm.substring(0, 1).toUpperCase() + nameForm.substring(1);
     }
 
     public static String nameForShape(Shape shape) {
@@ -117,6 +117,15 @@ public class NameUtils {
         } else {
             return name + "s";
         }
+    }
+
+    public static String singular(String plural) {
+        if (plural.endsWith("ses")) {
+            return plural.substring(0, plural.length() - 2);
+        } else if (plural.endsWith("s")) {
+            return plural.substring(0, plural.length() - 1);
+        }
+        return plural;
     }
 
     /**

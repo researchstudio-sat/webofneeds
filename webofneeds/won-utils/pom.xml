@@ -19,6 +19,7 @@
         <module>won-utils-tls</module>
         <module>won-utils-batch</module>
         <module>won-utils-shacl2java</module>
+        <module>won-utils-content</module>
     </modules>
     <packaging>pom</packaging>
 </project>

@@ -24,7 +24,7 @@
         </encoder>
     </appender>
 
-    <logger name="won.auth.WonAclEvaluatorTest" level="debug" />
+    <logger name="won.auth.WonAclEvaluatorTest" level="info" />
     <logger name="won.auth" level="warn" />
     <logger name="won.shacl2java" level="warn" />
 

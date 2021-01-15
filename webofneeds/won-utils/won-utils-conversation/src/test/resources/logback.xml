@@ -24,7 +24,7 @@
         </encoder>
     </appender>
 
-	<logger name="won" level="DEBUG" />
+	<logger name="won" level="INFO" />
 	
     
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->

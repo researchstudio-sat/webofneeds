@@ -13,7 +13,6 @@ package won.node.activemq;
 import org.apache.activemq.broker.Broker;
 import org.apache.activemq.broker.BrokerPlugin;
 import won.node.service.persistence.ActiveMQOwnerManagementService;
-import won.node.service.persistence.OwnerManagementService;
 
 /**
  * Broker plugin for checking consumer's certificates against queue names.

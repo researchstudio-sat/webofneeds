@@ -6,7 +6,6 @@ import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import won.matcher.service.common.event.AtomEvent;
@@ -30,19 +29,17 @@ import java.util.*;
 public class CrawlSparqlService extends SparqlService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String HTTP_HEADER_SEPARATOR = ", ";
-
-    @Autowired
-    public CrawlSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
-        super(sparqlEndpoint);
-    }
-
     @Autowired
     private CrawlConfig config;
+
+    public CrawlSparqlService(@Autowired String sparqlEndpoint) {
+        super(sparqlEndpoint);
+    }
 
     /**
      * Update the message meta data about the crawling process using a separate
      * graph.
-     * 
+     *
      * @param msg message that describe crawling meta data to update
      */
     public void updateCrawlingMetadata(CrawlUriMessage msg) {

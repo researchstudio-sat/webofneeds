@@ -11,16 +11,24 @@
 package won.utils.crawl.app;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 
 /**
  * Crawler app intended for crawling WoN nodes and experimenting with the data
  * in a local RDF store.
  */
 public class CrawlApp {
+    @Configuration
+    @ImportResource("classpath:/spring/app/linkeddata-crawler.xml")
+    static class Config {
+    }
+
     public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/linkeddata-crawler.xml" });
-        app.setWebEnvironment(false);
+        SpringApplication app = new SpringApplication(Config.class);
+        app.setWebApplicationType(WebApplicationType.NONE);
         ConfigurableApplicationContext applicationContext = app.run(args);
         // Thread.sleep(5*60*1000);
         // app.exit(applicationContext);

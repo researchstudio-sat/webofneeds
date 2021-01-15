@@ -104,5 +104,10 @@ public interface EventBus {
      */
     void unsubscribe(EventListener listener);
 
+    /**
+     * Unsubscribes all listeners.
+     */
+    void clear();
+
     EventBusStatistics generateEventBusStatistics();
 }

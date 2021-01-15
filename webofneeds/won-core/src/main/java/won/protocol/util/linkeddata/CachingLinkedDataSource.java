@@ -10,7 +10,25 @@
  */
 package won.protocol.util.linkeddata;
 
-import static java.util.EnumSet.*;
+import ch.qos.logback.core.util.Duration;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.StopWatch;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import won.protocol.util.LogMarkers;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,26 +48,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.util.StopWatch;
-
-import ch.qos.logback.core.util.Duration;
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
-import won.protocol.util.LogMarkers;
+import static java.util.EnumSet.noneOf;
 
 /**
  * LinkedDataSource implementation that uses an ehcache for caching.
@@ -67,20 +66,25 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     // are we acting as a shared cache? if so, we MUST not cache
     // resources that have CacheControl: private, even if we've cached them.
     private boolean sharedCache = true;
-
     // In-memory dataset for caching linked data.
-    /**
-     * Set if this linkedDataSource is/uses a shared cache.
-     * 
-     * @param sharedCache
-     */
-    public void setSharedCache(boolean sharedCache) {
-        this.sharedCache = sharedCache;
+    // synchronziation for concurrent requests to the same resource
+    private ConcurrentMap<String, CountDownLatch> countDownLatchMap = new ConcurrentHashMap<>(10);
+
+    private static Dataset readDatasetFromByteArray(byte[] datasetbytes) {
+        Dataset dataset = DatasetFactory.create();
+        RDFDataMgr.read(dataset, new ByteArrayInputStream(datasetbytes), Lang.NQUADS);
+        return dataset;
+    }
+
+    private static byte[] writeDatasetToByteArray(Dataset dataset) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
+        RDFDataMgr.write(out, dataset, Lang.NQUADS);
+        return out.toByteArray();
     }
 
     /**
      * Is this linkedDataSource using a shared cache?
-     * 
+     *
      * @return
      */
     public boolean isSharedCache() {
@@ -88,8 +92,17 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     /**
+     * Set if this linkedDataSource is/uses a shared cache.
+     *
+     * @param sharedCache
+     */
+    public void setSharedCache(boolean sharedCache) {
+        this.sharedCache = sharedCache;
+    }
+
+    /**
      * Removes the element associated with the specified URI from the cache
-     * 
+     *
      * @param resource
      */
     public void invalidate(URI resource) {
@@ -119,7 +132,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     /**
      * Add the specified dataset under the specified resource URI to the cache,
      * using the specified requester webID.
-     * 
+     *
      * @param dataset
      * @param resource
      * @param requesterWebID (may be null, in which case the resource is added to
@@ -139,8 +152,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         StopWatch sw = new StopWatch();
         sw.start();
         try {
-            if (resource == null)
+            if (resource == null) {
                 throw new IllegalArgumentException("resource cannot be null");
+            }
             Element element;
             try {
                 element = cache.get(makeCacheKey(resource, requesterWebID));
@@ -245,13 +259,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         return responseData;
     }
 
-    // synchronziation for concurrent requests to the same resource
-    private ConcurrentMap<String, CountDownLatch> countDownLatchMap = new ConcurrentHashMap<>(10);
-
     /**
      * We may run into fetching the same URI multiple times at once. Make sure we
      * make only one http request and use the response for every client.
-     * 
+     *
      * @param resource
      * @param requesterWebID
      * @param linkedDataCacheEntry
@@ -372,18 +383,6 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                             cache.calculateInMemorySize());
         }
         return responseData;
-    }
-
-    private static Dataset readDatasetFromByteArray(byte[] datasetbytes) {
-        Dataset dataset = DatasetFactory.create();
-        RDFDataMgr.read(dataset, new ByteArrayInputStream(datasetbytes), Lang.NQUADS);
-        return dataset;
-    }
-
-    private static byte[] writeDatasetToByteArray(Dataset dataset) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream(DEFAULT_BYTE_ARRAY_SIZE);
-        RDFDataMgr.write(out, dataset, Lang.NQUADS);
-        return out.toByteArray();
     }
 
     /**
@@ -513,8 +512,9 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                     final DatasetResponseWithStatusCodeAndHeaders responseData) {
         String cacheControlHeaderValue = responseData.getResponseHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
         EnumSet<CacheControlFlag> cacheControlFlags = EnumSet.noneOf(CacheControlFlag.class);
-        if (cacheControlHeaderValue == null)
+        if (cacheControlHeaderValue == null) {
             return cacheControlFlags;
+        }
         String[] values = cacheControlHeaderValue.split(",");
         for (String value : values) {
             CacheControlFlag flag = CacheControlFlag.forName(value.trim());
@@ -528,12 +528,14 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     private Date parseCacheControlMaxAgeValue(final URI resource,
                     final DatasetResponseWithStatusCodeAndHeaders responseData) {
         String cacheControlHeaderValue = responseData.getResponseHeaders().getFirst(HttpHeaders.CACHE_CONTROL);
-        if (cacheControlHeaderValue == null)
+        if (cacheControlHeaderValue == null) {
             return null;
+        }
         Pattern maxagePattern = Pattern.compile("$max-age=(\\d+)$");
         Matcher m = maxagePattern.matcher(cacheControlHeaderValue);
-        if (!m.find())
+        if (!m.find()) {
             return null;
+        }
         String maxAgeValueString = m.group(1);
         int maxAgeInt = 3600;
         try {
@@ -572,6 +574,20 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     @Autowired(required = false)
     public void setCrawlerCallback(final CrawlerCallback crawlerCallback) {
         this.crawlerCallback = crawlerCallback;
+    }
+
+    private String makeCacheKey(URI resource, URI requesterWebID) {
+        URI resourceForCacheKey = resource;
+        try {
+            resourceForCacheKey = new URI(resource.getScheme(), resource.getUserInfo(), resource.getHost(),
+                            resource.getPort(), resource.getPath(), resource.getQuery(), null);
+        } catch (URISyntaxException e) {
+            logger.warn("could not remove fragment from uri {} when generating cache key, using it as-is", resource, e);
+        }
+        // using spaces in the null placeholder to make it impossible to inject a
+        // requesterWebID URI that is equal to the
+        // null place holder (because an URI can't have spaces).
+        return resourceForCacheKey.toString() + (requesterWebID == null ? " (no Web ID)" : requesterWebID.toString());
     }
 
     public enum CacheControlFlag {
@@ -614,7 +630,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 
         /**
          * Entry for the linked data cache
-         * 
+         *
          * @param etag etag that will be compared when trying to update this entry from
          * the server. If null, the resource will be fetched without prior etag based
          * modification check when expired.
@@ -640,7 +656,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 
         /**
          * Non-expiring cache entry for the specified dataset.
-         * 
+         *
          * @param dataset
          */
         public LinkedDataCacheEntry(byte[] dataset) {
@@ -678,28 +694,15 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         /**
          * Checks if the cache item is expired at the given date. If the cache item has
          * no expiry date set, the method returns false for any given date.
-         * 
+         *
          * @param when
          * @return
          */
         public boolean isExpiredAtDate(final Date when) {
-            if (expires == null)
+            if (expires == null) {
                 return false;
+            }
             return expires.before(when);
         }
-    }
-
-    private String makeCacheKey(URI resource, URI requesterWebID) {
-        URI resourceForCacheKey = resource;
-        try {
-            resourceForCacheKey = new URI(resource.getScheme(), resource.getUserInfo(), resource.getHost(),
-                            resource.getPort(), resource.getPath(), resource.getQuery(), null);
-        } catch (URISyntaxException e) {
-            logger.warn("could not remove fragment from uri {} when generating cache key, using it as-is", resource, e);
-        }
-        // using spaces in the null placeholder to make it impossible to inject a
-        // requesterWebID URI that is equal to the
-        // null place holder (because an URI can't have spaces).
-        return resourceForCacheKey.toString() + (requesterWebID == null ? " (no Web ID)" : requesterWebID.toString());
     }
 }

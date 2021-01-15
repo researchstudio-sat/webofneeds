@@ -10,11 +10,6 @@
  */
 package won.protocol.util;
 
-import java.net.URI;
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Optional;
-
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.exception.NoSuchOwnerApplicationException;
@@ -26,6 +21,11 @@ import won.protocol.repository.AtomRepository;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 import won.protocol.repository.WonNodeRepository;
+
+import java.net.URI;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * User: fkleedorfer Date: 05.11.12
@@ -41,11 +41,13 @@ public class DataAccessUtils {
      */
     public static Atom loadAtom(AtomRepository atomRepository, final URI atomURI) throws NoSuchAtomException {
         List<Atom> atoms = atomRepository.findByAtomURI(atomURI);
-        if (atoms.size() == 0)
+        if (atoms.size() == 0) {
             throw new NoSuchAtomException(atomURI);
-        if (atoms.size() > 1)
+        }
+        if (atoms.size() > 1) {
             throw new IllegalStateException(MessageFormat.format(
                             "Inconsistent database state detected: multiple atoms found with URI {0}", atomURI));
+        }
         return atoms.get(0);
     }
 
@@ -57,11 +59,13 @@ public class DataAccessUtils {
      */
     public static WonNode loadWonNode(WonNodeRepository repository, final URI wonNodeURI) {
         List<WonNode> nodes = repository.findByWonNodeURI(wonNodeURI);
-        if (nodes.size() == 0)
+        if (nodes.size() == 0) {
             return null;
-        if (nodes.size() > 1)
+        }
+        if (nodes.size() > 1) {
             throw new IllegalStateException(MessageFormat.format(
                             "Inconsistent database state detected: multiple atoms found with URI {0}", wonNodeURI));
+        }
         return nodes.get(0);
     }
 
@@ -69,20 +73,19 @@ public class DataAccessUtils {
                     final String ownerApplicationId) throws NoSuchOwnerApplicationException {
         Optional<OwnerApplication> ownerApplications = ownerApplicationRepository
                         .findOneByOwnerApplicationId(ownerApplicationId);
-        if (!ownerApplications.isPresent())
+        if (!ownerApplications.isPresent()) {
             throw new NoSuchOwnerApplicationException();
+        }
         return ownerApplications.get().getOwnerApplicationId();
     }
 
     public static Connection loadConnection(ConnectionRepository connectionRepository, final Long id)
                     throws NoSuchConnectionException {
-        List<Connection> connections = connectionRepository.findById(id);
-        if (connections.size() == 0)
+        Optional<Connection> connection = connectionRepository.findById(id);
+        if (connection.isEmpty()) {
             throw new NoSuchConnectionException(id);
-        if (connections.size() > 1)
-            throw new IllegalStateException(MessageFormat.format(
-                            "Inconsistent database state detected: multiple connections found with URI {0}", id));
-        return connections.get(0);
+        }
+        return connection.get();
     }
 
     /**
@@ -97,12 +100,14 @@ public class DataAccessUtils {
     public static Connection loadConnection(ConnectionRepository connectionRepository, final URI connectionURI)
                     throws NoSuchConnectionException {
         List<Connection> connections = connectionRepository.findByConnectionURI(connectionURI);
-        if (connections.size() == 0)
+        if (connections.size() == 0) {
             throw new NoSuchConnectionException(connectionURI);
-        if (connections.size() > 1)
+        }
+        if (connections.size() > 1) {
             throw new IllegalStateException(MessageFormat.format(
                             "Inconsistent database state detected: multiple connections found with URI {0}",
                             connectionURI));
+        }
         return connections.get(0);
     }
 }

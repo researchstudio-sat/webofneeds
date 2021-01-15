@@ -1,14 +1,5 @@
 package won.node;
 
-import static org.mockito.Matchers.*;
-
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.Date;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.camel.Predicate;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -21,20 +12,22 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
-
 import won.node.springsecurity.acl.WonAclEvalContext;
 import won.node.test.WonMessageRoutesTestHelper;
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomMessageContainer;
-import won.protocol.model.AtomState;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionState;
+import won.protocol.model.*;
 import won.protocol.util.Prefixer;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.pretty.Lang_WON;
+
+import java.io.StringWriter;
+import java.net.URI;
+import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Tests that check the input/output behaviour of the WoN node.
@@ -46,7 +39,7 @@ import won.protocol.util.pretty.Lang_WON;
  * <p>
  * The outgoing messages are intercepted and checked.
  * </p>
- * 
+ *
  * @author fkleedorfer
  */
 public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
@@ -1591,7 +1584,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         URI groupAtomURI = newAtomURI();
         URI groupSocketURI = URI.create(groupAtomURI.toString() + "#groupSocket");
         prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
-        Mockito.when(linkedDataSource.getDataForResource(eq(groupAtomURI)))
+        Mockito.when(linkedDataSource.getDataForResource(groupAtomURI))
                         .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
@@ -1695,13 +1688,13 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         URI groupAtomURI = newAtomURI();
         URI groupSocketURI = URI.create(groupAtomURI.toString() + "#groupSocket");
         prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
-        Mockito.when(linkedDataSource.getDataForResource(eq(groupAtomURI)))
+        Mockito.when(linkedDataSource.getDataForResource(groupAtomURI))
                         .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null,
                                         WonAclEvalContext.allowAll()));
-        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI3)))
+        Mockito.when(linkedDataSource.getDataForResource(atomURI3))
                         .then(x -> linkedDataService.getAtomDataset(atomURI3, false, null,
                                         WonAclEvalContext.allowAll()));
-        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI4)))
+        Mockito.when(linkedDataSource.getDataForResource(atomURI4))
                         .then(x -> linkedDataService.getAtomDataset(atomURI4, false, null,
                                         WonAclEvalContext.allowAll()));
         WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,

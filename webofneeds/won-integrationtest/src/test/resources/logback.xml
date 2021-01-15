@@ -24,9 +24,10 @@
         </encoder>
     </appender>
 
-    <logger name="won.auth.WonAclEvaluatorTest" level="debug" />
+    <logger name="won.integrationtest.AbstractBotBasedTest" level="debug" />
     <logger name="won.auth" level="warn" />
     <logger name="won.shacl2java" level="warn" />
+    <logger name="org.springframework" level="warn" />
 
 
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->

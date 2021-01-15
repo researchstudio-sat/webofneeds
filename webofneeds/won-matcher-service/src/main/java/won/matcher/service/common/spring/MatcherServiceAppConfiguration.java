@@ -1,20 +1,15 @@
 package won.matcher.service.common.spring;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
 import akka.actor.ActorSystem;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import won.matcher.service.common.config.ClusterConfig;
 
 /**
@@ -35,6 +30,20 @@ public class MatcherServiceAppConfiguration {
     private ApplicationContext applicationContext;
     @Autowired
     private ClusterConfig clusterConfig;
+    @Value("${uri.sparql.endpoint}")
+    private String sparqlEndpoint;
+
+    // To resolve ${} in @Value
+    // found in http://www.mkyong.com/spring/spring-propertysources-example/
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public String getSparqlEndpoint() {
+        return sparqlEndpoint;
+    }
 
     /**
      * Actor system singleton for this application.
@@ -63,12 +72,5 @@ public class MatcherServiceAppConfiguration {
         // initialize the application context in the Akka Spring Extension
         SpringExtension.SpringExtProvider.get(system).initialize(applicationContext);
         return system;
-    }
-
-    // To resolve ${} in @Value
-    // found in http://www.mkyong.com/spring/spring-propertysources-example/
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 }

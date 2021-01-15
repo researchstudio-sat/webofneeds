@@ -30,10 +30,10 @@ public class TypegenUtils {
                         .build();
     }
 
-    public static MethodSpec generateAdder(FieldSpec field, String fieldNameSingular) {
+    public static MethodSpec generateAdder(FieldSpec field) {
         TypeName baseType = ((ParameterizedTypeName) field.type).typeArguments.get(0);
         return MethodSpec
-                        .methodBuilder(NameUtils.adderNameForFieldNameInSingular(fieldNameSingular))
+                        .methodBuilder(NameUtils.adderNameForFieldNameInPlural(field.name))
                         .addParameter(baseType, "toAdd")
                         .addModifiers(PUBLIC)
                         .beginControlFlow("if (this.$N == null)", field)

@@ -1,6 +1,7 @@
 package won.db;
 
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,8 +21,9 @@ public class FlywayWrapper implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         if ("validate".equals(ddlStrategy.trim())) {
-            Flyway flyway = new Flyway();
-            flyway.setDataSource(dataSource);
+            Configuration config = Flyway.configure()
+                            .dataSource(dataSource);
+            Flyway flyway = new Flyway(config);
             flyway.migrate();
         } else {
             logger.info("Flyway DB Migration ommitted due to non-validate DDL-Strategy: " + ddlStrategy);

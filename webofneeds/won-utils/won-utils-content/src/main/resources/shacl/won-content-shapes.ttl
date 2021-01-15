@@ -1,0 +1,66 @@
+@prefix ex:    <http://example.org/ns#> .
+@prefix auth:  <https://w3id.org/won/auth#> .
+@prefix won:   <https://w3id.org/won/core#> .
+@prefix msg:   <https://w3id.org/won/message#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix vs:    <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix rdfg:  <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+@prefix match: <https://w3id.org/won/matching#> .
+@prefix con:   <https://w3id.org/won/con#> .
+@prefix s:     <http://schema.org/> .
+
+won:atomSysinfoShape
+    a              sh:NodeShape ;
+    sh:targetClass won:Atom ;
+    sh:property    [ sh:path     won:state ;
+                     sh:nodeKind sh:IRI ;
+                     sh:in       ( won:Active won:Inactive ) ] ;
+    sh:property    [ sh:path     won:contentGraph ;
+                     sh:nodeKind sh:IRI ] ;
+    sh:property    [ sh:path     won:wonNode ;
+                     sh:nodeKind sh:IRI ;
+                     sh:maxCount 1 ;
+                     sh:minCount 1 ] ;
+    sh:property    [ sh:path     dct:created ;
+                     sh:maxCount 1 ;
+                     sh:datatype xsd:dateTime ] ;
+    sh:property    [ sh:path     dct:modified ;
+                     sh:maxCount 1 ;
+                     sh:datatype xsd:dateTime ] .
+
+
+won:atomContentShape
+    a              sh:NodeShape ;
+    sh:targetClass won:Atom ;
+    sh:property    [ sh:path rdf:type ;
+                     sh:nodeKind sh:IRI ] ;
+    sh:property    [ sh:path won:socket ;
+                     sh:node won:socketShape ] ;
+    sh:property    [ sh:path     match:query ;
+                     sh:nodeKind sh:Literal ;
+                     sh:datatype xsd:string ] ;
+    sh:property    [ sh:path     con:tag ;
+                     sh:nodeKind sh:Literal ;
+                     sh:datatype xsd:string ] ;
+    sh:property    [ sh:path     dc:title ;
+                     sh:nodeKind sh:Literal ;
+                     sh:datatype xsd:string ] ;
+    sh:property    [ sh:path     s:name ;
+                     sh:nodeKind sh:Literal ;
+                     sh:datatype xsd:string ] .
+
+
+won:socketShape
+    a           sh:NodeShape ;
+    sh:nodeKind sh:IRI ;
+    sh:property [ sh:path     won:socketDefinition ;
+                  sh:nodeKind sh:IRI ;
+                  sh:minCount 1 ;
+                  sh:maxCount 1 ] .
+

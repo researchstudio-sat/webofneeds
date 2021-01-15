@@ -49,6 +49,7 @@ public class IndividualsGenerator implements TypesGenerator {
     }
 
     private TypeSpec generateIndividuals(Shapes shapes, Shacl2JavaConfig config) {
+        Set<String> individualNames = new HashSet<>();
         ResettableErrorHandler err = new ResettableErrorHandler();
         ValidationContext vCtx = ValidationContext.create(shapes, shapes.getGraph(), err);
         TypeSpec.Builder individualsTypeBuilder = TypeSpec.classBuilder("Individuals")
@@ -70,6 +71,17 @@ public class IndividualsGenerator implements TypesGenerator {
                                     continue;
                                 }
                                 String name = NameUtils.enumConstantName(focusNode.getURI());
+                                if (individualNames.contains(name)) {
+                                    name = NameUtils.enumConstantName(focusNode.getURI())
+                                                    + "_"
+                                                    + NameUtils.enumConstantName(
+                                                                    NameUtils.classNameForShape(shape, config));
+                                    if (individualNames.contains(name)) {
+                                        throw new IllegalStateException(
+                                                        "Name clash while creating individual: " + name);
+                                    }
+                                }
+                                individualNames.add(name);
                                 String typeName = NameUtils.classNameForShape(shape, config);
                                 ClassName type = ClassName.get(config.getPackageName(),
                                                 typeName);

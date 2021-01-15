@@ -13,12 +13,19 @@ package won.matcher.cli;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 
 public class MatcherCLISpring {
     private static org.slf4j.Logger logger = LoggerFactory.getLogger(MatcherCLI.class);
 
+    @Configuration
+    @ImportResource("classpath:/spring/app/simpleMatcherCLI.xml")
+    static class Config {
+    }
+
     public static void main(String[] args) throws Exception {
-        SpringApplication app = new SpringApplication(new Object[] { "classpath:/spring/app/simpleMatcherCLI.xml" });
+        SpringApplication app = new SpringApplication(Config.class);
         ConfigurableApplicationContext applicationContext = app.run(args);
         Thread.sleep(5 * 60 * 1000);
         app.exit(applicationContext);

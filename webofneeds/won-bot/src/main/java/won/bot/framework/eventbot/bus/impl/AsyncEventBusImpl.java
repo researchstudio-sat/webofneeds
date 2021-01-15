@@ -139,6 +139,14 @@ public class AsyncEventBusImpl implements EventBus {
         }
     }
 
+    @Override
+    public synchronized void clear() {
+        this.listenerMap.entrySet().stream()
+                        .forEach(entry -> entry.getValue().stream()
+                                        .forEach(l -> callOnUnsubscribeIfApplicable(l, entry.getKey())));
+        this.listenerMap.clear();
+    }
+
     private void callEventListeners(final List<EventListener> listeners, final Event event) {
         if (listeners == null || listeners.isEmpty())
             return;

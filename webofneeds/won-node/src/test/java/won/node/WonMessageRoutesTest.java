@@ -1,41 +1,13 @@
 package won.node;
 
-import static org.mockito.Matchers.*;
-import static won.node.camel.WonNodeConstants.*;
-import static won.node.camel.service.WonCamelHelper.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
-
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
-import org.apache.camel.CamelContext;
-import org.apache.camel.Endpoint;
-import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
-import org.apache.camel.Predicate;
-import org.apache.camel.Processor;
-import org.apache.camel.ProducerTemplate;
+import org.apache.camel.*;
+import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.impl.DefaultExchange;
 import org.apache.camel.model.ModelCamelContext;
+import org.apache.camel.support.DefaultExchange;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -58,28 +30,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import won.cryptography.service.RandomNumberService;
 import won.node.camel.service.WonCamelHelper;
 import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.linkeddata.lookup.SocketLookupFromLinkedData;
-import won.node.service.persistence.DataDerivationService;
 import won.node.service.nodeconfig.URIService;
-import won.node.service.persistence.AtomService;
-import won.node.service.persistence.ConnectionService;
-import won.node.service.persistence.MessageService;
-import won.node.service.persistence.OwnerManagementService;
+import won.node.service.persistence.*;
 import won.node.springsecurity.acl.WonAclEvalContext;
 import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.jms.AtomProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.WonMessageType;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.message.processor.impl.KeyForNewAtomAddingProcessor;
@@ -100,7 +67,24 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.pretty.Lang_WON;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXCHAT;
-import won.test.category.RequiresPosgresServer;
+import won.test.category.RequiresPostgresServer;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static won.node.camel.WonNodeConstants.*;
+import static won.node.camel.service.WonCamelHelper.*;
 
 /**
  * Tests that check the input/output behaviour of the WoN node.
@@ -112,8 +96,8 @@ import won.test.category.RequiresPosgresServer;
  * <p>
  * The outgoing messages are intercepted and checked.
  * </p>
- * 
- * @author fkleedorfer
+ *
+ * @author fkleedorferT
  */
 @ContextConfiguration(locations = { "classpath:/won/node/WonMessageRoutesTest.xml",
                 "classpath:/won/node/WonMessageRoutesTest/jdbc-storage.xml",
@@ -126,10 +110,9 @@ import won.test.category.RequiresPosgresServer;
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource
 @Rollback
-@Category(RequiresPosgresServer.class)
+@DirtiesContext
+@Category(RequiresPostgresServer.class)
 public abstract class WonMessageRoutesTest {
-    protected final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected static final String OWNERAPPLICATION_ID_OWNER1 = "ownerapp-1";
     protected static final String OWNERAPPLICATION_ID_OWNER2 = "ownerapp-2";
     protected static final URI URI_NODE_1 = URI.create("https://localhost:8443/won/resource");
@@ -139,8 +122,19 @@ public abstract class WonMessageRoutesTest {
     protected static final URI URI_ATOM_1_ON_NODE_2 = URI.create("uri:atom-21");
     protected static final URI URI_ATOM_2_ON_NODE_2 = URI.create("uri:atom-22");
     protected static AtomicInteger counter = new AtomicInteger(0);
-    static BrokerService brokerSvc;
     protected static ExecutorService executor;
+    static BrokerService brokerSvc;
+    protected final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    /**
+     * Mocked endpoints
+     *
+     * @throws Exception
+     */
+    @EndpointInject("mock:direct:OwnerProtocolOut")
+    protected MockEndpoint toOwnerMockEndpoint;
+    @EndpointInject("mock:seda:MatcherProtocolOut")
+    protected MockEndpoint toMatcherMockEndpoint;
     /**
      * Actual services/injects
      */
@@ -155,7 +149,7 @@ public abstract class WonMessageRoutesTest {
     @Autowired
     MessagingService messagingService;
     @Autowired
-    OwnerManagementService ownerManagementService;
+    ActiveMQOwnerManagementService activeMqOwnerManagementService;
     @Autowired
     LinkedDataService linkedDataService;
     @Autowired
@@ -189,16 +183,11 @@ public abstract class WonMessageRoutesTest {
     MessageRoutingInfoServiceWithLookup messageRoutingInfoServiceWithLookup;
     @MockBean
     URIService uriService;
-    /**
-     * Mocked endpoints
-     * 
-     * @throws Exception
-     */
-    @EndpointInject(uri = "mock:direct:OwnerProtocolOut")
-    protected MockEndpoint toOwnerMockEndpoint;
-    @EndpointInject(uri = "mock:seda:MatcherProtocolOut")
-    protected MockEndpoint toMatcherMockEndpoint;
-
+    // @MockBean MessagingContext messagingContext;
+    // @MockBean LinkedDataRestClientHttps linkedDataRestClient;
+    // @MockBean RegistrationServer registrationServer;
+    // @MockBean RegistrationClient registrationClient;
+    // @MockBean TrustManagerWrapperWithTrustService nodeTrustManagerTLS;
     // **************************************************************************
     // STRUCTURE OF THIS CLASS
     //
@@ -259,6 +248,37 @@ public abstract class WonMessageRoutesTest {
     //
     // **************************************************************************
     //
+    Processor messageToSendIntoBody = new MessageToSendIntoBodyProcessor();
+
+    public WonMessageRoutesTest() {
+        // TODO Auto-generated constructor stub
+    }
+
+    /****************************************
+     * SETUP
+     ****************************************/
+    @BeforeClass
+    public static void setUpBroker() throws Exception {
+        brokerSvc = new BrokerService();
+        brokerSvc.setBrokerName("TestBroker");
+        brokerSvc.addConnector("tcp://localhost:61616");
+        brokerSvc.setPersistenceAdapter(new MemoryPersistenceAdapter());
+        brokerSvc.start();
+        executor = Executors.newSingleThreadExecutor();
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        if (executor != null) {
+            executor.awaitTermination(1000, TimeUnit.MICROSECONDS);
+            executor.shutdown();
+        }
+        if (brokerSvc != null) {
+            brokerSvc.stop();
+            brokerSvc.waitUntilStopped();
+        }
+    }
+
     /******************************************
      * TESTS
      ******************************************/
@@ -308,40 +328,6 @@ public abstract class WonMessageRoutesTest {
         };
     }
 
-    private class IsFailureResponseTo implements Predicate {
-        private URI messageURI;
-
-        public IsFailureResponseTo(URI messageURI) {
-            Objects.requireNonNull(messageURI);
-            this.messageURI = messageURI;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean result = msg.getMessageType().isFailureResponse()
-                            && messageURI.equals(msg.getRespondingToMessageURI());
-            if (!result) {
-                Optional<WonMessage> response = msg.getResponse();
-                if (response.isPresent()) {
-                    result = response.get().getMessageType().isFailureResponse()
-                                    && messageURI.equals(response.get().getRespondingToMessageURI());
-                }
-                if (!result) {
-                    response = msg.getRemoteResponse();
-                    if (response.isPresent()) {
-                        result = response.get().getMessageType().isFailureResponse()
-                                        && messageURI.equals(response.get().getRespondingToMessageURI());
-                    }
-                }
-            }
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
-            }
-            return result;
-        }
-    }
-
     protected Predicate isSuccessResponseTo(WonMessage msg) {
         Objects.requireNonNull(msg);
         return isSuccessResponseTo(msg.getMessageURIRequired());
@@ -349,40 +335,6 @@ public abstract class WonMessageRoutesTest {
 
     protected Predicate isSuccessResponseTo(URI messageURI) {
         return new IsSuccessResponseTo(messageURI);
-    }
-
-    private class IsSuccessResponseTo implements Predicate {
-        private URI messageURI;
-
-        public IsSuccessResponseTo(URI messageURI) {
-            Objects.requireNonNull(messageURI);
-            this.messageURI = messageURI;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean result = msg.getMessageType().isSuccessResponse()
-                            && messageURI.equals(msg.getRespondingToMessageURI());
-            if (!result) {
-                Optional<WonMessage> response = msg.getResponse();
-                if (response.isPresent()) {
-                    result = response.get().getMessageType().isSuccessResponse()
-                                    && messageURI.equals(response.get().getRespondingToMessageURI());
-                }
-                if (!result) {
-                    response = msg.getRemoteResponse();
-                    if (response.isPresent()) {
-                        result = response.get().getMessageType().isSuccessResponse()
-                                        && messageURI.equals(response.get().getRespondingToMessageURI());
-                    }
-                }
-            }
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
-            }
-            return result;
-        }
     }
 
     public Predicate isMessageContained(WonMessage message) {
@@ -393,70 +345,12 @@ public abstract class WonMessageRoutesTest {
         return new IsMessageContained(messageURI);
     }
 
-    private class IsMessageContained implements Predicate {
-        private URI messageURI;
-
-        public IsMessageContained(URI messageURI) {
-            Objects.requireNonNull(messageURI);
-            this.messageURI = messageURI;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean result = msg.getAllMessages().stream()
-                            .anyMatch(m -> m.getMessageURIRequired().equals(this.messageURI));
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
-            }
-            return result;
-        }
-    }
-
     protected Predicate or(Predicate... clauses) {
         return new Or(clauses);
     }
 
-    private class Or implements Predicate {
-        private Predicate[] clauses;
-
-        public Or(Predicate... clauses) {
-            Objects.requireNonNull(clauses);
-            this.clauses = clauses;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            for (int i = 0; i < clauses.length; i++) {
-                if (clauses[i].matches(exchange)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
     protected Predicate and(Predicate... clauses) {
         return new And(clauses);
-    }
-
-    private class And implements Predicate {
-        private Predicate[] clauses;
-
-        public And(Predicate... clauses) {
-            Objects.requireNonNull(clauses);
-            this.clauses = clauses;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            for (int i = 0; i < clauses.length; i++) {
-                if (!clauses[i].matches(exchange)) {
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 
     protected Predicate isMessageWithoutResponse(WonMessage msg) {
@@ -468,94 +362,16 @@ public abstract class WonMessageRoutesTest {
         return new IsMessageWithoutResponse(messageURI);
     }
 
-    private class IsMessageWithoutResponse implements Predicate {
-        private URI messageURI;
-
-        public IsMessageWithoutResponse(URI messageURI) {
-            Objects.requireNonNull(messageURI);
-            this.messageURI = messageURI;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean result = msg.getMessageURIRequired().equals(messageURI) && (!msg.getResponse().isPresent());
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
-            }
-            return result;
-        }
-    }
-
     protected Predicate isSocketHintFor(URI socketURI) {
         return new IsSocketHintFor(socketURI);
-    }
-
-    private class IsSocketHintFor implements Predicate {
-        private URI socketURI;
-
-        public IsSocketHintFor(URI socketURI) {
-            Objects.requireNonNull(socketURI);
-            this.socketURI = socketURI;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean result = ((msg.getMessageTypeRequired().isSocketHintMessage()
-                            && socketURI.equals(msg.getRecipientSocketURIRequired())));
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "socketURI", socketURI, msg);
-            }
-            return result;
-        }
     }
 
     protected Predicate isAtomCreatedNotification(URI atomURI) {
         return new IsAtomCreatedNotification(atomURI);
     }
 
-    private class IsAtomCreatedNotification implements Predicate {
-        private URI atomURI;
-
-        public IsAtomCreatedNotification(URI atomURI) {
-            Objects.requireNonNull(atomURI);
-            this.atomURI = atomURI;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean result = (msg.getMessageTypeRequired().isAtomCreatedNotification()
-                            && msg.getSenderAtomURIRequired().equals(atomURI));
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "atomURI", atomURI, msg);
-            }
-            return result;
-        }
-    }
-
     protected Predicate isChangeNotificationFor(URI atomURI) {
         return new IsChangeNotificationFor(atomURI);
-    }
-
-    private class IsChangeNotificationFor implements Predicate {
-        private URI atomURI;
-
-        public IsChangeNotificationFor(URI atomURI) {
-            Objects.requireNonNull(atomURI);
-            this.atomURI = atomURI;
-        }
-
-        public boolean matches(Exchange ex) {
-            WonMessage msg = getMessageRequired(ex);
-            boolean result = (msg.getMessageTypeRequired().isChangeNotification()
-                            && msg.getSenderAtomURIRequired().equals(atomURI));
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "atomURI", atomURI, msg);
-            }
-            return result;
-        }
     }
 
     public WonMessage getMessageRequired(Exchange ex) {
@@ -589,60 +405,8 @@ public abstract class WonMessageRoutesTest {
         return isMessageAndResponse(msg.getMessageURIRequired());
     }
 
-    private class IsMessageAndResponse implements Predicate {
-        private URI msgUri;
-
-        public IsMessageAndResponse(URI msgUri) {
-            Objects.requireNonNull(msgUri);
-            this.msgUri = msgUri;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean ret = Objects.equals(msgUri, msg.getMessageURIRequired())
-                            && msg.getResponse().isPresent()
-                            && !msg.getRemoteResponse().isPresent();
-            if (!ret) {
-                logMessageForFailedPredicate(getClass().getName(), "msgUri", msgUri, msg);
-            }
-            return ret;
-        }
-    }
-
     protected Predicate isResponseContainsSender() {
         return new ResponseContainsConnection();
-    }
-
-    private class ResponseContainsConnection implements Predicate {
-        public ResponseContainsConnection() {
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            Optional<WonMessage> resp = msg.getResponse();
-            if (resp.isPresent()) {
-                if (resp.get().getConnectionURI() == null) {
-                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
-                    return false;
-                }
-            }
-            resp = msg.getRemoteResponse();
-            if (resp.isPresent()) {
-                if (resp.get().getConnectionURI() == null) {
-                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
-                    return false;
-                }
-            }
-            if (msg.isRemoteResponse()) {
-                if (msg.getConnectionURI() == null) {
-                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 
     protected Predicate isMessageAndResponseAndRemoteResponse(WonMessage msg) {
@@ -651,57 +415,6 @@ public abstract class WonMessageRoutesTest {
 
     protected Predicate isMessageAndResponseAndRemoteResponse(final URI msgUri) {
         return new IsMessageAndResponseAndRemoteResponse(msgUri);
-    }
-
-    private class IsMessageAndResponseAndRemoteResponse implements Predicate {
-        private URI msgUri;
-
-        public IsMessageAndResponseAndRemoteResponse(URI msgUri) {
-            Objects.requireNonNull(msgUri);
-            this.msgUri = msgUri;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean result = Objects.equals(msgUri, msg.getMessageURIRequired())
-                            && msg.getResponse().isPresent()
-                            && msg.getRemoteResponse().isPresent();
-            if (result) {
-                Set<URI> s = new HashSet<>();
-                s.add(msg.getMessageURI());
-                s.add(msg.getResponse().get().getMessageURI());
-                s.add(msg.getRemoteResponse().get().getMessageURI());
-                result = s.size() == 3;
-            }
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "msgUri", msgUri, msg);
-            }
-            return result;
-        }
-    }
-
-    private static class MatchesMaxNTimesPredicate implements Predicate {
-        private final AtomicInteger matchesLeft;
-        private Predicate delegate;
-
-        public MatchesMaxNTimesPredicate(int n, Predicate delegate) {
-            Objects.requireNonNull(delegate);
-            this.delegate = delegate;
-            matchesLeft = new AtomicInteger(n);
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            if (matchesLeft.get() <= 0) {
-                return false;
-            }
-            boolean result = delegate.matches(exchange);
-            if (result) {
-                matchesLeft.decrementAndGet();
-            }
-            return result;
-        }
     }
 
     protected Predicate isOwnResponseConfirmsNPrevious(int n) {
@@ -714,76 +427,6 @@ public abstract class WonMessageRoutesTest {
 
     protected Predicate isMessageConfirmsNPrevious(int n) {
         return new MessageConfirmsNPreviousMessages(n);
-    }
-
-    private class OwnResponseConfirmsNPreviousMessages implements Predicate {
-        private final int n;
-
-        public OwnResponseConfirmsNPreviousMessages(int n) {
-            super();
-            this.n = n;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            Optional<WonMessage> resp = msg.getResponse();
-            boolean result = false;
-            if (resp.isPresent()) {
-                result = resp.get().getPreviousMessageURIs().size() == n;
-            } else {
-                result = n == 0;
-            }
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
-            }
-            return result;
-        }
-    }
-
-    private class RemoteResponseConfirmsNPreviousMessages implements Predicate {
-        private final int n;
-
-        public RemoteResponseConfirmsNPreviousMessages(int n) {
-            super();
-            this.n = n;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            Optional<WonMessage> resp = msg.getRemoteResponse();
-            boolean result = false;
-            if (resp.isPresent()) {
-                result = resp.get().getPreviousMessageURIs().size() == n;
-            } else {
-                result = n == 0;
-            }
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
-            }
-            return result;
-        }
-    }
-
-    private class MessageConfirmsNPreviousMessages implements Predicate {
-        private final int n;
-
-        public MessageConfirmsNPreviousMessages(int n) {
-            super();
-            this.n = n;
-        }
-
-        @Override
-        public boolean matches(Exchange exchange) {
-            WonMessage msg = getMessageRequired(exchange);
-            boolean result = false;
-            result = msg.getPreviousMessageURIs().size() == n;
-            if (!result) {
-                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
-            }
-            return result;
-        }
     }
 
     protected void assertConnectionAsExpected(Connection expected, Optional<Connection> con) {
@@ -853,7 +496,7 @@ public abstract class WonMessageRoutesTest {
 
     /**
      * Loads the Dataset.
-     * 
+     *
      * @param resourceName
      * @return
      * @throws IOException
@@ -865,7 +508,7 @@ public abstract class WonMessageRoutesTest {
     /**
      * Loads the Dataset, replacing all occurrences of <code>search</code> by
      * <code>replacement</code>.
-     * 
+     *
      * @param resourceName
      * @param search
      * @param replacement
@@ -923,7 +566,7 @@ public abstract class WonMessageRoutesTest {
             throw new IllegalArgumentException("message is not prepared, cannot send : " + msg.toShortStringForDebug());
         }
         logMessageRdf(makeMessageBox(" message OWNER => NODE"), msg);
-        Map<String, String> headers = new HashMap<>();
+        Map<String, Object> headers = new HashMap<>();
         headers.put(WonCamelConstants.OWNER_APPLICATION_ID_HEADER, ownerApplicationIdForResponse);
         send(null, headers, RdfUtils.writeDatasetToString(msg.getCompleteDataset(),
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "direct:fromOwnerMock");
@@ -956,18 +599,21 @@ public abstract class WonMessageRoutesTest {
                         WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE), "direct:fromNodeMock");
     }
 
-    protected void send(Map properties, Map headers, Object body, String endpoint) {
+    protected void send(Map properties, Map<String, Object> headers, Object body, String endpoint) {
         Exchange exchange = new DefaultExchange(camelContext);
         exchange.setPattern(ExchangePattern.InOnly);
         Endpoint ep = camelContext.getEndpoint(endpoint);
         if (properties != null) {
-            if (properties.containsKey("methodName"))
+            if (properties.containsKey("methodName")) {
                 exchange.setProperty("methodName", properties.get("methodName"));
-            if (properties.containsKey("protocol"))
+            }
+            if (properties.containsKey("protocol")) {
                 exchange.setProperty("protocol", properties.get("protocol"));
+            }
         }
-        if (headers != null)
+        if (headers != null) {
             exchange.getIn().setHeaders(headers);
+        }
         exchange.getIn().setBody(body);
         producerTemplate.send(ep, exchange);
     }
@@ -977,10 +623,6 @@ public abstract class WonMessageRoutesTest {
             logger.debug("\n" + logText + "\n" + RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
                             Lang_WON.TRIG_WON_CONVERSATION));
         }
-    }
-
-    public WonMessageRoutesTest() {
-        // TODO Auto-generated constructor stub
     }
 
     protected URI newAtomURI() {
@@ -1019,61 +661,45 @@ public abstract class WonMessageRoutesTest {
         }
     }
 
-    /****************************************
-     * SETUP
-     ****************************************/
-    @BeforeClass
-    public static void setUpBroker() throws Exception {
-        brokerSvc = new BrokerService();
-        brokerSvc.setBrokerName("TestBroker");
-        brokerSvc.addConnector("tcp://localhost:61616");
-        brokerSvc.setPersistenceAdapter(new MemoryPersistenceAdapter());
-        brokerSvc.start();
-        executor = Executors.newSingleThreadExecutor();
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        if (executor != null) {
-            executor.awaitTermination(1000, TimeUnit.MICROSECONDS);
-            executor.shutdown();
-        }
-    }
-
     @Before
     public void configureMockEndpoint() throws Exception {
         camelContext.setTracing(true);
         ModelCamelContext context = (ModelCamelContext) camelContext;
-        context.getRouteDefinition("activemq:queue:" +
-                        FROM_NODE_QUEUENAME).adviceWith(
-                                        context,
-                                        new AdviceWithRouteBuilder() {
-                                            @Override
-                                            public void configure() throws Exception {
-                                                replaceFromWith("direct:fromNodeMock");
-                                            };
-                                        });
-        context.getRouteDefinition("activemq:queue:" + FROM_OWNER_QUEUENAME)
-                        .adviceWith(
-                                        context,
-                                        new AdviceWithRouteBuilder() {
-                                            @Override
-                                            public void configure() throws Exception {
-                                                replaceFromWith("direct:fromOwnerMock");
-                                            };
-                                        });
-        context.getRouteDefinition("activemq:queue:" + FROM_MATCHER_QUEUENAME)
-                        .adviceWith(context,
-                                        new AdviceWithRouteBuilder() {
-                                            @Override
-                                            public void configure() throws Exception {
-                                                replaceFromWith("direct:fromMatcherMock");
-                                            };
-                                        });
+        AdviceWith.adviceWith(
+                        context.getRouteDefinition("activemq:queue:" +
+                                        FROM_NODE_QUEUENAME),
+                        context,
+                        new AdviceWithRouteBuilder() {
+                            @Override
+                            public void configure() throws Exception {
+                                replaceFromWith("direct:fromNodeMock");
+                            }
+                        });
+        AdviceWith.adviceWith(
+                        context.getRouteDefinition("activemq:queue:" + FROM_OWNER_QUEUENAME),
+                        context,
+                        new AdviceWithRouteBuilder() {
+                            @Override
+                            public void configure() throws Exception {
+                                replaceFromWith("direct:fromOwnerMock");
+                            }
+                        });
+        AdviceWith.adviceWith(
+                        context.getRouteDefinition("activemq:queue:" + FROM_MATCHER_QUEUENAME), context,
+                        new AdviceWithRouteBuilder() {
+                            @Override
+                            public void configure() throws Exception {
+                                replaceFromWith("direct:fromMatcherMock");
+                            }
+                        });
         // for some reason, we have to add the advice to each route
         // don't try to do it by iterating over routes etc. Doesn't work.
-        context.getRouteDefinition("direct:sendToOwner").adviceWith(context, adviceForOwnerProtocolOut());
-        context.getRouteDefinition("direct:reactToMessage").adviceWith(context,
+        AdviceWith.adviceWith(
+                        context.getRouteDefinition("direct:sendToOwner"),
+                        context, adviceForOwnerProtocolOut());
+        AdviceWith.adviceWith(
+                        context.getRouteDefinition("direct:reactToMessage"),
+                        context,
                         adviceForMatcherProtocolOut());
         //
         // MockEndpoint intercepting messages to owners
@@ -1210,7 +836,7 @@ public abstract class WonMessageRoutesTest {
                                 .skipSendToOriginalEndpoint()
                                 .bean(messageToSendIntoBody)
                                 .to(toOwnerMockEndpoint);
-            };
+            }
         };
     }
 
@@ -1221,7 +847,7 @@ public abstract class WonMessageRoutesTest {
                 interceptSendToEndpoint("seda:MatcherProtocolOut")
                                 .skipSendToOriginalEndpoint()
                                 .to(toMatcherMockEndpoint);
-            };
+            }
         };
     }
 
@@ -1236,14 +862,389 @@ public abstract class WonMessageRoutesTest {
                     WonMessage msg) {
         if (logger.isInfoEnabled()) {
             logger.info("predicate {} ({}: {}), does not match message {}:\n{}",
-                            new Object[] { className, parameterName, parameterValue,
-                                            msg.getMessageURI(),
-                                            RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
-                                                            Lang_WON.TRIG_WON_CONVERSATION) });
+                            className, parameterName, parameterValue,
+                            msg.getMessageURI(),
+                            RdfUtils.toString(Prefixer.setPrefixes(msg.getCompleteDataset()),
+                                            Lang_WON.TRIG_WON_CONVERSATION));
         }
     }
 
-    Processor messageToSendIntoBody = new MessageToSendIntoBodyProcessor();
+    private static class MatchesMaxNTimesPredicate implements Predicate {
+        private final AtomicInteger matchesLeft;
+        private final Predicate delegate;
+
+        public MatchesMaxNTimesPredicate(int n, Predicate delegate) {
+            Objects.requireNonNull(delegate);
+            this.delegate = delegate;
+            matchesLeft = new AtomicInteger(n);
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            if (matchesLeft.get() <= 0) {
+                return false;
+            }
+            boolean result = delegate.matches(exchange);
+            if (result) {
+                matchesLeft.decrementAndGet();
+            }
+            return result;
+        }
+    }
+
+    private class IsFailureResponseTo implements Predicate {
+        private final URI messageURI;
+
+        public IsFailureResponseTo(URI messageURI) {
+            Objects.requireNonNull(messageURI);
+            this.messageURI = messageURI;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = msg.getMessageType().isFailureResponse()
+                            && messageURI.equals(msg.getRespondingToMessageURI());
+            if (!result) {
+                Optional<WonMessage> response = msg.getResponse();
+                if (response.isPresent()) {
+                    result = response.get().getMessageType().isFailureResponse()
+                                    && messageURI.equals(response.get().getRespondingToMessageURI());
+                }
+                if (!result) {
+                    response = msg.getRemoteResponse();
+                    if (response.isPresent()) {
+                        result = response.get().getMessageType().isFailureResponse()
+                                        && messageURI.equals(response.get().getRespondingToMessageURI());
+                    }
+                }
+            }
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
+            }
+            return result;
+        }
+    }
+
+    private class IsSuccessResponseTo implements Predicate {
+        private final URI messageURI;
+
+        public IsSuccessResponseTo(URI messageURI) {
+            Objects.requireNonNull(messageURI);
+            this.messageURI = messageURI;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = msg.getMessageType().isSuccessResponse()
+                            && messageURI.equals(msg.getRespondingToMessageURI());
+            if (!result) {
+                Optional<WonMessage> response = msg.getResponse();
+                if (response.isPresent()) {
+                    result = response.get().getMessageType().isSuccessResponse()
+                                    && messageURI.equals(response.get().getRespondingToMessageURI());
+                }
+                if (!result) {
+                    response = msg.getRemoteResponse();
+                    if (response.isPresent()) {
+                        result = response.get().getMessageType().isSuccessResponse()
+                                        && messageURI.equals(response.get().getRespondingToMessageURI());
+                    }
+                }
+            }
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
+            }
+            return result;
+        }
+    }
+
+    private class IsMessageContained implements Predicate {
+        private final URI messageURI;
+
+        public IsMessageContained(URI messageURI) {
+            Objects.requireNonNull(messageURI);
+            this.messageURI = messageURI;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = msg.getAllMessages().stream()
+                            .anyMatch(m -> m.getMessageURIRequired().equals(this.messageURI));
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
+            }
+            return result;
+        }
+    }
+
+    private class Or implements Predicate {
+        private final Predicate[] clauses;
+
+        public Or(Predicate... clauses) {
+            Objects.requireNonNull(clauses);
+            this.clauses = clauses;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            for (int i = 0; i < clauses.length; i++) {
+                if (clauses[i].matches(exchange)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private class And implements Predicate {
+        private final Predicate[] clauses;
+
+        public And(Predicate... clauses) {
+            Objects.requireNonNull(clauses);
+            this.clauses = clauses;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            for (int i = 0; i < clauses.length; i++) {
+                if (!clauses[i].matches(exchange)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    private class IsMessageWithoutResponse implements Predicate {
+        private final URI messageURI;
+
+        public IsMessageWithoutResponse(URI messageURI) {
+            Objects.requireNonNull(messageURI);
+            this.messageURI = messageURI;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = msg.getMessageURIRequired().equals(messageURI) && (!msg.getResponse().isPresent());
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "messageURI", messageURI, msg);
+            }
+            return result;
+        }
+    }
+
+    private class IsSocketHintFor implements Predicate {
+        private final URI socketURI;
+
+        public IsSocketHintFor(URI socketURI) {
+            Objects.requireNonNull(socketURI);
+            this.socketURI = socketURI;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = ((msg.getMessageTypeRequired().isSocketHintMessage()
+                            && socketURI.equals(msg.getRecipientSocketURIRequired())));
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "socketURI", socketURI, msg);
+            }
+            return result;
+        }
+    }
+
+    private class IsAtomCreatedNotification implements Predicate {
+        private final URI atomURI;
+
+        public IsAtomCreatedNotification(URI atomURI) {
+            Objects.requireNonNull(atomURI);
+            this.atomURI = atomURI;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = (msg.getMessageTypeRequired().isAtomCreatedNotification()
+                            && msg.getSenderAtomURIRequired().equals(atomURI));
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "atomURI", atomURI, msg);
+            }
+            return result;
+        }
+    }
+
+    private class IsChangeNotificationFor implements Predicate {
+        private final URI atomURI;
+
+        public IsChangeNotificationFor(URI atomURI) {
+            Objects.requireNonNull(atomURI);
+            this.atomURI = atomURI;
+        }
+
+        public boolean matches(Exchange ex) {
+            WonMessage msg = getMessageRequired(ex);
+            boolean result = (msg.getMessageTypeRequired().isChangeNotification()
+                            && msg.getSenderAtomURIRequired().equals(atomURI));
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "atomURI", atomURI, msg);
+            }
+            return result;
+        }
+    }
+
+    private class IsMessageAndResponse implements Predicate {
+        private final URI msgUri;
+
+        public IsMessageAndResponse(URI msgUri) {
+            Objects.requireNonNull(msgUri);
+            this.msgUri = msgUri;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean ret = Objects.equals(msgUri, msg.getMessageURIRequired())
+                            && msg.getResponse().isPresent()
+                            && !msg.getRemoteResponse().isPresent();
+            if (!ret) {
+                logMessageForFailedPredicate(getClass().getName(), "msgUri", msgUri, msg);
+            }
+            return ret;
+        }
+    }
+
+    private class ResponseContainsConnection implements Predicate {
+        public ResponseContainsConnection() {
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            Optional<WonMessage> resp = msg.getResponse();
+            if (resp.isPresent()) {
+                if (resp.get().getConnectionURI() == null) {
+                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
+                    return false;
+                }
+            }
+            resp = msg.getRemoteResponse();
+            if (resp.isPresent()) {
+                if (resp.get().getConnectionURI() == null) {
+                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
+                    return false;
+                }
+            }
+            if (msg.isRemoteResponse()) {
+                if (msg.getConnectionURI() == null) {
+                    logMessageForFailedPredicate(getClass().getName(), "[no parameter]", null, msg);
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    private class IsMessageAndResponseAndRemoteResponse implements Predicate {
+        private final URI msgUri;
+
+        public IsMessageAndResponseAndRemoteResponse(URI msgUri) {
+            Objects.requireNonNull(msgUri);
+            this.msgUri = msgUri;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = Objects.equals(msgUri, msg.getMessageURIRequired())
+                            && msg.getResponse().isPresent()
+                            && msg.getRemoteResponse().isPresent();
+            if (result) {
+                Set<URI> s = new HashSet<>();
+                s.add(msg.getMessageURI());
+                s.add(msg.getResponse().get().getMessageURI());
+                s.add(msg.getRemoteResponse().get().getMessageURI());
+                result = s.size() == 3;
+            }
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "msgUri", msgUri, msg);
+            }
+            return result;
+        }
+    }
+
+    private class OwnResponseConfirmsNPreviousMessages implements Predicate {
+        private final int n;
+
+        public OwnResponseConfirmsNPreviousMessages(int n) {
+            super();
+            this.n = n;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            Optional<WonMessage> resp = msg.getResponse();
+            boolean result = false;
+            if (resp.isPresent()) {
+                result = resp.get().getPreviousMessageURIs().size() == n;
+            } else {
+                result = n == 0;
+            }
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
+            }
+            return result;
+        }
+    }
+
+    private class RemoteResponseConfirmsNPreviousMessages implements Predicate {
+        private final int n;
+
+        public RemoteResponseConfirmsNPreviousMessages(int n) {
+            super();
+            this.n = n;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            Optional<WonMessage> resp = msg.getRemoteResponse();
+            boolean result = false;
+            if (resp.isPresent()) {
+                result = resp.get().getPreviousMessageURIs().size() == n;
+            } else {
+                result = n == 0;
+            }
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
+            }
+            return result;
+        }
+    }
+
+    private class MessageConfirmsNPreviousMessages implements Predicate {
+        private final int n;
+
+        public MessageConfirmsNPreviousMessages(int n) {
+            super();
+            this.n = n;
+        }
+
+        @Override
+        public boolean matches(Exchange exchange) {
+            WonMessage msg = getMessageRequired(exchange);
+            boolean result = false;
+            result = msg.getPreviousMessageURIs().size() == n;
+            if (!result) {
+                logMessageForFailedPredicate(getClass().getName(), "n", Integer.valueOf(n), msg);
+            }
+            return result;
+        }
+    }
 
     private class MessageToSendIntoBodyProcessor implements Processor {
         public MessageToSendIntoBodyProcessor() {
@@ -1252,8 +1253,8 @@ public abstract class WonMessageRoutesTest {
         public void process(Exchange exchange) throws Exception {
             exchange.getIn().setBody(WonMessageEncoder.encode(getMessageToSendRequired(exchange),
                             WonCamelConstants.RDF_LANGUAGE_FOR_MESSAGE));
-        };
-    };
+        }
+    }
 
     protected class MessageCollector {
         Dataset collected = DatasetFactory.createGeneral();

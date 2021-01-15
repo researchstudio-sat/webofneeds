@@ -1,6 +1,9 @@
 package won.shacl2java.sourcegen.typegen.logic;
 
 import com.squareup.javapoet.*;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Node_Blank;
@@ -295,7 +298,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addMethod(setter)
                         .addMethod(getter);
         if (!propertySpec.isSingletonProperty()) {
-            typeBuilder.addMethod(generateAdder(field, helper.getFieldNameSingular()));
+            typeBuilder.addMethod(generateAdder(field));
         }
         boolean singleton = propertySpec.isSingletonProperty();
         generateToRdfForField(path, toRdfMethodBuilder, getter, singleton);
@@ -399,7 +402,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addMethod(setter)
                         .addMethod(getter);
         if (!propertySpec.isSingletonProperty()) {
-            typeBuilder.addMethod(generateAdder(field, helper.getFieldNameSingular()));
+            typeBuilder.addMethod(generateAdder(field));
         }
         generateToRdfForField(new P_Link(propertySpec.getPredicate()), toRdfBuilder, getter,
                         propertySpec.isSingletonProperty());
@@ -592,6 +595,10 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
             if (propertySpec.getShDatatype() != null) {
                 Class<?> clazz = propertySpec.getShDatatype().getJavaClass();
                 if (clazz == null) {
+                    RDFDatatype dt = propertySpec.getShDatatype();
+                    if (dt.getURI().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString")) {
+                        return Literal.class;
+                    }
                     throw new IllegalArgumentException("Cannot determine Java type for sh:datatype "
                                     + propertySpec.getShDatatype() + ". This datatype does not seem to be defined");
                 }

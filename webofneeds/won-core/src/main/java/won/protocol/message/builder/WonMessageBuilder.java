@@ -1,17 +1,5 @@
 package won.protocol.message.builder;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -19,8 +7,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.jboss.logging.Message;
-
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
@@ -28,10 +14,12 @@ import won.protocol.message.WonMessageType;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
-import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WONMSG;
+
+import java.net.URI;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Class to build a WonMessage based on the specific properties.
@@ -43,15 +31,15 @@ public class WonMessageBuilder {
     private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
     private static final int RANDOM_SUFFIX_LENGTH = 5;
     private final URI messageURI;
-    private URI atomURI;
     URI connectionURI;
+    WonMessageType wonMessageType;
+    private URI atomURI;
     private URI senderSocketURI;
     private URI recipientSocketURI;
     private URI hintTargetAtomURI;
     private URI hintTargetSocketURI;
     private Double hintScore;
     private Set<URI> injectIntoConnections = new HashSet<>();
-    WonMessageType wonMessageType;
     private WonMessageDirection wonMessageDirection;
     // if the message is a response message, it MUST have exactly one
     // isResponseToMessageURI set.
@@ -178,10 +166,12 @@ public class WonMessageBuilder {
         }
         messageEventResource.addLiteral(WONMSG.protocolVersion, envelopeGraph.createTypedLiteral("1.0"));
         // add sender
-        if (atomURI != null)
+        if (atomURI != null) {
             messageEventResource.addProperty(WONMSG.atom, envelopeGraph.createResource(atomURI.toString()));
-        if (connectionURI != null)
+        }
+        if (connectionURI != null) {
             messageEventResource.addProperty(WONMSG.connection, envelopeGraph.createResource(connectionURI.toString()));
+        }
         if (senderSocketURI != null) {
             messageEventResource.addProperty(WONMSG.senderSocket,
                             envelopeGraph.createResource(senderSocketURI.toString()));
@@ -373,16 +363,18 @@ public class WonMessageBuilder {
         // and the new graph uri
         final Map<String, String> changedGraphUris = new HashMap<>();
         RdfUtils.toNamedModelStream(toAdd, false).forEach(namedModel -> {
-            if (namedModel.getModel().size() == 0)
+            if (namedModel.getModel().size() == 0) {
                 return;
+            }
             URI newUri = addContentInternal(namedModel.getModel());
             changedGraphUris.put(namedModel.getName(), newUri.toString());
         });
         // replace the old graph uris with the new graph
         // uris in all graphs of our dataset
         RdfUtils.visit(toAdd, model1 -> {
-            if (model1.size() == 0)
+            if (model1.size() == 0) {
                 return null;
+            }
             changedGraphUris.entrySet().stream().forEach(graphNameMapping -> {
                 // in the model, get both the old and new resource, then replace
                 // the old by the new. Note: This will create a resource in the
@@ -455,8 +447,9 @@ public class WonMessageBuilder {
         }
         // content map is not empty. find one without a signature:
         for (Map.Entry<URI, Model> entry : contentMap.entrySet()) {
-            if (!signatureMap.containsKey(entry.getKey()))
+            if (!signatureMap.containsKey(entry.getKey())) {
                 return entry.getValue();
+            }
         }
         // all content graphs are signed. add a new one.
         Model contentGraph = ModelFactory.createDefaultModel();

@@ -24,31 +24,31 @@
         </encoder>
     </appender>
 
-	<!-- when debugging tests, start by setting this one to debug -->
-	<logger name="won.node.camel.processor.general.FailResponder" level="WARN" />
+    <!-- when debugging tests, start by setting this one to debug -->
+    <logger name="won.node.camel.processor.general.FailResponder" level="WARN"/>
 
-	<logger name="org.springframework" level="WARN" />
-	<logger name="won.node.WonMessageRoutesExternalInterceptedTest" level="WARN" />
-	<logger name="won.node.WonMessageRoutesExternalRoutedTest" level="WARN" />
-	<logger name="won.node.WonMessageRoutesTest" level="WARN" />
-	<logger name="won" level="WARN" />
-	<!-- if the CamelContext's 'trace' feature is enabled  (changes with camel version) -->
-	<logger name="org.apache.camel.processor.interceptor.Tracer" level="WARN"/> 
-	<logger name="won.node.camel.processor" level="WARN" />
-	<logger name="won.node.service" level="WARN" />
-	
-	<logger name="org.springframework.orm.jpa" level="WARN" />
-	<logger name="org.springframework.transaction" level="WARN" />
-	<logger name="org.hibernate.engine.transaction" level="WARN"/>	
-	<logger name="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" level ="WARN" />
-    <logger name="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" level ="WARN" />
-    <logger name="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" level="debug" />
-    <logger name="won.node.camel.processor.general.UriAlreadyUsedCheckingWonMessageProcessor" level="WARN" />
-    <logger name="won.protocol.util.linkeddata.CachingLinkedDataSource" level="WARN" />
-    <logger name="won.protocol.validation.WonSparqlValidator" level="WARN" />
-    <logger name="won.protocol.rest.LinkedDataRestClient" levlel="WARN" />
-    <logger name="won.node.service.persistence.MessageService" level="WARN" />
-    
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="won.node.WonMessageRoutesExternalInterceptedTest" level="WARN"/>
+    <logger name="won.node.WonMessageRoutesExternalRoutedTest" level="WARN"/>
+    <logger name="won.node.WonMessageRoutesTest" level="WARN"/>
+    <logger name="won" level="WARN"/>
+    <!-- if the CamelContext's 'trace' feature is enabled  (changes with camel version) -->
+    <logger name="org.apache.camel.processor.interceptor.Tracer" level="WARN"/>
+    <logger name="won.node.camel.processor" level="WARN"/>
+    <logger name="won.node.service" level="WARN"/>
+
+    <logger name="org.springframework.orm.jpa" level="WARN"/>
+    <logger name="org.springframework.transaction" level="WARN"/>
+    <logger name="org.hibernate.engine.transaction" level="WARN"/>
+    <logger name="won.protocol.message.processor.impl.WellformednessCheckingWonMessageProcessor" level="WARN"/>
+    <logger name="won.protocol.message.processor.impl.UriConsistencyCheckingWonMessageProcessor" level="WARN"/>
+    <logger name="won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor" level="debug"/>
+    <logger name="won.node.camel.processor.general.UriAlreadyUsedCheckingWonMessageProcessor" level="WARN"/>
+    <logger name="won.protocol.util.linkeddata.CachingLinkedDataSource" level="WARN"/>
+    <logger name="won.protocol.validation.WonSparqlValidator" level="WARN"/>
+    <logger name="won.protocol.rest.LinkedDataRestClient" levlel="WARN"/>
+    <logger name="won.node.service.persistence.MessageService" level="WARN"/>
+
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

@@ -1,21 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>webofneeds</artifactId>
-		<groupId>at.researchstudio.sat</groupId>
-		<version>0.10-SNAPSHOT</version>
-	</parent>
-	<artifactId>won-parent-pom</artifactId>
-	<name>Web of Needs parent pom</name>
-	<description>Parent pom for all modules that build code</description>
-	<packaging>pom</packaging>
-	<dependencies>
-		<dependency>
-			<groupId>at.researchstudio.sat</groupId>
-			<artifactId>won-test</artifactId>
-			<scope>test</scope>
-			<version>${project.version}</version>
-		</dependency>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>webofneeds</artifactId>
+        <groupId>at.researchstudio.sat</groupId>
+        <version>0.10-SNAPSHOT</version>
+    </parent>
+    <artifactId>won-parent-pom</artifactId>
+    <name>Web of Needs parent pom</name>
+    <description>Parent pom for all modules that build code</description>
+    <packaging>pom</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-test</artifactId>
+            <scope>test</scope>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -67,6 +68,20 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.basepom.maven</groupId>
+                <artifactId>duplicate-finder-maven-plugin</artifactId>
+                <version>1.3.0</version>
+                <executions>
+                    <execution>
+                        <id>default</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         
     </build>
@@ -98,28 +113,28 @@
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <excludedGroups>won.test.category.RequiresPosgresServer</excludedGroups>
+                            <excludedGroups>won.test.category.RequiresPostgresServer</excludedGroups>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
-        
+
         <profile>
-            <id>postgres-tests</id>
+            <id>skip-docker-tests</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <build>
                 <plugins>
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <groups>won.test.category.RequiresPosgresServer</groups>
+                            <excludedGroups>won.test.category.RequiresDockerServer</excludedGroups>
                         </configuration>
                     </plugin>
                 </plugins>
             </build>
         </profile>
-        
+
         <profile>
             <id>no-warn</id>
             <properties>

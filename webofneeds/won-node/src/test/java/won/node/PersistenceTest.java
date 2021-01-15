@@ -1,15 +1,5 @@
 package won.node;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
 import org.apache.camel.CamelContext;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -27,13 +17,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-
-import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.linkeddata.lookup.SocketLookupFromLinkedData;
-import won.node.service.persistence.DataDerivationService;
 import won.node.service.nodeconfig.URIService;
 import won.node.service.persistence.AtomService;
 import won.node.service.persistence.ConnectionService;
+import won.node.service.persistence.DataDerivationService;
 import won.node.service.persistence.MessageService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
@@ -47,6 +35,19 @@ import won.protocol.repository.MessageEventRepository;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+
 @ContextConfiguration(locations = { "classpath:/won/node/PersistenceTest.xml",
                 "classpath:/spring/component/storage/jdbc-storage.xml",
                 "classpath:/spring/component/storage/jpabased-rdf-storage.xml",
@@ -57,6 +58,7 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 @TestPropertySource
 @Transactional
 public class PersistenceTest {
+    protected static AtomicInteger counter = new AtomicInteger(0);
     /**
      * Actual services
      */
@@ -94,10 +96,10 @@ public class PersistenceTest {
 
     @Before
     public void setUp() {
-        Mockito.when(uriService.isAtomURI(any(URI.class))).thenReturn(true);
+        Mockito.when(uriService.isAtomURI(any())).thenReturn(true);
         Mockito.when(uriService.getAtomResourceURIPrefix()).then(x -> "uri:/node/resource/atom");
         Mockito.when(uriService.getResourceURIPrefix()).then(x -> "uri:/node/resource");
-        Mockito.when(uriService.createSysInfoGraphURIForAtomURI(any(URI.class))).thenCallRealMethod();
+        Mockito.when(uriService.createSysInfoGraphURIForAtomURI(any())).thenCallRealMethod();
     }
 
     @Test(expected = DataIntegrityViolationException.class)
@@ -195,9 +197,9 @@ public class PersistenceTest {
         Mockito.when(socketLookup.getCapacity(targetSocket)).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatible(senderSocket, targetSocket)).thenReturn(true);
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
-        Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
-        Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
-        Mockito.when(socketLookup.getSocketConfig(any(URI.class)))
+        Mockito.when(socketLookup.getCapacityOfType(any())).thenReturn(Optional.of(10));
+        Mockito.when(socketLookup.isCompatibleSocketTypes(any(), any())).thenReturn(true);
+        Mockito.when(socketLookup.getSocketConfig(any()))
                         .thenReturn(Optional.of(getChatSocketDefForDerivation()));
         WonMessage connectMessage = prepareFromOwner(WonMessageBuilder
                         .connect()
@@ -268,9 +270,9 @@ public class PersistenceTest {
         Mockito.when(socketLookup.getCapacity(targetSocket)).thenReturn(Optional.of(10));
         Mockito.when(socketLookup.isCompatible(senderSocket, targetSocket)).thenReturn(true);
         Mockito.when(socketLookup.isCompatible(targetSocket, senderSocket)).thenReturn(true);
-        Mockito.when(socketLookup.getCapacityOfType(any(URI.class))).thenReturn(Optional.of(10));
-        Mockito.when(socketLookup.isCompatibleSocketTypes(any(URI.class), any(URI.class))).thenReturn(true);
-        Mockito.when(socketLookup.getSocketConfig(any(URI.class)))
+        Mockito.when(socketLookup.getCapacityOfType(any())).thenReturn(Optional.of(10));
+        Mockito.when(socketLookup.isCompatibleSocketTypes(any(), any())).thenReturn(true);
+        Mockito.when(socketLookup.getSocketConfig(any()))
                         .thenReturn(Optional.of(getChatSocketDefForDerivation()));
         WonMessage connectMessage = prepareFromOwner(WonMessageBuilder
                         .connect()
@@ -278,8 +280,8 @@ public class PersistenceTest {
                         .content().text("Hey there!")
                         .build());
         // processing the message would lead to this call:
-        Mockito.when(wonNodeInformationService.generateConnectionURI(any(URI.class)))
-                        .then(invocation -> newConnectionURI(invocation.getArgumentAt(0, URI.class)));
+        Mockito.when(wonNodeInformationService.generateConnectionURI(any()))
+                        .then(invocation -> newConnectionURI(invocation.getArgument(0, URI.class)));
         Connection con = connectionService.connectFromOwner(connectMessage);
         // then it would be stored:
         messageService.saveMessage(connectMessage, con.getConnectionURI());
@@ -363,8 +365,6 @@ public class PersistenceTest {
         dataset.commit();
         return dataset;
     }
-
-    protected static AtomicInteger counter = new AtomicInteger(0);
 
     protected URI newConnectionURI(URI atomUri) {
         return URI.create(atomUri.toString() + "/c/connection-" + counter.incrementAndGet());

@@ -10,32 +10,26 @@
  */
 package won.node.camel.processor.general;
 
-import static won.node.camel.service.WonCamelHelper.*;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
-import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.support.DefaultExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.service.persistence.ActiveMQOwnerManagementService;
-import won.node.service.persistence.OwnerManagementService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.OwnerApplicationRepository;
+
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static won.node.camel.service.WonCamelHelper.*;
 
 /**
  * Combines the MESSAGE_HEADER and RESPONSE_HEADER messages and sends them to

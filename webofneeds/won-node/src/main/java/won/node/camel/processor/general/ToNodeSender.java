@@ -10,25 +10,24 @@
  */
 package won.node.camel.processor.general;
 
-import static won.node.camel.service.WonCamelHelper.*;
-
-import java.net.URI;
-import java.util.Optional;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.support.DefaultExchange;
 import org.apache.jena.riot.Lang;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.protocol.jms.AtomProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.service.MessageRoutingInfoService;
+
+import java.net.URI;
+import java.util.Optional;
+
+import static won.node.camel.service.WonCamelHelper.*;
 
 /**
  * Processor responsible for routing messages to another node, or to route it

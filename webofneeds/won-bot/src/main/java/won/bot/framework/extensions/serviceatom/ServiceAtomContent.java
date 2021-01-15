@@ -25,7 +25,7 @@ public class ServiceAtomContent {
             this.sockets = new HashMap<>();
             this.sockets.put("#HolderSocket", WXHOLD.HolderSocket.asString());
             this.sockets.put("#ChatSocket", WXCHAT.ChatSocket.asString());
-            this.sockets.put("#sReviewSocket", WXSCHEMA.ReviewSocket.asString());
+            this.sockets.put("#ReviewSocket", WXSCHEMA.ReviewSocket.asString());
         } else {
             this.sockets = sockets;
         }

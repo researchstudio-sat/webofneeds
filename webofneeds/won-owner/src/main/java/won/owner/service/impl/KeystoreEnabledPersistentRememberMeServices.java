@@ -1,28 +1,15 @@
 package won.owner.service.impl;
 
-import java.security.KeyStore;
-import java.util.Arrays;
-import java.util.Date;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.rememberme.CookieTheftException;
-import org.springframework.security.web.authentication.rememberme.InvalidCookieException;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationException;
+import org.springframework.security.web.authentication.rememberme.*;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-
 import won.owner.model.KeystoreHolder;
 import won.owner.model.KeystorePasswordHolder;
 import won.owner.model.PersistentLogin;
@@ -30,12 +17,15 @@ import won.owner.model.User;
 import won.owner.repository.KeystorePasswordRepository;
 import won.owner.repository.PersistentLoginRepository;
 
-public class KeystoreEnabledPersistentRememberMeServices extends PersistentTokenBasedRememberMeServices {
-    public KeystoreEnabledPersistentRememberMeServices(String key, UserDetailsService userDetailsService,
-                    PersistentTokenRepository tokenRepository) {
-        super(key, userDetailsService, tokenRepository);
-    }
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.KeyStore;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
 
+public class KeystoreEnabledPersistentRememberMeServices extends PersistentTokenBasedRememberMeServices {
     private static final String UNLOCK_COOKIE_NAME = "won.unlock";
     @Autowired
     private PersistentLoginRepository persistentLoginRepository;
@@ -43,6 +33,11 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
     private KeystorePasswordRepository keystorePasswordRepository;
     @Autowired
     private PlatformTransactionManager platformTransactionManager;
+
+    public KeystoreEnabledPersistentRememberMeServices(String key, UserDetailsService userDetailsService,
+                    PersistentTokenRepository tokenRepository) {
+        super(key, userDetailsService, tokenRepository);
+    }
 
     @Transactional
     protected UserDetails processAutoLoginCookie(String[] cookieTokens, HttpServletRequest request,
@@ -57,12 +52,13 @@ public class KeystoreEnabledPersistentRememberMeServices extends PersistentToken
         return transactionTemplate.execute(new TransactionCallback<UserDetails>() {
             @Override
             public UserDetails doInTransaction(TransactionStatus status) {
-                PersistentLogin persistentLogin = persistentLoginRepository.findOne(presentedSeries);
-                if (persistentLogin == null) {
+                Optional<PersistentLogin> persistentLoginOpt = persistentLoginRepository.findById(presentedSeries);
+                if (persistentLoginOpt.isEmpty()) {
                     // No series match, so we can't authenticate using this cookie
                     throw new RememberMeAuthenticationException(
                                     "No persistent token found for series id: " + presentedSeries);
                 }
+                PersistentLogin persistentLogin = persistentLoginOpt.get();
                 // We have a match for this user/series combination
                 if (!presentedToken.equals(persistentLogin.getToken())) {
                     // Token doesn't match series value. Delete all logins for this user and throw

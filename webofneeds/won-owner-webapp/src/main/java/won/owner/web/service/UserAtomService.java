@@ -1,12 +1,9 @@
 package won.owner.web.service;
 
-import java.net.URI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.owner.model.User;
 import won.owner.model.UserAtom;
 import won.owner.repository.UserAtomRepository;
@@ -15,6 +12,8 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.AtomState;
+
+import java.net.URI;
 
 @Component
 public class UserAtomService {
@@ -97,7 +96,7 @@ public class UserAtomService {
         UserAtom userAtom = new UserAtom(atomUri);
         // reload the user so we can save it
         // (the user object we get from getUserForSession is detached)
-        user = userRepository.findOne(user.getId());
+        user = userRepository.findById(user.getId()).get();
         userAtom = userAtomRepository.save(userAtom);
         logger.debug("saved user atom {}", userAtom.getId());
         user.addUserAtom(userAtom);
@@ -137,7 +136,7 @@ public class UserAtomService {
             if (userAtom.getState() == AtomState.DELETED) {
                 // reload the user so we can save it
                 // (the user object we get from getUserForSession is detached)
-                user = userRepository.findOne(user.getId());
+                user = userRepository.findById(user.getId()).get();
                 // Delete atom in users atom list and save changes
                 user.getUserAtoms().remove(userAtom);
                 user = userRepository.save(user);
@@ -154,7 +153,7 @@ public class UserAtomService {
         // Get the atom from owner application db
         UserAtom userAtom = userAtomRepository.findByAtomUri(atomUri);
         if (userAtom != null) {
-            user = userRepository.findOne(user.getId());
+            user = userRepository.findById(user.getId()).get();
             // Delete atom in users atom list and save changes
             user.getUserAtoms().remove(userAtom);
             user = userRepository.save(user);

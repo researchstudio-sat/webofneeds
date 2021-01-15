@@ -1,18 +1,10 @@
 package won.node.camel.processor;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutorService;
-import java.util.regex.Pattern;
-import javax.persistence.EntityManager;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.support.DefaultExchange;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -20,55 +12,33 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.fusesource.hawtbuf.ByteArrayInputStream;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockBeans;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import junit.framework.Assert;
 import org.springframework.transaction.PlatformTransactionManager;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.cryptography.service.CryptographyService;
 import won.cryptography.service.RandomNumberService;
 import won.cryptography.service.RegistrationClient;
 import won.node.camel.AtomProtocolCommunicationServiceImpl;
-import won.node.camel.processor.annotation.FixedMessageProcessor;
 import won.node.camel.processor.general.MessageTypeSlipComputer;
 import won.node.camel.service.CamelWonMessageService;
 import won.node.protocol.MatcherProtocolMatcherServiceClientSide;
-import won.node.service.persistence.AtomService;
-import won.node.service.persistence.ConnectionService;
-import won.node.service.persistence.MessageService;
-import won.node.service.persistence.OwnerManagementService;
-import won.node.service.persistence.SocketService;
+import won.node.service.persistence.*;
 import won.protocol.jms.ActiveMQService;
 import won.protocol.jms.AtomProtocolCamelConfigurator;
-import won.protocol.jms.AtomProtocolCommunicationService;
 import won.protocol.jms.MessagingService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
-import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
-import won.protocol.repository.AtomMessageContainerRepository;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.ConnectionContainerRepository;
-import won.protocol.repository.ConnectionMessageContainerRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.DatasetHolderRepository;
-import won.protocol.repository.MessageContainerRepository;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.OwnerApplicationRepository;
-import won.protocol.repository.SocketRepository;
+import won.protocol.repository.*;
 import won.protocol.service.MessageRoutingInfoService;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.AtomModelWrapper;
@@ -76,6 +46,15 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WONMSG;
 import won.protocol.vocabulary.WXCHAT;
 import won.protocol.vocabulary.WXGROUP;
+
+import javax.persistence.EntityManager;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(name = "parent", locations = {
@@ -88,7 +67,7 @@ import won.protocol.vocabulary.WXGROUP;
 @MockBean(name = "atomProtocolCommunicationService", classes = { AtomProtocolCommunicationServiceImpl.class })
 @MockBean(name = "messageContainerRepository", classes = { MessageContainerRepository.class })
 @MockBean(name = "messageRoutingInfoService", classes = { MessageRoutingInfoService.class })
-@MockBean(name = "ownerManagementService", classes = { OwnerManagementService.class })
+@MockBean(name = "ownerManagementService", classes = { ActiveMqOwnerManagementServiceImpl.class })
 @MockBean(name = "webIdKeyLoader", classes = { WebIdKeyLoader.class })
 @MockBean(name = "activeMQService", classes = { ActiveMQService.class })
 @MockBean(name = "entityManager", classes = { EntityManager.class })
@@ -114,6 +93,7 @@ import won.protocol.vocabulary.WXGROUP;
 @MockBean(name = "messageService", classes = { MessageService.class })
 @MockBean(name = "camelWonMessageService", classes = { CamelWonMessageService.class })
 @MockBean(name = "cryptographyService", classes = { CryptographyService.class })
+@MockBean(name = "producerTemplate", classes = { ProducerTemplate.class })
 @TestPropertySource(locations = { "classpath:/won/node/PersistenceTest.properties" })
 public class WonMessageSlipComputerTests {
     @Autowired

@@ -22,7 +22,6 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Component;
-
 import won.node.service.nodebehaviour.AtomManagementService;
 import won.protocol.model.Atom;
 import won.protocol.repository.AtomRepository;
@@ -57,8 +56,9 @@ public class AtomInactivityChecker implements InitializingBean, DisposableBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (this.taskScheduler == null)
+        if (this.taskScheduler == null) {
             throw new IllegalStateException("taskScheduler must be set");
+        }
         if (this.inactivityCheckInterval <= 0) {
             return;
         }
@@ -121,7 +121,7 @@ public class AtomInactivityChecker implements InitializingBean, DisposableBean {
                 calendar.add(Calendar.SECOND, -deactivateTimeoutDespiteEstablishedConnections);
                 Date deactivateThresholdDespiteEstablishedConnections = calendar.getTime();
                 // select atoms that match our criteria:
-                Pageable firstPage = new PageRequest(0, 100);
+                Pageable firstPage = PageRequest.of(0, 100);
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
                 logger.debug("warn start-date: {}, warn end-date: {}, deactivate cut-off date {}",
                                 new Object[] { simpleDateFormat.format(startWarningThreshold),
@@ -245,16 +245,20 @@ public class AtomInactivityChecker implements InitializingBean, DisposableBean {
 
         private String getTimeString(int seconds) {
             Duration duration = Duration.ofSeconds(seconds);
-            if (seconds <= 0)
+            if (seconds <= 0) {
                 return "bogus time";
-            if (seconds < 60)
+            }
+            if (seconds < 60) {
                 return singularOrPlural(seconds, "second", "seconds");
-            if (seconds < 3600)
+            }
+            if (seconds < 3600) {
                 return singularOrPlural(duration.toMinutes(), "minute", "minutes");
-            if (seconds < 86400)
+            }
+            if (seconds < 86400) {
                 return singularOrPlural(duration.toHours(), "hour", "hours");
-            else
+            } else {
                 return singularOrPlural(duration.toDays(), "day", "days");
+            }
         }
 
         private String singularOrPlural(long value, String singular, String plural) {

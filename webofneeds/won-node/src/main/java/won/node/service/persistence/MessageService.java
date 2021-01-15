@@ -1,44 +1,23 @@
 package won.node.service.persistence;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.text.MessageFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
-
 import won.protocol.exception.DuplicateResponseException;
 import won.protocol.exception.IncoherentDatabaseStateException;
 import won.protocol.exception.NoSuchMessageException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageEncoder;
-import won.protocol.message.WonMessageType;
-import won.protocol.message.WonMessageUtils;
-import won.protocol.model.AtomMessageContainer;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionMessageContainer;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.MessageContainer;
-import won.protocol.model.MessageEvent;
-import won.protocol.repository.AtomMessageContainerRepository;
-import won.protocol.repository.ConnectionContainerRepository;
-import won.protocol.repository.ConnectionMessageContainerRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.DatasetHolderRepository;
-import won.protocol.repository.MessageContainerRepository;
-import won.protocol.repository.MessageEventRepository;
+import won.protocol.message.*;
+import won.protocol.model.*;
+import won.protocol.repository.*;
+
+import javax.persistence.EntityManager;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class MessageService {
@@ -332,22 +311,24 @@ public class MessageService {
             // create an atom event container with null parent (because it will only be
             // persisted at a later point in time)
             MessageContainer container = atomMessageContainerRepository.findOneByParentUri(parent);
-            if (container != null)
+            if (container != null) {
                 return container;
+            }
             AtomMessageContainer nec = new AtomMessageContainer(null, parent);
             nec = atomMessageContainerRepository.save(nec);
-            return atomMessageContainerRepository.findOne(nec.getId());
+            return atomMessageContainerRepository.findById(nec.getId()).get();
         } else if (WonMessageType.CONNECT.equals(messageType)
                         || WonMessageType.SOCKET_HINT_MESSAGE.equals(messageType)) {
             // create a connection event container witn null parent (because it will only be
             // persisted at a later point in
             // time)
             MessageContainer container = connectionMessageContainerRepository.findOneByParentUri(parent);
-            if (container != null)
+            if (container != null) {
                 return container;
+            }
             ConnectionMessageContainer cec = new ConnectionMessageContainer(null, parent);
             cec = connectionMessageContainerRepository.save(cec);
-            return connectionMessageContainerRepository.findOne(cec.getId());
+            return connectionMessageContainerRepository.findById(cec.getId()).get();
         }
         Optional<MessageContainer> mc = messageContainerRepository.findOneByParentUri(parent);
         return mc.orElseThrow(() -> new IncoherentDatabaseStateException(

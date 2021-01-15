@@ -228,9 +228,9 @@ public class Shacl2JavaInstanceFactory {
                 while (it.hasNext()) {
                     shapeSet.add(it.next());
                 }
-                toInstantiate = shapeSet.parallelStream().map(shape -> {
+                toInstantiate = shapeSet.stream().map(shape -> {
                     return instantiate(null, shape, false, ctx);
-                }).reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
+                }).reduce(CollectionUtils::union).orElseGet(() -> Collections.emptySet());
                 toInstantiate = deduplicate(toInstantiate);
             } else {
                 toInstantiate = toInstantiate.parallelStream().map(dataNodeAndShapes -> {
@@ -239,16 +239,16 @@ public class Shacl2JavaInstanceFactory {
                                         .stream(shapes.spliterator(), true)
                                         .map(shape -> instantiate(dataNodeAndShapes.getDataNode(),
                                                         shape, false, ctx))
-                                        .reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
+                                        .reduce(CollectionUtils::union).orElseGet(() -> Collections.emptySet());
                     } else {
                         return dataNodeAndShapes
                                         .getShapeNodes()
                                         .parallelStream()
                                         .map(shapeNode -> instantiate(dataNodeAndShapes.getDataNode(),
                                                         shapes.getShape(shapeNode), true, ctx))
-                                        .reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
+                                        .reduce(CollectionUtils::union).orElseGet(() -> Collections.emptySet());
                     }
-                }).reduce(SetUtils::union).orElseGet(() -> Collections.emptySet());
+                }).reduce(CollectionUtils::union).orElseGet(() -> Collections.emptySet());
                 toInstantiate = deduplicate(toInstantiate);
             }
         }
@@ -405,10 +405,10 @@ public class Shacl2JavaInstanceFactory {
                                                                                     valueNode,
                                                                                     nodeShapeNodes))
                                                                     .collect(Collectors.toSet()))
-                                                    .reduce(SetUtils::union).orElse(Collections.emptySet());
-                                }).reduce(SetUtils::union).orElse(Collections.emptySet());
-            }).reduce(SetUtils::union).orElse(Collections.emptySet());
-        }).reduce(SetUtils::union).orElse(Collections.emptySet());
+                                                    .reduce(CollectionUtils::union).orElse(Collections.emptySet());
+                                }).reduce(CollectionUtils::union).orElse(Collections.emptySet());
+            }).reduce(CollectionUtils::union).orElse(Collections.emptySet());
+        }).reduce(CollectionUtils::union).orElse(Collections.emptySet());
         return ret;
     }
 

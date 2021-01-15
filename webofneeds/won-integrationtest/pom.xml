@@ -46,10 +46,27 @@
     </plugins>
   </build>
   <dependencies>
+    <dependency>
+      <groupId>at.researchstudio.sat</groupId>
+      <artifactId>won-bot</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>at.researchstudio.sat</groupId>
+      <artifactId>won-utils-content</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>at.researchstudio.sat</groupId>
+      <artifactId>won-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- TEST STUFF -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -82,6 +99,17 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
+    </dependency>
+    <!-- simulate a /etc/hosts entry for '127.0.0.1  wonnode' -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>dns-cache-manipulator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>at.researchstudio.sat</groupId>
+      <artifactId>won-bot</artifactId>
+      <version>0.10-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

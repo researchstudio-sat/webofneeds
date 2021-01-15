@@ -87,7 +87,7 @@ won:connectionShape
     sh:property    [ sh:path     won:messageContainer ;
                      sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
-                     sh:node     won:won:messageContainerShape ] .
+                     sh:node     won:messageContainerShape ] .
 
 won:messageShape
     a           sh:NodeShape ;

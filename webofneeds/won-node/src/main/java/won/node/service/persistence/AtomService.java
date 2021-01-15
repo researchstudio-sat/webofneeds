@@ -1,17 +1,5 @@
 package won.node.service.persistence;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.javasimon.SimonManager;
@@ -22,37 +10,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import won.node.service.nodeconfig.URIService;
-import won.protocol.exception.IllegalAtomContentException;
-import won.protocol.exception.IllegalAtomURIException;
-import won.protocol.exception.IllegalSocketModificationException;
-import won.protocol.exception.MissingMessagePropertyException;
-import won.protocol.exception.NoSuchAtomException;
-import won.protocol.exception.UriAlreadyInUseException;
-import won.protocol.exception.WonMessageProcessingException;
-import won.protocol.exception.WrongAddressingInformationException;
+import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomMessageContainer;
-import won.protocol.model.AtomState;
-import won.protocol.model.ConnectionContainer;
-import won.protocol.model.ConnectionState;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.Lock;
-import won.protocol.model.OwnerApplication;
-import won.protocol.model.Socket;
-import won.protocol.repository.AtomMessageContainerRepository;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.ConnectionContainerRepository;
-import won.protocol.repository.LockRepository;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.OwnerApplicationRepository;
-import won.protocol.repository.SocketRepository;
+import won.protocol.model.*;
+import won.protocol.repository.*;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.WONMSG;
+
+import javax.persistence.EntityManager;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class AtomService {
@@ -261,9 +235,9 @@ public class AtomService {
                                         + socket.getSocketURI() + ": socket has connections in state "
                                         + ConnectionState.CONNECTED));
         // add everything to the atom model class and save it
-        socketRepository.save(newSocketEntities);
-        socketRepository.save(changedSockets);
-        socketRepository.delete(removedSockets);
+        socketRepository.saveAll(newSocketEntities);
+        socketRepository.saveAll(changedSockets);
+        socketRepository.deleteAll(removedSockets);
         if (derivationModel.isPresent()) {
             atomContent.addNamedModel(atom.getAtomURI().toString() + "#derivedData", derivationModel.get());
         }
@@ -277,8 +251,9 @@ public class AtomService {
     private Set<Socket> determineNewSockets(URI atomURI, List<Socket> existingSockets,
                     AtomModelWrapper atomModelWrapper) {
         Collection<String> sockets = atomModelWrapper.getSocketUris();
-        if (sockets.size() == 0)
+        if (sockets.size() == 0) {
             throw new IllegalAtomContentException("at least one property won:socket required ");
+        }
         // create new socket entities for the sockets not yet existing:
         Set<Socket> newSocketEntities = sockets.stream()
                         .filter(socketUri -> !existingSockets.stream()
@@ -340,11 +315,12 @@ public class AtomService {
     }
 
     private void checkCanThisMessageCreateOrModifyThisAtom(final WonMessage wonMessage, URI atomURI) {
-        if (!atomURI.equals(wonMessage.getAtomURI()))
+        if (!atomURI.equals(wonMessage.getAtomURI())) {
             throw new WrongAddressingInformationException(
                             "atomURI of the message (" + wonMessage.getAtomURI() + ") and AtomURI of the content ("
                                             + atomURI + ") are not equal",
                             wonMessage.getMessageURI(), WONMSG.atom);
+        }
         if (!uriService.isAtomURI(atomURI)) {
             throw new IllegalAtomURIException("Atom URI " + atomURI + "does not match this node's prefix "
                             + uriService.getAtomResourceURIPrefix());
@@ -371,8 +347,9 @@ public class AtomService {
             }
             getSocketTypeAndCheck(atomModelWrapper, socketUri);
         });
-        if (sockets.size() == 0)
+        if (sockets.size() == 0) {
             throw new IllegalAtomContentException("at least one property won:socket required ");
+        }
         return sockets;
     }
 

@@ -47,13 +47,6 @@ public class BotContextWrapperTests {
         botContextClass = cl;
     }
 
-    @Before
-    public void setup() throws IllegalAccessException, InstantiationException {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("/botContext.xml");
-        botContext = (BotContext) ctx.getBean(botContextClass);
-        botContextWrapper = new BotContextWrapper(botContext, BOT_NAME, LIST_NAME_1, LIST_NAME_2);
-    }
-
     @Parameterized.Parameters
     public static Iterable<Class[]> getTestParameters() {
         LinkedList<Class[]> linkedList = new LinkedList<>();
@@ -62,6 +55,14 @@ public class BotContextWrapperTests {
         // mongodb integration Testing
         // linkedList.add(new Class[] { MongoBotContext.class });
         return linkedList;
+    }
+
+    @Before
+    public void setup() throws IllegalAccessException, InstantiationException {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext(
+                        "classpath:spring/component/botContext/memoryBotContext.xml");
+        botContext = (BotContext) ctx.getBean(botContextClass);
+        botContextWrapper = new BotContextWrapper(botContext, BOT_NAME, LIST_NAME_1, LIST_NAME_2);
     }
 
     @After

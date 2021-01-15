@@ -10,19 +10,12 @@
  */
 package won.node.service.persistence;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Optional;
-
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-
 import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
@@ -34,11 +27,17 @@ import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.util.DataAccessUtils;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Optional;
+
 /**
  * User: fkleedorfer Date: 02.11.12
  */
 @Component
 public class AtomInformationServiceImpl implements AtomInformationService {
+    private static final int DEFAULT_PAGE_SIZE = 500;
     @Autowired
     private AtomRepository atomRepository;
     @Autowired
@@ -47,7 +46,6 @@ public class AtomInformationServiceImpl implements AtomInformationService {
     private MessageEventRepository messageEventRepository;
     @Autowired
     private URIService uriService;
-    private static final int DEFAULT_PAGE_SIZE = 500;
     private int pageSize = DEFAULT_PAGE_SIZE;
 
     @Override
@@ -69,7 +67,7 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         }
         // use 'creationDate' to keep a constant atom order over requests
         return atomRepository.getAllAtomURIs(atomState,
-                        new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
+                        PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
     }
 
     @Override
@@ -85,11 +83,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         if (atomState == null) {
             // use 'creationDate' to keep a constant atom order over requests
             slice = atomRepository.getAtomURIsBefore(referenceDate,
-                            new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+                            PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
         } else {
             // use 'creationDate' to keep a constant atom order over requests
             slice = atomRepository.getAtomURIsBefore(referenceDate, atomState,
-                            new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+                            PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
         }
         return slice;
     }
@@ -117,11 +115,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         if (atomState == null) {
             // use 'creationDate' to keep a constant atom order over requests
             slice = atomRepository.getAtomURIsAfter(referenceDate,
-                            new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+                            PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
         } else {
             // use 'creationDate' to keep a constant atom order over requests
             slice = atomRepository.getAtomURIsAfter(referenceDate, atomState,
-                            new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+                            PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
         }
         return slice;
     }
@@ -155,11 +153,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         if (timeSpot == null) {
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionURIByActivityDate(
-                            new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+                            PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
         } else {
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionURIByActivityDate(timeSpot,
-                            new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+                            PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
         }
         return slice;
     }
@@ -172,11 +170,11 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         if (timeSpot == null) {
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionsByActivityDate(
-                            new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+                            PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
         } else {
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionsByActivityDate(timeSpot,
-                            new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+                            PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
         }
         return slice;
     }
@@ -189,7 +187,7 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         Slice<Connection> slice;
         // use 'min(msg.creationDate)' to keep a constant connection order over requests
         slice = connectionRepository.getConnectionsBeforeByActivityDate(resume, timeSpot,
-                        new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+                        PageRequest.of(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
         return slice;
     }
 
@@ -201,7 +199,7 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         Slice<Connection> slice;
         // use 'min(msg.creationDate)' to keep a constant connection order over requests
         slice = connectionRepository.getConnectionsAfterByActivityDate(resume, timeSpot,
-                        new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
+                        PageRequest.of(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
         return slice;
     }
 
@@ -229,7 +227,7 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         int pageSize = getPageSize(preferedPageSize);
         int pageNum = page - 1;
         // use 'min(msg.creationDate)' to keep a constant connection order over requests
-        PageRequest pageRequest = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)");
+        PageRequest pageRequest = PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)");
         if (messageType == null) {
             if (timeSpot == null) {
                 slice = connectionRepository.getConnectionURIByActivityDate(atomURI, pageRequest);
@@ -255,7 +253,7 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         int pageSize = getPageSize(preferedPageSize);
         int pageNum = page - 1;
         // use 'min(msg.creationDate)' to keep a constant connection order over requests
-        PageRequest pageRequest = new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)");
+        PageRequest pageRequest = PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, "min(msg.creationDate)");
         if (messageType == null) {
             if (timeSpot == null) {
                 slice = connectionRepository.getConnectionsByActivityDate(atomURI, pageRequest);
@@ -284,12 +282,12 @@ public class AtomInformationServiceImpl implements AtomInformationService {
             resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionsBeforeByActivityDate(atomURI, resume, timeSpot,
-                            new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+                            PageRequest.of(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
         } else {
             resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionsBeforeByActivityDate(atomURI, resume, messageType, timeSpot,
-                            new PageRequest(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
+                            PageRequest.of(0, pageSize, Sort.Direction.DESC, "min(msg.creationDate)"));
         }
         return slice;
     }
@@ -306,27 +304,29 @@ public class AtomInformationServiceImpl implements AtomInformationService {
             resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, timeSpot);
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionsAfterByActivityDate(atomURI, resume, timeSpot,
-                            new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
+                            PageRequest.of(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
         } else {
             resume = messageEventRepository.findMaxActivityDateOfParentAtTime(resumeConnURI, messageType, timeSpot);
             // use 'min(msg.creationDate)' to keep a constant connection order over requests
             slice = connectionRepository.getConnectionsAfterByActivityDate(atomURI, resume, messageType, timeSpot,
-                            new PageRequest(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
+                            PageRequest.of(0, pageSize, Sort.Direction.ASC, "min(msg.creationDate)"));
         }
         return slice;
     }
 
     @Override
     public Atom readAtom(final URI atomURI) throws NoSuchAtomException {
-        if (atomURI == null)
+        if (atomURI == null) {
             throw new IllegalArgumentException("atomURI is not set");
+        }
         return (DataAccessUtils.loadAtom(atomRepository, atomURI));
     }
 
     @Override
     public DataWithEtag<Atom> readAtom(final URI atomURI, String etag) throws NoSuchAtomException {
-        if (atomURI == null)
+        if (atomURI == null) {
             throw new IllegalArgumentException("atomURI is not set");
+        }
         Atom atom = null;
         if (etag == null) {
             atom = DataAccessUtils.loadAtom(atomRepository, atomURI);
@@ -340,15 +340,17 @@ public class AtomInformationServiceImpl implements AtomInformationService {
 
     @Override
     public Connection readConnection(final URI connectionURI) throws NoSuchConnectionException {
-        if (connectionURI == null)
+        if (connectionURI == null) {
             throw new IllegalArgumentException("connectionURI is not set");
+        }
         return DataAccessUtils.loadConnection(connectionRepository, connectionURI);
     }
 
     @Override
     public DataWithEtag<Connection> readConnection(final URI connectionURI, String etag) {
-        if (connectionURI == null)
+        if (connectionURI == null) {
             throw new IllegalArgumentException("connectionURI is not set");
+        }
         Connection con = null;
         if (etag == null) {
             con = connectionRepository.findOneByConnectionURI(connectionURI)
@@ -374,10 +376,10 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         Slice<MessageEvent> slice = null;
         if (messageType == null) {
             slice = messageEventRepository.findByParentURI(connectionUri,
-                            new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
+                            PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
         } else {
             slice = messageEventRepository.findByParentURIAndType(connectionUri, messageType,
-                            new PageRequest(pageNum, pageSize, Sort.Direction.DESC, "creationDate"));
+                            PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
         }
         return slice;
     }
@@ -392,10 +394,10 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         Slice<MessageEvent> slice = null;
         if (msgType == null) {
             slice = messageEventRepository.findByParentURIAfter(connectionUri, referenceDate,
-                            new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
+                            PageRequest.of(0, pageSize, Sort.by(Sort.Direction.ASC, "creationDate")));
         } else {
             slice = messageEventRepository.findByParentURIAndTypeAfter(connectionUri, referenceDate, msgType,
-                            new PageRequest(0, pageSize, Sort.Direction.ASC, "creationDate"));
+                            PageRequest.of(0, pageSize, Sort.by(Sort.Direction.ASC, "creationDate")));
         }
         return slice;
     }
@@ -407,10 +409,10 @@ public class AtomInformationServiceImpl implements AtomInformationService {
         Slice<MessageEvent> slice = null;
         if (msgType == null) {
             slice = messageEventRepository.findByParentURIBeforeFetchDatasetEagerly(connectionUri, msgURI,
-                            new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+                            PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
         } else {
             slice = messageEventRepository.findByParentURIAndTypeBeforeFetchDatasetEagerly(connectionUri, msgURI,
-                            msgType, new PageRequest(0, pageSize, Sort.Direction.DESC, "creationDate"));
+                            msgType, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "creationDate")));
         }
         return slice;
     }

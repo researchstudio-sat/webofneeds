@@ -31,7 +31,7 @@ public class KeystoreEnabledDaoAuthenticationProvider extends DaoAuthenticationP
                         authentication);
         User user = (User) auth.getPrincipal();
         // can't use that object as it's detached. load the user again:
-        user = userRepository.findOne(user.getId());
+        user = userRepository.findById(user.getId()).get();
         KeystorePasswordHolder keystorePasswordHolder = user.getKeystorePasswordHolder();
         if (keystorePasswordHolder == null || keystorePasswordHolder.getEncryptedPassword() == null
                         || keystorePasswordHolder.getEncryptedPassword().length() == 0) {

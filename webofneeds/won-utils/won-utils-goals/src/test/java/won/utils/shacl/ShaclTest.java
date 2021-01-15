@@ -74,7 +74,7 @@ public class ShaclTest {
         for (ValidationResultWrapper result : reportWrapper.getValidationResults()) {
             Assert.assertEquals(SH.Violation, result.getResultSeverity());
             Assert.assertEquals("myRide", result.getFocusNode().getLocalName());
-            Assert.assertEquals("Less than 1 values", result.getResultMessage());
+            Assert.assertEquals("Property needs to have at least 1 values, but found 0", result.getResultMessage());
             Assert.assertEquals(SH.MinCountConstraintComponent, result.getSourceConstraintComponent());
         }
     }

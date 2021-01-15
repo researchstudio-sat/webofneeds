@@ -58,7 +58,11 @@ docker-compose up -d
 ## Accessing the WoN Node
 
 Inside the docker-compose project, the node's hostname is `wonnode`. For browsing, you can reach it under [https://localhost:8443/won/resource](https://localhost:8443/won/resource) because the port is mapped to the docker host. However, if you want to connect another owner app or bot, you have to tell your system how to resolve `wonnode`:
+You have two options:
+1. Add an entry to your hosts file
+2. Resolve the entry programmatically in a java program using [DnsCacheManipulator](https://github.com/alibaba/java-dns-cache-manipulator)
 
+### Adding an entry for `wonnode` to the hosts file
 Add this to your `etc/hosts` (or `C:\windows\system32\drivers\etc\hosts` in windows):
 ```
 127.0.0.1       wonnode
@@ -69,6 +73,21 @@ Then, you can start e.g. the [won-debugbot](https://github.com/researchstudio-sa
 export WON_NODE_URI="https://wonnode:8443/won"
 java -jar target/bot.jar
 ```
+
+### Setting a DNS cache entry for `wonnode` programmatically
+Dependency:
+```
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>dns-cache-manipulator</artifactId>
+    <version>1.5.1</version>
+</dependency>
+```
+Usage:
+```
+DnsCacheManipulator.setDnsCache("wonnode", "127.0.0.1");
+```
+ 
 
 ## Hints
 

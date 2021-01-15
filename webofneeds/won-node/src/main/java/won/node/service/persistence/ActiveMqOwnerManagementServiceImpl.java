@@ -1,29 +1,28 @@
 package won.node.service.persistence;
 
-import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.Endpoint;
+import org.apache.camel.component.activemq.ActiveMQComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.transaction.annotation.Transactional;
 import won.protocol.model.Lock;
 import won.protocol.model.OwnerApplication;
 import won.protocol.repository.LockRepository;
 import won.protocol.repository.OwnerApplicationRepository;
 
+import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 /**
  * User: sbyim Date: 11.11.13
  */
 @org.springframework.stereotype.Component
-public class OwnerManagementService implements ActiveMQOwnerManagementService {
+public class ActiveMqOwnerManagementServiceImpl implements ActiveMQOwnerManagementService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private OwnerApplicationRepository ownerApplicationRepository;

@@ -10,8 +10,6 @@
  */
 package won.protocol.repository;
 
-import java.util.List;
-
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -21,8 +19,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 @NoRepositoryBean
 public interface WonRepository<M> extends PagingAndSortingRepository<M, Long> {
-    List<M> findById(Long id);
-
     // Removed the annotation as it interferes with CGLIB autoproxying aop.
     // @Transactional(propagation = Propagation.REQUIRES_NEW)
     // if needed, the business level services must be annotated.

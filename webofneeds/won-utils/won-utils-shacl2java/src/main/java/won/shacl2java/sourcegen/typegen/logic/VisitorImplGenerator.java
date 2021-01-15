@@ -64,52 +64,60 @@ public class VisitorImplGenerator implements TypesGenerator {
                                 hostTypeSpecs);
                 newTypeSpecs.add(visitorImpl);
             }
-            TypeSpec visitorImpl = generateVisitorDefaultImplementation(
-                            ClassName.get(config.getPackageName(), config.DEFAULT_VISITOR_FOR_ALL_CLASSES_NAME),
-                            ClassName.OBJECT,
-                            shapeTypeSpecs.values());
-            newTypeSpecs.add(visitorImpl);
-            visitorImpl = generateGraphEntityVisitorEngine(
-                            ClassName.get(config.getPackageName(), config.DEFAULT_VISITOR_FOR_ALL_CLASSES_NAME),
-                            shapeTypeSpecs.values());
-            newTypeSpecs.add(visitorImpl);
-            ClassName engineClassName = ClassName.get(config.getPackageName(), "GraphEntityVisitorEngine");
-            TypeSpec rdfOutput = TypeSpec.classBuilder(ClassName.get(config.getPackageName(), "RdfOutput"))
-                            .addModifiers(PUBLIC)
-                            .addMethod(MethodSpec.methodBuilder("toGraph")
-                                            .addModifiers(PUBLIC, STATIC)
-                                            .returns(ClassName.get(Graph.class))
-                                            .addParameter(ClassName.get(config.getPackageName(),
-                                                            config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
-                                                            "startingNode")
-                                            .addStatement("Graph graph = $T.createGraphMem()", GraphFactory.class)
-                                            .addStatement("populateGraph(startingNode, graph)")
-                                            .addStatement("return graph")
-                                            .build())
-                            .addMethod(MethodSpec.methodBuilder("populateGraph")
-                                            .addModifiers(PUBLIC, STATIC)
-                                            .addParameter(ClassName.get(config.getPackageName(),
-                                                            config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
-                                                            "startingNode")
-                                            .addParameter(ClassName.get(Graph.class), "graph")
-                                            .addStatement("$T graphEntityVisitor = $L",
-                                                            GraphEntityVisitor.class,
-                                                            TypeSpec.anonymousClassBuilder("")
-                                                                            .addSuperinterface(GraphEntityVisitor.class)
-                                                                            .addMethod(MethodSpec.methodBuilder("visit")
-                                                                                            .addModifiers(PUBLIC)
-                                                                                            .addParameter(GraphEntity.class,
-                                                                                                            "graphEntity")
-                                                                                            .addStatement("graphEntity.toRdf ( triple -> graph.add(triple) )")
-                                                                                            .build())
-                                                                            .build())
-                                            .addStatement("startingNode.accept(new $T(graphEntityVisitor))",
-                                                            engineClassName)
-                                            .build())
-                            .build();
-            newTypeSpecs.add(rdfOutput);
         }
+        generateVisitorsForAllClasses(newTypeSpecs);
         return newTypeSpecs;
+    }
+
+    public void generateVisitorsForAllClasses(Set<TypeSpec> newTypeSpecs) {
+        TypeSpec visitorImpl = generateVisitorDefaultImplementation(
+                        ClassName.get(config.getPackageName(), config.DEFAULT_VISITOR_FOR_ALL_CLASSES_NAME),
+                        ClassName.OBJECT,
+                        shapeTypeSpecs.values());
+        newTypeSpecs.add(visitorImpl);
+        visitorImpl = generateGraphEntityVisitorEngine(
+                        ClassName.get(config.getPackageName(), config.DEFAULT_VISITOR_FOR_ALL_CLASSES_NAME),
+                        shapeTypeSpecs.values());
+        newTypeSpecs.add(visitorImpl);
+        generateRdfOutput(newTypeSpecs);
+    }
+
+    public void generateRdfOutput(Set<TypeSpec> newTypeSpecs) {
+        ClassName engineClassName = ClassName.get(config.getPackageName(), "GraphEntityVisitorEngine");
+        TypeSpec rdfOutput = TypeSpec.classBuilder(ClassName.get(config.getPackageName(), "RdfOutput"))
+                        .addModifiers(PUBLIC)
+                        .addMethod(MethodSpec.methodBuilder("toGraph")
+                                        .addModifiers(PUBLIC, STATIC)
+                                        .returns(ClassName.get(Graph.class))
+                                        .addParameter(ClassName.get(config.getPackageName(),
+                                                        config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
+                                                        "startingNode")
+                                        .addStatement("Graph graph = $T.createGraphMem()", GraphFactory.class)
+                                        .addStatement("populateGraph(startingNode, graph)")
+                                        .addStatement("return graph")
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("populateGraph")
+                                        .addModifiers(PUBLIC, STATIC)
+                                        .addParameter(ClassName.get(config.getPackageName(),
+                                                        config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
+                                                        "startingNode")
+                                        .addParameter(ClassName.get(Graph.class), "graph")
+                                        .addStatement("$T graphEntityVisitor = $L",
+                                                        GraphEntityVisitor.class,
+                                                        TypeSpec.anonymousClassBuilder("")
+                                                                        .addSuperinterface(GraphEntityVisitor.class)
+                                                                        .addMethod(MethodSpec.methodBuilder("visit")
+                                                                                        .addModifiers(PUBLIC)
+                                                                                        .addParameter(GraphEntity.class,
+                                                                                                        "graphEntity")
+                                                                                        .addStatement("graphEntity.toRdf ( triple -> graph.add(triple) )")
+                                                                                        .build())
+                                                                        .build())
+                                        .addStatement("startingNode.accept(new $T(graphEntityVisitor))",
+                                                        engineClassName)
+                                        .build())
+                        .build();
+        newTypeSpecs.add(rdfOutput);
     }
 
     public TypeSpec generateVisitorDefaultImplementation(ClassName visitorInterface,

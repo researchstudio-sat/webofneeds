@@ -1,5 +1,6 @@
 package won.integrationtest;
 
+import com.alibaba.dcm.DnsCacheManipulator;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -8,30 +9,24 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.containers.wait.strategy.WaitStrategyTarget;
-import org.testcontainers.shaded.org.bouncycastle.asn1.x509.Target;
-import org.testcontainers.shaded.org.bouncycastle.jce.provider.BouncyCastleProvider;
+import won.test.category.RequiresDockerServer;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
-import java.security.Provider;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.regex.Pattern;
 
-// @RunWith(SpringJUnit4ClassRunner.class)
-// @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
+@Category(RequiresDockerServer.class)
 public class IntegrationTests {
-    // @Configuration
-    // static class Config {
-    // }
     @ClassRule
     public static DockerComposeContainer environment = new DockerComposeContainer(
                     new File("target/test-classes/docker-compose.yml"))
@@ -40,6 +35,11 @@ public class IntegrationTests {
                                                                     "^.+connected with WoN node:.+https://wonnode:8443/won/resource.*$",
                                                                     1)
                                                                     .withStartupTimeout(Duration.ofSeconds(60)));
+
+    @BeforeClass
+    public static void addWonnodeToLocalhostDnsEntry() {
+        DnsCacheManipulator.setDnsCache("wonnode", "127.0.0.1");
+    }
 
     @Test
     public void testOwnerReachable() throws Exception {
@@ -65,7 +65,7 @@ public class IntegrationTests {
         }
     }
 
-    private CloseableHttpClient getHttpClientThatTrustsAnyCert() throws Exception {
+    protected CloseableHttpClient getHttpClientThatTrustsAnyCert() throws Exception {
         SSLContext sslcontext = SSLContexts.custom()
                         .loadTrustMaterial(new TrustStrategy() {
                             @Override

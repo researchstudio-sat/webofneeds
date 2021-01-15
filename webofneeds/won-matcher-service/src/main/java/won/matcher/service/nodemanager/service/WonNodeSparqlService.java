@@ -6,7 +6,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import won.matcher.service.common.service.sparql.SparqlService;
 import won.protocol.exception.DataIntegrityException;
@@ -28,7 +27,7 @@ public class WonNodeSparqlService extends SparqlService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
-    public WonNodeSparqlService(@Value("${uri.sparql.endpoint}") final String sparqlEndpoint) {
+    public WonNodeSparqlService(@Autowired String sparqlEndpoint) {
         super(sparqlEndpoint);
     }
 

@@ -66,7 +66,7 @@ public class TargetAtomCheck {
 
     public boolean isConnectionStateAllowedCS(ConnectionState connectionState) {
         if (hasAllowedConnectionStates()) {
-            return getAllowedConnectionStates().contains(URI.create(connectionState.getValue()));
+            return getAllowedConnectionStates().contains(connectionState.getValue());
         }
         return true;
     }
@@ -113,7 +113,6 @@ public class TargetAtomCheck {
         if (connectionStates != null) {
             this.allowedConnectionStates = connectionStates.stream()
                             .map(ConnectionState::getValue)
-                            .map(URI::create)
                             .collect(Collectors.toSet());
         }
     }
@@ -146,7 +145,7 @@ public class TargetAtomCheck {
     public void intersectAllowedConnectionStatesCS(Set<ConnectionState> connectionStates) {
         if (connectionStates != null) {
             intersectAllowedConnectionStates(connectionStates
-                            .stream().map(ConnectionState::getValue).map(URI::create).collect(Collectors.toSet()));
+                            .stream().map(ConnectionState::getValue).collect(Collectors.toSet()));
         }
     }
 
