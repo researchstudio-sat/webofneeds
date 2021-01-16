@@ -30,17 +30,17 @@ services:
     restart: always
     build: ../../image/wonnode
     environment:
-      - "uri.host=cbi.matchat.org"
-      - "uri.prefix=https://cbi.matchat.org/won"
-      - "http.port=8443"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm06.researchstudio.at:5433/won_node"
-      - "db.ddl.strategy=validate"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
+      - "URI_HOST=cbi.matchat.org"
+      - "URI_PREFIX=https://cbi.matchat.org/won"
+      - "HTTP_PORT=8443"
+      - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
+      - "DB_SQL_JDBCURL=jdbc:postgresql://satvm06.researchstudio.at:5433/won_node"
+      - "DB_DDL_STRATEGY=validate"
+      - "DB_SQL_USER=won"
+      - "DB_SQL_PASSWORD=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$uki_certificate_passwd"
-      - "activemq.broker.port=61626"
-      - "client.authentication.behind.proxy=true"
+      - "ACTIVEMQ_BROKER_PORT=61626"
+      - "CLIENT_AUTHENTICATION_BEHIND_PROXY=true"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
       - "8443:8443"
@@ -72,22 +72,22 @@ services:
     restart: always
     build: ../../image/owner
     environment:
-      - "node.default.host=cbi.matchat.org"
-      - "uri.host=cbi.matchat.org"
-      - "http.port=8082"
-      - "node.default.http.port=443"
-      - "uri.prefix=https://cbi.matchat.org"
-      - "uri.prefix.node.default=https://node.matchat.org/won"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm06.researchstudio.at:5432/won_owner"
-      - "db.ddl.strategy=validate"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
+      - "NODE_DEFAULT_HOST=cbi.matchat.org"
+      - "URI_HOST=cbi.matchat.org"
+      - "HTTP_PORT=8082"
+      - "NODE_DEFAULT_HTTP_PORT=443"
+      - "URI_PREFIX=https://cbi.matchat.org"
+      - "URI_PREFIX_NODE_DEFAULT=https://node.matchat.org/won"
+      - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
+      - "DB_SQL_JDBCURL=jdbc:postgresql://satvm06.researchstudio.at:5432/won_owner"
+      - "DB_DDL_STRATEGY=validate"
+      - "DB_SQL_USER=won"
+      - "DB_SQL_PASSWORD=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$uki_certificate_passwd"
-      - "owner.webapp.rememberme.key=$rememberme_key"
-      - "email.from.won.user=$MAIL_USER"
-      - "email.from.won.password=$MAIL_PASS"
-      - "email.from.won.smtp.host=$MAIL_HOST"
+      - "OWNER_WEBAPP_REMEMBERME_KEY=$rememberme_key"
+      - "EMAIL_FROM_WON_USER=$MAIL_USER"
+      - "EMAIL_FROM_WON_PASSWORD=$MAIL_PASS"
+      - "EMAIL_FROM_WON_SMTP_HOST=$MAIL_HOST"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
       - "8082:8443"
@@ -113,12 +113,12 @@ services:
     restart: always
     build: ../../image/matcher-service
     environment:
-      - "node.host=satvm06.researchstudio.at"
-      - "matcher.uri=https://cbi.matchat.org/matcher_service"
-      - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
-      - "uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
-      - "wonNodeController.wonNode.crawl=https://cbi.matchat.org/won/resource,https://node.matchat.org/won/resource" # crawl uki won node and matchat won node
-      - "cluster.local.port=2561"
+      - "NODE_HOST=satvm06.researchstudio.at"
+      - "MATCHER_URI=https://cbi.matchat.org/matcher_service"
+      - "CLUSTER_SEEDNODES=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
+      - "URI_SPARQL_ENDPOINT=http://satvm06.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
+      - "WONNODECONTROLLER_WONNODE_CRAWL=https://cbi.matchat.org/won/resource,https://node.matchat.org/won/resource" # crawl uki won node and matchat won node
+      - "CLUSTER_LOCAL_PORT=2561"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
       - "2561:2561"
@@ -143,11 +143,11 @@ services:
     restart: always
     build: ../../image/matcher-solr
     environment:
-      - "node.host=satvm06.researchstudio.at"
-      - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
-      - "cluster.local.port=2562"
-      - "matcher.solr.uri.solr.server=http://satvm06.researchstudio.at:8984/solr/"
-      - "matcher.solr.uri.solr.server.public=http://satvm06.researchstudio.at:8984/solr/"
+      - "NODE_HOST=satvm06.researchstudio.at"
+      - "CLUSTER_SEEDNODES=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
+      - "CLUSTER_LOCAL_PORT=2562"
+      - "MATCHER_SOLR_URI_SOLR_SERVER=http://satvm06.researchstudio.at:8984/solr/"
+      - "MATCHER_SOLR_URI_SOLR_SERVER_PUBLIC=http://satvm06.researchstudio.at:8984/solr/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
       - "2562:2562"
@@ -176,13 +176,13 @@ services:
     environment:
       - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
       - "WON_NODE_URI=https://cbi.matchat.org/won"
-      - "uri.prefix.owner=https://cbi.matchat.org/debug_bot" # set this for the trust store alias
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm06.researchstudio.at"
-      - "botContext.mongodb.port=27017"
-      - "botContext.mongodb.database=uki_bot"
+      - "URI_PREFIX_OWNER=https://cbi.matchat.org/debug_bot" # set this for the trust store alias
+      - "BOTCONTEXT_IMPL=mongoBotContext"
+      - "BOTCONTEXT_MONGODB_USER=won"
+      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
+      - "BOTCONTEXT_MONGODB_HOST=satvm06.researchstudio.at"
+      - "BOTCONTEXT_MONGODB_PORT=27017"
+      - "BOTCONTEXT_MONGODB_DATABASE=uki_bot"
     volumes:
       - $base_folder/won-client-certs/debug_bot:/usr/src/bots/client-certs/
     depends_on:
@@ -195,11 +195,11 @@ services:
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
-    - "node.host=satvm06.researchstudio.at"
-    - "cluster.seedNodes=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
-    - "cluster.local.port=2563"
-    - "matcher.sparql.uri.sparql.endpoint=http://satvm06.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
-    - "matcher.sparql.uri.public=http://satvm06.researchstudio.at/sparql/"
+    - "NODE_HOST=satvm06.researchstudio.at"
+    - "CLUSTER_SEEDNODES=satvm06.researchstudio.at:2561,satvm06.researchstudio.at:2562"
+    - "CLUSTER_LOCAL_PORT=2563"
+    - "MATCHER_SPARQL_URI_SPARQL_ENDPOINT=http://satvm06.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
+    - "MATCHER_SPARQL_URI_PUBLIC=http://satvm06.researchstudio.at/sparql/"
     - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
     ports:
     - "2563:2563"

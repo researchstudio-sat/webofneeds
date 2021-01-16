@@ -1,40 +1,20 @@
 package won.matcher.service.nodemanager.actor;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections.IteratorUtils;
-import org.apache.jena.query.Dataset;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import akka.actor.ActorRef;
-import akka.actor.OneForOneStrategy;
-import akka.actor.SupervisorStrategy;
-import akka.actor.Terminated;
-import akka.actor.UntypedActor;
+import akka.actor.*;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.jena.query.Dataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import won.cryptography.service.RegistrationClient;
 import won.cryptography.ssl.MessagingContext;
-import won.matcher.service.common.event.AtomHintEvent;
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.HintEvent;
-import won.matcher.service.common.event.SocketHintEvent;
-import won.matcher.service.common.event.WonNodeEvent;
+import won.matcher.service.common.event.*;
 import won.matcher.service.common.spring.SpringExtension;
 import won.matcher.service.crawler.actor.MasterCrawlerActor;
 import won.matcher.service.nodemanager.config.ActiveMqWonNodeConnectionFactory;
@@ -46,6 +26,10 @@ import won.protocol.service.WonNodeInfo;
 import won.protocol.util.RdfUtils.Pair;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Actor that knows all won nodes the matching service is communicating with. It
@@ -59,6 +43,9 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 @Component
 @Scope("prototype")
 public class WonNodeControllerActor extends UntypedActor {
+    private static final String LIFE_CHECK_TICK = "life_check_tick";
+    @Autowired
+    LinkedDataSource linkedDataSource;
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private ActorRef pubSubMediator;
     private ActorRef crawler;
@@ -66,15 +53,12 @@ public class WonNodeControllerActor extends UntypedActor {
     private Map<String, WonNodeConnection> crawlWonNodes = new HashMap<>();
     private Set<String> skipWonNodeUris = new HashSet<>();
     private Set<String> failedWonNodeUris = new HashSet<>();
-    private static final String LIFE_CHECK_TICK = "life_check_tick";
     @Autowired
     private WonNodeSparqlService sparqlService;
     @Autowired
     private WonNodeControllerConfig config;
     @Autowired
     private RegistrationClient registrationClient;
-    @Autowired
-    LinkedDataSource linkedDataSource;
     @Autowired
     private MessagingContext messagingContext;
     @Autowired

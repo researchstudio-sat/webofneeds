@@ -43,17 +43,17 @@ services:
     build: ../../image/wonnode
     image: webofneeds/wonnode:master
     environment:
-      - "uri.host=nodeblue.master.matchat.org"
-      - "http.port=8888"
-      - "uri.prefix=https://nodeblue.master.matchat.org/won"
-      - "client.authentication.behind.proxy=true"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5432/won_node"
-      - "db.ddl.strategy=validate"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
+      - "URI_HOST=nodeblue.master.matchat.org"
+      - "HTTP_PORT=8888"
+      - "URI_PREFIX=https://nodeblue.master.matchat.org/won"
+      - "CLIENT_AUTHENTICATION_BEHIND_PROXY=true"
+      - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
+      - "DB_SQL_JDBCURL=jdbc:postgresql://satvm02.researchstudio.at:5432/won_node"
+      - "DB_DDL_STRATEGY=validate"
+      - "DB_SQL_USER=won"
+      - "DB_SQL_PASSWORD=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "activemq.broker.port=61612"
+      - "ACTIVEMQ_BROKER_PORT=61612"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62916,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9016 -Dcom.sun.management.jmxremote.authenticate=false
@@ -79,21 +79,21 @@ services:
     build: ../../image/owner
     image: webofneeds/owner:master
     environment:
-      - "node.default.host=nodeblue.master.matchat.org"
-      - "uri.host=ownerblue.master.matchat.org"
-      - "http.port=8081"
-      - "node.default.http.port=443"
-      - "uri.prefix=https://ownerblue.master.matchat.org"
-      - "uri.prefix.node.default=https://nodeblue.master.matchat.org/won"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5432/won_owner"
-      - "db.ddl.strategy=validate"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
+      - "NODE_DEFAULT_HOST=nodeblue.master.matchat.org"
+      - "URI_HOST=ownerblue.master.matchat.org"
+      - "HTTP_PORT=8081"
+      - "NODE_DEFAULT_HTTP_PORT=443"
+      - "URI_PREFIX=https://ownerblue.master.matchat.org"
+      - "URI_PREFIX_NODE_DEFAULT=https://nodeblue.master.matchat.org/won"
+      - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
+      - "DB_SQL_JDBCURL=jdbc:postgresql://satvm02.researchstudio.at:5432/won_owner"
+      - "DB_DDL_STRATEGY=validate"
+      - "DB_SQL_USER=won"
+      - "DB_SQL_PASSWORD=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "email.from.won.user=$MAIL_USER"
-      - "email.from.won.password=$MAIL_PASS"
-      - "email.from.won.smtp.host=$MAIL_HOST"
+      - "EMAIL_FROM_WON_USER=$MAIL_USER"
+      - "EMAIL_FROM_WON_PASSWORD=$MAIL_PASS"
+      - "EMAIL_FROM_WON_SMTP_HOST=$MAIL_HOST"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62917,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9017 -Dcom.sun.management.jmxremote.authenticate=false
@@ -131,17 +131,17 @@ services:
     build: ../../image/wonnode
     image: webofneeds/wonnode:master
     environment:
-      - "uri.host=nodegreen.master.matchat.org"
-      - "http.port=8889"
-      - "uri.prefix=https://nodegreen.master.matchat.org/won"
-      - "client.authentication.behind.proxy=true"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5433/won_node"
-      - "db.ddl.strategy=validate"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
+      - "URI_HOST=nodegreen.master.matchat.org"
+      - "HTTP_PORT=8889"
+      - "URI_PREFIX=https://nodegreen.master.matchat.org/won"
+      - "CLIENT_AUTHENTICATION_BEHIND_PROXY=true"
+      - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
+      - "DB_SQL_JDBCURL=jdbc:postgresql://satvm02.researchstudio.at:5433/won_node"
+      - "DB_DDL_STRATEGY=validate"
+      - "DB_SQL_USER=won"
+      - "DB_SQL_PASSWORD=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "activemq.broker.port=61611"
+      - "ACTIVEMQ_BROKER_PORT=61611"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62918,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9018 -Dcom.sun.management.jmxremote.authenticate=false
@@ -167,21 +167,21 @@ services:
     build: ../../image/owner
     image: webofneeds/owner:master
     environment:
-      - "node.default.host=nodegreen.master.matchat.org"
-      - "uri.host=ownergreen.master.matchat.org"
-      - "http.port=8082"
-      - "node.default.http.port=443"
-      - "uri.prefix=https://ownergreen.master.matchat.org"
-      - "uri.prefix.node.default=https://nodegreen.master.matchat.org/won"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5433/won_owner"
-      - "db.ddl.strategy=validate"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
+      - "NODE_DEFAULT_HOST=nodegreen.master.matchat.org"
+      - "URI_HOST=ownergreen.master.matchat.org"
+      - "HTTP_PORT=8082"
+      - "NODE_DEFAULT_HTTP_PORT=443"
+      - "URI_PREFIX=https://ownergreen.master.matchat.org"
+      - "URI_PREFIX_NODE_DEFAULT=https://nodegreen.master.matchat.org/won"
+      - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
+      - "DB_SQL_JDBCURL=jdbc:postgresql://satvm02.researchstudio.at:5433/won_owner"
+      - "DB_DDL_STRATEGY=validate"
+      - "DB_SQL_USER=won"
+      - "DB_SQL_PASSWORD=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "email.from.won.user=$MAIL_USER"
-      - "email.from.won.password=$MAIL_PASS"
-      - "email.from.won.smtp.host=$MAIL_HOST"
+      - "EMAIL_FROM_WON_USER=$MAIL_USER"
+      - "EMAIL_FROM_WON_PASSWORD=$MAIL_PASS"
+      - "EMAIL_FROM_WON_SMTP_HOST=$MAIL_HOST"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62919,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9019 -Dcom.sun.management.jmxremote.authenticate=false
@@ -221,14 +221,14 @@ services:
     environment:
       - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
       - "WON_NODE_URI=https://nodeblue.master.matchat.org/won"
-      - "uri.prefix.owner=https://master.matchat.org/debug_bot" # set this for the trust store alias
-      - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm02.researchstudio.at"
-      - "botContext.mongodb.port=27018"
-      - "botContext.mongodb.database=master_bot"
+      - "URI_PREFIX_OWNER=https://master.matchat.org/debug_bot" # set this for the trust store alias
+      - "WON_NODE_URIS=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
+      - "BOTCONTEXT_IMPL=mongoBotContext"
+      - "BOTCONTEXT_MONGODB_USER=won"
+      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
+      - "BOTCONTEXT_MONGODB_HOST=satvm02.researchstudio.at"
+      - "BOTCONTEXT_MONGODB_PORT=27018"
+      - "BOTCONTEXT_MONGODB_DATABASE=master_bot"
     volumes:
       - $base_folder/won-client-certs/debug_bot:/usr/src/bots/client-certs/
     depends_on:
@@ -242,20 +242,20 @@ services:
     environment:
       - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
       - "WON_NODE_URI=https://nodeblue.master.matchat.org/won"
-      #      - "logging.config=/usr/src/bots/logback.xml"
-      - "uri.prefix.owner=https://master.matchat.org/hokify_bot" # set this for the trust store alias
-      - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
-      - "hokifyjobbot.jsonURL=https://hokify.at/jobfeed-webofneeds.json/"
-      - "hokifyjobbot.geoURL=https://nominatim.openstreetmap.org/search"
-      - "hokifyjobbot.updateTime=60"
-      - "hokifyjobbot.publishTime=10"
-      - "hokifyjobbot.createAllInOne=false"
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm02.researchstudio.at"
-      - "botContext.mongodb.port=27018"
-      - "botContext.mongodb.database=master_bot"
+      #      - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
+      - "URI_PREFIX_OWNER=https://master.matchat.org/hokify_bot" # set this for the trust store alias
+      - "WON_NODE_URIS=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
+      - "HOKIFYJOBBOT_JSONURL=https://hokify.at/jobfeed-webofneeds.json/"
+      - "HOKIFYJOBBOT_GEOURL=https://nominatim.openstreetmap.org/search"
+      - "HOKIFYJOBBOT_UPDATETIME=60"
+      - "HOKIFYJOBBOT_PUBLISHTIME=10"
+      - "HOKIFYJOBBOT_CREATEALLINONE=false"
+      - "BOTCONTEXT_IMPL=mongoBotContext"
+      - "BOTCONTEXT_MONGODB_USER=won"
+      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
+      - "BOTCONTEXT_MONGODB_HOST=satvm02.researchstudio.at"
+      - "BOTCONTEXT_MONGODB_PORT=27018"
+      - "BOTCONTEXT_MONGODB_DATABASE=master_bot"
     volumes:
       - $base_folder/won-client-certs/hokify_bot:/usr/src/bots/client-certs/
     #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
@@ -270,23 +270,23 @@ services:
     environment:
       - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
       - "WON_NODE_URI=https://nodeblue.master.matchat.org/won"
-      # - "logging.config=/usr/src/bots/logback.xml"
-      - "uri.prefix.owner=https://master.matchat.org/raid_bot" # set this for the trust store alias
-      - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
-      - "api.linz.endpoint=$RB_ENDPOINT_LINZ"
-      - "api.linz.token=$RB_TOKEN_LINZ"
-      - "api.vienna.endpoint=$RB_ENDPOINT_VIENNA"
-      - "api.vienna.username=$RB_USER_VIENNA"
-      - "api.vienna.request=$RB_REQUEST_VIENNA"
-      - "raidbot.fetchInterval=600" #fetch new raids every 600 seconds (10min)
-      - "raidbot.sanitizeInterval=900" #sanitize existing raids every 900 seconds (15min)
-      - "botContext.impl=mongoBotContext"
-      - "botContext.mongodb.user=won"
-      - "botContext.mongodb.pass=$mongo_db_passwd"
-      - "botContext.mongodb.host=satvm02.researchstudio.at"
-      - "botContext.mongodb.port=27018"
-      - "botContext.mongodb.database=master_bot"
-      # - "raidbot.phaseOut=true" # set this if you do not want to create new atoms but just manage the existing ones
+      # - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
+      - "URI_PREFIX_OWNER=https://master.matchat.org/raid_bot" # set this for the trust store alias
+      - "WON_NODE_URIS=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
+      - "API_LINZ_ENDPOINT=$RB_ENDPOINT_LINZ"
+      - "API_LINZ_TOKEN=$RB_TOKEN_LINZ"
+      - "API_VIENNA_ENDPOINT=$RB_ENDPOINT_VIENNA"
+      - "API_VIENNA_USERNAME=$RB_USER_VIENNA"
+      - "API_VIENNA_REQUEST=$RB_REQUEST_VIENNA"
+      - "RAIDBOT_FETCHINTERVAL=600" #fetch new raids every 600 seconds (10min)
+      - "RAIDBOT_SANITIZEINTERVAL=900" #sanitize existing raids every 900 seconds (15min)
+      - "BOTCONTEXT_IMPL=mongoBotContext"
+      - "BOTCONTEXT_MONGODB_USER=won"
+      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
+      - "BOTCONTEXT_MONGODB_HOST=satvm02.researchstudio.at"
+      - "BOTCONTEXT_MONGODB_PORT=27018"
+      - "BOTCONTEXT_MONGODB_DATABASE=master_bot"
+      # - "RAIDBOT_PHASEOUT=true" # set this if you do not want to create new atoms but just manage the existing ones
     volumes:
       - $base_folder/won-client-certs/raid_bot:/usr/src/bots/client-certs/
     #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
@@ -301,24 +301,24 @@ services:
 #    image: webofneeds/bots:int
 #    environment:
 #      - "MAIN_BOT=won.bot.app.Mail2WonBotApp"
-#      - "node.default.host=nodeblue.master.matchat.org"
-#      - "node.default.http.port=443"
-#      - "uri.prefix.owner=https://master.matchat.org/mail_bot" # set this for the trust store alias
-#      - "won.node.uris=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
-#      - "botContext.impl=mongoBotContext"
-#      - "botContext.mongodb.user=won"
-#      - "botContext.mongodb.pass=$mongo_db_passwd"
-#      - "botContext.mongodb.host=satvm02.researchstudio.at"
-#      - "botContext.mongodb.port=27018"
-#      - "botContext.mongodb.database=master_bot"
-#      - "mailbot.email.user=won-internal"
-#      - "mailbot.email.address=won-internal@researchstudio.at"
-#      - "mailbot.email.name=Web of Needs Master Mail Bot"
-#      - "mailbot.email.password=$mailinglist_passwd"
-#      - "mailbot.email.imap.host=imap.researchstudio.at"
-#      - "mailbot.email.imap.port=993"
-#      - "mailbot.email.smtp.host=smtp.researchstudio.at"
-#      - "mailbot.email.smtp.port=587"
+#      - "NODE_DEFAULT_HOST=nodeblue.master.matchat.org"
+#      - "NODE_DEFAULT_HTTP_PORT=443"
+#      - "URI_PREFIX_OWNER=https://master.matchat.org/mail_bot" # set this for the trust store alias
+#      - "WON_NODE_URIS=https://nodeblue.master.matchat.org/won/resource https://nodegreen.master.matchat.org/won/resource"
+#      - "BOTCONTEXT_IMPL=mongoBotContext"
+#      - "BOTCONTEXT_MONGODB_USER=won"
+#      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
+#      - "BOTCONTEXT_MONGODB_HOST=satvm02.researchstudio.at"
+#      - "BOTCONTEXT_MONGODB_PORT=27018"
+#      - "BOTCONTEXT_MONGODB_DATABASE=master_bot"
+#      - "MAILBOT_EMAIL_USER=won-internal"
+#      - "MAILBOT_EMAIL_ADDRESS=won-internal@researchstudio.at"
+#      - "MAILBOT_EMAIL_NAME=Web of Needs Master Mail Bot"
+#      - "MAILBOT_EMAIL_PASSWORD=$mailinglist_passwd"
+#      - "MAILBOT_EMAIL_IMAP_HOST=imap.researchstudio.at"
+#      - "MAILBOT_EMAIL_IMAP_PORT=993"
+#      - "MAILBOT_EMAIL_SMTP_HOST=smtp.researchstudio.at"
+#      - "MAILBOT_EMAIL_SMTP_PORT=587"
 #    depends_on:
 #      - mongodb
 #      - wonnodeblue
@@ -339,12 +339,12 @@ services:
     build: ../../image/matcher-service
     image: webofneeds/matcher_service:master
     environment:
-      - "node.host=satvm02.researchstudio.at"
-      - "matcher.uri=https://master.matchat.org/matcher_service" # set this for the trust store alias
-      - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2552"
-      - "uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
-      - "wonNodeController.wonNode.crawl=https://nodeblue.master.matchat.org/won/resource,https://nodegreen.master.matchat.org/won/resource"
-      - "cluster.local.port=2551"
+      - "NODE_HOST=satvm02.researchstudio.at"
+      - "MATCHER_URI=https://master.matchat.org/matcher_service" # set this for the trust store alias
+      - "CLUSTER_SEEDNODES=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2552"
+      - "URI_SPARQL_ENDPOINT=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
+      - "WONNODECONTROLLER_WONNODE_CRAWL=https://nodeblue.master.matchat.org/won/resource,https://nodegreen.master.matchat.org/won/resource"
+      - "CLUSTER_LOCAL_PORT=2551"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62920,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9020 -Dcom.sun.management.jmxremote.authenticate=false
@@ -378,11 +378,11 @@ services:
     build: ../../image/matcher-solr
     image: webofneeds/matcher_solr:master
     environment:
-      - "node.host=satvm02.researchstudio.at"
-      - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2552"
-      - "cluster.local.port=2552"
-      - "matcher.solr.uri.solr.server=http://satvm02.researchstudio.at:8983/solr/"
-      - "matcher.solr.uri.solr.server.public=http://satvm02.researchstudio.at:8983/solr/"
+      - "NODE_HOST=satvm02.researchstudio.at"
+      - "CLUSTER_SEEDNODES=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2552"
+      - "CLUSTER_LOCAL_PORT=2552"
+      - "MATCHER_SOLR_URI_SOLR_SERVER=http://satvm02.researchstudio.at:8983/solr/"
+      - "MATCHER_SOLR_URI_SOLR_SERVER_PUBLIC=http://satvm02.researchstudio.at:8983/solr/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62921,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9021 -Dcom.sun.management.jmxremote.authenticate=false
@@ -402,14 +402,14 @@ services:
 #    build: ../../image/matcher-rescal
 #    image: webofneeds/matcher_rescal:master
 #    environment:
-#      - "node.host=satvm02.researchstudio.at"
-#      - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2553"
-#      - "cluster.local.port=2553"
-#      - "matcher.rescal.uri.public=http://satvm02.researchstudio.at/rescal/"
-#      - "matcher.rescal.uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
-#      - "matcher.rescal.executionDurationMinutes=5"
-#      - "matcher.rescal.threshold=0.15"
-#      - "matcher.rescal.rank=10"
+#      - "NODE_HOST=satvm02.researchstudio.at"
+#      - "CLUSTER_SEEDNODES=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2553"
+#      - "CLUSTER_LOCAL_PORT=2553"
+#      - "MATCHER_RESCAL_URI_PUBLIC=http://satvm02.researchstudio.at/rescal/"
+#      - "MATCHER_RESCAL_URI_SPARQL_ENDPOINT=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
+#      - "MATCHER_RESCAL_EXECUTIONDURATIONMINUTES=5"
+#      - "MATCHER_RESCAL_THRESHOLD=0.15"
+#      - "MATCHER_RESCAL_RANK=10"
 #      - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
 #      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62922,server=y,suspend=n
 #        -Dcom.sun.management.jmxremote.port=9022 -Dcom.sun.management.jmxremote.authenticate=false
@@ -429,11 +429,11 @@ services:
     build: ../../image/matcher-sparql
     image: webofneeds/matcher_sparql:int
     environment:
-      - "node.host=satvm02.researchstudio.at"
-      - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2553"
-      - "cluster.local.port=2554"
-      - "matcher.sparql.uri.sparql.endpoint=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
-      - "matcher.sparql.uri.public=http://satvm02.researchstudio.at/sparql/"
+      - "NODE_HOST=satvm02.researchstudio.at"
+      - "CLUSTER_SEEDNODES=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2553"
+      - "CLUSTER_LOCAL_PORT=2554"
+      - "MATCHER_SPARQL_URI_SPARQL_ENDPOINT=http://satvm02.researchstudio.at:9999/blazegraph/namespace/kb/sparql"
+      - "MATCHER_SPARQL_URI_PUBLIC=http://satvm02.researchstudio.at/sparql/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62923,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9023 -Dcom.sun.management.jmxremote.authenticate=false

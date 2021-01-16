@@ -31,17 +31,17 @@ services:
     build: ../../image/wonnode
     #image: webofneeds/wonnode:master
     environment:
-      - "uri.host=hackathonnode.matchat.org"
-      - "http.port=8890"
-      - "uri.prefix=https://hackathonnode.matchat.org/won"
-      - "client.authentication.behind.proxy=true"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5434/won_node"
-      - "db.ddl.strategy=validate"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
+      - "URI_HOST=hackathonnode.matchat.org"
+      - "HTTP_PORT=8890"
+      - "URI_PREFIX=https://hackathonnode.matchat.org/won"
+      - "CLIENT_AUTHENTICATION_BEHIND_PROXY=true"
+      - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
+      - "DB_SQL_JDBCURL=jdbc:postgresql://satvm02.researchstudio.at:5434/won_node"
+      - "DB_DDL_STRATEGY=validate"
+      - "DB_SQL_USER=won"
+      - "DB_SQL_PASSWORD=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "activemq.broker.port=61613"
+      - "ACTIVEMQ_BROKER_PORT=61613"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62924,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9030 -Dcom.sun.management.jmxremote.authenticate=false
@@ -68,21 +68,21 @@ services:
     build: ../../image/owner
     #image: webofneeds/owner:master
     environment:
-      - "node.default.host=hackathonnode.matchat.org"
-      - "uri.host=hackathon.matchat.org"
-      - "http.port=8083"
-      - "node.default.http.port=443"
-      - "uri.prefix=https://hackathon.matchat.org"
-      - "uri.prefix.node.default=https://hackathonnode.matchat.org/won"
-      - "db.sql.jdbcDriverClass=org.postgresql.Driver"
-      - "db.sql.jdbcUrl=jdbc:postgresql://satvm02.researchstudio.at:5434/won_owner"
-      - "db.ddl.strategy=validate"
-      - "db.sql.user=won"
-      - "db.sql.password=$postgres_db_passwd"
+      - "NODE_DEFAULT_HOST=hackathonnode.matchat.org"
+      - "URI_HOST=hackathon.matchat.org"
+      - "HTTP_PORT=8083"
+      - "NODE_DEFAULT_HTTP_PORT=443"
+      - "URI_PREFIX=https://hackathon.matchat.org"
+      - "URI_PREFIX_NODE_DEFAULT=https://hackathonnode.matchat.org/won"
+      - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
+      - "DB_SQL_JDBCURL=jdbc:postgresql://satvm02.researchstudio.at:5434/won_owner"
+      - "DB_DDL_STRATEGY=validate"
+      - "DB_SQL_USER=won"
+      - "DB_SQL_PASSWORD=$postgres_db_passwd"
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
-      - "email.from.won.user=$MAIL_USER"
-      - "email.from.won.password=$MAIL_PASS"
-      - "email.from.won.smtp.host=$MAIL_HOST"
+      - "EMAIL_FROM_WON_USER=$MAIL_USER"
+      - "EMAIL_FROM_WON_PASSWORD=$MAIL_PASS"
+      - "EMAIL_FROM_WON_SMTP_HOST=$MAIL_HOST"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62926,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9031 -Dcom.sun.management.jmxremote.authenticate=false
@@ -130,12 +130,12 @@ services:
     build: ../../image/matcher-service
     #image: webofneeds/matcher_service:master
     environment:
-      - "node.host=satvm02.researchstudio.at"
-      - "matcher.uri=https://hackathon.matchat.org/matcher_service" # set this for the trust store alias
-      - "cluster.seedNodes=satvm02.researchstudio.at:2555"
-      - "uri.sparql.endpoint=http://satvm02.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
-      - "wonNodeController.wonNode.crawl=https://hackathonnode.matchat.org/won/resource"
-      - "cluster.local.port=2555"
+      - "NODE_HOST=satvm02.researchstudio.at"
+      - "MATCHER_URI=https://hackathon.matchat.org/matcher_service" # set this for the trust store alias
+      - "CLUSTER_SEEDNODES=satvm02.researchstudio.at:2555"
+      - "URI_SPARQL_ENDPOINT=http://satvm02.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
+      - "WONNODECONTROLLER_WONNODE_CRAWL=https://hackathonnode.matchat.org/won/resource"
+      - "CLUSTER_LOCAL_PORT=2555"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62927,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9024 -Dcom.sun.management.jmxremote.authenticate=false
@@ -167,11 +167,11 @@ services:
   #   build: ../../image/matcher-solr
   #   image: webofneeds/matcher_solr:master
   #   environment:
-  #     - "node.host=satvm02.researchstudio.at"
-  #     - "cluster.seedNodes=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2552"
-  #     - "cluster.local.port=2552"
-  #     - "matcher.solr.uri.solr.server=http://satvm02.researchstudio.at:8983/solr/"
-  #     - "matcher.solr.uri.solr.server.public=http://satvm02.researchstudio.at:8983/solr/"
+  #     - "NODE_HOST=satvm02.researchstudio.at"
+  #     - "CLUSTER_SEEDNODES=satvm02.researchstudio.at:2551,satvm02.researchstudio.at:2552"
+  #     - "CLUSTER_LOCAL_PORT=2552"
+  #     - "MATCHER_SOLR_URI_SOLR_SERVER=http://satvm02.researchstudio.at:8983/solr/"
+  #     - "MATCHER_SOLR_URI_SOLR_SERVER_PUBLIC=http://satvm02.researchstudio.at:8983/solr/"
   #     - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
   #     - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62921,server=y,suspend=n
   #       -Dcom.sun.management.jmxremote.port=9021 -Dcom.sun.management.jmxremote.authenticate=false
@@ -190,11 +190,11 @@ services:
     build: ../../image/matcher-sparql
     #image: webofneeds/matcher_sparql:int
     environment:
-      - "node.host=satvm02.researchstudio.at"
-      - "cluster.seedNodes=satvm02.researchstudio.at:2555"
-      - "cluster.local.port=2556"
-      - "matcher.sparql.uri.sparql.endpoint=http://satvm02.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
-      - "matcher.sparql.uri.public=http://satvm02.researchstudio.at/hackathonsparql/"
+      - "NODE_HOST=satvm02.researchstudio.at"
+      - "CLUSTER_SEEDNODES=satvm02.researchstudio.at:2555"
+      - "CLUSTER_LOCAL_PORT=2556"
+      - "MATCHER_SPARQL_URI_SPARQL_ENDPOINT=http://satvm02.researchstudio.at:10000/blazegraph/namespace/kb/sparql"
+      - "MATCHER_SPARQL_URI_PUBLIC=http://satvm02.researchstudio.at/hackathonsparql/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62925,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9025 -Dcom.sun.management.jmxremote.authenticate=false

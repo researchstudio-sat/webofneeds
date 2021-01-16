@@ -88,6 +88,7 @@
         <module>won-parent-pom</module>
         <module>won-auth</module>
         <module>won-integrationtest</module>
+        <module>won-matcher-parent-pom</module>
     </modules>
     <properties>
         <doclint>none</doclint>
@@ -120,6 +121,10 @@
         <com.fasterxml.classmate.version>1.5.1</com.fasterxml.classmate.version>
         <com.github.rvesse.airline.version>2.8.0</com.github.rvesse.airline.version>
         <com.mchange.c3p0.version>0.9.5</com.mchange.c3p0.version>
+        <!-- need to stick with akka 2.5.x as 2.6 drops akka-camel -->
+        <com.typesafe.akka.version>2.5.32</com.typesafe.akka.version>
+        <com.typesafe.akka.akka-camel.version>2.5.32</com.typesafe.akka.akka-camel.version>
+        <com.typesafe.akka.scala.binary.version>2.13</com.typesafe.akka.scala.binary.version>
         <io.github.classgraph.version>4.8.90</io.github.classgraph.version>
         <junit.version>4.12</junit.version>
         <jjwt.version>0.11.2</jjwt.version>
@@ -852,33 +857,33 @@
             <!--Akka -->
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-actor_2.11</artifactId>
-                <version>2.4.11</version>
+                <artifactId>akka-actor_${com.typesafe.akka.scala.binary.version}</artifactId>
+                <version>${com.typesafe.akka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-slf4j_2.11</artifactId>
-                <version>2.4.11</version>
+                <artifactId>akka-slf4j_${com.typesafe.akka.scala.binary.version}</artifactId>
+                <version>${com.typesafe.akka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-camel_2.11</artifactId>
-                <version>2.4.11</version>
+                <artifactId>akka-camel_${com.typesafe.akka.scala.binary.version}</artifactId>
+                <version>${com.typesafe.akka.akka-camel.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-cluster_2.11</artifactId>
-                <version>2.4.11</version>
+                <artifactId>akka-cluster_${com.typesafe.akka.scala.binary.version}</artifactId>
+                <version>${com.typesafe.akka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-remote_2.11</artifactId>
-                <version>2.4.11</version>
+                <artifactId>akka-remote_${com.typesafe.akka.scala.binary.version}</artifactId>
+                <version>${com.typesafe.akka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-cluster-tools_2.11</artifactId>
-                <version>2.4.11</version>
+                <artifactId>akka-cluster-tools_${com.typesafe.akka.scala.binary.version}</artifactId>
+                <version>${com.typesafe.akka.version}</version>
             </dependency>
 
             <dependency>

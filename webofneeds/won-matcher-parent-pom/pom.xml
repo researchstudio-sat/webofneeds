@@ -1,0 +1,65 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>won-parent-pom</artifactId>
+        <relativePath>../won-parent-pom</relativePath>
+        <groupId>at.researchstudio.sat</groupId>
+        <version>0.10-SNAPSHOT</version>
+    </parent>
+    <artifactId>won-matcher-parent-pom</artifactId>
+    <name>Web of Needs matcher parent pom</name>
+    <description>Parent pom for all matcher modules, required because akka decided to drop camel support so we have to
+        manage dependencies differently
+    </description>
+    <packaging>pom</packaging>
+    <dependencyManagement>
+        <dependencies>
+            <!--
+            the most up-to-date version of akka that still supports
+            camel is 2.5.32, which depends on camel 2.17.7
+
+            therefore, we override our more recent camel
+            dependencies in the matcher modules
+            -->
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-core</artifactId>
+                <version>2.17.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-jms</artifactId>
+                <version>2.17.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-spring</artifactId>
+                <version>2.17.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-amqp</artifactId>
+                <version>2.17.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-camel</artifactId>
+                <version>5.16.0</version>
+            </dependency>
+            <!-- also, activemq-camel was moved to camel-activemq in more recent versions, we
+            have to use the old one, so we'll exclude the dependency
+            -->
+            <dependency>
+                <groupId>at.researchstudio.sat</groupId>
+                <artifactId>won-core</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.camel</groupId>
+                        <artifactId>camel-activemq</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

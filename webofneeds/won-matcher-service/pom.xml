@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-		<artifactId>won-parent-pom</artifactId>
-		<relativePath>../won-parent-pom</relativePath>
+		<artifactId>won-matcher-parent-pom</artifactId>
+		<relativePath>../won-matcher-parent-pom</relativePath>
 		<groupId>at.researchstudio.sat</groupId>
 		<version>0.10-SNAPSHOT</version>
 	</parent>
@@ -23,28 +24,32 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-actor_2.11</artifactId>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jms</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-slf4j_2.11</artifactId>
+			<artifactId>akka-actor_${com.typesafe.akka.scala.binary.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-camel_2.11</artifactId>
+			<artifactId>akka-slf4j_${com.typesafe.akka.scala.binary.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-cluster_2.11</artifactId>
+			<artifactId>akka-camel_${com.typesafe.akka.scala.binary.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-remote_2.11</artifactId>
+			<artifactId>akka-cluster_${com.typesafe.akka.scala.binary.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-cluster-tools_2.11</artifactId>
+			<artifactId>akka-remote_${com.typesafe.akka.scala.binary.version}</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.akka</groupId>
+			<artifactId>akka-cluster-tools_${com.typesafe.akka.scala.binary.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.jena</groupId>
