@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<beans:beans 
-	xmlns="http://www.springframework.org/schema/security" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:beans="http://www.springframework.org/schema/beans" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd								 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
+<beans:beans
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:beans="http://www.springframework.org/schema/beans"
+		xmlns="http://www.springframework.org/schema/security"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+									 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-5.4.xsd">
 	<!-- special config for linked data brige: we want no caching headers added  -->
-	<http use-expressions="true" pattern="/rest/linked-data/**" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint" security-context-repository-ref="securityContextRepository">
+	<http use-expressions="true" pattern="/rest/linked-data/**" entry-point-ref="ajaxLoginUrlAuthenticationEntryPoint"
+		  security-context-repository-ref="securityContextRepository">
 		<headers defaults-disabled="true">
-			<content-type-options />
-			<hsts />
-			<frame-options />
-			<xss-protection />
+			<content-type-options/>
+			<hsts/>
+			<frame-options/>
+			<xss-protection/>
 		</headers>
 		<intercept-url pattern="/rest/linked-data/**" access="permitAll()"/>
-		<intercept-url pattern="/**" access="denyAll" />
+		<intercept-url pattern="/**" access="denyAll"/>
 		<custom-filter ref="sessionRepositoryFilter" before="FIRST" />
 		<!-- we do not need CSRF protection for these resources as accessing them is not state-changing - however, it would be better to have it.. -->
 		<csrf disabled="true" />

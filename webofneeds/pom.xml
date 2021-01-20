@@ -126,7 +126,7 @@
         <com.typesafe.akka.akka-camel.version>2.5.32</com.typesafe.akka.akka-camel.version>
         <com.typesafe.akka.scala.binary.version>2.13</com.typesafe.akka.scala.binary.version>
         <io.github.classgraph.version>4.8.90</io.github.classgraph.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <jjwt.version>0.11.2</jjwt.version>
         <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
@@ -141,7 +141,7 @@
         <org.quartz-scheduler.version>2.2.1</org.quartz-scheduler.version>
         <org.springframework.boot.version>2.4.1</org.springframework.boot.version>
         <org.springframework.version>5.3.3</org.springframework.version>
-        <org.springframework.security.version>4.2.20.RELEASE</org.springframework.security.version>
+        <org.springframework.security.version>5.4.2</org.springframework.security.version>
         <org.slf4j.version>1.7.30</org.slf4j.version>
         <org.testcontainers.version>1.15.1</org.testcontainers.version>
         <org.hsqldb.version>2.5.1</org.hsqldb.version>
