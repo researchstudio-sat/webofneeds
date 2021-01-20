@@ -1,22 +1,10 @@
 package won.protocol.message.processor.impl;
 
-import java.net.URI;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-
-import won.cryptography.rdfsign.SignatureVerificationState;
-import won.cryptography.rdfsign.SigningStage;
-import won.cryptography.rdfsign.WonHasher;
-import won.cryptography.rdfsign.WonSigner;
-import won.cryptography.rdfsign.WonVerifier;
+import won.cryptography.rdfsign.*;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.message.WonSignatureData;
@@ -24,6 +12,14 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
+
+import java.net.URI;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * User: ypanchenko Date: 08.04.2015
@@ -39,6 +35,7 @@ public class WonMessageSignerVerifier {
                     WonMessage message)
                     throws Exception {
         Dataset msgDataset = message.getCompleteDataset();
+        removeEmptyGraphs(msgDataset);
         SigningStage sigStage = new SigningStage(message);
         WonSigner signer = new WonSigner(msgDataset);
         if (message.getMessageTypeRequired().isContentSignedSeparately()) {
@@ -51,6 +48,16 @@ public class WonMessageSignerVerifier {
         }
         calculateMessageUriForContent(msgDataset);
         return WonMessage.of(msgDataset);
+    }
+
+    public static void removeEmptyGraphs(Dataset msgDataset) {
+        Iterator<String> graphNames = msgDataset.listNames();
+        while (graphNames.hasNext()) {
+            String name = graphNames.next();
+            if (msgDataset.getNamedModel(name).isEmpty()) {
+                msgDataset.removeNamedModel(name);
+            }
+        }
     }
 
     public static SignatureVerificationState verify(Map<String, PublicKey> keys, WonMessage message) throws Exception {

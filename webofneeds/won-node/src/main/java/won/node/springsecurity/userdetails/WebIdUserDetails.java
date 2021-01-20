@@ -8,35 +8,24 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package won.node.springsecurity;
+package won.node.springsecurity.userdetails;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 /**
  * Created by fkleedorfer on 24.11.2016.
  */
-public class WebIdUserDetails implements UserDetails {
+public class WebIdUserDetails extends AbstractUserDetails {
     private URI webId;
-    Collection<GrantedAuthority> authorities = new ArrayList<>(3);
 
-    public WebIdUserDetails(final URI webId, Collection<GrantedAuthority> grantedAuthorities) {
+    public WebIdUserDetails(final URI webId, Collection<? extends GrantedAuthority> grantedAuthorities) {
+        super(grantedAuthorities);
         this.webId = webId;
-        this.authorities = grantedAuthorities;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
-    @Override
-    public String getPassword() {
-        return "";
     }
 
     /**
@@ -47,25 +36,5 @@ public class WebIdUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return webId.toString();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }

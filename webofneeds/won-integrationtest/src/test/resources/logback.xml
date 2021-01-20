@@ -20,14 +20,14 @@
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <pattern>%d{d.M.yy HH:mm:ss.SSS} [%thread] %-5level %logger{36} -  %msg %X %n</pattern>
+            <pattern>%d{d.M.yy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %X %n</pattern>
         </encoder>
     </appender>
 
-    <logger name="won.integrationtest.AbstractBotBasedTest" level="debug" />
-    <logger name="won.auth" level="warn" />
-    <logger name="won.shacl2java" level="warn" />
-    <logger name="org.springframework" level="warn" />
+    <logger name="won.integrationtest" level="debug"/>
+    <logger name="won" level="debug"/>
+    <logger name="won.shacl2java" level="warn"/>
+    <logger name="org.springframework" level="warn"/>
 
 
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->

@@ -1,23 +1,16 @@
 package won.cryptography.service.keystore;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.invoke.MethodHandles;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-
-import java.util.Objects;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.cryptography.service.BCProvider;
+
+import java.io.*;
+import java.lang.invoke.MethodHandles;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.util.Objects;
 
 /**
  * User: fsalcher Date: 12.06.2014
@@ -25,6 +18,7 @@ import won.cryptography.service.BCProvider;
 public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String KEY_STORE_TYPE = "UBER";
+    private final String keyStoreType;
     // 'UBER' is more secure, 'PKCS12' is supported by all tools, easier for
     // debugging, e.g. when importing keys,
     // therefore temporarily we can use 'PKCS12':
@@ -32,7 +26,6 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     private String storePW;
     private File storeFile;
     private java.security.KeyStore store;
-    private final String keyStoreType;
 
     public FileBasedKeyStoreService(String filePath, String storePW) {
         this(new File(filePath), storePW, KEY_STORE_TYPE);
@@ -78,7 +71,7 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
     public PublicKey getPublicKey(String alias) {
         Certificate cert = getCertificate(alias);
         if (cert == null) {
-            logger.warn("No certificate found for alias {}", alias);
+            logger.debug("No certificate found for alias {}", alias);
             return null;
         }
         return cert.getPublicKey();
@@ -211,9 +204,9 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
                 }
             }
             logger.debug("KEYSTORE: " + store);
-            if (storeFile == null || !storeFile.exists() || !storeFile.isFile())
+            if (storeFile == null || !storeFile.exists() || !storeFile.isFile()) {
                 store.load(null, null);
-            else {
+            } else {
                 loadStoreFromFile();
             }
         } catch (Exception e) {
@@ -224,10 +217,12 @@ public class FileBasedKeyStoreService extends AbstractKeyStoreService {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         FileBasedKeyStoreService that = (FileBasedKeyStoreService) o;
         return Objects.equals(storeFile, that.storeFile) &&
                         Objects.equals(keyStoreType, that.keyStoreType);

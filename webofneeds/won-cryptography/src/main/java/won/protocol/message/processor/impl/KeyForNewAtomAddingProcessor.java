@@ -1,14 +1,10 @@
 package won.protocol.message.processor.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.security.PublicKey;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.cryptography.service.CryptographyService;
@@ -17,6 +13,10 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageEncoder;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.model.Atom;
+
+import java.lang.invoke.MethodHandles;
+import java.security.PublicKey;
 
 /**
  * This processor is intended for use in owners (bot or webapp). If the message
@@ -56,7 +56,9 @@ public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
                 }
                 PublicKey pubKey = cryptographyService.getPublicKey(alias);
                 WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
-                String contentName = message.getContentGraphURIs().get(0);
+                String contentName = message.getContentGraphURIs().stream()
+                                .filter(uri -> !uri.endsWith(Atom.ACL_GRAPH_URI_FRAGMENT))
+                                .findAny().get();
                 Model contentModel = msgDataset.getNamedModel(contentName);
                 keyWriter.writeToModel(contentModel, contentModel.createResource(atomUri), pubKey);
                 return WonMessage.of(msgDataset);
@@ -70,7 +72,9 @@ public class KeyForNewAtomAddingProcessor implements WonMessageProcessor {
                 }
                 PublicKey pubKey = cryptographyService.getPublicKey(alias);
                 WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
-                String contentName = message.getContentGraphURIs().get(0);
+                String contentName = message.getContentGraphURIs().stream()
+                                .filter(uri -> !uri.endsWith(Atom.ACL_GRAPH_URI_FRAGMENT))
+                                .findAny().get();
                 Model contentModel = msgDataset.getNamedModel(contentName);
                 keyWriter.writeToModel(contentModel, contentModel.createResource(atomUri), pubKey);
                 return WonMessage.of(msgDataset);

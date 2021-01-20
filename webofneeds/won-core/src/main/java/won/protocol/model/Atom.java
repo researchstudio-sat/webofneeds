@@ -10,35 +10,14 @@
  */
 package won.protocol.model;
 
+import won.protocol.model.parentaware.VersionedEntity;
+
+import javax.persistence.*;
+import javax.xml.bind.annotation.XmlTransient;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
-import javax.xml.bind.annotation.XmlTransient;
-
-import won.protocol.model.parentaware.VersionedEntity;
 
 /**
  *
@@ -49,6 +28,11 @@ import won.protocol.model.parentaware.VersionedEntity;
                 @UniqueConstraint(name = "IDX_ATOM_UNIQUE_DATASETHOLDER_ID", columnNames = "datatsetholder_id") })
 // @Inheritance(strategy=InheritanceType.JOINED)
 public class Atom implements VersionedEntity {
+    public static final String ACL_GRAPH_URI_FRAGMENT = "#acl";
+    /* The URI of the atom */
+    @Column(name = "atomURI", unique = true)
+    @Convert(converter = URIConverter.class)
+    protected URI atomURI;
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -58,10 +42,6 @@ public class Atom implements VersionedEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_update", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date lastUpdate;
-    /* The URI of the atom */
-    @Column(name = "atomURI", unique = true)
-    @Convert(converter = URIConverter.class)
-    protected URI atomURI;
     /* The state of the atom */
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -102,6 +82,10 @@ public class Atom implements VersionedEntity {
         return messageContainer;
     }
 
+    public void setMessageContainer(final AtomMessageContainer messageContainer) {
+        this.messageContainer = messageContainer;
+    }
+
     @PreUpdate
     public void incrementVersion() {
         this.version++;
@@ -119,24 +103,20 @@ public class Atom implements VersionedEntity {
         this.lastUpdate = lastUpdate;
     }
 
-    protected void setVersion(final int version) {
-        this.version = version;
-    }
-
-    public void setMessageContainer(final AtomMessageContainer messageContainer) {
-        this.messageContainer = messageContainer;
-    }
-
-    public void setConnectionContainer(final ConnectionContainer connectionContainer) {
-        this.connectionContainer = connectionContainer;
-    }
-
     public int getVersion() {
         return version;
     }
 
+    protected void setVersion(final int version) {
+        this.version = version;
+    }
+
     public ConnectionContainer getConnectionContainer() {
         return connectionContainer;
+    }
+
+    public void setConnectionContainer(final ConnectionContainer connectionContainer) {
+        this.connectionContainer = connectionContainer;
     }
 
     @PrePersist
@@ -212,17 +192,22 @@ public class Atom implements VersionedEntity {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof Atom))
+        }
+        if (!(o instanceof Atom)) {
             return false;
+        }
         final Atom atom = (Atom) o;
-        if (!Objects.equals(atomURI, atom.atomURI))
+        if (!Objects.equals(atomURI, atom.atomURI)) {
             return false;
-        if (!Objects.equals(ownerURI, atom.ownerURI))
+        }
+        if (!Objects.equals(ownerURI, atom.ownerURI)) {
             return false;
-        if (!Objects.equals(creationDate, atom.creationDate))
+        }
+        if (!Objects.equals(creationDate, atom.creationDate)) {
             return false;
+        }
         return state == atom.state;
     }
 

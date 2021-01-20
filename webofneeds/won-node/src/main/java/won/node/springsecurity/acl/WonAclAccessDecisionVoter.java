@@ -1,19 +1,5 @@
 package won.node.springsecurity.acl;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -35,19 +21,16 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.util.StopWatch;
 import won.auth.AuthUtils;
 import won.auth.WonAclEvaluator;
+import won.auth.WonAclEvaluatorFactory;
 import won.auth.check.AtomNodeChecker;
 import won.auth.check.TargetAtomCheckEvaluator;
-import won.auth.model.AclEvalResult;
-import won.auth.model.DecisionValue;
-import won.auth.model.OperationRequest;
-import won.auth.model.TokenOperationExpression;
-import won.auth.model.TokenSpecification;
+import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.cryptography.service.CryptographyService;
 import won.node.service.nodeconfig.URIService;
 import won.node.service.persistence.AtomService;
-import won.node.springsecurity.WebIdUserDetails;
 import won.node.springsecurity.WonDefaultAccessControlRules;
+import won.node.springsecurity.userdetails.WebIdUserDetails;
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
 import won.protocol.model.DatasetHolder;
@@ -57,22 +40,22 @@ import won.protocol.repository.DatasetHolderRepository;
 import won.protocol.repository.MessageEventRepository;
 import won.protocol.util.WonMessageUriHelper;
 
-import static won.auth.AuthUtils.cloneShallow;
-import static won.auth.AuthUtils.toAuthAtomState;
-import static won.auth.AuthUtils.toAuthConnectionState;
-import static won.auth.model.Individuals.OP_READ;
-import static won.auth.model.Individuals.POSITION_ATOM_MESSAGE;
-import static won.auth.model.Individuals.POSITION_ATOM_MESSAGES;
-import static won.auth.model.Individuals.POSITION_CONNECTION;
-import static won.auth.model.Individuals.POSITION_CONNECTIONS;
-import static won.auth.model.Individuals.POSITION_CONNECTION_MESSAGE;
-import static won.auth.model.Individuals.POSITION_CONNECTION_MESSAGES;
-import static won.auth.model.Individuals.POSITION_ROOT;
+import javax.transaction.Transactional;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-public class WonAclAccessDecisionVoter implements AccessDecisionVoter, InitializingBean {
+import static won.auth.AuthUtils.*;
+import static won.auth.model.Individuals.*;
+
+public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvocation>, InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final String anonymousUserPrincipal = "anonymousUser";
     // the aclEvaluator is not thread-safe, each thread needs its own.
-    private ThreadLocal<WonAclEvaluator> aclEvaluator;
+    private ThreadLocal<WonAclEvaluatorFactory> aclEvaluatorFactory = new ThreadLocal<>();
     @Autowired
     private TargetAtomCheckEvaluator targetAtomCheckEvaluator;
     @Autowired
@@ -111,23 +94,32 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
 
     @Override
     @Transactional
-    public int vote(final Authentication authentication, final Object object,
-                    final Collection collection) {
+    public int vote(final Authentication authentication, final FilterInvocation filterInvocation,
+                    final Collection<ConfigAttribute> configAttributes) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        if (!(authentication instanceof PreAuthenticatedAuthenticationToken)) {
-            return ACCESS_ABSTAIN;
+        if (configAttributes.stream().map(Object::toString).anyMatch(x -> x.equals("permitAll"))) {
+            // if the config attribute 'permitAll' has been configured for the call, don't
+            // check ACLs
+            return ACCESS_GRANTED;
         }
-        Object principal = authentication.getPrincipal();
-        if (!(principal instanceof WebIdUserDetails)) {
-            return ACCESS_ABSTAIN;
+        String webId = null;
+        if (authentication instanceof PreAuthenticatedAuthenticationToken) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof WebIdUserDetails) {
+                WebIdUserDetails userDetails = (WebIdUserDetails) principal;
+                // check if the WebId was verified successfully, otherwise treat as anonymous
+                if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                                .filter(r -> "ROLE_WEBID".equals(r)).findAny().isPresent()) {
+                    // if the webid was not verified, use none
+                    webId = userDetails.getUsername();
+                }
+            }
         }
-        WebIdUserDetails userDetails = (WebIdUserDetails) principal;
-        if (!(object instanceof FilterInvocation)) {
-            return ACCESS_ABSTAIN;
+        if (webId != null && webId.equals(cryptographyService.getDefaultPrivateKeyAlias())) {
+            // if the WoN node itself is the requestor, bypass all checks and allow
+            return ACCESS_GRANTED;
         }
-        String webId = userDetails.getUsername();
-        FilterInvocation filterInvocation = (FilterInvocation) object;
         String resource = filterInvocation.getRequest().getRequestURL().toString();
         URI resourceUri = null;
         try {
@@ -140,27 +132,23 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
             logger.debug("Processing WoN ACL for request to resource {}", resourceUri);
         }
         int result = ACCESS_DENIED;
-        if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                        .filter(r -> "ROLE_WEBID".equals(r)).findAny().isPresent()) {
-            // perform our hard coded access control checks
-            List<String> webIDs = new ArrayList<>(1);
-            webIDs.add(webId);
-            // prepare the legacy implementation in case the target atom(s) have no acl
-            // graph
-            Supplier<Integer> legacyImpl = () -> {
-                if (defaultAccessControlRules.isAccessPermitted(resource, webIDs)) {
-                    return ACCESS_GRANTED;
-                }
-                return ACCESS_DENIED;
-            };
-            if (WonMessageUriHelper.isLocalMessageURI(resourceUri,
-                            uriService.getMessageResourceURIPrefix())) {
-                // handle request for message
-                result = voteForMessageRequest(webId, resourceUri, filterInvocation, legacyImpl);
-            } else {
-                // handle other requests
-                result = voteForNonMessageRequest(webId, resourceUri, filterInvocation, legacyImpl);
+        // perform our hard coded access control checks
+        // prepare the legacy implementation in case the target atom(s) have no acl
+        // graph
+        final List<String> webids = webId != null ? List.of(webId) : Collections.emptyList();
+        Supplier<Integer> legacyImpl = () -> {
+            if (defaultAccessControlRules.isAccessPermitted(resource, webids)) {
+                return ACCESS_GRANTED;
             }
+            return ACCESS_DENIED;
+        };
+        if (WonMessageUriHelper.isLocalMessageURI(resourceUri,
+                        uriService.getMessageResourceURIPrefix())) {
+            // handle request for message
+            result = voteForMessageRequest(webId, resourceUri, filterInvocation, legacyImpl);
+        } else {
+            // handle other requests
+            result = voteForNonMessageRequest(webId, resourceUri, filterInvocation, legacyImpl);
         }
         stopWatch.stop();
         if (logger.isDebugEnabled()) {
@@ -252,10 +240,8 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
         Set<AclEvalResult> aclEvalResults = new HashSet<>();
         for (URI atomUri : aclGraphs.keySet()) {
             Graph aclGraph = aclGraphs.get(atomUri);
-            WonAclEvaluator evaluator = getWonAclEvaluator();
-            evaluator.loadData(aclGraph);
             for (OperationRequest opReq : opReqs.get(atomUri)) {
-                aclEvalResults.add(evaluator.decide(opReq));
+                aclEvalResults.add(getWonAclEvaluator(aclGraph).decide(opReq));
             }
         }
         Optional<AclEvalResult> aclEvalResult = aclEvalResults.stream().reduce(WonAclEvaluator::mergeAclEvalResults);
@@ -302,14 +288,14 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
                             WonAclEvalContext.allowAll());
             return legacyImpl.get();
         }
-        if (!atom.isPresent()) {
-            return ACCESS_DENIED;
-        }
+        WonAclEvaluator wonAclEvaluator = getWonAclEvaluator(aclGraph);
         // set up request object
         OperationRequest request = new OperationRequest();
         request.setReqAtom(atomUri);
         request.setReqAtomState(toAuthAtomState(atom.get().getState()));
-        request.setRequestor(URI.create(webId));
+        if (webId != null) {
+            request.setRequestor(URI.create(webId));
+        }
         request.setOperationSimpleOperationExpression(OP_READ);
         if (uriService.isAtomURI(resourceUri)) {
             request.setReqPosition(POSITION_ROOT);
@@ -318,7 +304,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
             // approach: allow the request for now, then check acl for each subgraph
             WonAclRequestHelper.setWonAclEvaluationContext(
                             filterInvocation.getRequest(),
-                            WonAclEvalContext.contentFilter(request, detachWonAclEvaluator()));
+                            WonAclEvalContext.contentFilter(request, wonAclEvaluator));
             return ACCESS_GRANTED;
         } else if (uriService.isAtomMessagesURI(resourceUri)) {
             request.setReqPosition(POSITION_ATOM_MESSAGES);
@@ -359,7 +345,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
             // consequence: allow now, check later
             WonAclRequestHelper.setWonAclEvaluationContext(
                             filterInvocation.getRequest(),
-                            WonAclEvalContext.contentFilter(request, detachWonAclEvaluator()));
+                            WonAclEvalContext.contentFilter(request, wonAclEvaluator));
             return ACCESS_GRANTED;
         } else if (uriService.isTokenEndpointURI(resourceUri)) {
             // token request
@@ -394,10 +380,9 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
                     clonedRequest.setOperationSimpleOperationExpression(null);
                     opReqs.add(clonedRequest);
                 }
-                getWonAclEvaluator().loadData(aclGraph);
                 Set<AclEvalResult> evalResults = new HashSet<>();
                 for (OperationRequest req : opReqs) {
-                    AclEvalResult result = getWonAclEvaluator().decide(req);
+                    AclEvalResult result = wonAclEvaluator.decide(req);
                     evalResults.add(result);
                 }
                 AclEvalResult finalResult = evalResults.stream().reduce(WonAclEvaluator::mergeAclEvalResults).get();
@@ -418,9 +403,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
             // default
             request.setReqPosition(POSITION_ROOT);
         }
-        WonAclEvaluator evaluator = getWonAclEvaluator();
-        evaluator.loadData(aclGraph);
-        AclEvalResult result = evaluator.decide(request);
+        AclEvalResult result = wonAclEvaluator.decide(request);
         setAuthInfoIfDenied(filterInvocation, result);
         return toAccessDecisionVote(result);
     }
@@ -448,30 +431,16 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter, Initializ
         aclShapes = Shapes.parse(aclShapesGraph);
     }
 
-    private WonAclEvaluator getWonAclEvaluator() {
-        WonAclEvaluator evaluator = this.aclEvaluator.get();
-        if (evaluator == null) {
-            evaluator = new WonAclEvaluator(
+    private WonAclEvaluator getWonAclEvaluator(Graph aclGraph) {
+        WonAclEvaluatorFactory evaluatorFactory = this.aclEvaluatorFactory.get();
+        if (evaluatorFactory == null) {
+            evaluatorFactory = new WonAclEvaluatorFactory(
                             this.aclShapes,
                             this.targetAtomCheckEvaluator,
                             this.atomNodeChecker,
                             webIdKeyLoader);
+            this.aclEvaluatorFactory.set(evaluatorFactory);
         }
-        return evaluator;
-    }
-
-    /**
-     * Obtains the current thread-local instance of the WonAclEvaluator and removes
-     * it from the threadLocal. In some cases, the evaluator is needed at a later
-     * stage of request processing. It makes sense to use the instance already
-     * prepared for this usage instead of re-creating one later, this is how to
-     * obtain it in this case.
-     *
-     * @return
-     */
-    private WonAclEvaluator detachWonAclEvaluator() {
-        WonAclEvaluator evaluator = getWonAclEvaluator();
-        this.aclEvaluator.remove();
-        return evaluator;
+        return evaluatorFactory.create(aclGraph);
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.util.StopWatch;
 import won.cryptography.webid.AccessControlRules;
+import won.node.springsecurity.userdetails.WebIdUserDetails;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -52,14 +53,17 @@ public class DefaultWoNAccessDecisionVoter implements AccessDecisionVoter {
     public int vote(final Authentication authentication, final Object object, final Collection collection) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        if (!(authentication instanceof PreAuthenticatedAuthenticationToken))
+        if (!(authentication instanceof PreAuthenticatedAuthenticationToken)) {
             return ACCESS_ABSTAIN;
+        }
         Object principal = authentication.getPrincipal();
-        if (!(principal instanceof WebIdUserDetails))
+        if (!(principal instanceof WebIdUserDetails)) {
             return ACCESS_ABSTAIN;
+        }
         WebIdUserDetails userDetails = (WebIdUserDetails) principal;
-        if (!(object instanceof FilterInvocation))
+        if (!(object instanceof FilterInvocation)) {
             return ACCESS_ABSTAIN;
+        }
         String webId = userDetails.getUsername();
         String resource = ((FilterInvocation) object).getRequest().getRequestURL().toString();
         if (authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)

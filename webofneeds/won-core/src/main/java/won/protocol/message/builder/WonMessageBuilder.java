@@ -1,6 +1,7 @@
 package won.protocol.message.builder;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -11,6 +12,7 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
+import won.protocol.model.Atom;
 import won.protocol.util.CheapInsecureRandomString;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
@@ -254,7 +256,11 @@ public class WonMessageBuilder {
         }
         for (URI contentURI : contentMap.keySet()) {
             String contentUriString = contentURI.toString();
-            dataset.addNamedModel(contentUriString, contentMap.get(contentURI));
+            Model model = contentMap.get(contentURI);
+            if (model.isEmpty()) {
+                continue;
+            }
+            dataset.addNamedModel(contentUriString, model);
             messageEventResource.addProperty(WONMSG.content,
                             messageEventResource.getModel().createResource(contentUriString));
             Model signatureGraph = signatureMap.get(contentURI);
@@ -319,16 +325,41 @@ public class WonMessageBuilder {
     }
 
     /**
-     * Adds the specified content graph, and the specified signature graph, using
-     * the specified contentURI as the graph name. The contentURI will be made
-     * unique inside the message dataset by appending characters at the end.
-     * 
+     * Adds the specified content graph. The contentURI is generated as a unique
+     * graph uri within the message dataset.
+     *
      * @param content
      * @return
      */
     WonMessageBuilder content(Model content) {
         Objects.requireNonNull(content);
         addContentInternal(content);
+        return this;
+    }
+
+    /**
+     * Adds the specified content graph. The contentURI is generated as a unique
+     * graph uri within the message dataset.
+     *
+     * @param content
+     * @return
+     */
+    WonMessageBuilder content(Graph content) {
+        Objects.requireNonNull(content);
+        addContentInternal(ModelFactory.createModelForGraph(content));
+        return this;
+    }
+
+    /**
+     * Adds the specified acl graph. The if an acl graph has already been added to
+     * this builder, the triples of the specified graph are added.
+     *
+     * @param aclGraph
+     * @return
+     */
+    WonMessageBuilder aclGraph(Graph aclGraph) {
+        Objects.requireNonNull(aclGraph);
+        addAclGraphInternal(aclGraph);
         return this;
     }
 
@@ -339,13 +370,24 @@ public class WonMessageBuilder {
         return contentGraphUri;
     }
 
+    private URI addAclGraphInternal(Graph acl) {
+        URI aclGraphUri = URI.create(messageURI.toString() + Atom.ACL_GRAPH_URI_FRAGMENT);
+        Model existingAcl = contentMap.get(aclGraphUri);
+        if (existingAcl != null) {
+            existingAcl.add(ModelFactory.createModelForGraph(acl));
+        } else {
+            contentMap.put(aclGraphUri, ModelFactory.createModelForGraph(acl));
+        }
+        return aclGraphUri;
+    }
+
     /**
      * Adds all graphs in the specified dataset as content graphs to the message. In
      * this process, unique graph URIs are generated for all graphs in the dataset,
      * including the default graph (if present). If graphs are referenced within the
      * dataset through a triple in which the graph uri is the object, all such
      * references are changed to refer to the newly generated graph uri.
-     * 
+     *
      * @param dataset
      * @return
      */
@@ -550,8 +592,8 @@ public class WonMessageBuilder {
      * than one graph is present, and hence we cannot decide for any one of them, a
      * new content graph is created for the text. If no content graphs are present,
      * a new one is created.
-     * 
-     * @param textMessage
+     *
+     * @param
      * @return
      */
     Model getModelForAddingContent() {

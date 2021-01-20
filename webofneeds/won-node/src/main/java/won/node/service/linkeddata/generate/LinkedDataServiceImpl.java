@@ -10,21 +10,6 @@
  */
 package won.node.service.linkeddata.generate;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -47,7 +32,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import won.auth.AuthUtils;
 import won.auth.model.AclEvalResult;
 import won.auth.model.DecisionValue;
@@ -62,16 +46,7 @@ import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomModelMapper;
-import won.protocol.model.AtomState;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionModelMapper;
-import won.protocol.model.ConnectionState;
-import won.protocol.model.DataWithEtag;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.DatasetHolderAggregator;
-import won.protocol.model.MessageEvent;
+import won.protocol.model.*;
 import won.protocol.model.unread.UnreadMessageInfo;
 import won.protocol.model.unread.UnreadMessageInfoForAtom;
 import won.protocol.repository.AtomRepository;
@@ -85,9 +60,15 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WON;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import static won.auth.model.Individuals.POSITION_ATOM_GRAPH;
-import static won.node.springsecurity.acl.WonAclEvalContext.Mode.ALLOW_ALL;
-import static won.node.springsecurity.acl.WonAclEvalContext.Mode.FILTER;
 
 /**
  * Creates rdf models from the relational database. TODO: conform to:
@@ -267,10 +248,10 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         // check acl: should we add sysinfo graph?
         AclEvalResult result = null;
         if (wonAclEvalContext.isModeFilter()) {
-            URI aclGraphUri = uriService.createSysInfoGraphURIForAtomURI(atomUri);
+            URI sysInfoGraphUri = uriService.createSysInfoGraphURIForAtomURI(atomUri);
             OperationRequest operationRequest = AuthUtils.cloneShallow(wonAclEvalContext.getOperationRequest());
             operationRequest.setReqPosition(POSITION_ATOM_GRAPH);
-            operationRequest.setReqGraphs(Collections.singleton(aclGraphUri));
+            operationRequest.setReqGraphs(Collections.singleton(sysInfoGraphUri));
             result = wonAclEvalContext.getWonAclEvaluator().decide(operationRequest);
         }
         if (wonAclEvalContext.isModeAllowAll() || DecisionValue.ACCESS_GRANTED.equals(result.getDecision())) {
@@ -282,13 +263,16 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
             Instant finish = Instant.now();
             logger.debug("getAtomDataset({}) took {} ms", atomUri, Duration.between(start, finish).toMillis());
         }
+        if (dataset.isEmpty()) {
+            return DataWithEtag.dataNotFound();
+        }
         return new DataWithEtag<>(dataset, newEtag, etag, isDeleted);
     }
 
     private Dataset filterByAcl(URI atomUri, Dataset dataset, WonAclEvalContext wonAclEvalContext) {
         Dataset filtered = DatasetFactory.createGeneral();
         String aclGraphUri = uriService.createAclGraphURIForAtomURI(atomUri).toString();
-        Iterator<String> graphUriIt = filtered.listNames();
+        Iterator<String> graphUriIt = dataset.listNames();
         while (graphUriIt.hasNext()) {
             String graphUri = graphUriIt.next();
             OperationRequest operationRequest = AuthUtils.cloneShallow(wonAclEvalContext.getOperationRequest());
@@ -840,8 +824,9 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     }
 
     private void addPrefixForSpecialResources(Dataset dataset, String prefix, String uri) {
-        if (uri == null)
+        if (uri == null) {
             return; // ignore if no uri specified
+        }
         // the prefix (prefix of all local URIs must end with a slash or a hash,
         // otherwise,
         // it will never be used by RDF serializations. Force that.

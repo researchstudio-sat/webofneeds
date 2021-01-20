@@ -11,6 +11,7 @@ services:
     environment:
       - "CN=wonnode"
       - "PASS=pass:changeit"
+      - "SAN=DNS:localhost,DNS:wonnode,DNS:owner,DNS:bigdata,DNS:postgres"
     volumes:
       - ./won-server-certs:/usr/local/certs/out/
 

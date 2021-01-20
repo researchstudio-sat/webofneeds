@@ -1,14 +1,15 @@
 package won.protocol.message.builder;
 
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.function.Consumer;
-
+import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Consumer;
 
 abstract class ContentBuilderScaffold<THIS extends ContentBuilderScaffold<THIS, PARENT>, PARENT extends BuilderScaffold<PARENT, ?>>
                 extends BuilderScaffold<THIS, PARENT> {
@@ -18,12 +19,34 @@ abstract class ContentBuilderScaffold<THIS extends ContentBuilderScaffold<THIS, 
 
     /**
      * Adds the specified model as a content graph to the message.
-     * 
+     *
      * @param content
      * @return the parent builder
      */
     public PARENT model(Model content) {
         builder.content(content);
+        return parent.get();
+    }
+
+    /**
+     * Adds the specified graph as a content graph to the message.
+     *
+     * @param content
+     * @return the parent builder
+     */
+    public PARENT graph(Graph content) {
+        builder.content(content);
+        return parent.get();
+    }
+
+    /**
+     * Adds the specified acl graph to the message.
+     *
+     * @param aclGraph
+     * @return the parent builder
+     */
+    public PARENT aclGraph(Graph aclGraph) {
+        builder.aclGraph(aclGraph);
         return parent.get();
     }
 
@@ -76,19 +99,19 @@ abstract class ContentBuilderScaffold<THIS extends ContentBuilderScaffold<THIS, 
      * created. If the text is null or empty, this call has no effect.
      * </p>
      * <p>
-     * 
+     *
      * <pre>
      * .text("Hello, World!")
      * </pre>
-     * 
+     *
      * is equivalent to:
-     * 
+     *
      * <pre>
      * .withMessageResource(r -> r.addProperty(WONCON.text, "Hello, World!"))
      * </pre>
      * </p>
-     * 
-     * @param textMessage
+     *
+     * @param text
      * @return the parent builder
      */
     public PARENT text(String text) {

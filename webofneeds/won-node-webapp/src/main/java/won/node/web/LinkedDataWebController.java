@@ -10,31 +10,6 @@
  */
 package won.node.web;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
@@ -48,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
@@ -78,6 +54,22 @@ import won.protocol.util.RdfUtils;
 import won.protocol.vocabulary.CNT;
 import won.protocol.vocabulary.HTTP;
 import won.protocol.vocabulary.WONMSG;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * TODO: check the working draft here and see to conformance:
@@ -122,6 +114,10 @@ import won.protocol.vocabulary.WONMSG;
 @RequestMapping("/")
 public class LinkedDataWebController implements InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    // date format for Expires header (rfc 1123)
+    private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
+    // timeout for resources that clients may cache for a short term
+    private static final int SHORT_TERM_CACHE_TIMEOUT_SECONDS = 600;
     // full prefix of an atom resource
     private String atomResourceURIPrefix;
     // full prefix of a connection resource
@@ -137,12 +133,32 @@ public class LinkedDataWebController implements InitializingBean {
     private LinkedDataService linkedDataService;
     @Autowired
     private RegistrationServer registrationServer;
-    // date format for Expires header (rfc 1123)
-    private static final String DATE_FORMAT_RFC_1123 = "EEE, dd MMM yyyy HH:mm:ss z";
-    // timeout for resources that clients may cache for a short term
-    private static final int SHORT_TERM_CACHE_TIMEOUT_SECONDS = 600;
     @Autowired
     private URIService uriService;
+
+    private static AtomState getAtomState(final String state) {
+        if (state != null) {
+            return AtomState.parseString(state);
+        } else {
+            return null;
+        }
+    }
+
+    private static ConnectionState getConnectionState(final String state) {
+        if (state != null) {
+            return ConnectionState.parseString(state);
+        } else {
+            return null;
+        }
+    }
+
+    private static URI getURIOrNull(final String uri) {
+        if (uri != null) {
+            return URI.create(uri);
+        } else {
+            return null;
+        }
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -159,6 +175,7 @@ public class LinkedDataWebController implements InitializingBean {
 
     // webmvc controller method
     @RequestMapping("${uri.path.page}/atom/{identifier}")
+    @PreAuthorize("hasRole('ROLE_WEBID')")
     public String showAtomPage(@PathVariable String identifier, Model model,
                     HttpServletRequest request,
                     HttpServletResponse response) {
@@ -166,11 +183,10 @@ public class LinkedDataWebController implements InitializingBean {
         Dataset rdfDataset = linkedDataService
                         .getAtomDataset(atomURI, null, WonAclRequestHelper.getWonAclEvaluationContext(request))
                         .getData();
-        if (rdfDataset == null) {
+        if (rdfDataset == null || rdfDataset.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return "notFoundView";
         }
-        // TODO AUTH: extract acl graph and interpret
         model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI", atomURI.toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(atomURI).toString());
@@ -199,6 +215,10 @@ public class LinkedDataWebController implements InitializingBean {
             // TODO AUTH: extract acl graph and interpret
             // TODO AUTH: Research how to handle lower layers
             logger.warn("TODO: apply ACLs to atom/{identifier}/deep request!");
+            if (rdfDataset == null || rdfDataset.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return "notFoundView";
+            }
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI", atomURI.toString());
             model.addAttribute("dataURI", uriService.toDataURIIfPossible(atomURI).toString());
@@ -689,30 +709,6 @@ public class LinkedDataWebController implements InitializingBean {
         return headers;
     }
 
-    private static AtomState getAtomState(final String state) {
-        if (state != null) {
-            return AtomState.parseString(state);
-        } else {
-            return null;
-        }
-    }
-
-    private static ConnectionState getConnectionState(final String state) {
-        if (state != null) {
-            return ConnectionState.parseString(state);
-        } else {
-            return null;
-        }
-    }
-
-    private static URI getURIOrNull(final String uri) {
-        if (uri != null) {
-            return URI.create(uri);
-        } else {
-            return null;
-        }
-    }
-
     private Integer getPreferredSize(final HttpServletRequest request) {
         Integer preferedSize = null;
         Enumeration<String> preferValue = request.getHeaders("Prefer");
@@ -1123,8 +1119,9 @@ public class LinkedDataWebController implements InitializingBean {
             addCORSHeader(headers);
             String mimeTypeOfResponse = RdfUtils.findFirst(data.getData(), model -> {
                 String content = getObjectOfPropertyAsString(model, CNT.BYTES);
-                if (content == null)
+                if (content == null) {
                     return null;
+                }
                 return getObjectOfPropertyAsString(model, WONMSG.contentType);
             });
             if (mimeTypeOfResponse != null) {
@@ -1143,8 +1140,9 @@ public class LinkedDataWebController implements InitializingBean {
 
     private String getObjectOfPropertyAsString(org.apache.jena.rdf.model.Model model, Property property) {
         NodeIterator nodeIteratr = model.listObjectsOfProperty(property);
-        if (!nodeIteratr.hasNext())
+        if (!nodeIteratr.hasNext()) {
             return null;
+        }
         String ret = nodeIteratr.next().asLiteral().getString();
         if (nodeIteratr.hasNext()) {
             throw new IncorrectPropertyCountException("found more than one property of cnt:bytes", 1, 2);
@@ -1487,10 +1485,16 @@ public class LinkedDataWebController implements InitializingBean {
                     final HttpHeaders headers) {
         if (datasetWithEtag != null) {
             if (datasetWithEtag.isDeleted()) {
+                logger.debug("sending status 410 GONE");
                 return new ResponseEntity<>(headers, HttpStatus.GONE);
+            } else if (datasetWithEtag.isNotFound()) {
+                logger.debug("sending status 404 NOT FOUND");
+                return new ResponseEntity<>(headers, HttpStatus.NOT_FOUND);
             } else if (datasetWithEtag.isChanged()) {
+                logger.debug("sending status 200 OK");
                 return new ResponseEntity<>(datasetWithEtag.getData(), headers, HttpStatus.OK);
             } else {
+                logger.debug("sending status 304 NOT MODIFIED");
                 return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);
             }
         } else {
@@ -1600,6 +1604,19 @@ public class LinkedDataWebController implements InitializingBean {
         }
     }
 
+    private String createDatasetResponse(Model model, HttpServletResponse response, URI eventURI) {
+        DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(eventURI, null);
+        if (model != null && !data.isNotFound()) {
+            model.addAttribute("rdfDataset", data.getData());
+            model.addAttribute("resourceURI", eventURI.toString());
+            model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
+            return "rdfDatasetView";
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "notFoundView";
+        }
+    }
+
     private class DateParameter {
         private String timestamp;
         private Date date;
@@ -1639,19 +1656,6 @@ public class LinkedDataWebController implements InitializingBean {
          */
         String getTimestamp() {
             return timestamp;
-        }
-    }
-
-    private String createDatasetResponse(Model model, HttpServletResponse response, URI eventURI) {
-        DataWithEtag<Dataset> data = linkedDataService.getDatasetForUri(eventURI, null);
-        if (model != null && !data.isNotFound()) {
-            model.addAttribute("rdfDataset", data.getData());
-            model.addAttribute("resourceURI", eventURI.toString());
-            model.addAttribute("dataURI", uriService.toDataURIIfPossible(eventURI).toString());
-            return "rdfDatasetView";
-        } else {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return "notFoundView";
         }
     }
 }

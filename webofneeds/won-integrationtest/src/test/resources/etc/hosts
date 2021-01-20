@@ -1,0 +1,7 @@
+127.0.0.1   localhost
+127.0.0.1   wonnode
+127.0.0.1   owner
+127.0.0.1   bigdata
+127.0.0.1   postgres
+127.0.0.1   mongodb
+127.0.0.1   solr

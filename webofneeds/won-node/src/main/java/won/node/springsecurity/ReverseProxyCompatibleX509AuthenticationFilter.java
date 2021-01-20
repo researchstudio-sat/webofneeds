@@ -10,14 +10,8 @@
  */
 package won.node.springsecurity;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
-import javax.servlet.http.HttpServletRequest;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
@@ -25,12 +19,25 @@ import org.springframework.security.web.authentication.preauth.x509.SubjectDnX50
 import org.springframework.security.web.authentication.preauth.x509.X509PrincipalExtractor;
 import won.protocol.vocabulary.WON;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.time.Duration;
+import java.time.Instant;
+
 /**
  * Created by fkleedorfer on 28.11.2016.
  */
 public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreAuthenticatedProcessingFilter {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final boolean behindProxy;
     private X509PrincipalExtractor principalExtractor = new SubjectDnX509PrincipalExtractor();
+    private Instant lastWarning;
+    private Duration warningInterval = Duration.ofHours(1);
 
     public ReverseProxyCompatibleX509AuthenticationFilter(final boolean behindProxy) {
         this.behindProxy = behindProxy;
@@ -100,10 +107,15 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreA
         } else {
             certificateChainObj = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
             if (certificateChainObj == null) {
-                throw new AuthenticationCredentialsNotFoundException(
-                                "Client certificate attribute is null! Check if you are behind a proxy server that takes care about the "
-                                                + "client authentication already. If so, set the property 'client.authentication.behind.proxy' to true and "
-                                                + "make sure the proxy sets the HTTP header 'X-Client-Certificate' appropriately to the sent client certificate");
+                if (lastWarning == null || lastWarning
+                                .isBefore(Instant.from(warningInterval.subtractFrom(Instant.now())))) {
+                    logger.warn(
+                                    "Client certificate attribute is null. This is ok for many requests but it may indicate that you are behind a proxy server that terminates TLS and your system is misconfigured."
+                                                    + " If this is the case, you never receive requests that include client certificates. If so, set the property 'client.authentication.behind.proxy' to true and "
+                                                    + "make sure the proxy sets the HTTP header 'X-Client-Certificate' appropriately, passing the client certificate on to you. This warning is not generated more than once per hour.");
+                    lastWarning = Instant.now();
+                }
+                return null;
             }
         }
         return certificateChainObj[0];

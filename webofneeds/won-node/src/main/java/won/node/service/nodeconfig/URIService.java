@@ -10,22 +10,21 @@
  */
 package won.node.service.nodeconfig;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+import won.protocol.model.Atom;
+import won.protocol.util.WonMessageUriHelper;
+import won.protocol.util.WonUriCheckHelper;
+
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
-
-import won.protocol.util.WonMessageUriHelper;
-import won.protocol.util.WonUriCheckHelper;
 
 /**
  * User: fkleedorfer Date: 06.11.12
  */
 @Component
 public class URIService implements InitializingBean {
-    private static final String ACL_GRAPH_SUFFIX = "#acl";
     private static final String TOKEN_ENDPOINT_SUFFIX = "/token";
     // prefix of any URI
     private String generalURIPrefix;
@@ -74,27 +73,31 @@ public class URIService implements InitializingBean {
     }
 
     public boolean isMessageURI(URI toCheck) {
-        if (toCheck == null)
+        if (toCheck == null) {
             return false;
+        }
         return messageUriPattern.matcher(toCheck.toString()).lookingAt();
     }
 
     public boolean isAtomURI(URI toCheck) {
-        if (toCheck == null)
+        if (toCheck == null) {
             return false;
+        }
         return atomUriPattern.matcher(toCheck.toString()).lookingAt();
     }
 
     public boolean isAtomMessagesURI(URI toCheck) {
-        if (toCheck == null)
+        if (toCheck == null) {
             return false;
+        }
         Matcher m = atomMessagesPattern.matcher(toCheck.toString());
         return m.lookingAt();
     }
 
     public boolean isAtomUnreadURI(URI toCheck) {
-        if (toCheck == null)
+        if (toCheck == null) {
             return false;
+        }
         Matcher m = atomUnreadPattern.matcher(toCheck.toString());
         return m.lookingAt();
     }
@@ -116,29 +119,33 @@ public class URIService implements InitializingBean {
     }
 
     public boolean isConnectionURI(URI toCheck) {
-        if (toCheck == null)
+        if (toCheck == null) {
             return false;
+        }
         return WonUriCheckHelper.isValidConnectionURI(this.atomResourceURIPrefix, toCheck.toString());
     }
 
     public boolean isConnectionMessagesURI(URI toCheck) {
-        if (toCheck == null)
+        if (toCheck == null) {
             return false;
+        }
         Matcher m = connectionMessagesPattern.matcher(toCheck.toString());
         return m.lookingAt();
     }
 
     public URI getConnectionURIofConnectionMessagesURI(URI connectionMessagesURI) {
-        if (connectionMessagesURI == null)
+        if (connectionMessagesURI == null) {
             return null;
+        }
         Matcher m = connectionUriPattern.matcher(connectionMessagesURI.toString());
         m.find();
         return URI.create(m.group());
     }
 
     public URI getAtomURIofAtomMessagesURI(URI atomMessagesURI) {
-        if (atomMessagesURI == null)
+        if (atomMessagesURI == null) {
             return null;
+        }
         Matcher m = atomUriPattern.matcher(atomMessagesURI.toString());
         m.find();
         return URI.create(m.group());
@@ -153,8 +160,9 @@ public class URIService implements InitializingBean {
      * is not present.
      */
     public URI getAtomURIofSubURI(URI subUri) {
-        if (subUri == null)
+        if (subUri == null) {
             return null;
+        }
         Matcher m = atomUriPattern.matcher(subUri.toString());
         if (!m.find()) {
             return null;
@@ -163,8 +171,9 @@ public class URIService implements InitializingBean {
     }
 
     public URI getAtomURIofAtomUnreadURI(URI atomUnreadURI) {
-        if (atomUnreadURI == null)
+        if (atomUnreadURI == null) {
             return null;
+        }
         Matcher m = atomUriPattern.matcher(atomUnreadURI.toString());
         m.find();
         return URI.create(m.group());
@@ -228,8 +237,9 @@ public class URIService implements InitializingBean {
     }
 
     private String resolveAgainstGeneralURIPrefix(final URI uri) {
-        if (uri.isAbsolute())
+        if (uri.isAbsolute()) {
             return uri.toString();
+        }
         return URI.create(generalURIPrefix).resolve(uri).toString();
     }
 
@@ -258,7 +268,7 @@ public class URIService implements InitializingBean {
     }
 
     public URI createAclGraphURIForAtomURI(URI atomUri) {
-        return URI.create(atomUri + ACL_GRAPH_SUFFIX);
+        return URI.create(atomUri + Atom.ACL_GRAPH_URI_FRAGMENT);
     }
 
     public URI createSysInfoGraphURIForAtomURI(final URI atomURI) {
@@ -280,36 +290,24 @@ public class URIService implements InitializingBean {
         this.dataURIPrefix = dataURIPrefix;
     }
 
-    public void setResourceURIPrefix(final String resourceURIPrefix) {
-        this.resourceURIPrefix = resourceURIPrefix;
-    }
-
     public String getResourceURIPrefix() {
         return resourceURIPrefix;
+    }
+
+    public void setResourceURIPrefix(final String resourceURIPrefix) {
+        this.resourceURIPrefix = resourceURIPrefix;
     }
 
     public void setPageURIPrefix(final String pageURIPrefix) {
         this.pageURIPrefix = pageURIPrefix;
     }
 
-    public void setGeneralURIPrefix(final String generalURIPrefix) {
-        this.generalURIPrefix = generalURIPrefix;
-    }
-
-    /**
-     * Assumes the specified uri to be of the form [connectionURI]/event/[long event
-     * id].
-     *
-     * @param eventURI
-     * @return
-     */
-    public Long getMessageIdFromMessageURI(final URI eventURI) {
-        String path = eventURI.getPath();
-        return new Long(path.substring(path.lastIndexOf("/") + 1));
-    }
-
     public String getGeneralURIPrefix() {
         return this.generalURIPrefix;
+    }
+
+    public void setGeneralURIPrefix(final String generalURIPrefix) {
+        this.generalURIPrefix = generalURIPrefix;
     }
 
     public URI toLocalMessageURI(URI messageURI) {

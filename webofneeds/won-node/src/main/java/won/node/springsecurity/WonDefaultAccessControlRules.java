@@ -1,18 +1,17 @@
 package won.node.springsecurity;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import won.cryptography.webid.AccessControlRules;
 import won.node.service.nodeconfig.URIService;
 import won.protocol.repository.AtomMessageContainerRepository;
 import won.protocol.repository.ConnectionMessageContainerRepository;
 import won.protocol.repository.MessageEventRepository;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.List;
 
 /**
  * User: ypanchenko Date: 28.07.2015
@@ -33,16 +32,26 @@ public class WonDefaultAccessControlRules implements AccessControlRules {
     }
 
     public boolean isAccessPermitted(String resourceUriString, List<String> requesterWebIDs) {
-        // TODO retrieve from an acl source for a resource instead of this temporary
-        // approach
-        // specific for the message event resources
         URI resourceUri = uriService.toResourceURIIfPossible(URI.create(resourceUriString));
+        if (requesterWebIDs.isEmpty()) {
+            // no client cert with webID provided - show only atom/connections
+            if (uriService.isAtomURI(resourceUri) || uriService.isConnectionContainerURI(resourceUri)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         String firstWebId = requesterWebIDs.get(0);
         if (requesterWebIDs.size() > 1) {
             logger.warn("received more than 1 requester webids, only using first one: ", firstWebId);
         }
         URI webId = URI.create(firstWebId);
-        if (uriService.isMessageURI(resourceUri)) {
+        if (uriService.isAtomURI(resourceUri)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("allowing access to atom {} with webID {}", resourceUri, firstWebId);
+            }
+            return true;
+        } else if (uriService.isMessageURI(resourceUri)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("checking access for event {} with webID {} ({} of {})",
                                 new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });

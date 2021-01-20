@@ -20,7 +20,7 @@
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <pattern>%d{d.M.yy HH:mm:ss.SSS} [%thread] %-5level %logger{36} -  %msg %X %n</pattern>
+            <pattern>%d{d.M.yy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %X %n</pattern>
         </encoder>
     </appender>
 
@@ -28,6 +28,8 @@
     <logger name="org.apache.camel.component.jms.reply.TemporaryQueueReplyManager" level="ERROR"/>
     <logger name="org.springframework.jms.connection.CachingConnectionFactory" level="ERROR"/>
     <logger name="org.springframework" level="info"/>
+    <logger name="org.springframework.security" level="debug"/>
+    <logger name="won.node" level="debug"/>
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

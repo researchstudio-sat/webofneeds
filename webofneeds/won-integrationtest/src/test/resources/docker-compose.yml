@@ -11,7 +11,7 @@ services:
     environment:
       - "CN=wonnode"
       - "PASS=pass:changeit"
-      - "SAN=DNS:localhost,DNS:wonnode"
+      - "SAN=DNS:localhost,DNS:wonnode,DNS:owner,DNS:bigdata,DNS:postgres"
     volumes:
       - ./won-server-certs:/usr/local/certs/out/
 
@@ -75,7 +75,6 @@ services:
                   -Dcom.sun.management.jmxremote.port=61010 -Dcom.sun.management.jmxremote.authenticate=false
                   -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=61011
                   -Djava.rmi.server.hostname=wonnode" #wonnode is correct here!"
-      #- "LOGBACK_CONFIGURATIONFILE=/usr/local/tomcat/won/logback-config/logback.xml"
       - "LOGBACK_CONFIG=logback.xml"
     ports:
       - "8082:8443"
@@ -90,7 +89,7 @@ services:
     restart: always
     build: ./image/bigdata
     ports:
-      - "10000:9999"
+      - "9999:9999"
 
   # matcher service on connect with wonnode
   matcher_service:
@@ -102,6 +101,7 @@ services:
       - "URI_SPARQL_ENDPOINT=http://bigdata:9999/blazegraph/namespace/kb/sparql"
       - "WONNODECONTROLLER_WONNODE_CRAWL=https://wonnode:8443/won/resource"
       - "CLUSTER_LOCAL_PORT=2561"
+      - "LOGGING_LEVEL_WON_MATCHER_SERVICE=debug"
     networks:
       default:
         aliases:
@@ -111,33 +111,6 @@ services:
     depends_on:
       - bigdata
       - wonnode
-
-  # solr server as an atom index
-  solr:
-    restart: always
-    image: webofneeds/solr:live
-    ports:
-      - "8984:8983"
-
-  # solr matcher and connect to matcher service
-  matcher_solr:
-    restart: always
-    build: ./image/matcher-solr
-    environment:
-      - "NODE_HOST=matchersolr"
-      - "CLUSTER_SEEDNODES=matcherservice:2561"
-      - "CLUSTER_LOCAL_PORT=2562"
-      - "MATCHER_SOLR_URI_SOLR_SERVER=http://solr:8983/solr/"
-      - "MATCHER_SOLR_URI_SOLR_SERVER_PUBLIC=http://solr:8983/solr/"
-    networks:
-      default:
-        aliases:
-          - matchersolr
-    ports:
-      - "2562:2562"
-    depends_on:
-      - solr
-      - matcher_service
 
   # sparql matcher and connect to matcher service
   matcher_sparql:
@@ -151,6 +124,7 @@ services:
       - "MATCHER_SPARQL_URI_SPARQL_ENDPOINT=http://bigdata:9999/blazegraph/namespace/kb/sparql"
       - "MATCHER_SPARQL_URI_PUBLIC=http://matchersparql/sparql/"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
+      - "LOGGING_LEVEL_WON_MATCHER_SPARQL=debug"
     networks:
       default:
         aliases:
