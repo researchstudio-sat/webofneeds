@@ -4,12 +4,6 @@ import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.TypeSpec;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.StreamSupport;
 import org.apache.jena.graph.Node;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.engine.ValidationContext;
@@ -24,9 +18,10 @@ import won.shacl2java.sourcegen.typegen.support.ProducerConsumerMap;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.validation.ResettableErrorHandler;
 
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.PUBLIC;
-import static javax.lang.model.element.Modifier.STATIC;
+import java.util.*;
+import java.util.stream.StreamSupport;
+
+import static javax.lang.model.element.Modifier.*;
 import static org.apache.jena.shacl.validation.VLib.focusNodes;
 
 public class IndividualsGenerator implements TypesGenerator {
@@ -101,7 +96,7 @@ public class IndividualsGenerator implements TypesGenerator {
                                                                                                 shape.getShapeNode()
                                                                                                                 .getURI())
                                                                                 .build())
-                                                .initializer("new $T()", type)
+                                                .initializer("new $T($S)", type, focusNode.getURI())
                                                 .build();
                                 individualsTypeBuilder.addField(fieldSpec);
                             }

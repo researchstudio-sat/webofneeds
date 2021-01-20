@@ -1,34 +1,6 @@
 package won.shacl2java;
 
-import io.github.classgraph.AnnotationInfo;
-import io.github.classgraph.AnnotationParameterValue;
-import io.github.classgraph.AnnotationParameterValueList;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfo;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.FieldInfo;
-import io.github.classgraph.ScanResult;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import org.apache.commons.collections4.SetUtils;
+import io.github.classgraph.*;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -56,6 +28,14 @@ import won.shacl2java.util.CollectionUtils;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.*;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import static org.apache.jena.shacl.validation.VLib.focusNodes;
 import static org.apache.jena.shacl.validation.VLib.isFocusNode;
 import static won.shacl2java.util.NameUtils.adderNameForFieldNameInPlural;
@@ -78,6 +58,21 @@ public class Shacl2JavaInstanceFactory {
         this.baseInstantiationContext = ctx;
     }
 
+    private static Map<Path, Set<PropertyShape>> getPropertyShapesByPath(Set<Shape> nodeShapes) {
+        Map<Path, Set<PropertyShape>> propertyShapesPerPath = nodeShapes
+                        .parallelStream()
+                        .flatMap(s -> s.getPropertyShapes().stream())
+                        .collect(Collectors.toMap(
+                                        s -> s.getPath(),
+                                        s -> Collections.singleton(s),
+                                        (left, right) -> {
+                                            Set union = new HashSet(left);
+                                            union.addAll(right);
+                                            return union;
+                                        }));
+        return propertyShapesPerPath;
+    }
+
     /**
      * Removes the results of any prior calls to <code>load(Graph)</code>.
      */
@@ -88,7 +83,7 @@ public class Shacl2JavaInstanceFactory {
     /**
      * Instantiates everything found in data. Replaces any results from previous
      * calls to <code>load(Graph)</code>.
-     * 
+     *
      * @param data the data to load
      * @param instantiateViolatingNodes if <code>true</code>, instances are
      * generated for nodes even if they violate one or more of their shapes.
@@ -103,6 +98,10 @@ public class Shacl2JavaInstanceFactory {
 
     public void load(Graph data) {
         load(data, false);
+    }
+
+    public boolean isLoaded() {
+        return this.dataInstantiationContext != null;
     }
 
     public Set<Object> getInstances(String uri) {
@@ -674,21 +673,6 @@ public class Shacl2JavaInstanceFactory {
             }
         }
         return false;
-    }
-
-    private static Map<Path, Set<PropertyShape>> getPropertyShapesByPath(Set<Shape> nodeShapes) {
-        Map<Path, Set<PropertyShape>> propertyShapesPerPath = nodeShapes
-                        .parallelStream()
-                        .flatMap(s -> s.getPropertyShapes().stream())
-                        .collect(Collectors.toMap(
-                                        s -> s.getPath(),
-                                        s -> Collections.singleton(s),
-                                        (left, right) -> {
-                                            Set union = new HashSet(left);
-                                            union.addAll(right);
-                                            return union;
-                                        }));
-        return propertyShapesPerPath;
     }
 
     public int size() {

@@ -2,14 +2,13 @@ package won.shacl2java.sourcegen.typegen.logic;
 
 import com.squareup.javapoet.*;
 import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.datatypes.xsd.XSDDatatype;
-import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Node_Blank;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.shacl.Shapes;
+import org.apache.jena.shacl.engine.constraint.ClassConstraint;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.vocabulary.SHACL;
@@ -17,6 +16,7 @@ import org.apache.jena.sparql.path.P_Inverse;
 import org.apache.jena.sparql.path.P_Link;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathVisitorBase;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.shacl2java.Shacl2JavaConfig;
@@ -70,184 +70,6 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         this.shapeTargetClasses = shapeTargetClasses;
     }
 
-    @Override
-    public Map<TypeSpec, TypeSpec> postprocess(Set<TypeSpec> typeSpecs) {
-        Map<TypeSpec, TypeSpec> changes = new HashMap<>();
-        for (Map.Entry<Shape, TypeSpec> shapeTypeSpec : shapeTypeSpecs.entrySet()) {
-            Shape shape = shapeTypeSpec.getKey();
-            TypeSpec typeSpec = shapeTypeSpec.getValue();
-            if (typeSpec.kind != CLASS) {
-                continue;
-            }
-            TypeSpec.Builder typeBuilder = typeSpec.toBuilder();
-            Set<Shape> relevantShapes = new HashSet<Shape>();
-            relevantShapes.add(shape);
-            relevantShapes.addAll(
-                            ShapeUtils.getShNodeShapeNodes(shape)
-                                            .stream()
-                                            .map(shapes::getShape)
-                                            .collect(Collectors.toSet()));
-            configureTypeWithNodeShapes(typeBuilder, relevantShapes, shapes, config);
-            ClassName typeClass = ClassName.get(config.getPackageName(), typeBuilder.build().name);
-            addToStringAllFields(typeBuilder);
-            addDeepEquals(typeBuilder, typeClass);
-            changes.put(typeSpec, typeBuilder.build());
-        }
-        return changes;
-    }
-
-    private void configureTypeWithNodeShapes(TypeSpec.Builder typeBuilder, Set<Shape> relevantShapes,
-                    Shapes shapes,
-                    Shacl2JavaConfig config) {
-        // first,prepare a methodbuilder for the toRdf method
-        // we will add statements to it while processing the relevant shapes
-        MethodSpec.Builder toRdfBuilder = MethodSpec.methodBuilder("toRdf")
-                        .addModifiers(PUBLIC)
-                        .addAnnotation(Override.class)
-                        .addParameter(ParameterizedTypeName.get(Consumer.class, Triple.class), "tripleConsumer")
-                        .addStatement("$T obj = null", Node.class)
-                        .addStatement("$T entityNode = getNodeCreateIfNecessary()", Node.class)
-                        .beginControlFlow("if (getGraph() == null)")
-                        .addStatement("additionalTriplesToRdf(tripleConsumer)");
-        for (Shape relevantShape : relevantShapes) {
-            Set<PropertyShape> propertyShapes = new HashSet();
-            propertyShapes.addAll(relevantShape.getPropertyShapes());
-            propertyShapes.addAll(ShapeUtils.getShPropertyShapes(relevantShape));
-            // remember all fields we generate for the same path for this type, so we can
-            // add a common interface
-            // and a getter for the union of all these fields:
-            Map<Path, Set<FieldSpec>> fieldsPerPath = new HashMap<>();
-            Map<Path, Set<PropertySpec>> propSpecsPerPath = propertyShapes.stream().collect(Collectors.toMap(
-                            s -> s.getPath(),
-                            s -> (Set<PropertySpec>) ShapeUtils.getPropertySpecs(s),
-                            (left, right) -> {
-                                Set union = new HashSet(left);
-                                union.addAll(right);
-                                return union;
-                            }));
-            for (Path path : propSpecsPerPath.keySet()) {
-                Optional<String> propertyName = NameUtils.propertyNameForPath(path);
-                if (!propertyName.isPresent()) {
-                    continue;
-                }
-                logger.debug("generating property '{}' of {}", propertyName.get(),
-                                NameUtils.nameForShape(relevantShape));
-                Set<PropertySpec> propertySpecs = propSpecsPerPath.get(path);
-                if (logger.isDebugEnabled()) {
-                    for (PropertySpec propertySpec : propertySpecs) {
-                        logger.debug("\tfound property spec: {}", propertySpec);
-                    }
-                }
-                boolean addTypeSuffix = propertySpecs.size() > 1;
-                for (PropertySpec propertySpec : propertySpecs) {
-                    addFieldWithPropertySpec(shapes, propertyName.get(), path, propertySpec, typeBuilder, toRdfBuilder,
-                                    fieldsPerPath,
-                                    config,
-                                    addTypeSuffix);
-                }
-            }
-            // add union getter
-            fieldsPerPath.entrySet().stream().forEach(pathToFields -> {
-                Set<FieldSpec> fieldSpecs = pathToFields.getValue();
-                if (fieldSpecs.size() < 2) {
-                    return;
-                }
-                Path path = pathToFields.getKey();
-                Optional<String> fieldName = propertyNameForPath(path);
-                if (fieldName.isPresent()) {
-                    addUnionGetter(fieldName.get(), path, typeBuilder, fieldSpecs, config);
-                }
-            });
-        }
-        //
-        relevantShapes
-                        .stream()
-                        .flatMap(s -> checkShapeForIndividuals(s).stream())
-                        .collect(Collectors.toMap(
-                                        s -> new Object[] { s.getPredicate(), s.getClassName() },
-                                        s -> s,
-                                        (left, right) -> IndividualPropertySpec.merge(left, right)))
-                        .values()
-                        .stream()
-                        .forEach(spec -> addFieldWithIndividualPropertySpec(spec, typeBuilder, toRdfBuilder, config));
-        // finish toRdf method
-        toRdfBuilder.nextControlFlow("else")
-                        .addStatement("super.toRdf(tripleConsumer)")
-                        .endControlFlow();
-        typeBuilder.addMethod(toRdfBuilder.build());
-    }
-
-    private Set<IndividualPropertySpec> checkShapeForIndividuals(Shape shape) {
-        Set<IndividualPropertySpec> individualPropertySpecs = new HashSet<>();
-        shape.getShapeGraph()
-                        .find(shape.getShapeNode(), null, null)
-                        .forEach(triple -> {
-                            Node pred = triple.getPredicate();
-                            Node obj = triple.getObject();
-                            if (!(pred.isURI() && obj.isURI())) {
-                                return;
-                            }
-                            if (pred.getURI().startsWith(SHACL.getURI())) {
-                                return;
-                            }
-                            if (obj.getURI().startsWith(SHACL.getURI())) {
-                                return;
-                            }
-                            Optional<ClassName> type = individualClassNames.get(obj);
-                            if (!type.isPresent()) {
-                                return;
-                            }
-                            // we found a static property, add to property spec:
-                            IndividualPropertySpec spec = new IndividualPropertySpec(pred, type.get());
-                            spec.addObject(obj);
-                            individualPropertySpecs.add(spec);
-                        });
-        return individualPropertySpecs;
-    }
-
-    private void addUnionGetter(String fieldName, Path path, TypeSpec.Builder typeBuilder,
-                    Set<FieldSpec> fieldSpecs, Shacl2JavaConfig config) {
-        logger.debug("adding union getter for fields [{}]",
-                        fieldSpecs.stream().map(f -> f.name).collect(Collectors.joining(",")));
-        fieldName = plural(fieldName) + config.getUnionGetterSuffix();
-        TypeName commonSuperclass = findCommonSuperclassOrSuperinterface(fieldSpecs, typeSpecNames.asMap(), config);
-        MethodSpec.Builder unionGetterbuilder = MethodSpec
-                        .methodBuilder(getterNameForField(fieldName))
-                        .returns(
-                                        ParameterizedTypeName.get(
-                                                        ClassName.get(Set.class),
-                                                        commonSuperclass))
-                        .addModifiers(PUBLIC);
-        String setName = "union";
-        unionGetterbuilder.addStatement("Set $N = new $T()", setName, ClassName.get(HashSet.class));
-        ClassName classNameSet = ClassName.get(Set.class);
-        for (FieldSpec fieldSpec : fieldSpecs) {
-            if (fieldSpec.type instanceof ParameterizedTypeName) {
-                ClassName rawType = ((ParameterizedTypeName) fieldSpec.type).rawType;
-                if (rawType.equals(classNameSet)) {
-                    addStatementsSetAddAll(unionGetterbuilder, setName, fieldSpec.name);
-                }
-            } else if (fieldSpec.type.equals(classNameSet)) {
-                addStatementsSetAddAll(unionGetterbuilder, setName, fieldSpec.name);
-            } else {
-                addStatementsSetAdd(unionGetterbuilder, setName, fieldSpec.name);
-            }
-        }
-        unionGetterbuilder.addStatement("return $N", setName);
-        unionGetterbuilder
-                        .addJavadoc("Returns the union of all fields that represent the property path\n<p>'" +
-                                        "{@code " + path.toString() + "}\n"
-                                        + "'</p>\n<p> i.e. \n"
-                                        + fieldSpecs.stream()
-                                                        .map(f -> f.name)
-                                                        .collect(Collectors.joining(
-                                                                        "</code></li>\n\t<li><code>",
-                                                                        "<ul>\n\t<li><code>",
-                                                                        "</code></li>\n</ul>"))
-                                        + "\n</p>");
-        typeBuilder.addMethod(unionGetterbuilder.build());
-    }
-
     private static void addStatementsSetAddAll(MethodSpec.Builder methodBuilder, String setName, String toAdd) {
         methodBuilder
                         .beginControlFlow("if ($N != null) ", toAdd)
@@ -260,70 +82,6 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .beginControlFlow("if ($N != null)", toAdd)
                         .addStatement("$N.add($N)", setName, toAdd)
                         .endControlFlow();
-    }
-
-    private void addFieldWithPropertySpec(Shapes shapes, String propertyName, Path path, PropertySpec propertySpec,
-                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfMethodBuilder,
-                    Map<Path, Set<FieldSpec>> fieldsPerPath, Shacl2JavaConfig config,
-                    boolean addTypeSuffix) {
-        logger.debug("adding field {} for propertySpec: {}", propertyName, propertySpec);
-        PropertyHelper helper = new PropertyHelper(shapes, propertyName, propertySpec, config, addTypeSuffix);
-        TypeName fieldType = helper.getTypeName();
-        String fieldName = helper.getFieldName();
-        FieldSpec field = FieldSpec.builder(fieldType,
-                        fieldName, PRIVATE)
-                        .addAnnotation(
-                                        AnnotationSpec.builder(PropertyPath.class)
-                                                        .addMember(
-                                                                        "value",
-                                                                        "$S",
-                                                                        path.toString())
-                                                        .build())
-                        .build();
-        CollectionUtils.addToMultivalueMap(fieldsPerPath, path, field);
-        MethodSpec setter = generateSetter(field);
-        if (propertySpec.hasNamedNodeShape() && propertySpec.getShNodeShape().getShapeNode().isURI()) {
-            setter = setter.toBuilder().addJavadoc(
-                            getAccessorJavadocGeneratedForNodeShape(propertySpec.getShNodeShape(), propertySpec))
-                            .build();
-        }
-        MethodSpec getter = generateGetter(field);
-        if (propertySpec.hasNamedNodeShape() && propertySpec.getShNodeShape().getShapeNode().isURI()) {
-            getter = getter.toBuilder().addJavadoc(
-                            getAccessorJavadocGeneratedForNodeShape(propertySpec.getShNodeShape(), propertySpec))
-                            .build();
-        }
-        typeBuilder
-                        .addField(field)
-                        .addMethod(setter)
-                        .addMethod(getter);
-        if (!propertySpec.isSingletonProperty()) {
-            typeBuilder.addMethod(generateAdder(field));
-        }
-        boolean singleton = propertySpec.isSingletonProperty();
-        generateToRdfForField(path, toRdfMethodBuilder, getter, singleton);
-    }
-
-    private void generateToRdfForField(Path path, MethodSpec.Builder toRdfMethodBuilder, MethodSpec getter,
-                    boolean isSingleton) {
-        if (isSingleton) {
-            toRdfMethodBuilder
-                            .addStatement("obj = $T.getAsNode($N())", ToRdfUtils.class, getter.name)
-                            .beginControlFlow("if (obj != null)");
-            transcribeTriples(pathToTriples(path), "entityNode", "obj", toRdfMethodBuilder);
-            toRdfMethodBuilder.endControlFlow();
-        } else {
-            toRdfMethodBuilder
-                            .beginControlFlow("$T.ofNullable($N()).orElse($T.emptySet()).forEach(val ->",
-                                            Optional.class,
-                                            getter.name,
-                                            Collections.class)
-                            .addStatement("Node object = $T.getAsNode(val)", ToRdfUtils.class)
-                            .beginControlFlow("if (object != null)");
-            transcribeTriples(pathToTriples(path), "entityNode", "object", toRdfMethodBuilder);
-            toRdfMethodBuilder.endControlFlow()
-                            .endControlFlow(")");
-        }
     }
 
     private static List<Triple> pathToTriples(Path path) {
@@ -380,32 +138,6 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
             return String.format("Value conforms to shape <a href=\"%s\">%s</a>", uri, uri);
         }
         return String.format("Values conform to shape <a href=\"%s\">%s</a>", uri, uri);
-    }
-
-    private void addFieldWithIndividualPropertySpec(IndividualPropertySpec propertySpec,
-                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfBuilder, Shacl2JavaConfig config) {
-        logger.debug("adding field {} for individual property spec: {}", propertySpec.getPredicate().getLocalName(),
-                        propertySpec);
-        IndividualPropertyHelper helper = new IndividualPropertyHelper(propertySpec, config, false);
-        TypeName typeName = helper.getTypeName();
-        String fieldName = helper.getFieldName();
-        AnnotationSpec.Builder annBuilder = AnnotationSpec.builder(Individual.class);
-        propertySpec.getObjects().forEach(o -> annBuilder.addMember("value", "{ $S }", o.getURI()));
-        FieldSpec field = FieldSpec.builder(typeName,
-                        fieldName, PRIVATE)
-                        .addAnnotation(annBuilder.build())
-                        .build();
-        MethodSpec setter = generateSetter(field);
-        MethodSpec getter = generateGetter(field);
-        typeBuilder
-                        .addField(field)
-                        .addMethod(setter)
-                        .addMethod(getter);
-        if (!propertySpec.isSingletonProperty()) {
-            typeBuilder.addMethod(generateAdder(field));
-        }
-        generateToRdfForField(new P_Link(propertySpec.getPredicate()), toRdfBuilder, getter,
-                        propertySpec.isSingletonProperty());
     }
 
     private static void addDeepEquals(TypeSpec.Builder typeBuilder, ClassName typeClass) {
@@ -503,6 +235,354 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addStatement("sb.append($S)", "}")
                         .addStatement("return sb.toString()");
         typeBuilder.addMethod(toStringAllFieldsBuilder.build());
+    }
+
+    @Override
+    public Map<TypeSpec, TypeSpec> postprocess(Set<TypeSpec> typeSpecs) {
+        Map<TypeSpec, TypeSpec> changes = new HashMap<>();
+        for (Map.Entry<Shape, TypeSpec> shapeTypeSpec : shapeTypeSpecs.entrySet()) {
+            Shape shape = shapeTypeSpec.getKey();
+            TypeSpec typeSpec = shapeTypeSpec.getValue();
+            if (typeSpec.kind != CLASS) {
+                continue;
+            }
+            TypeSpec.Builder typeBuilder = typeSpec.toBuilder();
+            Set<Shape> relevantShapes = new HashSet<Shape>();
+            relevantShapes.add(shape);
+            relevantShapes.addAll(
+                            ShapeUtils.getShNodeShapeNodes(shape)
+                                            .stream()
+                                            .map(shapes::getShape)
+                                            .collect(Collectors.toSet()));
+            configureTypeWithNodeShapes(typeBuilder, relevantShapes, shapes, config);
+            ClassName typeClass = ClassName.get(config.getPackageName(), typeBuilder.build().name);
+            addToStringAllFields(typeBuilder);
+            addDeepEquals(typeBuilder, typeClass);
+            changes.put(typeSpec, typeBuilder.build());
+        }
+        return changes;
+    }
+
+    private void configureTypeWithNodeShapes(TypeSpec.Builder typeBuilder, Set<Shape> relevantShapes,
+                    Shapes shapes,
+                    Shacl2JavaConfig config) {
+        // first,prepare a methodbuilder for the toRdf method
+        // we will add statements to it while processing the relevant shapes
+        MethodSpec.Builder toRdfBuilder = MethodSpec.methodBuilder("toRdf")
+                        .addModifiers(PUBLIC)
+                        .addAnnotation(Override.class)
+                        .addParameter(ParameterizedTypeName.get(Consumer.class, Triple.class), "tripleConsumer")
+                        .addStatement("$T obj = null", Node.class)
+                        .addStatement("$T entityNode = getNodeCreateIfNecessary()", Node.class)
+                        .beginControlFlow("if (getGraph() == null)")
+                        .addStatement("additionalTriplesToRdf(tripleConsumer)");
+        generateRequiredRdfTypeStatements(toRdfBuilder, relevantShapes);
+        for (Shape relevantShape : relevantShapes) {
+            Set<PropertyShape> propertyShapes = new HashSet();
+            propertyShapes.addAll(relevantShape.getPropertyShapes());
+            propertyShapes.addAll(ShapeUtils.getShPropertyShapes(relevantShape));
+            // remember all fields we generate for the same path for this type, so we can
+            // add a common interface
+            // and a getter for the union of all these fields:
+            Map<Path, Set<FieldSpec>> fieldsPerPath = new HashMap<>();
+            Map<Path, Set<PropertySpec>> propSpecsPerPath = propertyShapes.stream().collect(Collectors.toMap(
+                            s -> s.getPath(),
+                            s -> (Set<PropertySpec>) ShapeUtils.getPropertySpecs(s),
+                            (left, right) -> {
+                                Set union = new HashSet(left);
+                                union.addAll(right);
+                                return union;
+                            }));
+            for (Path path : propSpecsPerPath.keySet()) {
+                Optional<String> propertyName = NameUtils.propertyNameForPath(path);
+                if (!propertyName.isPresent()) {
+                    continue;
+                }
+                logger.debug("generating property '{}' of {}", propertyName.get(),
+                                NameUtils.nameForShape(relevantShape));
+                Set<PropertySpec> propertySpecs = propSpecsPerPath.get(path);
+                if (logger.isDebugEnabled()) {
+                    for (PropertySpec propertySpec : propertySpecs) {
+                        logger.debug("\tfound property spec: {}", propertySpec);
+                    }
+                }
+                boolean addTypeSuffix = propertySpecs.size() > 1;
+                for (PropertySpec propertySpec : propertySpecs) {
+                    addFieldWithPropertySpec(shapes, propertyName.get(), path, propertySpec, typeBuilder, toRdfBuilder,
+                                    fieldsPerPath,
+                                    config,
+                                    addTypeSuffix);
+                }
+            }
+            // add union getter
+            fieldsPerPath.entrySet().stream().forEach(pathToFields -> {
+                Set<FieldSpec> fieldSpecs = pathToFields.getValue();
+                if (fieldSpecs.size() < 2) {
+                    return;
+                }
+                Path path = pathToFields.getKey();
+                Optional<String> fieldName = propertyNameForPath(path);
+                if (fieldName.isPresent()) {
+                    addUnionGetter(fieldName.get(), path, typeBuilder, fieldSpecs, config);
+                }
+            });
+        }
+        //
+        relevantShapes
+                        .stream()
+                        .flatMap(s -> checkShapeForIndividuals(s).stream())
+                        .collect(Collectors.toMap(
+                                        s -> new Object[] { s.getPredicate(), s.getClassName() },
+                                        s -> s,
+                                        (left, right) -> IndividualPropertySpec.merge(left, right)))
+                        .values()
+                        .stream()
+                        .forEach(spec -> addFieldWithIndividualPropertySpec(spec, typeBuilder, toRdfBuilder, config));
+        // finish toRdf method
+        toRdfBuilder.nextControlFlow("else")
+                        .addStatement("super.toRdf(tripleConsumer)")
+                        .endControlFlow();
+        typeBuilder.addMethod(toRdfBuilder.build());
+    }
+
+    private void generateRequiredRdfTypeStatements(MethodSpec.Builder toRdfBuilder,
+                    Set<Shape> relevantShapes) {
+        // if the specs use a sh:class property, this property has to be regenerated
+        // when writing rdf
+        // -> add the code to the toRdfBuilder. If we find multiple sh:class properties,
+        // generate all of them
+        // and produce a warning. This could happen in a shapes disjunction, in which
+        // case we cannot
+        // know when generating RDF what the original shape was (if there was any).
+        Set<Node> requiredClasses = relevantShapes.stream()
+                        .flatMap(s -> s.getConstraints().stream())
+                        .filter(c -> c instanceof ClassConstraint)
+                        .map(c -> ((ClassConstraint) c).getExpectedClass())
+                        .collect(Collectors.toSet());
+        if (requiredClasses.size() > 1) {
+            logger.warn("toRdf() on detached entity will produce multiple rdf:type triples:  {}",
+                            requiredClasses.stream().map(Node::toString).collect(Collectors.joining(",")));
+        }
+        requiredClasses.forEach(node -> {
+            toRdfBuilder.addStatement("tripleConsumer.accept(new $T(entityNode, $T.type.asNode(), $T.createURI($S)))",
+                            Triple.class, RDF.class, NodeFactory.class, node.getURI());
+        });
+    }
+
+    private Set<IndividualPropertySpec> checkShapeForIndividuals(Shape shape) {
+        Set<IndividualPropertySpec> individualPropertySpecs = new HashSet<>();
+        shape.getShapeGraph()
+                        .find(shape.getShapeNode(), null, null)
+                        .forEach(triple -> {
+                            Node pred = triple.getPredicate();
+                            Node obj = triple.getObject();
+                            if (!(pred.isURI() && obj.isURI())) {
+                                return;
+                            }
+                            if (pred.getURI().startsWith(SHACL.getURI())) {
+                                return;
+                            }
+                            if (obj.getURI().startsWith(SHACL.getURI())) {
+                                return;
+                            }
+                            Optional<ClassName> type = individualClassNames.get(obj);
+                            if (!type.isPresent()) {
+                                return;
+                            }
+                            // we found a static property, add to property spec:
+                            IndividualPropertySpec spec = new IndividualPropertySpec(pred, type.get());
+                            spec.addObject(obj);
+                            individualPropertySpecs.add(spec);
+                        });
+        return individualPropertySpecs;
+    }
+
+    private void addUnionGetter(String fieldName, Path path, TypeSpec.Builder typeBuilder,
+                    Set<FieldSpec> fieldSpecs, Shacl2JavaConfig config) {
+        logger.debug("adding union getter for fields [{}]",
+                        fieldSpecs.stream().map(f -> f.name).collect(Collectors.joining(",")));
+        fieldName = plural(fieldName) + config.getUnionGetterSuffix();
+        TypeName commonSuperclass = findCommonSuperclassOrSuperinterface(fieldSpecs, typeSpecNames.asMap(), config);
+        MethodSpec.Builder unionGetterbuilder = MethodSpec
+                        .methodBuilder(getterNameForField(fieldName))
+                        .returns(
+                                        ParameterizedTypeName.get(
+                                                        ClassName.get(Set.class),
+                                                        commonSuperclass))
+                        .addModifiers(PUBLIC);
+        String setName = "union";
+        unionGetterbuilder.addStatement("Set $N = new $T()", setName, ClassName.get(HashSet.class));
+        ClassName classNameSet = ClassName.get(Set.class);
+        for (FieldSpec fieldSpec : fieldSpecs) {
+            if (fieldSpec.type instanceof ParameterizedTypeName) {
+                ClassName rawType = ((ParameterizedTypeName) fieldSpec.type).rawType;
+                if (rawType.equals(classNameSet)) {
+                    addStatementsSetAddAll(unionGetterbuilder, setName, fieldSpec.name);
+                }
+            } else if (fieldSpec.type.equals(classNameSet)) {
+                addStatementsSetAddAll(unionGetterbuilder, setName, fieldSpec.name);
+            } else {
+                addStatementsSetAdd(unionGetterbuilder, setName, fieldSpec.name);
+            }
+        }
+        unionGetterbuilder.addStatement("return $N", setName);
+        unionGetterbuilder
+                        .addJavadoc("Returns the union of all fields that represent the property path\n<p>'" +
+                                        "{@code " + path.toString() + "}\n"
+                                        + "'</p>\n<p> i.e. \n"
+                                        + fieldSpecs.stream()
+                                                        .map(f -> f.name)
+                                                        .collect(Collectors.joining(
+                                                                        "</code></li>\n\t<li><code>",
+                                                                        "<ul>\n\t<li><code>",
+                                                                        "</code></li>\n</ul>"))
+                                        + "\n</p>");
+        typeBuilder.addMethod(unionGetterbuilder.build());
+    }
+
+    private void addFieldWithPropertySpec(Shapes shapes, String propertyName, Path path, PropertySpec propertySpec,
+                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfMethodBuilder,
+                    Map<Path, Set<FieldSpec>> fieldsPerPath, Shacl2JavaConfig config,
+                    boolean addTypeSuffix) {
+        logger.debug("adding field {} for propertySpec: {}", propertyName, propertySpec);
+        PropertyHelper helper = new PropertyHelper(shapes, propertyName, propertySpec, config, addTypeSuffix);
+        TypeName fieldType = helper.getTypeName();
+        String fieldName = helper.getFieldName();
+        FieldSpec field = FieldSpec.builder(fieldType,
+                        fieldName, PRIVATE)
+                        .addAnnotation(
+                                        AnnotationSpec.builder(PropertyPath.class)
+                                                        .addMember(
+                                                                        "value",
+                                                                        "$S",
+                                                                        path.toString())
+                                                        .build())
+                        .build();
+        CollectionUtils.addToMultivalueMap(fieldsPerPath, path, field);
+        MethodSpec setter = generateSetter(field);
+        if (propertySpec.hasNamedNodeShape() && propertySpec.getShNodeShape().getShapeNode().isURI()) {
+            setter = setter.toBuilder().addJavadoc(
+                            getAccessorJavadocGeneratedForNodeShape(propertySpec.getShNodeShape(), propertySpec))
+                            .build();
+        }
+        MethodSpec getter = generateGetter(field);
+        if (propertySpec.hasNamedNodeShape() && propertySpec.getShNodeShape().getShapeNode().isURI()) {
+            getter = getter.toBuilder().addJavadoc(
+                            getAccessorJavadocGeneratedForNodeShape(propertySpec.getShNodeShape(), propertySpec))
+                            .build();
+        }
+        typeBuilder
+                        .addField(field)
+                        .addMethod(setter)
+                        .addMethod(getter);
+        if (!propertySpec.isSingletonProperty()) {
+            typeBuilder.addMethod(generateAdder(field));
+        }
+        boolean singleton = propertySpec.isSingletonProperty();
+        generateToRdfForField(path, toRdfMethodBuilder, getter, singleton);
+    }
+
+    private void generateToRdfForField(Path path, MethodSpec.Builder toRdfMethodBuilder, MethodSpec getter,
+                    boolean isSingleton) {
+        if (isSingleton) {
+            toRdfMethodBuilder
+                            .addStatement("obj = $T.getAsNode($N())", ToRdfUtils.class, getter.name)
+                            .beginControlFlow("if (obj != null)");
+            transcribeTriples(pathToTriples(path), "entityNode", "obj", toRdfMethodBuilder);
+            toRdfMethodBuilder.endControlFlow();
+        } else {
+            toRdfMethodBuilder
+                            .beginControlFlow("$T.ofNullable($N()).orElse($T.emptySet()).forEach(val ->",
+                                            Optional.class,
+                                            getter.name,
+                                            Collections.class)
+                            .addStatement("Node object = $T.getAsNode(val)", ToRdfUtils.class)
+                            .beginControlFlow("if (object != null)");
+            transcribeTriples(pathToTriples(path), "entityNode", "object", toRdfMethodBuilder);
+            toRdfMethodBuilder.endControlFlow()
+                            .endControlFlow(")");
+        }
+    }
+
+    private void addFieldWithIndividualPropertySpec(IndividualPropertySpec propertySpec,
+                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfBuilder, Shacl2JavaConfig config) {
+        logger.debug("adding field {} for individual property spec: {}", propertySpec.getPredicate().getLocalName(),
+                        propertySpec);
+        IndividualPropertyHelper helper = new IndividualPropertyHelper(propertySpec, config, false);
+        TypeName typeName = helper.getTypeName();
+        String fieldName = helper.getFieldName();
+        AnnotationSpec.Builder annBuilder = AnnotationSpec.builder(Individual.class);
+        propertySpec.getObjects().forEach(o -> annBuilder.addMember("value", "{ $S }", o.getURI()));
+        FieldSpec field = FieldSpec.builder(typeName,
+                        fieldName, PRIVATE)
+                        .addAnnotation(annBuilder.build())
+                        .build();
+        MethodSpec setter = generateSetter(field);
+        MethodSpec getter = generateGetter(field);
+        typeBuilder
+                        .addField(field)
+                        .addMethod(setter)
+                        .addMethod(getter);
+        if (!propertySpec.isSingletonProperty()) {
+            typeBuilder.addMethod(generateAdder(field));
+        }
+        generateToRdfForField(new P_Link(propertySpec.getPredicate()), toRdfBuilder, getter,
+                        propertySpec.isSingletonProperty());
+    }
+
+    private static class IndividualPropertyHelper {
+        private ClassName baseType;
+        private TypeName typeName;
+        private String basePropertyName;
+        private IndividualPropertySpec propertySpec;
+        private Shacl2JavaConfig config;
+        private String typeSuffix = "";
+
+        public IndividualPropertyHelper(IndividualPropertySpec propertySpec, Shacl2JavaConfig config,
+                        boolean addTypeIndicator) {
+            this.basePropertyName = propertySpec.getPredicate().getLocalName();
+            this.propertySpec = propertySpec;
+            this.config = config;
+            this.baseType = propertySpec.getClassName();
+            this.typeName = determineTypeName();
+            this.typeSuffix = (config.isAlwaysAddTypeIndicator() || addTypeIndicator) ? getTypeIndicator() : "";
+        }
+
+        public TypeName getTypeName() {
+            return typeName;
+        }
+
+        public String getFieldName() {
+            String name = basePropertyName;
+            if (!propertySpec.isSingletonProperty()) {
+                name = plural(name);
+            }
+            return name + typeSuffix;
+        }
+
+        public String getFieldNameSingular() {
+            return basePropertyName + typeSuffix;
+        }
+
+        private String getTypeIndicator() {
+            if (baseType == null) {
+                return "";
+            }
+            if (!config.isAbbreviateTypeIndicators()) {
+                return baseType.simpleName();
+            }
+            return baseType.simpleName().toString().replaceAll("\\p{Lower}", "");
+        }
+
+        private TypeName determineTypeName() {
+            TypeName type = propertySpec.getClassName();
+            if (propertySpec.isSingletonProperty()) {
+                return type;
+            } else {
+                ClassName set = ClassName.get(Set.class);
+                return ParameterizedTypeName.get(set, type);
+            }
+        }
     }
 
     private class PropertyHelper {
@@ -641,61 +721,6 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 return node.getLiteralDatatype().getJavaClass();
             }
             throw new IllegalStateException("Node is neither blank, nor IRI, nor literal - cannot handle that");
-        }
-    }
-
-    private static class IndividualPropertyHelper {
-        private ClassName baseType;
-        private TypeName typeName;
-        private String basePropertyName;
-        private IndividualPropertySpec propertySpec;
-        private Shacl2JavaConfig config;
-        private String typeSuffix = "";
-
-        public IndividualPropertyHelper(IndividualPropertySpec propertySpec, Shacl2JavaConfig config,
-                        boolean addTypeIndicator) {
-            this.basePropertyName = propertySpec.getPredicate().getLocalName();
-            this.propertySpec = propertySpec;
-            this.config = config;
-            this.baseType = propertySpec.getClassName();
-            this.typeName = determineTypeName();
-            this.typeSuffix = (config.isAlwaysAddTypeIndicator() || addTypeIndicator) ? getTypeIndicator() : "";
-        }
-
-        public TypeName getTypeName() {
-            return typeName;
-        }
-
-        public String getFieldName() {
-            String name = basePropertyName;
-            if (!propertySpec.isSingletonProperty()) {
-                name = plural(name);
-            }
-            return name + typeSuffix;
-        }
-
-        public String getFieldNameSingular() {
-            return basePropertyName + typeSuffix;
-        }
-
-        private String getTypeIndicator() {
-            if (baseType == null) {
-                return "";
-            }
-            if (!config.isAbbreviateTypeIndicators()) {
-                return baseType.simpleName();
-            }
-            return baseType.simpleName().toString().replaceAll("\\p{Lower}", "");
-        }
-
-        private TypeName determineTypeName() {
-            TypeName type = propertySpec.getClassName();
-            if (propertySpec.isSingletonProperty()) {
-                return type;
-            } else {
-                ClassName set = ClassName.get(Set.class);
-                return ParameterizedTypeName.get(set, type);
-            }
         }
     }
 }
