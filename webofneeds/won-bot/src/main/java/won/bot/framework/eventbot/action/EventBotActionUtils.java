@@ -10,12 +10,8 @@
  */
 package won.bot.framework.eventbot.action;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
@@ -27,11 +23,72 @@ import won.bot.framework.eventbot.listener.impl.ActionOnFirstEventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 /**
  * User: fkleedorfer Date: 02.02.14
  */
 public class EventBotActionUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    /**
+     * Creates an anonymous instance of <code>BaseEventBotAction</code> that
+     * executes the specified action.
+     *
+     * @param ctx
+     * @param action
+     * @return
+     */
+    public static BaseEventBotAction makeAction(EventListenerContext ctx, Consumer<Event> action) {
+        return new BaseEventBotAction(ctx) {
+            @Override
+            protected void doRun(Event event, EventListener executingListener)
+                            throws Exception {
+                action.accept(event);
+            }
+        };
+    }
+
+    /**
+     * Creates an anonymous instance of <code>BaseEventBotAction</code> that
+     * executes the specified action.
+     *
+     * @param ctx
+     * @param action
+     * @return
+     */
+    public static BaseEventBotAction makeActionWithListenerRef(EventListenerContext ctx,
+                    BiConsumer<Event, EventListenerContext> action) {
+        return new BaseEventBotAction(ctx) {
+            @Override
+            protected void doRun(Event event, EventListener executingListener)
+                            throws Exception {
+                action.accept(event, getEventListenerContext());
+            }
+        };
+    }
+
+    /**
+     * Creates an anonymous instance of <code>BaseEventBotAction</code> that
+     * executes the specified action.
+     *
+     * @param ctx
+     * @param action
+     * @return
+     */
+    public static BaseEventBotAction makeActionWithContextRef(EventListenerContext ctx,
+                    BiConsumer<Event, EventListener> action) {
+        return new BaseEventBotAction(ctx) {
+            @Override
+            protected void doRun(Event event, EventListener executingListener)
+                            throws Exception {
+                action.accept(event, executingListener);
+            }
+        };
+    }
 
     /**
      * @deprecated use

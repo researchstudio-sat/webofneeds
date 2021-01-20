@@ -21,16 +21,32 @@ import won.bot.framework.eventbot.listener.EventListener;
  */
 public class MultipleActions extends BaseEventBotAction {
     private EventBotAction[] actions;
+    private boolean runActionsInParallel = true;
 
     public MultipleActions(final EventListenerContext eventListenerContext, final EventBotAction... actions) {
         super(eventListenerContext);
         this.actions = actions;
     }
 
+    public MultipleActions(EventListenerContext eventListenerContext, boolean runActionsInParallel,
+                    EventBotAction... actions) {
+        super(eventListenerContext);
+        this.actions = actions;
+        this.runActionsInParallel = runActionsInParallel;
+    }
+
     @Override
     protected void doRun(final Event event, EventListener executingListener) throws Exception {
-        for (EventBotAction action : actions) {
-            getEventListenerContext().getExecutor().execute(action.getActionTask(event, executingListener));
+        if (runActionsInParallel) {
+            for (EventBotAction action : actions) {
+                getEventListenerContext().getExecutor().execute(action.getActionTask(event, executingListener));
+            }
+        } else {
+            getEventListenerContext().getExecutor().execute(() -> {
+                for (EventBotAction action : actions) {
+                    action.getActionTask(event, executingListener).run();
+                }
+            });
         }
     }
 }

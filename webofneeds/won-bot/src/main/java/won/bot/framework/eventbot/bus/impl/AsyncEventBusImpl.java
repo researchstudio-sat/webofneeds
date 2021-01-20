@@ -118,8 +118,9 @@ public class AsyncEventBusImpl implements EventBus {
                 boolean unsubscribed = false; // remember if we had to unsubscribe the listener for the current event
                                               // type
                 List<EventListener> listeners = entry.getValue();
-                if (listeners == null)
+                if (listeners == null) {
                     continue;
+                }
                 listeners = copyOrCreateList(listeners);
                 Iterator<EventListener> it = listeners.iterator();
                 while (it.hasNext()) {
@@ -148,8 +149,9 @@ public class AsyncEventBusImpl implements EventBus {
     }
 
     private void callEventListeners(final List<EventListener> listeners, final Event event) {
-        if (listeners == null || listeners.isEmpty())
+        if (listeners == null || listeners.isEmpty()) {
             return;
+        }
         this.executor.execute(() -> {
             logger.debug("processing event {} with {} listeners", event, listeners.size());
             for (EventListener listener : listeners) {
@@ -173,8 +175,9 @@ public class AsyncEventBusImpl implements EventBus {
 
     private Set<Class<? extends Event>> getEventTypes(final Class<? extends Event> clazz,
                     Set<Class<? extends Event>> eventTypes) {
-        if (eventTypes == null)
+        if (eventTypes == null) {
             eventTypes = new HashSet<>();
+        }
         final Set<Class<? extends Event>> finalEventTypes = eventTypes;
         // add interfaces and recurse for interfaces
         Arrays.stream(clazz.getInterfaces()).forEach(c -> {
@@ -191,8 +194,9 @@ public class AsyncEventBusImpl implements EventBus {
     }
 
     private List<EventListener> copyOrCreateList(final List<EventListener> listenerList) {
-        if (listenerList == null)
+        if (listenerList == null) {
             return new ArrayList<>(1);
+        }
         List<EventListener> newListenerList = new ArrayList<>(listenerList.size() + 1);
         newListenerList.addAll(listenerList);
         return newListenerList;

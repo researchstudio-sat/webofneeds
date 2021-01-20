@@ -88,7 +88,7 @@ public interface EventBus {
      * Unsubscribes a listener from an event type. If the listener implements the
      * SubscriptionAware interface, its onUnsubscribe() method will be called after
      * the bot is unsubscribed.
-     * 
+     *
      * @param eventClazz
      * @param listener
      * @param <T>
