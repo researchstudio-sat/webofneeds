@@ -1,10 +1,6 @@
 package won.auth;
 
-import java.util.function.Predicate;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.compose.Union;
-import org.apache.jena.shacl.Shapes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.auth.check.AtomNodeChecker;
@@ -12,12 +8,12 @@ import won.auth.check.TargetAtomCheck;
 import won.auth.check.TargetAtomCheckEvaluator;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
-import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static won.auth.model.DecisionValue.ACCESS_DENIED;
@@ -27,51 +23,21 @@ import static won.auth.model.RelativeAtomExpression.ANY_ATOM;
 import static won.auth.model.RelativeAtomExpression.SELF;
 
 public class WonAclEvaluator {
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     public static final long DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS = 3600;
-    private TargetAtomCheckEvaluator targetAtomCheckEvaluator;
-    private AtomNodeChecker atomNodeChecker;
-    private WebIdKeyLoader webIdKeyLoader;
-    private Shacl2JavaInstanceFactory instanceFactory;
-    private Shapes shapes;
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final Set<Authorization> authorizations;
+    private final TargetAtomCheckEvaluator targetAtomCheckEvaluator;
+    private final AtomNodeChecker atomNodeChecker;
+    private final WebIdKeyLoader webIdKeyLoader;
 
-    public WonAclEvaluator(
-                    Shapes shapes,
+    public WonAclEvaluator(Set<Authorization> authorizations,
                     TargetAtomCheckEvaluator targetAtomCheckEvaluator,
                     AtomNodeChecker atomNodeChecker,
                     WebIdKeyLoader webIdKeyLoader) {
+        this.authorizations = authorizations;
         this.targetAtomCheckEvaluator = targetAtomCheckEvaluator;
-        this.shapes = shapes;
-        this.instanceFactory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
         this.webIdKeyLoader = webIdKeyLoader;
         this.atomNodeChecker = atomNodeChecker;
-    }
-
-    public void loadData(Graph dataGraph) {
-        this.instanceFactory.load(new Union(shapes.getGraph(), dataGraph));
-    }
-
-    public Set<Authorization> getAuthorizations() {
-        return this.instanceFactory
-                        .getInstancesOfType(Authorization.class);
-    }
-
-    public Set<OperationRequest> getOperationRequests() {
-        return this.instanceFactory.getInstancesOfType(OperationRequest.class);
-    }
-
-    public AclEvalResult decide(OperationRequest request) {
-        return this.decide(this.getAuthorizations(), request);
-    }
-
-    public AclEvalResult decide(Set<Authorization> authorizations, OperationRequest request) {
-        Set<Authorization> requestorIsGranteeOf = new HashSet<>();
-        boolean grantAuthInfo = canProvideAuthInfo(authorizations, request,
-                        requestorIsGranteeOf);
-        Optional<AclEvalResult> result = authorizations.stream()
-                        .map(auth -> decide(auth, request, grantAuthInfo, requestorIsGranteeOf))
-                        .reduce((left, right) -> mergeAclEvalResults(left, right));
-        return result.orElse(accessControlDecision(false, request));
     }
 
     public static AclEvalResult mergeAclEvalResults(AclEvalResult left, AclEvalResult right) {
@@ -115,6 +81,69 @@ public class WonAclEvaluator {
         }
     }
 
+    private static boolean canProvideAuthInfo(Authorization authorization, OperationRequest request) {
+        AseRoot root = authorization.getProvideAuthInfo();
+        OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
+        root.accept(operationRequestChecker);
+        boolean finalDecision = operationRequestChecker.getFinalDecision();
+        debug("providing auth info : {}", authorization, request, finalDecision);
+        if (finalDecision) {
+            return true;
+        }
+        return false;
+    }
+
+    private static Predicate<TokenOperationExpression> isRequestedToken(OperationRequest request,
+                    boolean allRequested) {
+        return op -> allRequested
+                        || (!op.getRequestToken().getTokenScopesUnion().isEmpty()
+                                        && op.getRequestToken().getTokenScopesUnion().containsAll(
+                                                        request.getOperationTokenOperationExpression()
+                                                                        .getRequestToken()
+                                                                        .getTokenScopesUnion()));
+    }
+
+    private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
+        if (request.getReqAtom().equals(request.getRequestor())) {
+            // requestor is owner - allow anything
+            return true;
+        }
+        for (AseRoot root : authorization.getGrants()) {
+            OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
+            root.accept(operationRequestChecker);
+            boolean finalDecision = operationRequestChecker.getFinalDecision();
+            debug("operation granted: {}", authorization, request, finalDecision);
+            if (finalDecision) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void debug(String message, Authorization auth, OperationRequest request, Object... params) {
+        if (logger.isDebugEnabled()) {
+            Object[] logParams = new Object[params.length + 2];
+            logParams[logParams.length - 2] = request;
+            logParams[logParams.length - 1] = auth;
+            System.arraycopy(params, 0, logParams, 0, params.length);
+            logger.debug("AuthCheck: " + message + " ({} against {})", logParams);
+        }
+    }
+
+    public AclEvalResult decide(OperationRequest request) {
+        return this.decide(this.authorizations, request);
+    }
+
+    public AclEvalResult decide(Set<Authorization> authorizations, OperationRequest request) {
+        Set<Authorization> requestorIsGranteeOf = new HashSet<>();
+        boolean grantAuthInfo = canProvideAuthInfo(authorizations, request,
+                        requestorIsGranteeOf);
+        Optional<AclEvalResult> result = authorizations.stream()
+                        .map(auth -> decide(auth, request, grantAuthInfo, requestorIsGranteeOf))
+                        .reduce((left, right) -> mergeAclEvalResults(left, right));
+        return result.orElse(accessControlDecision(false, request));
+    }
+
     private AclEvalResult accessControlDecision(boolean accessGranted, OperationRequest request) {
         AclEvalResult result = new AclEvalResult();
         result.setDecision(accessGranted ? ACCESS_GRANTED : ACCESS_DENIED);
@@ -149,18 +178,6 @@ public class WonAclEvaluator {
                         });
     }
 
-    private static boolean canProvideAuthInfo(Authorization authorization, OperationRequest request) {
-        AseRoot root = authorization.getProvideAuthInfo();
-        OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
-        root.accept(operationRequestChecker);
-        boolean finalDecision = operationRequestChecker.getFinalDecision();
-        debug("providing auth info : {}", authorization, request, finalDecision);
-        if (finalDecision) {
-            return true;
-        }
-        return false;
-    }
-
     public AclEvalResult decide(Authorization authorization, OperationRequest request,
                     boolean provideAuthInfo) {
         return decide(authorization, request, provideAuthInfo, Collections.emptySet());
@@ -172,6 +189,9 @@ public class WonAclEvaluator {
         boolean decisionSoFar = false;
         if (request.getReqAtom().equals(request.getRequestor())) {
             // owner of atom is requestor - allow anything
+            decisionSoFar = true;
+        } else if (ANYONE.equals(authorization.getGranteeGranteeWildcard())) {
+            // wildcard access
             decisionSoFar = true;
         } else if (requestorIsGranteeOf.contains(authorization)) {
             // requestor is grantee, we have established that earlier
@@ -277,29 +297,6 @@ public class WonAclEvaluator {
         return authTokens;
     }
 
-    private static Predicate<TokenOperationExpression> isRequestedToken(OperationRequest request,
-                    boolean allRequested) {
-        return op -> allRequested
-                        || (!op.getRequestToken().getTokenScopesUnion().isEmpty()
-                                        && op.getRequestToken().getTokenScopesUnion().containsAll(
-                                                        request.getOperationTokenOperationExpression()
-                                                                        .getRequestToken()
-                                                                        .getTokenScopesUnion()));
-    }
-
-    private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
-        for (AseRoot root : authorization.getGrants()) {
-            OperationRequestChecker operationRequestChecker = new OperationRequestChecker(request);
-            root.accept(operationRequestChecker);
-            boolean finalDecision = operationRequestChecker.getFinalDecision();
-            debug("operation granted: {}", authorization, request, finalDecision);
-            if (finalDecision) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean isRequestorAGrantee(Authorization authorization, OperationRequest request) {
         // fast check: check for direct referenct
         if (ANYONE.equals(authorization.getGranteeGranteeWildcard())) {
@@ -321,8 +318,9 @@ public class WonAclEvaluator {
         debug("looking for grantee in atom structure expressions", authorization, request);
         for (AseRoot root : authorization.getGranteesAseRoot()) {
             URI baseAtom = request.getReqAtom();
-            if (isTargetAtom(requestor, baseAtom, root))
+            if (isTargetAtom(requestor, baseAtom, root)) {
                 return true;
+            }
         }
         return false;
     }
@@ -459,24 +457,5 @@ public class WonAclEvaluator {
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toSet());
-    }
-
-    private static void debug(String message, Authorization auth, OperationRequest request, Object... params) {
-        if (logger.isDebugEnabled()) {
-            Object[] logParams = new Object[params.length + 2];
-            logParams[logParams.length - 2] = request;
-            logParams[logParams.length - 1] = auth;
-            System.arraycopy(params, 0, logParams, 0, params.length);
-            logger.debug("AuthCheck: " + message + " ({} against {})", logParams);
-        }
-    }
-
-    /**
-     * Access to the instance factory for tests.
-     *
-     * @return
-     */
-    Shacl2JavaInstanceFactory getInstanceFactory() {
-        return instanceFactory;
     }
 }
