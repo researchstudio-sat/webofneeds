@@ -12,7 +12,7 @@
 @prefix dct:   <http://purl.org/dc/terms/> .
 @prefix dc:    <http://purl.org/dc/elements/1.1/> .
 @prefix match: <https://w3id.org/won/matching#> .
-@prefix con:   <https://w3id.org/won/con#> .
+@prefix con:   <https://w3id.org/won/content#> .
 @prefix s:     <http://schema.org/> .
 
 won:atomSysinfoShape
@@ -38,11 +38,11 @@ won:atomSysinfoShape
 won:atomContentShape
     a              sh:NodeShape ;
     sh:targetClass won:Atom ;
-    sh:property    [ sh:path rdf:type ;
+    sh:property    [ sh:path     rdf:type ;
                      sh:nodeKind sh:IRI ] ;
     sh:property    [ sh:path won:socket ;
                      sh:node won:socketShape ] ;
-    sh:property    [ sh:path     match:query ;
+    sh:property    [ sh:path     match:sparqlQuery ;
                      sh:nodeKind sh:Literal ;
                      sh:datatype xsd:string ] ;
     sh:property    [ sh:path     con:tag ;
