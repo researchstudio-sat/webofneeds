@@ -10,13 +10,9 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
@@ -26,6 +22,9 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.WonRdfUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * Listener that will try to obtain a connectionURI from any event passed to it
@@ -65,7 +64,7 @@ public class CloseConnectionAction extends BaseEventBotAction {
     }
 
     private WonMessage createWonMessage(URI connectionURI) throws WonMessageBuilderException {
-        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForPublicResource(connectionURI);
         URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
         URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
                         connectionURI);

@@ -1,20 +1,20 @@
 package won.owner.protocol.message;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Optional;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.util.AtomModelWrapper;
+import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
 
 /**
  * Removes elements from the linked data cache when certain messages are seen.
@@ -22,6 +22,8 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
  */
 public class LinkedDataCacheInvalidator implements WonMessageProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private CachingLinkedDataSource linkedDataSource;
+    private CachingLinkedDataSource linkedDataSourceOnBehalfOfAtom;
 
     public void setLinkedDataSource(final CachingLinkedDataSource linkedDataSource) {
         this.linkedDataSource = linkedDataSource;
@@ -30,9 +32,6 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
     public void setLinkedDataSourceOnBehalfOfAtom(CachingLinkedDataSource linkedDataSourceOnBehalfOfAtom) {
         this.linkedDataSourceOnBehalfOfAtom = linkedDataSourceOnBehalfOfAtom;
     }
-
-    private CachingLinkedDataSource linkedDataSource;
-    private CachingLinkedDataSource linkedDataSourceOnBehalfOfAtom;
 
     @Override
     public WonMessage process(final WonMessage message) throws WonMessageProcessingException {
@@ -48,13 +47,19 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
                 // the cached list of events of the receiver atom for the involved connection
                 // should be invalidated, since one more
                 // message was created
-                logger.debug("invalidating events list for atom " + message.getRecipientAtomURI() + " for connection "
-                                + connectionURI.get());
-                URI messageContainerUri = WonLinkedDataUtils
-                                .getMessageContainerURIforConnectionURI(connectionURI.get(), linkedDataSource);
-                invalidate(messageContainerUri, webId);
-                if (type.causesConnectionStateChange()) {
-                    invalidate(connectionURI.get(), webId);
+                try {
+                    logger.debug("invalidating events list for atom " + message.getRecipientAtomURI()
+                                    + " for connection "
+                                    + connectionURI.get());
+                    URI messageContainerUri = WonRdfUtils.ConnectionUtils
+                                    .getMessageContainerURIforConnectionURI(connectionURI.get());
+                    invalidate(messageContainerUri, webId);
+                    if (type.causesConnectionStateChange()) {
+                        invalidate(connectionURI.get(), webId);
+                    }
+                } catch (Exception e) {
+                    logger.info("Error occurred while trying to invalidate cache for {}: {}",
+                                    message.getRecipientAtomURI(), e.getMessage());
                 }
             }
         }
@@ -63,10 +68,16 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
             // these type
             // of messages mean that the new connection has been created recently
             logger.debug("invalidating connections list for atom " + message.getRecipientAtomURI());
-            Dataset atom = linkedDataSource.getDataForResource(message.getRecipientAtomURI());
-            AtomModelWrapper wrapper = new AtomModelWrapper(atom);
-            URI connectionsListUri = URI.create(wrapper.getConnectionContainerUri());
-            invalidate(connectionsListUri, webId);
+            try {
+                Dataset atom = linkedDataSource.getDataForResource(message.getRecipientAtomURI(),
+                                message.getRecipientAtomURI());
+                AtomModelWrapper wrapper = new AtomModelWrapper(atom);
+                URI connectionsListUri = URI.create(wrapper.getConnectionContainerUri());
+                invalidate(connectionsListUri, webId);
+            } catch (Exception e) {
+                logger.info("Error occurred while trying to invalidate cache for {}: {}", message.getRecipientAtomURI(),
+                                e.getMessage());
+            }
         }
         if (type.causesAtomStateChange()) {
             invalidate(message.getRecipientAtomURI(), webId);
@@ -75,8 +86,9 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
     }
 
     private void invalidate(URI uri, URI webId) {
-        if (uri == null)
+        if (uri == null) {
             return;
+        }
         linkedDataSource.invalidate(uri);
         linkedDataSource.invalidate(uri, webId);
         if (linkedDataSourceOnBehalfOfAtom != linkedDataSource) {

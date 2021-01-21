@@ -21,7 +21,7 @@ public interface MatcherExtension {
                     final Dataset atomModel) {
         if (getMatcherBehaviour().isActive()) {
             Dataset dataset = getMatcherBehaviour().getEventListenerContext().getLinkedDataSource()
-                            .getDataForResource(atomURI);
+                            .getDataForPublicResource(atomURI);
             getMatcherBehaviour().getEventBus().publish(new MatcherExtensionAtomCreatedEvent(atomURI, dataset));
         }
     }

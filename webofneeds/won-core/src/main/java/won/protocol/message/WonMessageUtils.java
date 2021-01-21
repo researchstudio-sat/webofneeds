@@ -10,13 +10,12 @@
  */
 package won.protocol.message;
 
+import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.vocabulary.WONMSG;
+
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
-
-import won.protocol.exception.WonMessageProcessingException;
-import won.protocol.util.WonMessageUriHelper;
-import won.protocol.vocabulary.WONMSG;
 
 /**
  * Utilities for working with wonMessage objects.
@@ -64,9 +63,39 @@ public class WonMessageUtils {
                         () -> new WonMessageProcessingException("Could not obtain recipient atom uri", msg));
     }
 
+    public static Optional<URI> getOwnAtomFromIncomingMessage(WonMessage wonMessage) {
+        if (wonMessage.getMessageTypeRequired().isSocketHintMessage()) {
+            return Optional.of(WonMessageUtils.getRecipientAtomURIRequired(wonMessage));
+        } else if (wonMessage.getMessageTypeRequired().isAtomHintMessage()) {
+            return Optional.empty();
+        }
+        if (wonMessage.isMessageWithBothResponses()) {
+            // message with both responses is an incoming message from another atom.
+            // the head message is out partner's, so we are the recipient
+            return Optional.of(WonMessageUtils.getRecipientAtomURIRequired(wonMessage));
+        } else if (wonMessage.isMessageWithResponse()) {
+            // message with onlny one response is our node's response plus the echo
+            // the head message is the message we sent, so we are the sender
+            return Optional.of(WonMessageUtils.getSenderAtomURIRequired(wonMessage));
+        } else if (wonMessage.isRemoteResponse()) {
+            // only a remote response. we are the recipient
+            return Optional.of(WonMessageUtils.getRecipientAtomURIRequired(wonMessage));
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<URI> getOwnAtomFromOutgoingMessage(WonMessage wonMessage) {
+        if (wonMessage.getMessageTypeRequired().isSocketHintMessage()) {
+            return Optional.of(WonMessageUtils.getSenderAtomURIRequired(wonMessage));
+        } else if (wonMessage.getMessageTypeRequired().isAtomHintMessage()) {
+            return Optional.empty();
+        }
+        return Optional.of(WonMessageUtils.getSenderAtomURIRequired(wonMessage));
+    }
+
     /**
      * Returns the atom that this message belongs to.
-     * 
+     *
      * @param message
      * @return
      */

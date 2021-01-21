@@ -10,15 +10,14 @@
  */
 package won.protocol.util.linkeddata;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.path.Path;
 import org.springframework.http.HttpHeaders;
-
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Interface for fetching linked data as a jena Model.
@@ -31,7 +30,7 @@ public interface LinkedDataSource {
      * @return resource description as Dataset, or empty Dataset if not a valid URI
      * or not found
      */
-    Dataset getDataForResource(URI resourceURI);
+    Dataset getDataForPublicResource(URI resourceURI);
 
     /**
      * Obtains resource description of the resource identified by the given URI for
@@ -45,12 +44,12 @@ public interface LinkedDataSource {
      */
     Dataset getDataForResource(URI resourceURI, URI requesterWebID);
 
-    Dataset getDataForResource(final URI resourceURI, List<URI> properties, int maxRequest, int maxDepth);
+    Dataset getDataForPublicResource(final URI resourceURI, List<URI> properties, int maxRequest, int maxDepth);
 
     Dataset getDataForResource(final URI resourceURI, URI requesterWebID, List<URI> properties, int maxRequest,
                     int maxDepth);
 
-    Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
+    Dataset getDataForPublicResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
                     int maxRequest, int maxDepth, final boolean moveAllTriplesInDefaultGraph);
 
     Dataset getDataForResourceWithPropertyPath(final URI resourceURI, URI requesterWebID,

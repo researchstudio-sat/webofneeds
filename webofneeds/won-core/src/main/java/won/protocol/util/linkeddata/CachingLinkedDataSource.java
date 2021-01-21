@@ -551,7 +551,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     }
 
     @Override
-    public Dataset getDataForResource(final URI resource) {
+    public Dataset getDataForPublicResource(final URI resource) {
         return getDataForResource(resource, null);
     }
 

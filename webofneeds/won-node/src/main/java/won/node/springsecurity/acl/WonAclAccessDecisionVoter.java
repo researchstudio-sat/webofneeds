@@ -261,6 +261,9 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                                         && aclEvalResult.get().getDecision().equals(DecisionValue.ACCESS_GRANTED))) {
             return ACCESS_GRANTED;
         } else {
+            if (aclEvalResult.isPresent()) {
+                setAuthInfoIfDenied(filterInvocation, aclEvalResult.get());
+            }
             return ACCESS_DENIED;
         }
     }

@@ -252,7 +252,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
             OperationRequest operationRequest = AuthUtils.cloneShallow(wonAclEvalContext.getOperationRequest());
             operationRequest.setReqPosition(POSITION_ATOM_GRAPH);
             operationRequest.setReqGraphs(Collections.singleton(sysInfoGraphUri));
-            result = wonAclEvalContext.getWonAclEvaluator().decide(operationRequest);
+            result = wonAclEvalContext.decideAndRemember(operationRequest);
         }
         if (wonAclEvalContext.isModeAllowAll() || DecisionValue.ACCESS_GRANTED.equals(result.getDecision())) {
             addSysInfoGraph(atom, dataset);
@@ -264,7 +264,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
             logger.debug("getAtomDataset({}) took {} ms", atomUri, Duration.between(start, finish).toMillis());
         }
         if (dataset.isEmpty()) {
-            return DataWithEtag.dataNotFound();
+            return DataWithEtag.accessDenied();
         }
         return new DataWithEtag<>(dataset, newEtag, etag, isDeleted);
     }
@@ -283,7 +283,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
             } else {
                 operationRequest.setReqGraphTypes(Collections.singleton(GraphType.CONTENT_GRAPH));
             }
-            AclEvalResult result = wonAclEvalContext.getWonAclEvaluator().decide(operationRequest);
+            AclEvalResult result = wonAclEvalContext.decideAndRemember(operationRequest);
             if (DecisionValue.ACCESS_GRANTED.equals(result.getDecision())) {
                 filtered.addNamedModel(graphUri, dataset.getNamedModel(graphUri));
             }

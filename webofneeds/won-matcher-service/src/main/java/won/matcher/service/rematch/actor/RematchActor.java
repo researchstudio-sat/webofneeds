@@ -1,31 +1,24 @@
 package won.matcher.service.rematch.actor;
 
-import java.net.URI;
-import java.util.Optional;
-import java.util.Set;
-
-import org.apache.jena.query.Dataset;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.cluster.pubsub.DistributedPubSub;
 import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import won.matcher.service.common.event.AtomEvent;
-import won.matcher.service.common.event.AtomHintEvent;
-import won.matcher.service.common.event.BulkAtomEvent;
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.Cause;
-import won.matcher.service.common.event.HintEvent;
-import won.matcher.service.common.event.SocketHintEvent;
+import org.apache.jena.query.Dataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import won.matcher.service.common.event.*;
 import won.matcher.service.rematch.config.RematchConfig;
 import won.matcher.service.rematch.service.RematchSparqlService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.net.URI;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Actor that is responsible for re-matching and inverse matching. Re-matching
@@ -53,15 +46,15 @@ import won.protocol.util.linkeddata.WonLinkedDataUtils;
 @Component
 @Scope("prototype")
 public class RematchActor extends UntypedActor {
-    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private static final String REMATCH_TICK = "rematch_tick";
-    private ActorRef pubSubMediator;
-    @Autowired
-    private RematchSparqlService rematchSparqlService;
     @Autowired
     RematchConfig config;
     @Autowired
     LinkedDataSource linkedDataSource;
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private ActorRef pubSubMediator;
+    @Autowired
+    private RematchSparqlService rematchSparqlService;
 
     public void setConfig(RematchConfig config) {
         this.config = config;
@@ -173,7 +166,7 @@ public class RematchActor extends UntypedActor {
         if (!targetAtom.isPresent()) {
             return Optional.empty();
         }
-        Dataset ds = linkedDataSource.getDataForResource(targetAtom.get());
+        Dataset ds = linkedDataSource.getDataForPublicResource(targetAtom.get());
         return Optional.of(new AtomEvent(targetAtom.get().toString(), targetWonNode, AtomEvent.TYPE.ACTIVE,
                         System.currentTimeMillis(), ds, Cause.MATCHED));
     }

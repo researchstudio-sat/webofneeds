@@ -10,10 +10,7 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandFailureEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandNotSentEvent;
@@ -27,6 +24,8 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.WonRdfUtils;
+
+import java.net.URI;
 
 /**
  * Action executing a ConnectCommandEvent, connecting to the targetAtom on
@@ -75,7 +74,7 @@ public class ExecuteCloseCommandAction extends ExecuteMessageCommandAction<Close
 
     protected WonMessage createWonMessage(CloseCommandEvent connectCommandEvent) throws WonMessageBuilderException {
         URI connectionURI = connectCommandEvent.getConnectionURI();
-        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForResource(connectionURI);
+        Dataset connectionRDF = getEventListenerContext().getLinkedDataSource().getDataForPublicResource(connectionURI);
         URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
         URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
                         connectionURI);

@@ -10,6 +10,26 @@
  */
 package won.protocol.message.processor.impl;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.riot.Lang;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.StopWatch;
+import org.springframework.web.client.HttpClientErrorException;
+import won.cryptography.rdfsign.SignatureVerificationState;
+import won.cryptography.rdfsign.WebIdKeyLoader;
+import won.cryptography.rdfsign.WonKeysReaderWriter;
+import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageType;
+import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.rest.LinkedDataFetchingException;
+import won.protocol.util.LogMarkers;
+import won.protocol.util.Prefixer;
+import won.protocol.util.RdfUtils;
+
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
@@ -20,28 +40,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.riot.Lang;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.util.StopWatch;
-import org.springframework.web.client.HttpClientErrorException;
-
-import won.cryptography.rdfsign.WebIdKeyLoader;
-import won.cryptography.rdfsign.SignatureVerificationState;
-import won.cryptography.rdfsign.WonKeysReaderWriter;
-import won.protocol.exception.WonMessageProcessingException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageType;
-import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.rest.LinkedDataFetchingException;
-import won.protocol.util.LogMarkers;
-import won.protocol.util.Prefixer;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * Checks all signatures found in a WonMessage. It is assumed that the message

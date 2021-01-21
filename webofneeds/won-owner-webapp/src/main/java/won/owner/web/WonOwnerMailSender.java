@@ -49,11 +49,11 @@ public class WonOwnerMailSender {
     private static final String SUBJECT_EXPORT = "Your account export is complete";
     private static final String SUBJECT_EXPORT_FAILED = "Your account export did not succeed";
     private static final String SUBJECT_RECOVERY_KEY_GENERATED = "Your new recovery key";
+    @Autowired
+    LinkedDataSource linkedDataSource;
     private WonMailSender wonMailSender;
     @Value(value = "${uri.prefix}")
     private URI ownerWebappUri;
-    @Autowired
-    LinkedDataSource linkedDataSource;
     @Autowired
     private URIService uriService;
     private VelocityEngine velocityEngine;
@@ -114,7 +114,7 @@ public class WonOwnerMailSender {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
         if (targetAtom != null) {
-            Dataset atomDataset = linkedDataSource.getDataForResource(URI.create(targetAtom));
+            Dataset atomDataset = linkedDataSource.getDataForPublicResource(URI.create(targetAtom));
             DefaultAtomModelWrapper targetAtomWrapper = new DefaultAtomModelWrapper(atomDataset);
             String targetAtomTitle = targetAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
             targetAtomTitle = useValueOrDefaultValue(targetAtomTitle, "(no title)");
@@ -123,7 +123,7 @@ public class WonOwnerMailSender {
             velocityContext.put("linkTargetAtom", linkTargetAtom);
         }
         if (localAtom != null) {
-            Dataset localAtomDataset = linkedDataSource.getDataForResource(URI.create(localAtom));
+            Dataset localAtomDataset = linkedDataSource.getDataForPublicResource(URI.create(localAtom));
             DefaultAtomModelWrapper localAtomWrapper = new DefaultAtomModelWrapper(localAtomDataset);
             String localAtomTitle = localAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
             localAtomTitle = useValueOrDefaultValue(localAtomTitle, "(no title)");
@@ -188,7 +188,7 @@ public class WonOwnerMailSender {
         Map<String, String> atomLinks = new HashMap<>();
         Map<String, String> atomTitles = new HashMap<>();
         hintCountPerAtom.keySet().stream().forEach(localAtom -> {
-            Dataset localAtomDataset = linkedDataSource.getDataForResource(URI.create(localAtom));
+            Dataset localAtomDataset = linkedDataSource.getDataForPublicResource(URI.create(localAtom));
             DefaultAtomModelWrapper localAtomWrapper = new DefaultAtomModelWrapper(localAtomDataset);
             String localAtomTitle = localAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
             localAtomTitle = useValueOrDefaultValue(localAtomTitle, "(no title)");

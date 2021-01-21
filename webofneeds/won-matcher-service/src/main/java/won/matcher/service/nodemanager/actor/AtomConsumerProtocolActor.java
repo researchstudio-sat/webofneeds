@@ -1,15 +1,5 @@
 package won.matcher.service.nodemanager.actor;
 
-import java.net.URI;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.riot.Lang;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
@@ -20,6 +10,11 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.riot.Lang;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.Cause;
@@ -28,6 +23,10 @@ import won.matcher.service.crawler.msg.CrawlUriMessage;
 import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
+
+import java.net.URI;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Camel actor represents the atom consumer protocol to a won node. It is used
@@ -84,7 +83,7 @@ public class AtomConsumerProtocolActor extends UntypedConsumerActor {
                         // publish an atom event to all the (distributed) matchers
                         AtomEvent event = null;
                         long crawlDate = System.currentTimeMillis();
-                        Dataset ds = linkedDataSource.getDataForResource(URI.create(atomUri));
+                        Dataset ds = linkedDataSource.getDataForPublicResource(URI.create(atomUri));
                         if (AtomModelWrapper.isAAtom(ds)) {
                             if (methodName.equals(MSG_HEADER_METHODNAME_ATOMCREATED)) {
                                 event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,

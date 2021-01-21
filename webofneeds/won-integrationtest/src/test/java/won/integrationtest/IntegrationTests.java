@@ -11,12 +11,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-import won.test.category.RequiresDockerServer;
 import won.utils.dns.DnsMappingAdder;
 
 import javax.net.ssl.SSLContext;
@@ -29,7 +27,15 @@ import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Optional;
 
-@Category(RequiresDockerServer.class)
+/**
+ * Base class for all tests that require the won services to run. The services
+ * are only started once for all tests. If the environment variable
+ * 'START_CONTAINERS' (default:true) is set to false, the services are not
+ * started - in that case the tests assume the services (wonnode, owner,
+ * matcher_service) to be reachable at the configured ports. (see
+ * src/test/resources/docker-compose.yml)
+ */
+// @Category(RequiresDockerServer.class)
 public abstract class IntegrationTests {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static boolean startContainers = Optional.ofNullable(System.getenv("START_CONTAINERS"))
@@ -72,7 +78,7 @@ public abstract class IntegrationTests {
         }
     }
 
-    @Test
+    @Test(timeout = 10 * 1000)
     public void testOwnerReachable() throws Exception {
         CloseableHttpClient httpclient = getHttpClientThatTrustsAnyCert();
         HttpGet httpget = new HttpGet("https://owner:8082/owner");
@@ -84,7 +90,7 @@ public abstract class IntegrationTests {
         }
     }
 
-    @Test
+    @Test(timeout = 10 * 1000)
     public void testWonnodeReachable() throws Exception {
         CloseableHttpClient httpclient = getHttpClientThatTrustsAnyCert();
         HttpGet httpget = new HttpGet("https://owner:8443/won/resource");

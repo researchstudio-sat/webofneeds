@@ -10,13 +10,9 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
@@ -26,6 +22,9 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.WonRdfUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * Action that sends a generic message.
@@ -41,6 +40,19 @@ public class SendMessageAction extends BaseEventBotAction {
     public SendMessageAction(final EventListenerContext eventListenerContext, final String message) {
         super(eventListenerContext);
         this.message = message;
+    }
+
+    private static WonMessage createWonMessage(final EventListenerContext context, final URI connectionURI,
+                    final String message) throws WonMessageBuilderException {
+        Dataset connectionRDF = context.getLinkedDataSource().getDataForPublicResource(connectionURI);
+        URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
+        URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
+                        connectionURI);
+        return WonMessageBuilder
+                        .connectionMessage()
+                        .sockets().sender(socketURI).recipient(targetSocketURI)
+                        .content().text(message)
+                        .build();
     }
 
     @Override
@@ -59,18 +71,5 @@ public class SendMessageAction extends BaseEventBotAction {
         } catch (Exception e) {
             logger.warn("could not send message via connection {}", connectionUri, e);
         }
-    }
-
-    private static WonMessage createWonMessage(final EventListenerContext context, final URI connectionURI,
-                    final String message) throws WonMessageBuilderException {
-        Dataset connectionRDF = context.getLinkedDataSource().getDataForResource(connectionURI);
-        URI socketURI = WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(connectionRDF, connectionURI);
-        URI targetSocketURI = WonRdfUtils.ConnectionUtils.getTargetSocketURIFromConnection(connectionRDF,
-                        connectionURI);
-        return WonMessageBuilder
-                        .connectionMessage()
-                        .sockets().sender(socketURI).recipient(targetSocketURI)
-                        .content().text(message)
-                        .build();
     }
 }

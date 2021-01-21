@@ -29,7 +29,7 @@
     <logger name="org.springframework.jms.connection.CachingConnectionFactory" level="ERROR"/>
     <logger name="org.springframework" level="info"/>
     <logger name="org.springframework.security" level="debug"/>
-    <logger name="won.node" level="debug"/>
+    <logger name="won.node" level="info"/>
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

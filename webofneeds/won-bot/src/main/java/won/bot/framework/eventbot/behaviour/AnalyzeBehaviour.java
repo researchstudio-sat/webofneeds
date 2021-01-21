@@ -1,18 +1,5 @@
 package won.bot.framework.eventbot.behaviour;
 
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -20,7 +7,6 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
@@ -28,11 +14,7 @@ import won.bot.framework.eventbot.action.impl.factory.model.Precondition;
 import won.bot.framework.eventbot.action.impl.factory.model.Proposal;
 import won.bot.framework.eventbot.action.impl.factory.model.ProposalState;
 import won.bot.framework.eventbot.bus.EventBus;
-import won.bot.framework.eventbot.event.AtomSpecificEvent;
-import won.bot.framework.eventbot.event.ConnectionSpecificEvent;
-import won.bot.framework.eventbot.event.Event;
-import won.bot.framework.eventbot.event.MessageEvent;
-import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
+import won.bot.framework.eventbot.event.*;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.AgreementCancellationAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.agreement.ProposalAcceptedEvent;
 import won.bot.framework.eventbot.event.impl.analyzation.precondition.PreconditionMetEvent;
@@ -53,6 +35,14 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.utils.goals.GoalInstantiationProducer;
 import won.utils.goals.GoalInstantiationResult;
+
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 public class AnalyzeBehaviour extends BotBehaviour {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -88,11 +78,273 @@ public class AnalyzeBehaviour extends BotBehaviour {
         this.connectionPreconditionListMapName = botName + ":connectionPreconditionListMap";
     }
 
+    private static String getUniqueGoalId(Resource goal, Dataset atomDataset) {
+        if (goal.getURI() != null) {
+            return goal.getURI();
+        } else {
+            AtomModelWrapper atomWrapper = new AtomModelWrapper(atomDataset);
+            Model dataModel = atomWrapper.getDataGraph(goal);
+            Model shapesModel = atomWrapper.getShapesGraph(goal);
+            String strGraphs = "";
+            if (dataModel != null) {
+                StringWriter sw = new StringWriter();
+                RDFDataMgr.write(sw, dataModel, Lang.NQUADS);
+                String content = sw.toString();
+                String dataGraphName = atomWrapper.getDataGraphName(goal);
+                strGraphs += replaceBlankNode(content, dataGraphName);
+            }
+            if (shapesModel != null) {
+                StringWriter sw = new StringWriter();
+                RDFDataMgr.write(sw, shapesModel, Lang.NQUADS);
+                String content = sw.toString();
+                String shapesGraphName = atomWrapper.getShapesGraphName(goal);
+                strGraphs += replaceBlankNode(content, shapesGraphName);
+            }
+            String[] statements = strGraphs.split("\n");
+            Arrays.sort(statements);
+            String strStatements = Arrays.toString(statements);
+            // java.security.MessageDigest -> SHA256
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] hash = digest.digest(strStatements.getBytes(StandardCharsets.UTF_8));
+                return new String(Base64.getEncoder().encode(hash));
+            } catch (NoSuchAlgorithmException e) {
+                return strStatements;
+            }
+        }
+    }
+
+    private static String replaceBlankNode(String strModel, String replaceUri) {
+        while (strModel.contains("_:")) {
+            int pos = strModel.indexOf("_:");
+            int end = pos + 35;
+            strModel = strModel.substring(0, pos) + replaceUri + strModel.substring(end);
+        }
+        return strModel;
+    }
+
+    private static String getWonMessageString(WonMessage wonMessage, Lang lang) {
+        StringWriter writer = new StringWriter();
+        RDFDataMgr.write(writer, wonMessage.getCompleteDataset(), lang);
+        return writer.toString();
+    }
+
+    private static Connection makeConnection(URI atomURI, URI targetAtomURI, URI connectionURI) {
+        Connection con = new Connection();
+        con.setConnectionURI(connectionURI);
+        con.setAtomURI(atomURI);
+        con.setTargetAtomURI(targetAtomURI);
+        return con;
+    }
+
     @Override
     protected void onActivate(Optional<Object> message) {
         ActionOnEventListener analyzeAction = new ActionOnEventListener(context, new AnalyzeAction(context));
         this.subscribeWithAutoCleanup(MessageFromOtherAtomEvent.class, analyzeAction);
         this.subscribeWithAutoCleanup(ConnectionMessageCommandSuccessEvent.class, analyzeAction);
+    }
+
+    /**
+     * @param preconditionURI to retrieve the state from
+     * @return the saved state of the precondition, null if the state was never
+     * saved before (undeterminable)
+     */
+    public Boolean getPreconditionConversationState(String preconditionURI) {
+        return (Boolean) botContext.loadFromObjectMap(preconditionConversationStateMapName, preconditionURI);
+    }
+
+    /**
+     * Removes the stored state of a given Precondition, in order to reset that
+     * there was ever a state present for the precondition
+     *
+     * @param preconditionURI
+     */
+    public void removePreconditionConversationState(String preconditionURI) {
+        botContext.removeFromObjectMap(preconditionConversationStateMapName, preconditionURI);
+    }
+
+    /**
+     * Saves the state of the precondition
+     *
+     * @param preconditionURI to save the state of
+     * @param state to save
+     */
+    private void addPreconditionConversationState(String preconditionURI, boolean state) {
+        botContext.saveToObjectMap(preconditionConversationStateMapName, preconditionURI, state);
+    }
+
+    private void addPreconditionMetPending(String preconditionURI) {
+        botContext.saveToObjectMap(preconditionMetPending, preconditionURI, true);
+    }
+
+    public void addPreconditionMetError(String preconditionURI) {
+        botContext.saveToObjectMap(preconditionMetError, preconditionURI, true);
+    }
+
+    /**
+     * Removes the stored entry for a preconditionPending Uri This method is used so
+     * we can remove the pending precondition (e.g if a proposal can't be created)
+     *
+     * @param preconditionURI the string of the preconditionUri that is not pending
+     * anymore
+     */
+    public void removePreconditionMetPending(String preconditionURI) {
+        botContext.removeFromObjectMap(preconditionMetPending, preconditionURI);
+    }
+
+    public void removePreconditionMetError(String preconditionURI) {
+        botContext.removeFromObjectMap(preconditionMetError, preconditionURI);
+    }
+
+    /**
+     * Determines if a certain precondition is met but still pending for proposal
+     * creation
+     *
+     * @param preconditionURI the string of the preconditionUri
+     */
+    public boolean isPreconditionMetPending(String preconditionURI) {
+        return botContext.loadFromObjectMap(preconditionMetPending, preconditionURI) != null;
+    }
+
+    public boolean isPreconditionMetError(String preconditionURI) {
+        return botContext.loadFromObjectMap(preconditionMetError, preconditionURI) != null;
+    }
+
+    private void addPreconditionProposalRelation(Precondition precondition, Proposal proposal) {
+        botContext.addToListMap(preconditionToProposalListMapName, precondition.getUri(), proposal);
+        botContext.addToListMap(proposalToPreconditionListMapName, proposal.getUri().toString(), precondition);
+    }
+
+    /**
+     * Add a Precondition to a given connectionUri
+     *
+     * @param connectionUri
+     * @param precondition
+     */
+    private void addPreconditionConnectionRelation(String connectionUri, Precondition precondition) {
+        if (!hasPreconditionConnectionRelation(connectionUri, precondition)) {
+            botContext.addToListMap(connectionPreconditionListMapName, connectionUri, precondition);
+        }
+    }
+
+    /**
+     * Determines if a preconditionUri is stored for the connectionUri
+     *
+     * @param connectionURI
+     * @param preconditionURI
+     * @return
+     */
+    public boolean hasPreconditionConnectionRelation(String connectionURI, String preconditionURI) {
+        Precondition precondition = new Precondition(preconditionURI, false); // Status of the Precondition is
+                                                                              // irrelevant
+                                                                              // (equals works on uri alone)
+        return hasPreconditionConnectionRelation(connectionURI, precondition);
+    }
+
+    /**
+     * Determines if a precondition is stored for the connectionUri
+     *
+     * @param connectionURI
+     * @param precondition
+     * @return
+     */
+    public boolean hasPreconditionConnectionRelation(String connectionURI, Precondition precondition) {
+        return getPreconditionListForConnectionUri(connectionURI).contains(precondition);
+    }
+
+    /**
+     * Returns a List of preconditions saved for the given connectionUri
+     *
+     * @param connectionUri
+     * @return {@link List}&lt;{@link Precondition}&gt;
+     */
+    public List<Precondition> getPreconditionListForConnectionUri(String connectionUri) {
+        return (List<Precondition>) (List<?>) botContext.loadFromListMap(connectionPreconditionListMapName,
+                        connectionUri);
+    }
+
+    public boolean hasPreconditionProposalRelation(String preconditionURI, String proposalURI) {
+        return getPreconditionsForProposalUri(proposalURI).contains(new Precondition(preconditionURI, false)); // Status
+                                                                                                               // of
+                                                                                                               // the
+                                                                                                               // Precondition
+                                                                                                               // is
+                                                                                                               // irrelevant
+                                                                                                               // (equals
+                                                                                                               // works
+                                                                                                               // on
+                                                                                                               // uri
+                                                                                                               // alone)
+    }
+
+    public List<Proposal> getProposalsForPreconditionUri(String preconditionURI) {
+        return (List<Proposal>) (List<?>) botContext.loadFromListMap(preconditionToProposalListMapName,
+                        preconditionURI);
+    }
+
+    /**
+     * Returns a List of All saved Precondition URIS for the proposal
+     *
+     * @param proposalURI string of the proposaluri to retrieve the preconditionList
+     * of
+     * @return List of all URI-Strings of preconditions save for the given
+     * connectionURI
+     */
+    public List<Precondition> getPreconditionsForProposalUri(String proposalURI) {
+        return (List<Precondition>) (List<?>) botContext.loadFromListMap(proposalToPreconditionListMapName,
+                        proposalURI);
+    }
+
+    /**
+     * @param preconditionURI string of the uri of the precondition
+     * @return true if the given precondition is met by at least one proposal
+     */
+    public boolean isPreconditionMetInProposals(String preconditionURI) {
+        List<Proposal> proposals = getProposalsForPreconditionUri(preconditionURI);
+        for (Proposal p : proposals) {
+            List<Precondition> preconditions = getPreconditionsForProposalUri(p.getUri().toString());
+            for (Precondition condition : preconditions) {
+                if (condition.isMet()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param proposalUri uri of the proposal to retrieve the preconditionList of
+     * @return true if there is at least one Met Precondition for this proposal
+     */
+    public boolean hasMetPrecondition(URI proposalUri) {
+        List<Precondition> preconditions = getPreconditionsForProposalUri(proposalUri.toString());
+        for (Precondition p : preconditions) {
+            if (p.isMet()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Removes All the stored entries in all Maps Lists or MapList for the given
+     * ProposalURI
+     *
+     * @param proposalURI to be removed
+     */
+    public void removeProposalReferences(URI proposalURI) {
+        removeProposalReferences(proposalURI.toString());
+    }
+
+    /**
+     * Removes All the stored entries in all Maps Lists or MapList for the given
+     * ProposalURI
+     *
+     * @param proposalURI the string of the proposalURI to be removed
+     */
+    public void removeProposalReferences(String proposalURI) {
+        botContext.removeFromListMap(proposalToPreconditionListMapName, proposalURI);
+        botContext.removeLeavesFromListMap(preconditionToProposalListMapName, proposalURI);
     }
 
     private class AnalyzeAction extends BaseEventBotAction {
@@ -146,7 +398,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
                                 "################################## ANALYZING COMPLETE #########################################");
                 return;
             }
-            Dataset atomDataset = linkedDataSource.getDataForResource(atomUri);
+            Dataset atomDataset = linkedDataSource.getDataForPublicResource(atomUri);
             Collection<Resource> goalsInAtom = new AtomModelWrapper(atomDataset).getGoals();
             logger.trace("Preconditions in Atom: " + goalsInAtom.size());
             AgreementProtocolState agreementProtocolState = AgreementProtocolState.of(connectionUri,
@@ -241,7 +493,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
             logger.trace("--------------------------");
             // Things to do for each individual message regardless of it being received or
             // sent
-            Dataset targetAtomDataset = ctx.getLinkedDataSource().getDataForResource(targetAtomUri);
+            Dataset targetAtomDataset = ctx.getLinkedDataSource().getDataForPublicResource(targetAtomUri);
             Dataset conversationDataset = null; // Initialize with null, to ensure some form of lazy init for the
                                                 // conversationDataset
             GoalInstantiationProducer goalInstantiationProducer = null;
@@ -311,265 +563,5 @@ public class AnalyzeBehaviour extends BotBehaviour {
                 return goalInstantiationProducer;
             }
         }
-    }
-
-    private static String getUniqueGoalId(Resource goal, Dataset atomDataset) {
-        if (goal.getURI() != null) {
-            return goal.getURI();
-        } else {
-            AtomModelWrapper atomWrapper = new AtomModelWrapper(atomDataset);
-            Model dataModel = atomWrapper.getDataGraph(goal);
-            Model shapesModel = atomWrapper.getShapesGraph(goal);
-            String strGraphs = "";
-            if (dataModel != null) {
-                StringWriter sw = new StringWriter();
-                RDFDataMgr.write(sw, dataModel, Lang.NQUADS);
-                String content = sw.toString();
-                String dataGraphName = atomWrapper.getDataGraphName(goal);
-                strGraphs += replaceBlankNode(content, dataGraphName);
-            }
-            if (shapesModel != null) {
-                StringWriter sw = new StringWriter();
-                RDFDataMgr.write(sw, shapesModel, Lang.NQUADS);
-                String content = sw.toString();
-                String shapesGraphName = atomWrapper.getShapesGraphName(goal);
-                strGraphs += replaceBlankNode(content, shapesGraphName);
-            }
-            String[] statements = strGraphs.split("\n");
-            Arrays.sort(statements);
-            String strStatements = Arrays.toString(statements);
-            // java.security.MessageDigest -> SHA256
-            try {
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                byte[] hash = digest.digest(strStatements.getBytes(StandardCharsets.UTF_8));
-                return new String(Base64.getEncoder().encode(hash));
-            } catch (NoSuchAlgorithmException e) {
-                return strStatements;
-            }
-        }
-    }
-
-    private static String replaceBlankNode(String strModel, String replaceUri) {
-        while (strModel.contains("_:")) {
-            int pos = strModel.indexOf("_:");
-            int end = pos + 35;
-            strModel = strModel.substring(0, pos) + replaceUri + strModel.substring(end);
-        }
-        return strModel;
-    }
-
-    private static String getWonMessageString(WonMessage wonMessage, Lang lang) {
-        StringWriter writer = new StringWriter();
-        RDFDataMgr.write(writer, wonMessage.getCompleteDataset(), lang);
-        return writer.toString();
-    }
-
-    private static Connection makeConnection(URI atomURI, URI targetAtomURI, URI connectionURI) {
-        Connection con = new Connection();
-        con.setConnectionURI(connectionURI);
-        con.setAtomURI(atomURI);
-        con.setTargetAtomURI(targetAtomURI);
-        return con;
-    }
-
-    /**
-     * @param preconditionURI to retrieve the state from
-     * @return the saved state of the precondition, null if the state was never
-     * saved before (undeterminable)
-     */
-    public Boolean getPreconditionConversationState(String preconditionURI) {
-        return (Boolean) botContext.loadFromObjectMap(preconditionConversationStateMapName, preconditionURI);
-    }
-
-    /**
-     * Removes the stored state of a given Precondition, in order to reset that
-     * there was ever a state present for the precondition
-     * 
-     * @param preconditionURI
-     */
-    public void removePreconditionConversationState(String preconditionURI) {
-        botContext.removeFromObjectMap(preconditionConversationStateMapName, preconditionURI);
-    }
-
-    /**
-     * Saves the state of the precondition
-     * 
-     * @param preconditionURI to save the state of
-     * @param state to save
-     */
-    private void addPreconditionConversationState(String preconditionURI, boolean state) {
-        botContext.saveToObjectMap(preconditionConversationStateMapName, preconditionURI, state);
-    }
-
-    private void addPreconditionMetPending(String preconditionURI) {
-        botContext.saveToObjectMap(preconditionMetPending, preconditionURI, true);
-    }
-
-    public void addPreconditionMetError(String preconditionURI) {
-        botContext.saveToObjectMap(preconditionMetError, preconditionURI, true);
-    }
-
-    /**
-     * Removes the stored entry for a preconditionPending Uri This method is used so
-     * we can remove the pending precondition (e.g if a proposal can't be created)
-     * 
-     * @param preconditionURI the string of the preconditionUri that is not pending
-     * anymore
-     */
-    public void removePreconditionMetPending(String preconditionURI) {
-        botContext.removeFromObjectMap(preconditionMetPending, preconditionURI);
-    }
-
-    public void removePreconditionMetError(String preconditionURI) {
-        botContext.removeFromObjectMap(preconditionMetError, preconditionURI);
-    }
-
-    /**
-     * Determines if a certain precondition is met but still pending for proposal
-     * creation
-     * 
-     * @param preconditionURI the string of the preconditionUri
-     */
-    public boolean isPreconditionMetPending(String preconditionURI) {
-        return botContext.loadFromObjectMap(preconditionMetPending, preconditionURI) != null;
-    }
-
-    public boolean isPreconditionMetError(String preconditionURI) {
-        return botContext.loadFromObjectMap(preconditionMetError, preconditionURI) != null;
-    }
-
-    private void addPreconditionProposalRelation(Precondition precondition, Proposal proposal) {
-        botContext.addToListMap(preconditionToProposalListMapName, precondition.getUri(), proposal);
-        botContext.addToListMap(proposalToPreconditionListMapName, proposal.getUri().toString(), precondition);
-    }
-
-    /**
-     * Add a Precondition to a given connectionUri
-     * 
-     * @param connectionUri
-     * @param precondition
-     */
-    private void addPreconditionConnectionRelation(String connectionUri, Precondition precondition) {
-        if (!hasPreconditionConnectionRelation(connectionUri, precondition)) {
-            botContext.addToListMap(connectionPreconditionListMapName, connectionUri, precondition);
-        }
-    }
-
-    /**
-     * Determines if a preconditionUri is stored for the connectionUri
-     * 
-     * @param connectionURI
-     * @param preconditionURI
-     * @return
-     */
-    public boolean hasPreconditionConnectionRelation(String connectionURI, String preconditionURI) {
-        Precondition precondition = new Precondition(preconditionURI, false); // Status of the Precondition is
-                                                                              // irrelevant
-                                                                              // (equals works on uri alone)
-        return hasPreconditionConnectionRelation(connectionURI, precondition);
-    }
-
-    /**
-     * Determines if a precondition is stored for the connectionUri
-     * 
-     * @param connectionURI
-     * @param precondition
-     * @return
-     */
-    public boolean hasPreconditionConnectionRelation(String connectionURI, Precondition precondition) {
-        return getPreconditionListForConnectionUri(connectionURI).contains(precondition);
-    }
-
-    /**
-     * Returns a List of preconditions saved for the given connectionUri
-     * 
-     * @param connectionUri
-     * @return {@link List}&lt;{@link Precondition}&gt;
-     */
-    public List<Precondition> getPreconditionListForConnectionUri(String connectionUri) {
-        return (List<Precondition>) (List<?>) botContext.loadFromListMap(connectionPreconditionListMapName,
-                        connectionUri);
-    }
-
-    public boolean hasPreconditionProposalRelation(String preconditionURI, String proposalURI) {
-        return getPreconditionsForProposalUri(proposalURI).contains(new Precondition(preconditionURI, false)); // Status
-                                                                                                               // of
-                                                                                                               // the
-                                                                                                               // Precondition
-                                                                                                               // is
-                                                                                                               // irrelevant
-                                                                                                               // (equals
-                                                                                                               // works
-                                                                                                               // on
-                                                                                                               // uri
-                                                                                                               // alone)
-    }
-
-    public List<Proposal> getProposalsForPreconditionUri(String preconditionURI) {
-        return (List<Proposal>) (List<?>) botContext.loadFromListMap(preconditionToProposalListMapName,
-                        preconditionURI);
-    }
-
-    /**
-     * Returns a List of All saved Precondition URIS for the proposal
-     * 
-     * @param proposalURI string of the proposaluri to retrieve the preconditionList
-     * of
-     * @return List of all URI-Strings of preconditions save for the given
-     * connectionURI
-     */
-    public List<Precondition> getPreconditionsForProposalUri(String proposalURI) {
-        return (List<Precondition>) (List<?>) botContext.loadFromListMap(proposalToPreconditionListMapName,
-                        proposalURI);
-    }
-
-    /**
-     * @param preconditionURI string of the uri of the precondition
-     * @return true if the given precondition is met by at least one proposal
-     */
-    public boolean isPreconditionMetInProposals(String preconditionURI) {
-        List<Proposal> proposals = getProposalsForPreconditionUri(preconditionURI);
-        for (Proposal p : proposals) {
-            List<Precondition> preconditions = getPreconditionsForProposalUri(p.getUri().toString());
-            for (Precondition condition : preconditions) {
-                if (condition.isMet())
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param proposalUri uri of the proposal to retrieve the preconditionList of
-     * @return true if there is at least one Met Precondition for this proposal
-     */
-    public boolean hasMetPrecondition(URI proposalUri) {
-        List<Precondition> preconditions = getPreconditionsForProposalUri(proposalUri.toString());
-        for (Precondition p : preconditions) {
-            if (p.isMet())
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Removes All the stored entries in all Maps Lists or MapList for the given
-     * ProposalURI
-     * 
-     * @param proposalURI to be removed
-     */
-    public void removeProposalReferences(URI proposalURI) {
-        removeProposalReferences(proposalURI.toString());
-    }
-
-    /**
-     * Removes All the stored entries in all Maps Lists or MapList for the given
-     * ProposalURI
-     * 
-     * @param proposalURI the string of the proposalURI to be removed
-     */
-    public void removeProposalReferences(String proposalURI) {
-        botContext.removeFromListMap(proposalToPreconditionListMapName, proposalURI);
-        botContext.removeLeavesFromListMap(preconditionToProposalListMapName, proposalURI);
     }
 }

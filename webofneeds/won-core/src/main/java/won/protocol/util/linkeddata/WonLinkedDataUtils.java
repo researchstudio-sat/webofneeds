@@ -10,33 +10,13 @@
  */
 package won.protocol.util.linkeddata;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.SimpleSelector;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.shared.impl.PrefixMappingImpl;
 import org.apache.jena.sparql.path.Path;
@@ -46,12 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
 import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageUtils;
 import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
 import won.protocol.model.SocketDefinition;
@@ -65,6 +41,17 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 /**
  * Utilitiy functions for common linked data lookups.
  */
@@ -72,6 +59,8 @@ public class WonLinkedDataUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Ehcache linkedDataObjectCache;
     private static final Integer DEFAULT_FETCH_ATOM_URIS_PAGE_SIZE = 200;
+    private static final Pattern LDP_PREV_LINK_PATTERN = Pattern.compile("<([^>]*)>; rel=\"prev\"");
+    private static final Pattern LDP_NEXT_LINK_PATTERN = Pattern.compile("<([^>]*)>; rel=\"next\"");
     static {
         CacheManager manager = CacheManager.getInstance();
         linkedDataObjectCache = new Cache("linkedDataObjectCache", 1000, false, false, 3600, 3600);
@@ -87,35 +76,42 @@ public class WonLinkedDataUtils {
 
     public static Optional<URI> getConnectionURIForIncomingMessage(WonMessage wonMessage,
                     LinkedDataSource linkedDataSource) {
-        if (wonMessage.getMessageTypeRequired().isSocketHintMessage()) {
-            return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
-                            wonMessage.getRecipientSocketURIRequired(),
-                            wonMessage.getHintTargetSocketURIRequired(), linkedDataSource);
-        } else if (wonMessage.getMessageTypeRequired().isAtomHintMessage()) {
-            return Optional.empty();
-        }
-        if (wonMessage.isMessageWithBothResponses()) {
-            // message with both responses is an incoming message from another atom.
-            // our node's response (the remote response, in this delivery chain) has the
-            // connection URI
-            return Optional.of(wonMessage.getRemoteResponse().get().getConnectionURIRequired());
-        } else if (wonMessage.isMessageWithResponse()) {
-            // message with onlny one response is our node's response plus the echo
-            // our node's response (the response in this delivery chain) has the connection
-            // URI
-            if (wonMessage.getHeadMessage().get().getMessageTypeRequired().isConnectionSpecificMessage()) {
-                return Optional.of(wonMessage.getResponse().get().getConnectionURIRequired());
-            } else {
+        try {
+            if (wonMessage.getMessageTypeRequired().isSocketHintMessage()) {
+                return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
+                                wonMessage.getRecipientSocketURIRequired(),
+                                wonMessage.getHintTargetSocketURIRequired(), linkedDataSource,
+                                WonMessageUtils.getRecipientAtomURIRequired(wonMessage));
+            } else if (wonMessage.getMessageTypeRequired().isAtomHintMessage()) {
                 return Optional.empty();
             }
-        } else if (wonMessage.isRemoteResponse()) {
-            // only a remote response. Our connection URI isn't there at all
-            // here, we fetch it from the node by asking for the connection for the two
-            // sockets
-            // - we could also use some kind of local storage for that.
-            return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
-                            wonMessage.getRecipientSocketURIRequired(),
-                            wonMessage.getSenderSocketURIRequired(), linkedDataSource);
+            if (wonMessage.isMessageWithBothResponses()) {
+                // message with both responses is an incoming message from another atom.
+                // our node's response (the remote response, in this delivery chain) has the
+                // connection URI
+                return Optional.of(wonMessage.getRemoteResponse().get().getConnectionURIRequired());
+            } else if (wonMessage.isMessageWithResponse()) {
+                // message with onlny one response is our node's response plus the echo
+                // our node's response (the response in this delivery chain) has the connection
+                // URI
+                if (wonMessage.getHeadMessage().get().getMessageTypeRequired().isConnectionSpecificMessage()) {
+                    return Optional.of(wonMessage.getResponse().get().getConnectionURIRequired());
+                } else {
+                    return Optional.empty();
+                }
+            } else if (wonMessage.isRemoteResponse()) {
+                // only a remote response. Our connection URI isn't there at all
+                // here, we fetch it from the node by asking for the connection for the two
+                // sockets
+                // - we could also use some kind of local storage for that.
+                return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
+                                wonMessage.getRecipientSocketURIRequired(),
+                                wonMessage.getSenderSocketURIRequired(), linkedDataSource,
+                                WonMessageUtils.getRecipientAtomURIRequired(wonMessage));
+            }
+        } catch (Exception e) {
+            logger.debug("Error fetching connection for incoming message",
+                            wonMessage.getSenderSocketURI(), wonMessage.getRecipientSocketURI(), e);
         }
         return Optional.empty();
     }
@@ -123,9 +119,16 @@ public class WonLinkedDataUtils {
     public static Optional<URI> getConnectionURIForOutgoingMessage(WonMessage wonMessage,
                     LinkedDataSource linkedDataSource) {
         if (wonMessage.getMessageTypeRequired().isConnectionSpecificMessage()) {
-            return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
-                            wonMessage.getSenderSocketURIRequired(),
-                            wonMessage.getRecipientSocketURIRequired(), linkedDataSource);
+            try {
+                return WonLinkedDataUtils.getConnectionURIForSocketAndTargetSocket(
+                                wonMessage.getSenderSocketURIRequired(),
+                                wonMessage.getRecipientSocketURIRequired(), linkedDataSource,
+                                WonMessageUtils.getSenderAtomURIRequired(wonMessage));
+            } catch (Exception e) {
+                logger.debug("Error fetching conection for outgoing message via socket {} and target socket {}",
+                                wonMessage.getSenderSocketURI(), wonMessage.getRecipientSocketURI(), e);
+                return Optional.empty();
+            }
         }
         return Optional.empty();
     }
@@ -134,20 +137,25 @@ public class WonLinkedDataUtils {
                     LinkedDataSource linkedDataSource) {
         Optional<URI> connectionURI = getConnectionURIForIncomingMessage(wonMessage, linkedDataSource);
         return connectionURI.map(uri -> WonRdfUtils.ConnectionUtils
-                        .getConnection(linkedDataSource.getDataForResource(uri), uri));
+                        .getConnection(linkedDataSource.getDataForResource(uri,
+                                        WonMessageUtils.getOwnAtomFromIncomingMessage(wonMessage).get()), uri));
     }
 
     public static Optional<Connection> getConnectionForOutgoingMessage(WonMessage wonMessage,
                     LinkedDataSource linkedDataSource) {
         Optional<URI> connectionURI = getConnectionURIForOutgoingMessage(wonMessage, linkedDataSource);
         return connectionURI.map(uri -> WonRdfUtils.ConnectionUtils
-                        .getConnection(linkedDataSource.getDataForResource(uri), uri));
+                        .getConnection(linkedDataSource
+                                        .getDataForResource(uri,
+                                                        WonMessageUtils.getOwnAtomFromOutgoingMessage(wonMessage)
+                                                                        .get()),
+                                        uri));
     }
 
     public static Optional<Connection> getConnectionForConnectionURI(URI connectionURI,
                     LinkedDataSource linkedDataSource) {
         return Optional.ofNullable(WonRdfUtils.ConnectionUtils
-                        .getConnection(linkedDataSource.getDataForResource(connectionURI), connectionURI));
+                        .getConnection(linkedDataSource.getDataForPublicResource(connectionURI), connectionURI));
     }
 
     public static URI getAtomURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
@@ -216,7 +224,7 @@ public class WonLinkedDataUtils {
     /**
      * Fetch <code>pageSize</code> atoms with specified restrictions, starting at
      * page <code>page</code>.
-     * 
+     *
      * @param nodeURI
      * @param modifiedAfter
      * @param createdAfter
@@ -282,7 +290,7 @@ public class WonLinkedDataUtils {
     /**
      * Fetch <code>pageSize</code> atoms with specified restrictions, starting after
      * the specified atom <code>resumeAfter</code>.
-     * 
+     *
      * @param nodeURI
      * @param modifiedAfter
      * @param createdAfter
@@ -463,7 +471,7 @@ public class WonLinkedDataUtils {
     public static Dataset getDataForResource(final URI resourceURI, final LinkedDataSource linkedDataSource) {
         Objects.requireNonNull(resourceURI);
         logger.debug("loading model for resource {}", resourceURI);
-        Dataset dataset = linkedDataSource.getDataForResource(resourceURI);
+        Dataset dataset = linkedDataSource.getDataForPublicResource(resourceURI);
         if (dataset == null) {
             throw new IllegalStateException("failed to load model for resource " + resourceURI);
         }
@@ -498,7 +506,7 @@ public class WonLinkedDataUtils {
     public static URI getWonNodeURIForAtomOrConnectionURI(final URI resourceURI, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         logger.debug("fetching WON node URI for resource {} with linked data source {}", resourceURI, linkedDataSource);
-        return getWonNodeURIForAtomOrConnection(resourceURI, linkedDataSource.getDataForResource(resourceURI));
+        return getWonNodeURIForAtomOrConnection(resourceURI, linkedDataSource.getDataForPublicResource(resourceURI));
     }
 
     public static URI getWonNodeURIForAtomOrConnection(final URI resURI, final Model resourceModel) {
@@ -547,7 +555,7 @@ public class WonLinkedDataUtils {
                     LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(resourceURI, linkedDataSource);
-        Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeUri);
+        Dataset nodeDataset = linkedDataSource.getDataForPublicResource(wonNodeUri);
         return RdfUtils.getNodeForPropertyPath(nodeDataset, wonNodeUri, propertyPath);
     }
 
@@ -562,7 +570,7 @@ public class WonLinkedDataUtils {
      */
     public static Node getPropertyForURI(URI resourceURI, Path propertyPath, LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
-        Dataset dataset = linkedDataSource.getDataForResource(resourceURI);
+        Dataset dataset = linkedDataSource.getDataForPublicResource(resourceURI);
         return RdfUtils.getNodeForPropertyPath(dataset, resourceURI, propertyPath);
     }
 
@@ -574,7 +582,7 @@ public class WonLinkedDataUtils {
     /**
      * Executes {@link WonRdfUtils.SocketUtils#getCompatibleSocketsForAtoms} after
      * crawling the required data.
-     * 
+     *
      * @param linkedDataSource
      * @param firstAtom
      * @param secondAtom
@@ -611,14 +619,14 @@ public class WonLinkedDataUtils {
     }
 
     public static Dataset loadDataForAtomWithSocketDefinitions(LinkedDataSource linkedDataSource, URI atomURI) {
-        Dataset dataset = linkedDataSource.getDataForResource(atomURI);
+        Dataset dataset = linkedDataSource.getDataForPublicResource(atomURI);
         Set<URI> sockets = WonRdfUtils.SocketUtils.getSocketsOfAtom(dataset, atomURI);
         sockets.forEach(socket -> RdfUtils.addDatasetToDataset(dataset, loadDataForSocket(linkedDataSource, socket)));
         return dataset;
     }
 
     public static Dataset loadDataForSocket(LinkedDataSource linkedDataSource, URI socket) {
-        Dataset dataset = linkedDataSource.getDataForResource(socket);
+        Dataset dataset = linkedDataSource.getDataForPublicResource(socket);
         // load all data for configurations
         List<URI> configURIs = RdfUtils.getObjectsOfProperty(dataset, socket,
                         URI.create(WON.socketDefinition.getURI()),
@@ -630,7 +638,7 @@ public class WonLinkedDataUtils {
             throw new IllegalArgumentException("No socket definition found for socket " + socket);
         }
         configURIs.stream().forEach(configURI -> {
-            Dataset ds = linkedDataSource.getDataForResource(configURI);
+            Dataset ds = linkedDataSource.getDataForPublicResource(configURI);
             RdfUtils.addDatasetToDataset(dataset, ds);
         });
         return dataset;
@@ -638,7 +646,7 @@ public class WonLinkedDataUtils {
 
     public static Optional<SocketDefinition> getSocketDefinitionOfSocket(LinkedDataSource linkedDataSource,
                     URI socket) {
-        Dataset dataset = linkedDataSource.getDataForResource(socket);
+        Dataset dataset = linkedDataSource.getDataForPublicResource(socket);
         // load all data for configurations
         List<URI> configURIs = RdfUtils.getObjectsOfProperty(dataset, socket,
                         URI.create(WON.socketDefinition.getURI()),
@@ -650,7 +658,7 @@ public class WonLinkedDataUtils {
             throw new IllegalArgumentException("No socket definition found for socket " + socket);
         }
         configURIs.stream().forEach(configURI -> {
-            Dataset ds = linkedDataSource.getDataForResource(configURI);
+            Dataset ds = linkedDataSource.getDataForPublicResource(configURI);
             RdfUtils.addDatasetToDataset(dataset, ds);
         });
         URI socketDefinitionURI = configURIs.stream().findFirst().get();
@@ -663,7 +671,7 @@ public class WonLinkedDataUtils {
         if (socketDef != null) {
             return Optional.of(socketDef);
         }
-        Dataset dataset = linkedDataSource.getDataForResource(socketDefinitionURI);
+        Dataset dataset = linkedDataSource.getDataForPublicResource(socketDefinitionURI);
         socketDef = new SocketDefinitionImpl(socketDefinitionURI);
         // if a socket definition is referenced via won:socketDefinition, it has to be
         // the subject of a triple
@@ -720,39 +728,9 @@ public class WonLinkedDataUtils {
         return linkedDataSource.getDataForResourceWithPropertyPath(atomURI, atomURI, propertyPaths, maxRequests, depth);
     }
 
-    /**
-     * Iterator implementation that fetches linked data lazily for the specified
-     * iterator of URIs.
-     */
-    private static class ModelFetchingIterator implements Iterator<Dataset> {
-        private Iterator<URI> uriIterator;
-        private LinkedDataSource linkedDataSource;
-
-        private ModelFetchingIterator(final Iterator<URI> uriIterator, final LinkedDataSource linkedDataSource) {
-            this.uriIterator = uriIterator;
-            this.linkedDataSource = linkedDataSource;
-        }
-
-        @Override
-        public Dataset next() {
-            URI uri = uriIterator.next();
-            return linkedDataSource.getDataForResource(uri);
-        }
-
-        @Override
-        public boolean hasNext() {
-            return uriIterator.hasNext();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("this iterator cannot remove");
-        }
-    }
-
     public static Optional<URI> getConnectionURIForSocketAndTargetSocket(URI socket,
-                    URI targetSocket, LinkedDataSource linkedDataSource) {
-        Dataset ds = linkedDataSource.getDataForResource(socket);
+                    URI targetSocket, LinkedDataSource linkedDataSource, URI requestorWebId) {
+        Dataset ds = linkedDataSource.getDataForResource(socket, requestorWebId);
         Optional<URI> atomUri = WonRdfUtils.SocketUtils.getAtomOfSocket(ds, socket);
         if (!atomUri.isPresent()) {
             return Optional.empty();
@@ -768,7 +746,7 @@ public class WonLinkedDataUtils {
                                             + "?socket=" + URLEncoder.encode(socket.toString(), "UTF-8")
                                             + "&targetSocket="
                                             + URLEncoder.encode(targetSocket.toString(), "UTF-8")),
-                            atomUri.get()));
+                            requestorWebId));
         } catch (UnsupportedEncodingException e) {
             throw new LinkedDataFetchingException(connectionContainer.get(),
                             "Error building request for connection by socket " + socket.toString()
@@ -781,13 +759,10 @@ public class WonLinkedDataUtils {
         return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
     }
 
-    private static final Pattern LDP_PREV_LINK_PATTERN = Pattern.compile("<([^>]*)>; rel=\"prev\"");
-    private static final Pattern LDP_NEXT_LINK_PATTERN = Pattern.compile("<([^>]*)>; rel=\"next\"");
-
     /**
      * Extracts the prev page link from a list of HTTP 'Link' headers returned by an
      * LDP container.
-     * 
+     *
      * @see {@link "https://www.w3.org/TR/ldp-paging/#ldpp-ex-paging-other-links"}
      * @param linkHeaders
      * @return
@@ -811,7 +786,7 @@ public class WonLinkedDataUtils {
     /**
      * Extracts the next page link from a list of HTTP 'Link' headers returned by an
      * LDP container.
-     * 
+     *
      * @see {@link "https://www.w3.org/TR/ldp-paging/#ldpp-ex-paging-other-links"}
      * @param linkHeaders
      * @return
@@ -830,5 +805,35 @@ public class WonLinkedDataUtils {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Iterator implementation that fetches linked data lazily for the specified
+     * iterator of URIs.
+     */
+    private static class ModelFetchingIterator implements Iterator<Dataset> {
+        private Iterator<URI> uriIterator;
+        private LinkedDataSource linkedDataSource;
+
+        private ModelFetchingIterator(final Iterator<URI> uriIterator, final LinkedDataSource linkedDataSource) {
+            this.uriIterator = uriIterator;
+            this.linkedDataSource = linkedDataSource;
+        }
+
+        @Override
+        public Dataset next() {
+            URI uri = uriIterator.next();
+            return linkedDataSource.getDataForPublicResource(uri);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return uriIterator.hasNext();
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("this iterator cannot remove");
+        }
     }
 }

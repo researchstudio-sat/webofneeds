@@ -1,16 +1,8 @@
 package won.bot.framework.extensions.serviceatom;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -32,6 +24,13 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WXHOLD;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Behaviour that creates exactly one Atom that represents the Bot itself
@@ -75,7 +74,7 @@ public class ServiceAtomBehaviour extends BotBehaviour {
                                     logger.debug("BotServiceAtom exists atomUri: {} checking validity...",
                                                     serviceAtomUri);
                                     Dataset serviceBotDataSet = ctx.getLinkedDataSource()
-                                                    .getDataForResource(serviceAtomUri);
+                                                    .getDataForPublicResource(serviceAtomUri);
                                     if (serviceBotDataSet == null) {
                                         logger.debug("BotServiceAtom can't be retrieved, creating a new one...");
                                         createServiceAtom();

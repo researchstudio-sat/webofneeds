@@ -29,7 +29,6 @@ import java.util.Set;
  * User: sbyim Date: 28.11.13
  */
 public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements MatcherActiveMQService {
-    private List<String> matcherProtocolTopicList;
     // private String pathInformation;
     private static final String PATH_MATCHER_PROTOCOL_OUT_ATOM_CREATED = "<" + WON.supportsWonProtocolImpl + ">/<"
                     + WON.atomCreatedTopic + ">";
@@ -39,6 +38,7 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
                     + WON.atomDeactivatedTopic + ">";
     private static final String PATH_MATCHER_PROTOCOL_QUEUE_NAME = "<" + WON.supportsWonProtocolImpl + ">/<"
                     + WON.matcherQueue + ">";
+    private List<String> matcherProtocolTopicList;
 
     public MatcherActiveMQServiceImpl(ProtocolType type) {
         super(type);
@@ -56,12 +56,13 @@ public class MatcherActiveMQServiceImpl extends ActiveMQServiceImpl implements M
             try {
                 Path path = PathParser.parse(s, PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-                                linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
+                                linkedDataSource.getDataForPublicResource(resourceURI), resourceURI, path));
             } catch (HttpClientErrorException e) {
                 if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                     return null;
-                } else
+                } else {
                     throw e;
+                }
             }
         }
         return activeMQMatcherProtocolTopicNames;

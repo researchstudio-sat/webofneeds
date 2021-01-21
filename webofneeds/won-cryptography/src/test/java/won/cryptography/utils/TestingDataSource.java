@@ -1,5 +1,18 @@
 package won.cryptography.utils;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.path.Path;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.springframework.http.HttpHeaders;
+import won.cryptography.rdfsign.WonKeysReaderWriter;
+import won.cryptography.service.keystore.FileBasedKeyStoreService;
+import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import won.protocol.util.DefaultPrefixUtils;
+import won.protocol.util.linkeddata.LinkedDataSource;
+
 import java.io.File;
 import java.net.URI;
 import java.security.PublicKey;
@@ -8,20 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.path.Path;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.springframework.http.HttpHeaders;
-
-import won.cryptography.rdfsign.WonKeysReaderWriter;
-import won.cryptography.service.keystore.FileBasedKeyStoreService;
-import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
-import won.protocol.util.DefaultPrefixUtils;
-import won.protocol.util.linkeddata.LinkedDataSource;
 
 /**
  * User: ypanchenko Date: 12.04.2015
@@ -44,7 +43,7 @@ public class TestingDataSource implements LinkedDataSource {
     }
 
     @Override
-    public Dataset getDataForResource(final URI resourceURI) {
+    public Dataset getDataForPublicResource(final URI resourceURI) {
         Dataset dataset = DatasetFactory.createGeneral();
         DefaultPrefixUtils.setDefaultPrefixes(dataset.getDefaultModel());
         WonKeysReaderWriter keyWriter = new WonKeysReaderWriter();
@@ -65,7 +64,7 @@ public class TestingDataSource implements LinkedDataSource {
     }
 
     @Override
-    public Dataset getDataForResource(final URI resourceURI, final List<URI> properties, final int maxRequest,
+    public Dataset getDataForPublicResource(final URI resourceURI, final List<URI> properties, final int maxRequest,
                     final int maxDepth) {
         throw new UnsupportedOperationException();
     }
@@ -77,7 +76,7 @@ public class TestingDataSource implements LinkedDataSource {
     }
 
     @Override
-    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
+    public Dataset getDataForPublicResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
                     final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
         throw new UnsupportedOperationException();
     }

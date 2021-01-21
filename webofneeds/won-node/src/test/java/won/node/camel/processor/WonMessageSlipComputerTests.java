@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
-import won.cryptography.rdfsign.WebIdKeyLoader;
+import won.cryptography.rdfsign.DefaultWebIdKeyLoader;
 import won.cryptography.service.CryptographyService;
 import won.cryptography.service.RandomNumberService;
 import won.cryptography.service.RegistrationClient;
@@ -68,7 +68,7 @@ import java.util.regex.Pattern;
 @MockBean(name = "messageContainerRepository", classes = { MessageContainerRepository.class })
 @MockBean(name = "messageRoutingInfoService", classes = { MessageRoutingInfoService.class })
 @MockBean(name = "ownerManagementService", classes = { ActiveMqOwnerManagementServiceImpl.class })
-@MockBean(name = "webIdKeyLoader", classes = { WebIdKeyLoader.class })
+@MockBean(name = "webIdKeyLoader", classes = { DefaultWebIdKeyLoader.class })
 @MockBean(name = "activeMQService", classes = { ActiveMQService.class })
 @MockBean(name = "entityManager", classes = { EntityManager.class })
 @MockBean(name = "messagingService", classes = { MessagingService.class })

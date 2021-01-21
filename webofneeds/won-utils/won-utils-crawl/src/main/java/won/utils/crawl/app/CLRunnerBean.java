@@ -1,22 +1,6 @@
 package won.utils.crawl.app;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QueryParseException;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shared.PrefixMapping;
@@ -31,12 +15,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.sparql.WonQueries;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by fsuda on 04.03.2015.
@@ -45,6 +36,41 @@ import won.protocol.vocabulary.sparql.WonQueries;
 public class CLRunnerBean implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private LinkedDataSource linkedDataSource;
+
+    /***
+     * Build the property paths needed for crawling atom data
+     */
+    private static List<Path> configurePropertyPaths() {
+        List<Path> propertyPaths = new ArrayList<>();
+        addPropertyPath(propertyPaths, "<" + WON.connections + ">");
+        addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member");
+        addPropertyPath(propertyPaths,
+                        "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<" + WON.targetConnection + ">");
+        addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<" + WON.messageContainer
+                        + ">/rdfs:member");
+        addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<" + WON.targetConnection
+                        + ">/<" + WON.sourceAtom + ">");
+        return propertyPaths;
+    }
+
+    private static List<Path> configurePropertyPathAll() {
+        List<Path> propertyPaths = new ArrayList<>();
+        addPropertyPath(propertyPaths, "rdfs:member");
+        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">");
+        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member");
+        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<"
+                        + WON.targetConnection + ">");
+        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<"
+                        + WON.messageContainer + ">/rdfs:member");
+        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<"
+                        + WON.targetConnection + ">/<" + WON.sourceAtom + ">");
+        return propertyPaths;
+    }
+
+    private static void addPropertyPath(final List<Path> propertyPaths, String pathString) {
+        Path path = PathParser.parse(pathString, PrefixMapping.Standard);
+        propertyPaths.add(path);
+    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -56,7 +82,7 @@ public class CLRunnerBean implements CommandLineRunner {
         for (String arg : args) {
             URI uri = URI.create(arg);
             logger.info("Getting Data from uri: " + uri);
-            RdfUtils.addDatasetToDataset(atomDataset, linkedDataSource.getDataForResourceWithPropertyPath(uri,
+            RdfUtils.addDatasetToDataset(atomDataset, linkedDataSource.getDataForPublicResourceWithPropertyPath(uri,
                             configurePropertyPaths(), 10000, 5, false), true);
         }
         logger.info("PRINTING DATASET");
@@ -160,41 +186,6 @@ public class CLRunnerBean implements CommandLineRunner {
         System.out.println("Commands > #[STMT]     - executes the given statement");
         System.out.println("Commands > %listall    - lists all atoms");
         System.out.println("Commands > %listgraphs - lists all graphs");
-    }
-
-    /***
-     * Build the property paths needed for crawling atom data
-     */
-    private static List<Path> configurePropertyPaths() {
-        List<Path> propertyPaths = new ArrayList<>();
-        addPropertyPath(propertyPaths, "<" + WON.connections + ">");
-        addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member");
-        addPropertyPath(propertyPaths,
-                        "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<" + WON.targetConnection + ">");
-        addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<" + WON.messageContainer
-                        + ">/rdfs:member");
-        addPropertyPath(propertyPaths, "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<" + WON.targetConnection
-                        + ">/<" + WON.sourceAtom + ">");
-        return propertyPaths;
-    }
-
-    private static List<Path> configurePropertyPathAll() {
-        List<Path> propertyPaths = new ArrayList<>();
-        addPropertyPath(propertyPaths, "rdfs:member");
-        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">");
-        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member");
-        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<"
-                        + WON.targetConnection + ">");
-        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<"
-                        + WON.messageContainer + ">/rdfs:member");
-        addPropertyPath(propertyPaths, "rdfs:member/" + "<" + WON.connections + ">" + "/" + "rdfs:member" + "/<"
-                        + WON.targetConnection + ">/<" + WON.sourceAtom + ">");
-        return propertyPaths;
-    }
-
-    private static void addPropertyPath(final List<Path> propertyPaths, String pathString) {
-        Path path = PathParser.parse(pathString, PrefixMapping.Standard);
-        propertyPaths.add(path);
     }
 
     @Autowired

@@ -13,7 +13,7 @@ package won.protocol.model;
 /**
  * Data holder for situations in which data is used together with a value that
  * can be used for an http ETAG header.
- * 
+ *
  * @param <T>
  */
 public class DataWithEtag<T> {
@@ -22,60 +22,67 @@ public class DataWithEtag<T> {
     private String oldEtag;
     // if true indicates that the data was not found (as opposed to unchanged)
     private boolean notFound;
-    private boolean isDeleted;
+    private boolean deleted;
+    private boolean forbidden;
+
+    public DataWithEtag(final T data, final String etag, String oldEtag, boolean notFound, boolean deleted,
+                    boolean forbidden) {
+        this.data = data;
+        this.etag = etag;
+        this.oldEtag = oldEtag;
+        this.notFound = notFound;
+        this.deleted = deleted;
+        this.forbidden = forbidden;
+    }
+
+    /**
+     * Construcutor setting notFound + isDeleted + isForbidden to false.
+     *
+     * @param data
+     * @param etag
+     */
+    public DataWithEtag(final T data, final String etag, final String oldEtag) {
+        this(data, etag, oldEtag, false, false, false);
+    }
+
+    /**
+     * Construcutor setting notFound + isForbidden false + isDeleted to value.
+     *
+     * @param data
+     * @param etag
+     * @param deleted
+     */
+    public DataWithEtag(final T data, final String etag, final String oldEtag, final boolean deleted) {
+        this(data, etag, oldEtag, false, deleted, false);
+    }
 
     public static DataWithEtag dataNotFound() {
-        return new DataWithEtag(null, null, null, true, false);
+        return new DataWithEtag(null, null, null, true, false, false);
     }
 
     /**
      * Creates a DWE that indicates nothing has changed. May be useful if the type
      * of the object at hand has the wrong generic type.
-     * 
+     *
      * @param data
      * @return
      */
     public static DataWithEtag dataNotChanged(DataWithEtag data) {
         return new DataWithEtag(null, data.etag, data.oldEtag);
-    };
+    }
+
+    public static DataWithEtag accessDenied() {
+        return new DataWithEtag(null, null, null, false, false, true);
+    }
 
     /**
      * Creates a DWE that indicates nothing has changed.
-     * 
+     *
      * @param etag the unchanged etag
      * @return
      */
     public static DataWithEtag dataNotChanged(String etag) {
         return new DataWithEtag(null, etag, etag);
-    }
-
-    public DataWithEtag(final T data, final String etag, String oldEtag, boolean notFound, boolean isDeleted) {
-        this.data = data;
-        this.etag = etag;
-        this.oldEtag = oldEtag;
-        this.notFound = notFound;
-        this.isDeleted = isDeleted;
-    }
-
-    /**
-     * Construcutor setting notFound + isDeleted to false.
-     * 
-     * @param data
-     * @param etag
-     */
-    public DataWithEtag(final T data, final String etag, final String oldEtag) {
-        this(data, etag, oldEtag, false, false);
-    }
-
-    /**
-     * Construcutor setting notFound false + isDeleted to value.
-     * 
-     * @param data
-     * @param etag
-     * @param isDeleted
-     */
-    public DataWithEtag(final T data, final String etag, final String oldEtag, final boolean isDeleted) {
-        this(data, etag, oldEtag, false, isDeleted);
     }
 
     public T getData() {
@@ -84,7 +91,7 @@ public class DataWithEtag<T> {
 
     /**
      * The etag currently associated with the data.
-     * 
+     *
      * @return
      */
     public String getEtag() {
@@ -114,16 +121,25 @@ public class DataWithEtag<T> {
      * @return
      */
     public boolean isDeleted() {
-        return this.isDeleted;
+        return this.deleted;
     }
 
     /**
      * This method allows querying if the data is null because it was not found.
      * Only returns true if notFound was explicitly set to true before.
-     * 
+     *
      * @return
      */
     public boolean isNotFound() {
         return notFound;
+    }
+
+    /**
+     * Indicates the access to the data is denied.
+     *
+     * @return
+     */
+    public boolean isForbidden() {
+        return forbidden;
     }
 }

@@ -253,7 +253,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -294,7 +294,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -335,7 +335,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -377,7 +377,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -419,7 +419,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -460,7 +460,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -501,7 +501,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -542,7 +542,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -583,7 +583,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -624,7 +624,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(1);
@@ -665,7 +665,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         .atom(atomURI)
                         .content().dataset(atom1ReplaceContent)
                         .build());
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         toOwnerMockEndpoint.expectedMessageCount(2);
@@ -688,7 +688,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
                         "/won/node/WonMessageRoutesTest/data/test-atom1.ttl"));
         // create
         sendFromOwner(createAtom1Msg, OWNERAPPLICATION_ID_OWNER1);
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         WonMessage deactivateMsg = prepareFromOwner(WonMessageBuilder
@@ -897,7 +897,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         toOwnerMockEndpoint.expectedMessageCount(1);
         toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(deactivateMsg));
         toMatcherMockEndpoint.expectedMessageCount(1);
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         sendFromOwner(deactivateMsg, OWNERAPPLICATION_ID_OWNER1);
@@ -935,7 +935,7 @@ public class WonMessageRoutesExternalInterceptedTest extends WonMessageRoutesTes
         toOwnerMockEndpoint.expectedMessageCount(1);
         toOwnerMockEndpoint.expectedMessagesMatches(isMessageAndResponse(deactivateMsg));
         toMatcherMockEndpoint.expectedMessageCount(1);
-        Mockito.when(linkedDataSource.getDataForResource(atomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         sendFromOwner(deactivateMsg, OWNERAPPLICATION_ID_OWNER1);

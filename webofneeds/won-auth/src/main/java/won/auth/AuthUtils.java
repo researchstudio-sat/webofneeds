@@ -1,34 +1,18 @@
 package won.auth;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
+import won.auth.model.*;
+import won.cryptography.rdfsign.WebIdKeyLoader;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import org.apache.jena.datatypes.xsd.XSDDateTime;
-import won.auth.model.AtomState;
-import won.auth.model.AuthToken;
-import won.auth.model.ConnectionState;
-import won.auth.model.OperationRequest;
-import won.auth.model.TokenSpecification;
-import won.cryptography.rdfsign.WebIdKeyLoader;
-import won.cryptography.service.CryptographyService;
+import java.util.*;
 
 public class AuthUtils {
     private static final String JWT_FIELD_SIG = "sig";

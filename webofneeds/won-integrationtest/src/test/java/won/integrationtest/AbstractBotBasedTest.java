@@ -1,7 +1,8 @@
 package won.integrationtest;
 
+import org.apache.jena.query.Dataset;
 import org.junit.Assert;
-import org.junit.experimental.categories.Category;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +38,8 @@ import won.bot.framework.eventbot.listener.impl.ActionOnEventListener;
 import won.bot.framework.extensions.serviceatom.ServiceAtomEnabledBotContextWrapper;
 import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.integrationtest.support.CountdownLatchAction;
+import won.node.service.nodeconfig.URIService;
 import won.protocol.util.WonRdfUtils;
-import won.test.category.RequiresDockerServer;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -54,13 +55,14 @@ import java.util.function.Consumer;
                 "WON_NODE_URI=https://wonnode:8443/won",
                 "WON_KEYSTORE_DIR=target/bot-keys"
 })
-@Category(RequiresDockerServer.class)
+// @Category(RequiresDockerServer.class)
 public abstract class AbstractBotBasedTest
                 // uncomment next line to run tests against testcontainers
                 extends IntegrationTests {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final long ACT_LOOP_TIMEOUT_MILLIS = 100;
     private static final long ACT_LOOP_INITIAL_DELAY_MILLIS = 100;
+    protected static URIService uriService = new URIService();
     @Autowired
     ApplicationContext applicationContext;
     @Autowired
@@ -69,6 +71,20 @@ public abstract class AbstractBotBasedTest
     String botContextBean;
     @Autowired
     MyBot bot;
+
+    @BeforeClass
+    public static void setupUriService() throws Exception {
+        uriService.setGeneralURIPrefix("https://wonnode:8443/won");
+        uriService.setDataURIPrefix("https://wonnode:8443/won/data");
+        uriService.setPageURIPrefix("https://wonnode:8443/won/page");
+        uriService.setResourceURIPrefix("https://wonnode:8443/won/resource");
+        uriService.afterPropertiesSet();
+    }
+
+    @BeforeClass
+    public static void setLogbackConfig() throws Exception {
+        System.setProperty("logback.configurationFile", "logback.xml");
+    }
 
     protected void runTest(Consumer<EventListenerContext> botInitializer) throws Exception {
         runTestWithAsserts(botInitializer, () -> {
@@ -170,6 +186,117 @@ public abstract class AbstractBotBasedTest
             bus.publish(new TestPassedEvent(bot));
         };
         return successCallback;
+    }
+
+    protected boolean testLinkedDataRequestOkNoWebId(EventListenerContext ctx, EventBus bus, String testCaseIdPrefix,
+                    URI... resourceUris) {
+        for (int i = 0; i < resourceUris.length; i++) {
+            boolean passed = testLinkedDataRequest(ctx, bus, null, false, null, resourceUris[i],
+                            (testCaseIdPrefix + (i + 1)));
+            if (!passed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean testLinkedDataRequestOk(EventListenerContext ctx, EventBus bus, String testCaseIdPrefix,
+                    URI webId,
+                    URI... resourceUris) {
+        for (int i = 0; i < resourceUris.length; i++) {
+            boolean passed = testLinkedDataRequest(ctx, bus, null, false, webId, resourceUris[i],
+                            (testCaseIdPrefix + (i + 1)));
+            if (!passed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean testLinkedDataRequestOkNoWebId_emptyDataset(EventListenerContext ctx, EventBus bus,
+                    String testCaseIdPrefix,
+                    URI... resourceUris) {
+        for (int i = 0; i < resourceUris.length; i++) {
+            boolean passed = testLinkedDataRequest(ctx, bus, null, true, null, resourceUris[i],
+                            (testCaseIdPrefix + (i + 1)));
+            if (!passed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean testLinkedDataRequestOk_emptyDataset(EventListenerContext ctx, EventBus bus,
+                    String testCaseIdPrefix, URI webId,
+                    URI... resourceUris) {
+        for (int i = 0; i < resourceUris.length; i++) {
+            boolean passed = testLinkedDataRequest(ctx, bus, null, true, webId, resourceUris[i],
+                            (testCaseIdPrefix + (i + 1)));
+            if (!passed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean testLinkedDataRequestFailsNoWebId(EventListenerContext ctx, EventBus bus, String testCaseIdPrefix,
+                    Class<? extends Exception> expectedException, URI... resourceUris) {
+        for (int i = 0; i < resourceUris.length; i++) {
+            boolean passed = testLinkedDataRequest(ctx, bus, expectedException, false, null, resourceUris[i],
+                            (testCaseIdPrefix + (i + 1)));
+            if (!passed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean testLinkedDataRequestFails(EventListenerContext ctx, EventBus bus, String testCaseIdPrefix,
+                    URI webId,
+                    Class<? extends Exception> expectedException, URI... resourceUris) {
+        for (int i = 0; i < resourceUris.length; i++) {
+            boolean passed = testLinkedDataRequest(ctx, bus, expectedException, false, webId, resourceUris[i],
+                            (testCaseIdPrefix + (i + 1)));
+            if (!passed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    boolean testLinkedDataRequest(EventListenerContext ctx, EventBus bus, Class<? extends Exception> expectedException,
+                    boolean expectedEmpty, URI webId, URI resourceUri, String testCaseId) {
+        boolean exceptionExpected = expectedException != null;
+        String webidString = webId == null ? "(requested without webId)"
+                        : String.format("using WebID %s", webId.toString());
+        try {
+            // make sure we can read the atom using our webid
+            Dataset data = ctx.getLinkedDataSource().getDataForResource(resourceUri, webId);
+            if (exceptionExpected) {
+                failTest(bus, String.format("Test Case %s: Expected exception %s not thrown for resource %s %s",
+                                testCaseId, expectedException,
+                                resourceUri, webidString));
+                return false;
+            } else {
+                if (data == null) {
+                    failTest(bus, String.format("Test Case %s: Got null result for resource %s %s", testCaseId,
+                                    resourceUri, webidString));
+                    return false;
+                } else if (data.isEmpty() && !expectedEmpty) {
+                    failTest(bus, String.format("Test Case %s: Got empty result for resource %s %s", testCaseId,
+                                    resourceUri, webidString));
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            if (!exceptionExpected || !expectedException.isAssignableFrom(e.getClass())) {
+                failTest(bus, String.format("Test Case %s: Got unexpected exception for resource %s %s", testCaseId,
+                                resourceUri,
+                                webidString), e);
+                return false;
+            }
+        }
+        return true;
     }
 
     @Configuration

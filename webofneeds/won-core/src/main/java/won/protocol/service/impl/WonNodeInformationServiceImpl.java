@@ -1,17 +1,12 @@
 package won.protocol.service.impl;
 
-import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.apache.jena.query.Dataset;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import org.apache.jena.query.Dataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import won.cryptography.service.RandomNumberService;
 import won.protocol.exception.IllegalAtomURIException;
 import won.protocol.message.WonMessageUtils;
@@ -22,18 +17,22 @@ import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+
 /**
  * User: fsalcher Date: 17.09.2014
  */
 public class WonNodeInformationServiceImpl implements WonNodeInformationService {
     private static final int RANDOM_ID_STRING_LENGTH = 20;
+    private final Ehcache wonNodeInfoCache;
     @Autowired
     private RandomNumberService randomNumberService;
     @Autowired
     private LinkedDataSource linkedDataSource;
     @Value(value = "${uri.node.default}")
     private URI defaultWonNodeUri;
-    private final Ehcache wonNodeInfoCache;
 
     public WonNodeInformationServiceImpl() {
         CacheManager manager = CacheManager.getInstance();
@@ -56,10 +55,11 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
         if (info != null) {
             return info;
         }
-        Dataset nodeDataset = linkedDataSource.getDataForResource(wonNodeURI);
+        Dataset nodeDataset = linkedDataSource.getDataForPublicResource(wonNodeURI);
         info = WonRdfUtils.WonNodeUtils.getWonNodeInfo(wonNodeURI, nodeDataset);
-        if (info == null)
+        if (info == null) {
             throw new IllegalStateException("Could not obtain WonNodeInformation for URI " + wonNodeURI);
+        }
         wonNodeInfoCache.put(new Element(wonNodeURI, info));
         return info;
     }
@@ -123,8 +123,9 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
     @Override
     public URI getWonNodeUri(final URI resourceURI) {
         URI wonNodeURI = WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(resourceURI, linkedDataSource);
-        if (wonNodeURI == null)
+        if (wonNodeURI == null) {
             throw new IllegalStateException("Could not obtain WoN node URI for resource " + resourceURI);
+        }
         return wonNodeURI;
     }
 

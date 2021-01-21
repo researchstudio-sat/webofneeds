@@ -221,7 +221,7 @@ public class RematchSparqlService extends SparqlService {
                 QuerySolution qs = results.nextSolution();
                 String atomUri = qs.get("atomUri").asResource().getURI();
                 try {
-                    Dataset ds = linkedDataSource.getDataForResource(URI.create(atomUri));
+                    Dataset ds = linkedDataSource.getDataForPublicResource(URI.create(atomUri));
                     if (AtomModelWrapper.isAAtom(ds)) {
                         StringWriter sw = new StringWriter();
                         RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());

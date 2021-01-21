@@ -43,6 +43,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
                     + WON.nodeQueue + ">";
     private static final String PATH_BROKER_URI = "<" + WON.supportsWonProtocolImpl + ">/<" + WON.brokerUri + ">";
     protected String queueNamePath;
+    @Autowired
+    @Qualifier("default")
+    protected LinkedDataSource linkedDataSource;
     private List<String> matcherProtocolTopicList;
     private ProtocolType protocolType;
     private String pathInformation;
@@ -61,17 +64,13 @@ public class ActiveMQServiceImpl implements ActiveMQService {
         protocolType = type;
     }
 
-    @Autowired
-    @Qualifier("default")
-    protected LinkedDataSource linkedDataSource;
-
     @Override
     public final String getProtocolQueueNameWithResource(URI resourceUri) {
         String activeMQOwnerProtocolQueueName;
         try {
             logger.debug("trying to get queue name prototol type {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(queueNamePath, PrefixMapping.Standard);
-            Dataset resourceDataset = linkedDataSource.getDataForResource(resourceUri);
+            Dataset resourceDataset = linkedDataSource.getDataForPublicResource(resourceUri);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(resourceDataset, resourceUri,
                             path);
             // check if we've found the information we were looking for
@@ -81,7 +80,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             logger.debug("could not to get queue name from resource {}, trying to obtain won node URI", resourceUri);
             URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(resourceUri, resourceDataset);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
-                            linkedDataSource.getDataForResource(wonNodeUri), wonNodeUri, path);
+                            linkedDataSource.getDataForPublicResource(wonNodeUri), wonNodeUri, path);
             // now, even if it's null, we return the result.
             logger.debug("returning queue name {}", activeMQOwnerProtocolQueueName);
             return activeMQOwnerProtocolQueueName;
@@ -89,8 +88,9 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             logger.warn("Could not obtain data for URI:{}", resourceUri);
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return null;
-            } else
+            } else {
                 throw e;
+            }
         }
     }
 
@@ -101,7 +101,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
         try {
             logger.debug("trying to get broker endpoint for {} on resource {}", protocolType, resourceUri);
             Path path = PathParser.parse(PATH_BROKER_URI, PrefixMapping.Standard);
-            Dataset resourceDataset = linkedDataSource.getDataForResource(resourceUri);
+            Dataset resourceDataset = linkedDataSource.getDataForPublicResource(resourceUri);
             logger.debug("ResourceModel for {}: {}", resourceUri, resourceDataset);
             activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(resourceDataset, resourceUri, path);
             // check if we've found the information we were looking for
@@ -114,13 +114,14 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             // <wonNode> and get the information from there.
             URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(resourceUri, resourceDataset);
             logger.debug("wonNodeUri: {}", wonNodeUri);
-            resourceDataset = linkedDataSource.getDataForResource(wonNodeUri);
+            resourceDataset = linkedDataSource.getDataForPublicResource(wonNodeUri);
             activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(resourceDataset, wonNodeUri, path);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return null;
-            } else
+            } else {
                 throw e;
+            }
         }
         logger.debug("returning brokerUri {} for resourceUri {} ", activeMQEndpoint, resourceUri);
         return activeMQEndpoint;
@@ -133,12 +134,13 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             try {
                 Path path = PathParser.parse(s, PrefixMapping.Standard);
                 activeMQMatcherProtocolTopicNames.add(RdfUtils.getStringPropertyForPropertyPath(
-                                linkedDataSource.getDataForResource(resourceURI), resourceURI, path));
+                                linkedDataSource.getDataForPublicResource(resourceURI), resourceURI, path));
             } catch (HttpClientErrorException e) {
                 if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                     return null;
-                } else
+                } else {
                     throw e;
+                }
             }
         }
         return activeMQMatcherProtocolTopicNames;

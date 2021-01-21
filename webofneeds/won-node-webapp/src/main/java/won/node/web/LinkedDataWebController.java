@@ -39,6 +39,7 @@ import won.cryptography.service.RegistrationServer;
 import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.nodeconfig.URIService;
 import won.node.service.persistence.AtomInformationService;
+import won.node.springsecurity.acl.WonAclEvalContext;
 import won.node.springsecurity.acl.WonAclRequestHelper;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.exception.NoSuchAtomException;
@@ -180,12 +181,15 @@ public class LinkedDataWebController implements InitializingBean {
                     HttpServletRequest request,
                     HttpServletResponse response) {
         URI atomURI = uriService.createAtomURIForId(identifier);
+        WonAclEvalContext waeCtx = WonAclRequestHelper.getWonAclEvaluationContext(request);
         Dataset rdfDataset = linkedDataService
-                        .getAtomDataset(atomURI, null, WonAclRequestHelper.getWonAclEvaluationContext(request))
+                        .getAtomDataset(atomURI, null, waeCtx)
                         .getData();
         if (rdfDataset == null || rdfDataset.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return "notFoundView";
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            waeCtx.getCombinedResults()
+                            .ifPresent(result -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
+            return "forbiddenView";
         }
         model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI", atomURI.toString());
@@ -210,14 +214,16 @@ public class LinkedDataWebController implements InitializingBean {
                     @RequestParam(value = "layer-size", required = false) Integer layerSize) {
         try {
             URI atomURI = uriService.createAtomURIForId(identifier);
-            Dataset rdfDataset = linkedDataService.getAtomDataset(atomURI, true, layerSize,
-                            WonAclRequestHelper.getWonAclEvaluationContext(request));
+            WonAclEvalContext waeCtx = WonAclRequestHelper.getWonAclEvaluationContext(request);
+            Dataset rdfDataset = linkedDataService.getAtomDataset(atomURI, true, layerSize, waeCtx);
             // TODO AUTH: extract acl graph and interpret
             // TODO AUTH: Research how to handle lower layers
             logger.warn("TODO: apply ACLs to atom/{identifier}/deep request!");
             if (rdfDataset == null || rdfDataset.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return "notFoundView";
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                waeCtx.getCombinedResults()
+                                .ifPresent(result -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
+                return "forbiddenView";
             }
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI", atomURI.toString());
@@ -825,10 +831,10 @@ public class LinkedDataWebController implements InitializingBean {
 
     @RequestMapping(value = "${uri.path.data}/atom/{identifier}", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
-    public ResponseEntity<Dataset> readAtom(HttpServletRequest request,
+    public ResponseEntity<Dataset> readAtom(HttpServletRequest request, HttpServletResponse response,
                     @PathVariable(value = "identifier") String identifier) {
         logger.debug("readAtom() called");
-        return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
+        return getResponseEntity(identifier, request, response, new EtagSupportingDataLoader<Dataset>() {
             @Override
             public URI createUriForIdentifier(final String identifier) {
                 return URI.create(atomResourceURIPrefix + "/" + identifier);
@@ -938,12 +944,12 @@ public class LinkedDataWebController implements InitializingBean {
 
     @RequestMapping(value = "${uri.path.data}/atom/{atomId}/c/{identifier}", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
-    public ResponseEntity<Dataset> readConnection(HttpServletRequest request,
+    public ResponseEntity<Dataset> readConnection(HttpServletRequest request, HttpServletResponse response,
                     @PathVariable String atomId,
                     @PathVariable(value = "identifier") String identifier) {
         logger.debug("readConnection() called");
         URI connectionURI = uriService.createConnectionURIForId(atomId, identifier);
-        return getResponseEntity(connectionURI.toString(), request, new EtagSupportingDataLoader<Dataset>() {
+        return getResponseEntity(connectionURI.toString(), request, response, new EtagSupportingDataLoader<Dataset>() {
             @Override
             public URI createUriForIdentifier(final String connectionURL) {
                 return URI.create(connectionURL);
@@ -1069,7 +1075,7 @@ public class LinkedDataWebController implements InitializingBean {
                     HttpServletRequest request, HttpServletResponse response) {
         // get etag from headers, extract version identifier
         logger.debug("readConnectionEvent() called");
-        return getResponseEntity(identifier, request, new EtagSupportingDataLoader<Dataset>() {
+        return getResponseEntity(identifier, request, response, new EtagSupportingDataLoader<Dataset>() {
             @Override
             public URI createUriForIdentifier(final String identifier) {
                 return uriService.createMessageURIForId(identifier);
@@ -1090,6 +1096,7 @@ public class LinkedDataWebController implements InitializingBean {
     }
 
     private <T> ResponseEntity<T> getResponseEntity(String identifier, final HttpServletRequest request,
+                    final HttpServletResponse response,
                     EtagSupportingDataLoader<T> loader) {
         HttpHeaders requestHeaders = getHttpHeaders(request);
         WonEtagHelper requestEtagHelper = WonEtagHelper.fromHeaderIfCompatibleWithAcceptHeader(requestHeaders);
@@ -1104,7 +1111,7 @@ public class LinkedDataWebController implements InitializingBean {
         // set the etag headers
         setEtagHeaderForResponse(headers, dataWithEtag, requestEtagHelper);
         // return the response
-        return getResponseEntityForPossiblyNotModifiedResult(dataWithEtag, headers);
+        return getResponseEntityForPossiblyNotModifiedResult(dataWithEtag, headers, request, response);
     }
 
     @RequestMapping(value = "${uri.path.data}/attachment/{identifier}", method = RequestMethod.GET, produces = {
@@ -1482,7 +1489,8 @@ public class LinkedDataWebController implements InitializingBean {
     }
 
     private <T> ResponseEntity<T> getResponseEntityForPossiblyNotModifiedResult(final DataWithEtag<T> datasetWithEtag,
-                    final HttpHeaders headers) {
+                    final HttpHeaders headers, HttpServletRequest request,
+                    HttpServletResponse response) {
         if (datasetWithEtag != null) {
             if (datasetWithEtag.isDeleted()) {
                 logger.debug("sending status 410 GONE");
@@ -1493,6 +1501,12 @@ public class LinkedDataWebController implements InitializingBean {
             } else if (datasetWithEtag.isChanged()) {
                 logger.debug("sending status 200 OK");
                 return new ResponseEntity<>(datasetWithEtag.getData(), headers, HttpStatus.OK);
+            } else if (datasetWithEtag.isForbidden()) {
+                logger.debug("sending status 403 FORBIDDEN");
+                WonAclEvalContext waeCtx = WonAclRequestHelper.getWonAclEvaluationContext(request);
+                waeCtx.getCombinedResults()
+                                .ifPresent(result -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
+                return new ResponseEntity<>(headers, HttpStatus.FORBIDDEN);
             } else {
                 logger.debug("sending status 304 NOT MODIFIED");
                 return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);

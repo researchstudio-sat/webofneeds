@@ -10,21 +10,6 @@
  */
 package won.protocol.util.linkeddata;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.function.BiFunction;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -42,13 +27,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.rest.LinkedDataRestClient;
 import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.uriresolver.WonMessageUriResolver;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * LinkedDataSource implementation that delegates fetching linked data resources
@@ -58,14 +52,20 @@ public class LinkedDataSourceBase implements LinkedDataSource {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     protected LinkedDataRestClient linkedDataRestClient;
     @Autowired
-    private ThreadPoolExecutor parallelRequestsThreadpool;
-    @Autowired
     protected WonMessageUriResolver wonMessageUriResolver;
+    @Autowired
+    private ThreadPoolExecutor parallelRequestsThreadpool;
+
+    public static Dataset makeDataset() {
+        DatasetGraph dsg = TDBFactory.createDatasetGraph();
+        dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
+        return DatasetFactory.wrap(dsg);
+    }
 
     /**
      * extract the previous link (in case won node had more data than could be sent
      * or was requested) from http response headers
-     * 
+     *
      * @param datasetWithHeaders
      * @return the previous link to more data on the node or null if the link header
      * does not exist
@@ -103,7 +103,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
     }
 
     @Override
-    public Dataset getDataForResource(URI resource) {
+    public Dataset getDataForPublicResource(URI resource) {
         if (resource == null) {
             throw new IllegalArgumentException("resource must not be null");
         }
@@ -147,7 +147,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
     }
 
     @Override
-    public Dataset getDataForResource(final URI resourceURI, List<URI> properties, int maxRequest, int maxDepth) {
+    public Dataset getDataForPublicResource(final URI resourceURI, List<URI> properties, int maxRequest, int maxDepth) {
         return getDataForResource(resourceURI, null, properties, maxRequest, maxDepth);
     }
 
@@ -168,7 +168,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
     }
 
     @Override
-    public Dataset getDataForResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
+    public Dataset getDataForPublicResourceWithPropertyPath(final URI resourceURI, final List<Path> properties,
                     final int maxRequest, final int maxDepth, final boolean moveAllTriplesInDefaultGraph) {
         Dataset result = DatasetFactory.createGeneral();
         Model m = result.getDefaultModel();
@@ -220,7 +220,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
                                         AuthenticationThreadLocal.setAuthentication(authenticationOpt.get());
                                     }
                                     return requesterWebID.isPresent() ? getDataForResource(uri, requesterWebID.get())
-                                                    : getDataForResource(uri);
+                                                    : getDataForPublicResource(uri);
                                 } finally {
                                     // be sure to remove the principal from the threadlocal after the call
                                     AuthenticationThreadLocal.remove();
@@ -260,7 +260,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
      * For the specified resourceURI, evaluates the specified property paths and
      * adds the identified resources to the returned set if they are not contained
      * in the specified exclude set.
-     * 
+     *
      * @param dataset
      * @param resourceURI
      * @param excludedUris
@@ -306,7 +306,7 @@ public class LinkedDataSourceBase implements LinkedDataSource {
      * For the specified properties, finds their objects and adds the identified
      * resources to the returned set if they are not contained in the specified
      * exclude set.
-     * 
+     *
      * @param dataset
      * @param excludedUris
      * @param properties
@@ -339,11 +339,5 @@ public class LinkedDataSourceBase implements LinkedDataSource {
 
     public void setParallelRequestsThreadpool(ThreadPoolExecutor parallelRequestsThreadpool) {
         this.parallelRequestsThreadpool = parallelRequestsThreadpool;
-    }
-
-    public static Dataset makeDataset() {
-        DatasetGraph dsg = TDBFactory.createDatasetGraph();
-        dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
-        return DatasetFactory.wrap(dsg);
     }
 }

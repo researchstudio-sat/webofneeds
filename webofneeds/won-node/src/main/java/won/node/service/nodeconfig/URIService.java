@@ -14,7 +14,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import won.protocol.model.Atom;
 import won.protocol.util.WonMessageUriHelper;
-import won.protocol.util.WonUriCheckHelper;
 
 import java.net.URI;
 import java.util.regex.Matcher;
@@ -42,56 +41,81 @@ public class URIService implements InitializingBean {
     private String resourceURIPrefix;
     // prefix for human readable pages
     private String pageURIPrefix;
-    private Pattern connectionMessagesPattern;
+    private Pattern connectionMessagesUriPattern;
     private Pattern connectionUriPattern;
-    private Pattern atomMessagesPattern;
+    private Pattern atomMessagesUriPattern;
     private Pattern atomUnreadPattern;
     private Pattern atomUriPattern;
     private Pattern messageUriPattern;
     private Pattern connectionContainerUriPattern;
     private Pattern tokenEndpointUriPattern;
+    private Pattern connectionMessagesSubUriPattern;
+    private Pattern messageSubUriPattern;
+    private Pattern connectionSubUriPattern;
+    private Pattern connectionContainerSubUriPattern;
+    private Pattern atomMessagesSubUriPattern;
+    private Pattern atomSubUriPattern;
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        String resourcePatternSuffix = "/?(\\?[^\\s+]+)?";
         this.atomResourceURIPrefix = this.resourceURIPrefix + "/atom";
         this.connectionResourceURIPrefix = this.resourceURIPrefix + "/connection";
         this.messageResourceURIPrefix = this.resourceURIPrefix + "/msg";
         this.attachmentResourceURIPrefix = this.resourceURIPrefix + "/attachment";
-        this.connectionMessagesPattern = Pattern
+        this.connectionMessagesSubUriPattern = Pattern
                         .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c/[\\-\\._~\\+a-zA-Z0-9]+/msg\\b");
-        this.messageUriPattern = Pattern
+        this.connectionMessagesUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c/[\\-\\._~\\+a-zA-Z0-9]+/msg"
+                                        + resourcePatternSuffix);
+        this.messageSubUriPattern = Pattern
                         .compile(messageResourceURIPrefix
                                         + "/[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]+\\b");
-        this.connectionUriPattern = Pattern
+        this.messageUriPattern = Pattern
+                        .compile(messageResourceURIPrefix
+                                        + "/[123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ]+"
+                                        + resourcePatternSuffix);
+        this.connectionSubUriPattern = Pattern
                         .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c/[\\-\\._~\\+a-zA-Z0-9]+\\b");
-        this.connectionContainerUriPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c\\b");
-        this.atomMessagesPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/msg\\b");
+        this.connectionUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c/[\\-\\._~\\+a-zA-Z0-9]+"
+                                        + resourcePatternSuffix);
+        this.connectionContainerSubUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c\\b");
+        this.connectionContainerUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/c" + resourcePatternSuffix);
+        this.atomMessagesSubUriPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/msg\\b");
+        this.atomMessagesUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/msg" + resourcePatternSuffix);
         this.atomUnreadPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+/unread\\b");
-        this.atomUriPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+\\b");
+        this.atomSubUriPattern = Pattern.compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+\\b");
+        this.atomUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+" + resourcePatternSuffix);
         this.tokenEndpointUriPattern = Pattern
-                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+" + TOKEN_ENDPOINT_SUFFIX + "\\b");
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+" + TOKEN_ENDPOINT_SUFFIX
+                                        + resourcePatternSuffix);
     }
 
     public boolean isMessageURI(URI toCheck) {
         if (toCheck == null) {
             return false;
         }
-        return messageUriPattern.matcher(toCheck.toString()).lookingAt();
+        return messageUriPattern.matcher(toCheck.toString()).matches();
     }
 
     public boolean isAtomURI(URI toCheck) {
         if (toCheck == null) {
             return false;
         }
-        return atomUriPattern.matcher(toCheck.toString()).lookingAt();
+        return atomUriPattern.matcher(toCheck.toString()).matches();
     }
 
     public boolean isAtomMessagesURI(URI toCheck) {
         if (toCheck == null) {
             return false;
         }
-        Matcher m = atomMessagesPattern.matcher(toCheck.toString());
-        return m.lookingAt();
+        Matcher m = atomMessagesUriPattern.matcher(toCheck.toString());
+        return m.matches();
     }
 
     public boolean isAtomUnreadURI(URI toCheck) {
@@ -99,7 +123,7 @@ public class URIService implements InitializingBean {
             return false;
         }
         Matcher m = atomUnreadPattern.matcher(toCheck.toString());
-        return m.lookingAt();
+        return m.matches();
     }
 
     public boolean isTokenEndpointURI(URI toCheck) {
@@ -107,7 +131,7 @@ public class URIService implements InitializingBean {
             return false;
         }
         Matcher m = tokenEndpointUriPattern.matcher(toCheck.toString());
-        return m.lookingAt();
+        return m.matches();
     }
 
     public boolean isConnectionContainerURI(URI toCheck) {
@@ -115,29 +139,29 @@ public class URIService implements InitializingBean {
             return false;
         }
         Matcher m = connectionContainerUriPattern.matcher(toCheck.toString());
-        return m.lookingAt();
+        return m.matches();
     }
 
     public boolean isConnectionURI(URI toCheck) {
         if (toCheck == null) {
             return false;
         }
-        return WonUriCheckHelper.isValidConnectionURI(this.atomResourceURIPrefix, toCheck.toString());
+        return connectionUriPattern.matcher(toCheck.toString()).matches();
     }
 
     public boolean isConnectionMessagesURI(URI toCheck) {
         if (toCheck == null) {
             return false;
         }
-        Matcher m = connectionMessagesPattern.matcher(toCheck.toString());
-        return m.lookingAt();
+        Matcher m = connectionMessagesUriPattern.matcher(toCheck.toString());
+        return m.matches();
     }
 
     public URI getConnectionURIofConnectionMessagesURI(URI connectionMessagesURI) {
         if (connectionMessagesURI == null) {
             return null;
         }
-        Matcher m = connectionUriPattern.matcher(connectionMessagesURI.toString());
+        Matcher m = connectionSubUriPattern.matcher(connectionMessagesURI.toString());
         m.find();
         return URI.create(m.group());
     }
@@ -146,7 +170,7 @@ public class URIService implements InitializingBean {
         if (atomMessagesURI == null) {
             return null;
         }
-        Matcher m = atomUriPattern.matcher(atomMessagesURI.toString());
+        Matcher m = atomSubUriPattern.matcher(atomMessagesURI.toString());
         m.find();
         return URI.create(m.group());
     }
@@ -163,7 +187,7 @@ public class URIService implements InitializingBean {
         if (subUri == null) {
             return null;
         }
-        Matcher m = atomUriPattern.matcher(subUri.toString());
+        Matcher m = atomSubUriPattern.matcher(subUri.toString());
         if (!m.find()) {
             return null;
         }
@@ -174,7 +198,7 @@ public class URIService implements InitializingBean {
         if (atomUnreadURI == null) {
             return null;
         }
-        Matcher m = atomUriPattern.matcher(atomUnreadURI.toString());
+        Matcher m = atomSubUriPattern.matcher(atomUnreadURI.toString());
         m.find();
         return URI.create(m.group());
     }

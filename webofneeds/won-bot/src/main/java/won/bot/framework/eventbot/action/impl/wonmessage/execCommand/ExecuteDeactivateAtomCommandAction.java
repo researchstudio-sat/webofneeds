@@ -1,12 +1,8 @@
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -23,6 +19,9 @@ import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonRdfUtils;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * Created by fsuda on 17.05.2017.
  */
@@ -35,13 +34,14 @@ public class ExecuteDeactivateAtomCommandAction extends BaseEventBotAction {
 
     @Override
     protected void doRun(Event event, EventListener executingListener) throws Exception {
-        if (!(event instanceof DeactivateAtomCommandEvent))
+        if (!(event instanceof DeactivateAtomCommandEvent)) {
             return;
+        }
         DeactivateAtomCommandEvent deactivateAtomCommandEvent = (DeactivateAtomCommandEvent) event;
         EventListenerContext ctx = getEventListenerContext();
         EventBus bus = ctx.getEventBus();
         final URI atomUri = deactivateAtomCommandEvent.getAtomUri();
-        Dataset atomRDF = ctx.getLinkedDataSource().getDataForResource(atomUri);
+        Dataset atomRDF = ctx.getLinkedDataSource().getDataForPublicResource(atomUri);
         final URI wonNodeUri = WonRdfUtils.ConnectionUtils.getWonNodeURIFromAtom(atomRDF, atomUri);
         WonNodeInformationService wonNodeInformationService = ctx.getWonNodeInformationService();
         WonMessage deactivateAtomMessage = createWonMessage(wonNodeInformationService, atomUri, wonNodeUri);

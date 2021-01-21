@@ -1,17 +1,12 @@
 package won.cryptography.message;
 
-import java.io.File;
-import java.net.URI;
-import java.security.Security;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import won.cryptography.rdfsign.WebIdKeyLoader;
+import won.cryptography.rdfsign.DefaultWebIdKeyLoader;
 import won.cryptography.service.CryptographyService;
 import won.cryptography.service.keystore.FileBasedKeyStoreService;
 import won.cryptography.utils.TestSigningUtils;
@@ -22,6 +17,10 @@ import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.impl.SignatureAddingWonMessageProcessor;
 import won.protocol.message.processor.impl.SignatureCheckingWonMessageProcessor;
 import won.protocol.util.RdfUtils;
+
+import java.io.File;
+import java.net.URI;
+import java.security.Security;
 
 /**
  * User: ypanchenko Date: 25.03.2015
@@ -50,7 +49,7 @@ public class VerifyAndSignExamples {
         ownerAddingProcessor = new SignatureAddingWonMessageProcessor();
         ownerAddingProcessor.setCryptographyService(cryptographyService);
         checkingProcessor = new SignatureCheckingWonMessageProcessor();
-        WebIdKeyLoader keyLoader = new WebIdKeyLoader();
+        DefaultWebIdKeyLoader keyLoader = new DefaultWebIdKeyLoader();
         keyLoader.setLinkedDataSource(new TestingDataSource());
         checkingProcessor.setWebIdKeyLoader(keyLoader);
     }

@@ -280,7 +280,7 @@ public class WonNodeControllerActor extends UntypedActor {
         // try register at won node
         try {
             registrationClient.register(wonNodeUri);
-            ds = linkedDataSource.getDataForResource(URI.create(wonNodeUri));
+            ds = linkedDataSource.getDataForPublicResource(URI.create(wonNodeUri));
         } catch (Exception e) {
             addFailedWonNode(wonNodeUri, con);
             if (logWonNodeRegisterWarning) {

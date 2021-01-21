@@ -450,10 +450,10 @@ public abstract class WonMessageRoutesTest {
     }
 
     protected void prepareMockitoStubs(URI atomURI, URI socketURI, URI atomURI2, URI socketURI2) {
-        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI)))
+        Mockito.when(linkedDataSource.getDataForPublicResource(eq(atomURI)))
                         .then(x -> linkedDataService.getAtomDataset(atomURI, false, null,
                                         WonAclEvalContext.allowAll()));
-        Mockito.when(linkedDataSource.getDataForResource(eq(atomURI2)))
+        Mockito.when(linkedDataSource.getDataForPublicResource(eq(atomURI2)))
                         .then(x -> linkedDataService.getAtomDataset(atomURI2, false, null,
                                         WonAclEvalContext.allowAll()));
         Mockito.when(socketLookup.getCapacity(eq(socketURI))).thenReturn(Optional.of(10));
@@ -768,7 +768,7 @@ public abstract class WonMessageRoutesTest {
         // Mockito.when(linkedDataSource.getDataForResource(any(URI.class)))
         // .thenThrow(new UnsupportedOperationException("cannot do linkeddata lookups
         // during tests"));
-        Mockito.when(linkedDataSource.getDataForResource(eq(URI_NODE_1)))
+        Mockito.when(linkedDataSource.getDataForPublicResource(eq(URI_NODE_1)))
                         .then(x -> linkedDataService.getNodeDataset());
         mockForMessageFromNode1ToNode1();
     }

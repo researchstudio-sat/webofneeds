@@ -1,39 +1,19 @@
 package won.matcher.sparql.actor;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
+import akka.actor.ActorRef;
+import akka.actor.OneForOneStrategy;
+import akka.actor.SupervisorStrategy;
+import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
+import akka.japi.Function;
+import com.github.jsonldjava.core.JsonLdError;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelExtract;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StatementBoundary;
-import org.apache.jena.rdf.model.StatementBoundaryBase;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.algebra.Algebra;
 import org.apache.jena.sparql.algebra.Op;
@@ -48,30 +28,20 @@ import org.apache.jena.sparql.engine.binding.BindingHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import com.github.jsonldjava.core.JsonLdError;
-
-import akka.actor.ActorRef;
-import akka.actor.OneForOneStrategy;
-import akka.actor.SupervisorStrategy;
-import akka.actor.UntypedActor;
-import akka.cluster.pubsub.DistributedPubSub;
-import akka.cluster.pubsub.DistributedPubSubMediator;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
-import akka.japi.Function;
 import scala.concurrent.duration.Duration;
-import won.matcher.service.common.event.AtomEvent;
-import won.matcher.service.common.event.AtomHintEvent;
-import won.matcher.service.common.event.BulkAtomEvent;
-import won.matcher.service.common.event.BulkHintEvent;
-import won.matcher.service.common.event.Cause;
-import won.matcher.service.common.event.HintEvent;
+import won.matcher.service.common.event.*;
 import won.matcher.sparql.config.SparqlMatcherConfig;
 import won.protocol.model.AtomState;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WONMATCH;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Siren/Solr based abstract matcher with all implementations for querying as
@@ -80,12 +50,61 @@ import won.protocol.vocabulary.WONMATCH;
 @Component
 @Scope("prototype")
 public class SparqlMatcherActor extends UntypedActor {
+    private static final Var resultName = Var.alloc("result");
+    private static final Var thisAtom = Var.alloc("thisAtom");
+    private static final Var scoreName = Var.alloc("score");
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private ActorRef pubSubMediator;
     @Autowired
     private SparqlMatcherConfig config;
     @Autowired
     private LinkedDataSource linkedDataSource;
+
+    private static String hashFunction(Object input) {
+        return Integer.toHexString(input.hashCode());
+    }
+
+    private static BasicPattern createDetailsQuery(Model model, Statement parentStatement) {
+        BasicPattern pattern = new BasicPattern();
+        StreamSupport.stream(Spliterators.spliteratorUnknownSize(model.listStatements(), Spliterator.CONCURRENT), true)
+                        .map((statement) -> {
+                            Triple triple = statement.asTriple();
+                            RDFNode object = statement.getObject();
+                            Node newSubject = Var.alloc(hashFunction(triple.getSubject()));
+                            Node newObject = triple.getObject();
+                            if (triple.getSubject().equals(parentStatement.getObject().asNode())) {
+                                newSubject = resultName.asNode();
+                            }
+                            if (object.isAnon()) {
+                                newObject = Var.alloc(hashFunction(newObject));
+                            }
+                            return new Triple(newSubject, triple.getPredicate(), newObject);
+                        }).filter(p -> p != null).forEach(pattern::add);
+        return pattern;
+    }
+
+    private static Op createAtomQuery(Model model, Statement parentStatement) {
+        StatementBoundary boundary = new StatementBoundaryBase() {
+            public boolean stopAt(Statement s) {
+                return parentStatement.getSubject().equals(s.getSubject());
+            }
+        };
+        Model subModel = new ModelExtract(boundary).extract(parentStatement.getObject().asResource(), model);
+        BasicPattern pattern = createDetailsQuery(subModel, parentStatement);
+        if (pattern.isEmpty()) {
+            return null;
+        }
+        return new OpBGP(pattern);
+    }
+
+    private static Set<String> getMatchingContexts(AtomModelWrapper atom) {
+        Model model = atom.getAtomModel();
+        Resource atomURI = model.createResource(atom.getAtomUri());
+        Property matchingContextProperty = model.createProperty("https://w3id.org/won/matching#matchingContext");
+        Stream<RDFNode> stream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
+                        model.listObjectsOfProperty(atomURI, matchingContextProperty), Spliterator.CONCURRENT), false);
+        return stream.map(node -> node.asLiteral().getString()).collect(Collectors.toSet());
+    }
 
     @Override
     public void preStart() throws IOException {
@@ -132,47 +151,6 @@ public class SparqlMatcherActor extends UntypedActor {
 
     protected void processInactiveAtomEvent(AtomEvent atomEvent) throws IOException, JsonLdError {
         log.info("Received inactive atom.");
-    }
-
-    private static String hashFunction(Object input) {
-        return Integer.toHexString(input.hashCode());
-    }
-
-    private static final Var resultName = Var.alloc("result");
-    private static final Var thisAtom = Var.alloc("thisAtom");
-    private static final Var scoreName = Var.alloc("score");
-
-    private static BasicPattern createDetailsQuery(Model model, Statement parentStatement) {
-        BasicPattern pattern = new BasicPattern();
-        StreamSupport.stream(Spliterators.spliteratorUnknownSize(model.listStatements(), Spliterator.CONCURRENT), true)
-                        .map((statement) -> {
-                            Triple triple = statement.asTriple();
-                            RDFNode object = statement.getObject();
-                            Node newSubject = Var.alloc(hashFunction(triple.getSubject()));
-                            Node newObject = triple.getObject();
-                            if (triple.getSubject().equals(parentStatement.getObject().asNode())) {
-                                newSubject = resultName.asNode();
-                            }
-                            if (object.isAnon()) {
-                                newObject = Var.alloc(hashFunction(newObject));
-                            }
-                            return new Triple(newSubject, triple.getPredicate(), newObject);
-                        }).filter(p -> p != null).forEach(pattern::add);
-        return pattern;
-    }
-
-    private static Op createAtomQuery(Model model, Statement parentStatement) {
-        StatementBoundary boundary = new StatementBoundaryBase() {
-            public boolean stopAt(Statement s) {
-                return parentStatement.getSubject().equals(s.getSubject());
-            }
-        };
-        Model subModel = new ModelExtract(boundary).extract(parentStatement.getObject().asResource(), model);
-        BasicPattern pattern = createDetailsQuery(subModel, parentStatement);
-        if (pattern.isEmpty()) {
-            return null;
-        }
-        return new OpBGP(pattern);
     }
 
     /**
@@ -234,7 +212,7 @@ public class SparqlMatcherActor extends UntypedActor {
 
     /**
      * publishes the specified hint events.
-     * 
+     *
      * @param hintEvents the collection of HintEvent to publish
      * @param atomURI used for logging
      * @param inverse used for logging
@@ -268,8 +246,9 @@ public class SparqlMatcherActor extends UntypedActor {
                         model.createProperty("https://w3id.org/won/matching#seeks"));
         if (seeks != null) {
             Op seeksQuery = createAtomQuery(model, seeks);
-            if (seeksQuery != null)
+            if (seeksQuery != null) {
                 queries.add(seeksQuery);
+            }
         }
         Statement search = model.getProperty(model.createResource(atomURI),
                         model.createProperty("https://w3id.org/won/matching#searchString"));
@@ -286,7 +265,7 @@ public class SparqlMatcherActor extends UntypedActor {
      * in. If atomToCheck is passed, it is used as the result data iff the
      * atomToCheck is a match for atom. This saves us a linked data lookup for data
      * we already have.
-     * 
+     *
      * @param atom
      * @param atomToCheck
      * @return
@@ -320,7 +299,7 @@ public class SparqlMatcherActor extends UntypedActor {
 
     /**
      * Executes the query, optionally only searching in the atomToCheck.
-     * 
+     *
      * @param q
      * @param atomToCheck
      * @param atomURI - the URI of the atom we are matching for
@@ -386,7 +365,7 @@ public class SparqlMatcherActor extends UntypedActor {
         return foundUris.parallelStream().map(foundAtomUri -> {
             try {
                 // download the linked data and return a new AtomModelWrapper
-                Dataset ds = linkedDataSource.getDataForResource(URI.create(foundAtomUri.uri));
+                Dataset ds = linkedDataSource.getDataForPublicResource(URI.create(foundAtomUri.uri));
                 // make sure we don't accidentally use empty or faulty results
                 if (!AtomModelWrapper.isAAtom(ds)) {
                     return null;
@@ -401,15 +380,6 @@ public class SparqlMatcherActor extends UntypedActor {
                 return null;
             }
         }).filter(foundAtom -> foundAtom != null);
-    }
-
-    private static Set<String> getMatchingContexts(AtomModelWrapper atom) {
-        Model model = atom.getAtomModel();
-        Resource atomURI = model.createResource(atom.getAtomUri());
-        Property matchingContextProperty = model.createProperty("https://w3id.org/won/matching#matchingContext");
-        Stream<RDFNode> stream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(
-                        model.listObjectsOfProperty(atomURI, matchingContextProperty), Spliterator.CONCURRENT), false);
-        return stream.map(node -> node.asLiteral().getString()).collect(Collectors.toSet());
     }
 
     private boolean postFilter(AtomModelWrapper atom, AtomModelWrapper foundAtom) {
@@ -432,10 +402,12 @@ public class SparqlMatcherActor extends UntypedActor {
                 }
             }
             Calendar now = Calendar.getInstance();
-            if (now.after(foundAtom.getDoNotMatchAfter()))
+            if (now.after(foundAtom.getDoNotMatchAfter())) {
                 return false;
-            if (now.before(foundAtom.getDoNotMatchBefore()))
+            }
+            if (now.before(foundAtom.getDoNotMatchBefore())) {
                 return false;
+            }
             return true;
         } catch (Exception e) {
             log.info("caught Exception during post-filtering, ignoring match", e);

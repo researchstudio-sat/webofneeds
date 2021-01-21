@@ -1,46 +1,10 @@
 package won.protocol.util;
 
-import static won.protocol.util.RdfUtils.findOnePropertyFromResource;
-import static won.protocol.util.RdfUtils.findOrCreateBaseResource;
-import static won.protocol.util.RdfUtils.visit;
-
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
@@ -62,24 +26,22 @@ import org.apache.jena.vocabulary.RDF;
 import org.hibernate.cfg.NotYetImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
-import won.protocol.model.AtomGraphType;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionModelMapper;
-import won.protocol.model.ConnectionState;
-import won.protocol.model.SocketDefinitionImpl;
+import won.protocol.model.*;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInfoBuilder;
-import won.protocol.util.RdfUtils.Pair;
-import won.protocol.vocabulary.SCHEMA;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WONAGR;
-import won.protocol.vocabulary.WONCON;
-import won.protocol.vocabulary.WONMOD;
-import won.protocol.vocabulary.WONMSG;
+import won.protocol.util.RdfUtils.*;
+import won.protocol.vocabulary.*;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static won.protocol.util.RdfUtils.*;
 
 /**
  * Utilities for populating/manipulating the RDF models used throughout the WON
@@ -88,6 +50,13 @@ import won.protocol.vocabulary.WONMSG;
 public class WonRdfUtils {
     public static final String NAMED_GRAPH_SUFFIX = "#data";
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private static Model createModelWithBaseResource() {
+        Model model = ModelFactory.createDefaultModel();
+        model.setNsPrefix("", "no:uri");
+        model.createResource(model.getNsPrefixURI(""));
+        return model;
+    }
 
     public static class SignatureUtils {
         public static boolean isSignatureGraph(String graphUri, Model model) {
@@ -148,7 +117,7 @@ public class WonRdfUtils {
         /**
          * Adds the triples holding the signature data to the model of the specified
          * resource, using the resource as the subject.
-         * 
+         *
          * @param subject
          * @param wonSignatureData
          */
@@ -175,7 +144,7 @@ public class WonRdfUtils {
          * Creates a WonNodeInfo object based on the specified dataset. The first model
          * found in the dataset that seems to contain the datan needed for a WonNodeInfo
          * object is used.
-         * 
+         *
          * @param wonNodeUri
          * @param dataset
          * @return
@@ -188,7 +157,7 @@ public class WonRdfUtils {
          * Creates a WonNodeInfo object based on the specified dataset. The first model
          * found in the dataset that seems to contain the data needed for a WonNodeInfo
          * object is used.
-         * 
+         *
          * @param wonNodeUri
          * @param dataset
          * @return
@@ -199,8 +168,9 @@ public class WonRdfUtils {
                 // use the first blank node found for [wonNodeUri]
                 // won:hasUriPatternSpecification [blanknode]
                 NodeIterator it = model.listObjectsOfProperty(WON.uriPrefixSpecification);
-                if (!it.hasNext())
+                if (!it.hasNext()) {
                     return null;
+                }
                 RDFNode confignode = it.next();
                 StmtIterator stmtit = model.listStatements(null, WON.uriPrefixSpecification, confignode);
                 if (!stmtit.hasNext()) {
@@ -211,17 +181,20 @@ public class WonRdfUtils {
                 wonNodeInfoBuilder.setWonNodeURI(wonNode.asResource().toString());
                 // set the URI prefixes
                 it = model.listObjectsOfProperty(confignode.asResource(), WON.atomUriPrefix);
-                if (!it.hasNext())
+                if (!it.hasNext()) {
                     return null;
+                }
                 String atomUriPrefix = it.next().asLiteral().getString();
                 wonNodeInfoBuilder.setAtomURIPrefix(atomUriPrefix);
                 it = model.listObjectsOfProperty(confignode.asResource(), WON.connectionUriPrefix);
-                if (!it.hasNext())
+                if (!it.hasNext()) {
                     return null;
+                }
                 wonNodeInfoBuilder.setConnectionURIPrefix(it.next().asLiteral().getString());
                 it = model.listObjectsOfProperty(confignode.asResource(), WON.messageUriPrefix);
-                if (!it.hasNext())
+                if (!it.hasNext()) {
                     return null;
+                }
                 wonNodeInfoBuilder.setEventURIPrefix(it.next().asLiteral().getString());
                 // set the atom list URI
                 it = model.listObjectsOfProperty(confignode.asResource(), WON.atomList);
@@ -263,7 +236,7 @@ public class WonRdfUtils {
     public static class MessageUtils {
         /**
          * Adds the specified text as a con:text to the model's base resource.
-         * 
+         *
          * @param message
          * @return
          */
@@ -275,7 +248,7 @@ public class WonRdfUtils {
 
         /**
          * Creates an RDF model containing a text message.
-         * 
+         *
          * @param message
          * @return
          */
@@ -288,7 +261,7 @@ public class WonRdfUtils {
 
         /**
          * Creates an RDF Model containing an file encoded in Base64
-         * 
+         *
          * @param fileString: Base64 encoded file
          * @param fileName: Name of the file
          * @param message: Message to be send as well
@@ -310,7 +283,7 @@ public class WonRdfUtils {
 
         /**
          * Create an RDF model containing a text message and a processing message
-         * 
+         *
          * @param message
          * @return
          */
@@ -369,8 +342,9 @@ public class WonRdfUtils {
 
         public static Model addRetracts(Model messageModel, URI... toRetract) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-            if (toRetract == null)
+            if (toRetract == null) {
                 return messageModel;
+            }
             for (URI uri : toRetract) {
                 if (uri != null) {
                     baseRes.addProperty(WONMOD.retracts, baseRes.getModel().getResource(uri.toString()));
@@ -381,8 +355,9 @@ public class WonRdfUtils {
 
         public static Model addProposes(Model messageModel, URI... toPropose) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-            if (toPropose == null)
+            if (toPropose == null) {
                 return messageModel;
+            }
             for (URI uri : toPropose) {
                 if (uri != null) {
                     baseRes.addProperty(WONAGR.proposes, baseRes.getModel().getResource(uri.toString()));
@@ -393,8 +368,9 @@ public class WonRdfUtils {
 
         public static Model addRejects(Model messageModel, URI... toReject) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-            if (toReject == null)
+            if (toReject == null) {
                 return messageModel;
+            }
             for (URI uri : toReject) {
                 if (uri != null) {
                     baseRes.addProperty(WONAGR.rejects, baseRes.getModel().getResource(uri.toString()));
@@ -405,8 +381,9 @@ public class WonRdfUtils {
 
         public static Model addAccepts(Model messageModel, URI... toAccept) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-            if (toAccept == null)
+            if (toAccept == null) {
                 return messageModel;
+            }
             for (URI uri : toAccept) {
                 if (uri != null) {
                     logger.debug("checking uri for addProposesToCancel with uri {}", uri);
@@ -418,8 +395,9 @@ public class WonRdfUtils {
 
         public static Model addProposesToCancel(Model messageModel, URI... toProposesToCancel) {
             Resource baseRes = RdfUtils.findOrCreateBaseResource(messageModel);
-            if (toProposesToCancel == null)
+            if (toProposesToCancel == null) {
                 return messageModel;
+            }
             for (URI uri : toProposesToCancel) {
                 if (uri != null) {
                     logger.debug("checking uri for addProposesToCancel with uri {}", uri);
@@ -432,7 +410,7 @@ public class WonRdfUtils {
         /**
          * Creates an RDF model containing a feedback message referring to the specified
          * resource that is either positive or negative.
-         * 
+         *
          * @return
          */
         public static Model binaryFeedbackMessage(URI forResource, boolean isFeedbackPositive) {
@@ -448,7 +426,7 @@ public class WonRdfUtils {
         /**
          * Returns the first con:text object, or null if none is found. Won't work on
          * WonMessage models, removal depends on refactoring of BA socket code
-         * 
+         *
          * @param model
          * @return
          */
@@ -464,7 +442,7 @@ public class WonRdfUtils {
         /**
          * Returns all con:text objects, or an empty set if none is found. The specified
          * model has to be a message's content graph.
-         * 
+         *
          * @param model
          * @return
          */
@@ -592,7 +570,7 @@ public class WonRdfUtils {
 
         /**
          * Adds the specified text as a con:text to the model's base resource.
-         * 
+         *
          * @param message
          * @return
          */
@@ -652,7 +630,7 @@ public class WonRdfUtils {
 
         /**
          * Returns previous message URIs for local and remote message.
-         * 
+         *
          * @param wonMessage
          * @return
          */
@@ -684,7 +662,7 @@ public class WonRdfUtils {
 
         /**
          * Returns the whole review content of a WonMessage
-         * 
+         *
          * @param wonMessage
          * @return
          */
@@ -742,7 +720,7 @@ public class WonRdfUtils {
          * Returns the socket in a connect message. Attempts to get it from the
          * specified message itself. If no such socket is found there, the targetSocket
          * of the correspondingRemoteMessage is used.
-         * 
+         *
          * @param message
          * @return
          */
@@ -754,7 +732,7 @@ public class WonRdfUtils {
          * Returns the targetSocket in a connect message. Attempts to get it from the
          * specified message itself. If no such socket is found there, the socket of the
          * correspondingRemoteMessage is used.
-         * 
+         *
          * @param message
          * @return
          */
@@ -765,7 +743,7 @@ public class WonRdfUtils {
         /**
          * Calculates all compatible socket pairs in the two specified atoms defined in
          * the dataset.
-         * 
+         *
          * @param dataset
          * @param firstAtom
          * @param secondAtom
@@ -797,7 +775,7 @@ public class WonRdfUtils {
 
         /**
          * Checks if the specified sockets are compatible.
-         * 
+         *
          * @param dataset
          * @param firstAtomSocket
          * @param secondAtomSocket
@@ -850,7 +828,7 @@ public class WonRdfUtils {
         /**
          * Returns all sockets found in the model, attached to the null relative URI
          * '{@literal <>}'. Returns an empty collection if there is no such socket.
-         * 
+         *
          * @param content
          * @return
          */
@@ -870,7 +848,7 @@ public class WonRdfUtils {
         /**
          * Returns all sockets found in the model, attached to the null relative URI
          * '{@literal <>}'. Returns an empty collection if there is no such socket.
-         * 
+         *
          * @param content
          * @return
          */
@@ -889,7 +867,7 @@ public class WonRdfUtils {
 
         /**
          * Returns all sockets of the base resource of the given type.
-         * 
+         *
          * @param model
          * @param socketType
          * @return
@@ -900,7 +878,7 @@ public class WonRdfUtils {
 
         /**
          * Returns all sockets of subject with the given type found in the model.
-         * 
+         *
          * @param model
          * @param socketType
          * @return
@@ -911,7 +889,7 @@ public class WonRdfUtils {
 
         /**
          * Returns all sockets of the given type found in the model.
-         * 
+         *
          * @param model
          * @param socketType
          * @return
@@ -947,7 +925,7 @@ public class WonRdfUtils {
 
         /**
          * Adds a triple to the model of the form {@literal <>} won:socket [socketURI].
-         * 
+         *
          * @param model
          * @param socketURI
          * @deprecated will be removed, use
@@ -1004,7 +982,7 @@ public class WonRdfUtils {
         /**
          * Adds a triple to the model of the form {@literal <>} won:targetSocket
          * [socketURI].
-         * 
+         *
          * @param content
          * @param socketURI
          */
@@ -1016,7 +994,7 @@ public class WonRdfUtils {
         /**
          * Creates a model for connecting two sockets. Both sockets are optional, if
          * none are given the returned Optional is empty
-         * 
+         *
          * @return
          */
         public static Optional<Model> createSocketModelForHintOrConnect(Optional<URI> socket,
@@ -1242,13 +1220,10 @@ public class WonRdfUtils {
         public static List<URI> getMessageURIs() {
             throw new NotYetImplementedException();
         }
-    }
 
-    private static Model createModelWithBaseResource() {
-        Model model = ModelFactory.createDefaultModel();
-        model.setNsPrefix("", "no:uri");
-        model.createResource(model.getNsPrefixURI(""));
-        return model;
+        public static URI getMessageContainerURIforConnectionURI(URI connectionURI) {
+            return URI.create(connectionURI.toString() + "/msg");
+        }
     }
 
     public static class AtomUtils {
@@ -1286,16 +1261,17 @@ public class WonRdfUtils {
             while (iterator.hasNext()) {
                 atomURIs.add(iterator.next());
             }
-            if (atomURIs.size() == 0)
+            if (atomURIs.size() == 0) {
                 return null;
-            else if (atomURIs.size() == 1)
+            } else if (atomURIs.size() == 1) {
                 return atomURIs.get(0);
-            else {
+            } else {
                 atomURIs.size();
                 Resource u = atomURIs.get(0);
                 for (Resource uri : atomURIs) {
-                    if (!uri.equals(u))
+                    if (!uri.equals(u)) {
                         throw new IncorrectPropertyCountException(1, 2);
+                    }
                 }
                 return u;
             }
@@ -1376,10 +1352,12 @@ public class WonRdfUtils {
                                 }
                                 return Optional.of(new OpUnion((Op) union.get(), pattern));
                             }, (union1, union2) -> {
-                                if (!union1.isPresent())
+                                if (!union1.isPresent()) {
                                     return union2;
-                                if (!union2.isPresent())
+                                }
+                                if (!union2.isPresent()) {
                                     return union1;
+                                }
                                 return Optional.of(new OpUnion((Op) union1.get(), (Op) union2.get()));
                             });
             if (!unions.isPresent()) {

@@ -1584,7 +1584,7 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         URI groupAtomURI = newAtomURI();
         URI groupSocketURI = URI.create(groupAtomURI.toString() + "#groupSocket");
         prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
-        Mockito.when(linkedDataSource.getDataForResource(groupAtomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(groupAtomURI))
                         .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null,
                                         WonAclEvalContext.allowAll()));
         WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,
@@ -1688,13 +1688,13 @@ public class WonMessageRoutesExternalRoutedTest extends WonMessageRoutesTest {
         URI groupAtomURI = newAtomURI();
         URI groupSocketURI = URI.create(groupAtomURI.toString() + "#groupSocket");
         prepareMockitoStubs(atomURI, socketURI, atomURI2, socketURI2);
-        Mockito.when(linkedDataSource.getDataForResource(groupAtomURI))
+        Mockito.when(linkedDataSource.getDataForPublicResource(groupAtomURI))
                         .then(x -> linkedDataService.getAtomDataset(groupAtomURI, false, null,
                                         WonAclEvalContext.allowAll()));
-        Mockito.when(linkedDataSource.getDataForResource(atomURI3))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI3))
                         .then(x -> linkedDataService.getAtomDataset(atomURI3, false, null,
                                         WonAclEvalContext.allowAll()));
-        Mockito.when(linkedDataSource.getDataForResource(atomURI4))
+        Mockito.when(linkedDataSource.getDataForPublicResource(atomURI4))
                         .then(x -> linkedDataService.getAtomDataset(atomURI4, false, null,
                                         WonAclEvalContext.allowAll()));
         WonMessage createAtom1Msg = prepareFromOwner(makeCreateAtomMessage(atomURI,

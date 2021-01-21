@@ -67,6 +67,11 @@
       <artifactId>won-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>at.researchstudio.sat</groupId>
+      <artifactId>won-node</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- TEST STUFF -->
     <dependency>
