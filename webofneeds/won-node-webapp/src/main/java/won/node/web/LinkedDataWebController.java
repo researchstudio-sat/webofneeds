@@ -13,6 +13,7 @@ package won.node.web;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerMapping;
+import won.auth.model.AclEvalResult;
+import won.auth.model.OperationRequest;
 import won.cryptography.service.RegistrationServer;
 import won.node.service.linkeddata.generate.LinkedDataService;
 import won.node.service.nodeconfig.URIService;
@@ -71,6 +74,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static won.auth.model.DecisionValue.ACCESS_DENIED;
+import static won.auth.model.Individuals.POSITION_ROOT;
 
 /**
  * TODO: check the working draft here and see to conformance:
@@ -1181,7 +1187,7 @@ public class LinkedDataWebController implements InitializingBean {
      */
     @RequestMapping(value = "${uri.path.data}/atom/{identifier}/c", method = RequestMethod.GET, produces = {
                     "application/ld+json", "application/trig", "application/n-quads" })
-    public ResponseEntity<Dataset> readConnectionsOfAtom(HttpServletRequest request,
+    public ResponseEntity<Dataset> readConnectionsOfAtom(HttpServletRequest request, HttpServletResponse response,
                     @PathVariable(value = "identifier") String identifier,
                     @RequestParam(value = "socket", required = false) String socket,
                     @RequestParam(value = "targetSocket", required = false) String targetSocket,
@@ -1256,6 +1262,23 @@ public class LinkedDataWebController implements InitializingBean {
                                                     dateParam.getDate(), deep, true, connectionState);
                     rdfDataset = resource.getContent();
                     addPagedConnectionResourceInSequenceHeader(headers, connectionsURI, resource, passableQuery);
+                }
+            }
+            WonAclEvalContext ec = WonAclRequestHelper.getWonAclEvaluationContext(request);
+            // check if the dataset contains any connections
+            if (ec.isModeFilter() && !RdfUtils.toStatementStream(rdfDataset)
+                            .anyMatch(p -> p.getPredicate().equals(RDFS.member))) {
+                // the dataset may be empty because no connections are allowed
+                // we don't have a position for all connections in the ACL, so we say: if the
+                // user
+                // is allowed to see the top level, we show the empty container, otherwise deny
+                OperationRequest or = ec.getOperationRequest();
+                or.setReqPosition(POSITION_ROOT);
+                AclEvalResult result = ec.decideAndRemember(or);
+                if (ACCESS_DENIED.equals(result.getDecision())) {
+                    ec.getCombinedResults()
+                                    .ifPresent(r -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
+                    new ResponseEntity<>(null, headers, HttpStatus.FORBIDDEN);
                 }
             }
             // append the required headers

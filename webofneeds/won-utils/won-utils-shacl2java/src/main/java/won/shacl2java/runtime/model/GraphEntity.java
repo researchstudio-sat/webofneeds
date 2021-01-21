@@ -1,16 +1,16 @@
 package won.shacl2java.runtime.model;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
 
 public class GraphEntity {
     private Node node;
@@ -77,6 +77,9 @@ public class GraphEntity {
         requireEntityNodeKind(node);
     }
 
+    public GraphEntity() {
+    }
+
     public void requireEntityNodeKind(Node node) {
         if (node != null) {
             if (!(node.isBlank() || node.isURI())) {
@@ -84,9 +87,6 @@ public class GraphEntity {
                                 "A GraphEntity's node must be an URI or a blank node, but received: " + node);
             }
         }
-    }
-
-    public GraphEntity() {
     }
 
     public void detach() {
@@ -101,11 +101,6 @@ public class GraphEntity {
         return this.node;
     }
 
-    public Node getNodeCreateIfNecessary() {
-        createNodeIfNecessary();
-        return this.node;
-    }
-
     public void setNode(Node node) {
         requireEntityNodeKind(node);
         this.node = node;
@@ -117,6 +112,11 @@ public class GraphEntity {
 
     public void setNode(URI nodeUri) {
         setNode(NodeFactory.createURI(nodeUri.toString()));
+    }
+
+    public Node getNodeCreateIfNecessary() {
+        createNodeIfNecessary();
+        return this.node;
     }
 
     public Graph getGraph() {
@@ -207,11 +207,16 @@ public class GraphEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         GraphEntity that = (GraphEntity) o;
+        if (this.node == null && that.node == null) {
+            return false;
+        }
         return Objects.equals(node, that.node);
     }
 

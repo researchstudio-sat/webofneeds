@@ -35,7 +35,9 @@ public class WonDefaultAccessControlRules implements AccessControlRules {
         URI resourceUri = uriService.toResourceURIIfPossible(URI.create(resourceUriString));
         if (requesterWebIDs.isEmpty()) {
             // no client cert with webID provided - show only atom/connections
-            if (uriService.isAtomURI(resourceUri) || uriService.isConnectionContainerURI(resourceUri)) {
+            if (uriService.isAtomURI(resourceUri)
+                            || uriService.isConnectionContainerURI(resourceUri)
+                            || uriService.isConnectionURI(resourceUri)) {
                 return true;
             } else {
                 return false;
@@ -79,6 +81,18 @@ public class WonDefaultAccessControlRules implements AccessControlRules {
             }
             // only the atom itself can get unread events
             return webId.equals(uriService.getAtomURIofAtomUnreadURI(resourceUri));
+        } else if (uriService.isConnectionContainerURI(resourceUri)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("allowing access for connectionContainer {} with webID {} ({} of {})",
+                                new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
+            }
+            return true;
+        } else if (uriService.isConnectionURI(resourceUri)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("allowing access for connection {} with webID {} ({} of {})",
+                                new Object[] { resourceUri, firstWebId, 1, requesterWebIDs.size() });
+            }
+            return true;
         }
         if (logger.isDebugEnabled()) {
             logger.debug("request could not be categorized, denying: {} with webID {} ({} of {})",

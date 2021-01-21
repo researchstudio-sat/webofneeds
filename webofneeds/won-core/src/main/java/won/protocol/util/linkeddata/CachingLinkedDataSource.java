@@ -28,6 +28,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StopWatch;
 import won.protocol.rest.DatasetResponseWithStatusCodeAndHeaders;
+import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.LogMarkers;
 
 import java.io.ByteArrayInputStream;
@@ -324,7 +325,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
                         linkedDataCacheEntry, headers);
         Date expires = parseCacheControlMaxAgeValue(resource, responseData);
         if (responseData.getDataset() == null) {
-            throw new IllegalStateException(
+            throw new LinkedDataFetchingException(resource,
                             "Could not load dataset for URI " + resource + " and requesterWebID " + requesterWebID);
         }
         if (expires == null) {

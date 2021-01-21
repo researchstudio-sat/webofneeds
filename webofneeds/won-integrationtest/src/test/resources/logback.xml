@@ -24,8 +24,8 @@
         </encoder>
     </appender>
 
-    <logger name="won.integrationtest" level="debug"/>
-    <logger name="won" level="debug"/>
+    <logger name="won.integrationtest" level="warn"/>
+    <logger name="won" level="warn"/>
     <logger name="won.shacl2java" level="warn"/>
     <logger name="org.springframework" level="warn"/>
 

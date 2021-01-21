@@ -289,10 +289,17 @@ public abstract class AbstractBotBasedTest
                 }
             }
         } catch (Exception e) {
-            if (!exceptionExpected || !expectedException.isAssignableFrom(e.getClass())) {
+            if (!exceptionExpected) {
                 failTest(bus, String.format("Test Case %s: Got unexpected exception for resource %s %s", testCaseId,
                                 resourceUri,
                                 webidString), e);
+                return false;
+            }
+            if (!expectedException.isAssignableFrom(e.getClass())) {
+                failTest(bus, String.format("Test Case %s: Got wrong kind of exception for resource %s %s, expected %s",
+                                testCaseId,
+                                resourceUri,
+                                webidString, expectedException), e);
                 return false;
             }
         }

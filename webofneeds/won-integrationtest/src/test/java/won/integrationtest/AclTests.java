@@ -275,17 +275,15 @@ public class AclTests extends AbstractBotBasedTest {
                     boolean passed = true;
                     passed = passed && testLinkedDataRequestOk(ctx, bus, "test1.", atomUri1, atomUri1,
                                     createMessageUri1.get());
-                    passed = passed && testLinkedDataRequestOk(ctx, bus, "test2.", atomUri2, atomUri1);
+                    passed = passed && testLinkedDataRequestOk(ctx, bus, "test2.", atomUri2, atomUri1,
+                                    createMessageUri1.get());
                     passed = passed && testLinkedDataRequestFails(ctx, bus, "test3.", atomUri1,
                                     LinkedDataFetchingException.class,
                                     atomUri2, connContainerUri2, createMessageUri2.get());
-                    passed = passed && testLinkedDataRequestFails(ctx, bus, "test4.", atomUri2,
-                                    LinkedDataFetchingException.class,
-                                    connContainerUri1, createMessageUri1.get());
                     passed = passed && testLinkedDataRequestOk_emptyDataset(ctx, bus, "test5.", atomUri1,
                                     connContainerUri1);
                     passed = passed && testLinkedDataRequestOk_emptyDataset(ctx, bus, "test6.", atomUri2,
-                                    connContainerUri2);
+                                    connContainerUri1, connContainerUri2);
                     passed = passed && testLinkedDataRequestFailsNoWebId(ctx, bus, "test7.",
                                     LinkedDataFetchingException.class,
                                     atomUri1, connContainerUri1, atomUri2, connContainerUri2, createMessageUri1.get(),
@@ -328,12 +326,14 @@ public class AclTests extends AbstractBotBasedTest {
                     AtomExpression ae = new AtomExpression();
                     ae.addAtomsURI(atomUri2);
                     auth.addGranteesAtomExpression(ae);
-                    AseRoot g = new AseRoot();
-                    g.addOperationsSimpleOperationExpression(Individuals.OP_READ);
+                    AseRoot r = new AseRoot();
+                    GraphExpression gr = new GraphExpression();
+                    gr.addOperationsSimpleOperationExpression(Individuals.OP_READ);
+                    r.addGraph(gr);
                     SocketExpression s = new SocketExpression();
                     s.setInherit(false);
-                    g.addSocket(s);
-                    auth.addGrant(g);
+                    r.addSocket(s);
+                    auth.addGrant(r);
                     WonMessage createMessage = WonMessageBuilder.createAtom()
                                     .atom(atomUri1)
                                     .content().graph(RdfOutput.toGraph(atomContent))
@@ -375,12 +375,14 @@ public class AclTests extends AbstractBotBasedTest {
                     AtomExpression ae = new AtomExpression();
                     ae.addAtomsURI(atomUri1);
                     auth.addGranteesAtomExpression(ae);
-                    AseRoot g = new AseRoot();
-                    g.addOperationsSimpleOperationExpression(Individuals.OP_READ);
+                    AseRoot r = new AseRoot();
+                    GraphExpression gr = new GraphExpression();
+                    gr.addOperationsSimpleOperationExpression(Individuals.OP_READ);
+                    r.addGraph(gr);
                     SocketExpression s = new SocketExpression();
                     s.setInherit(false);
-                    g.addSocket(s);
-                    auth.addGrant(g);
+                    r.addSocket(s);
+                    auth.addGrant(r);
                     WonMessage createMessage = WonMessageBuilder.createAtom()
                                     .atom(atomUri2)
                                     .content().graph(RdfOutput.toGraph(atomContent))
