@@ -8,11 +8,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.junit.*;
+import org.junit.experimental.categories.Category;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
+import won.test.category.RequiresDockerServer;
 import won.utils.dns.DnsMappingAdder;
 
 import javax.net.ssl.SSLContext;
@@ -34,7 +36,7 @@ import java.util.function.Supplier;
  * matcher_service) to be reachable at the configured ports. (see
  * src/test/resources/docker-compose.yml)
  */
-// @Category(RequiresDockerServer.class)
+@Category(RequiresDockerServer.class)
 public abstract class IntegrationTests {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static boolean startContainers = Optional.ofNullable(System.getenv("START_CONTAINERS"))

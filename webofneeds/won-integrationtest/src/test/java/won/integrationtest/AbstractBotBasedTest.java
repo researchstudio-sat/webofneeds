@@ -3,6 +3,7 @@ package won.integrationtest;
 import org.apache.jena.query.Dataset;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import won.bot.framework.manager.impl.SpringAwareBotManagerImpl;
 import won.integrationtest.support.CountdownLatchAction;
 import won.node.service.nodeconfig.URIService;
 import won.protocol.util.WonRdfUtils;
+import won.test.category.RequiresDockerServer;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -55,7 +57,7 @@ import java.util.function.Consumer;
                 "WON_NODE_URI=https://wonnode:8443/won",
                 "WON_KEYSTORE_DIR=target/bot-keys"
 })
-// @Category(RequiresDockerServer.class)
+@Category(RequiresDockerServer.class)
 public abstract class AbstractBotBasedTest
                 // uncomment next line to run tests against testcontainers
                 extends IntegrationTests {

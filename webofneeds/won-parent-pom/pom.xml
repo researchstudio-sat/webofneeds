@@ -108,7 +108,6 @@
 
         <profile>
             <id>skip-docker-tests</id>
-            <activation><activeByDefault>true</activeByDefault></activation>
             <build>
                 <plugins>
                     <plugin>
