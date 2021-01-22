@@ -7,12 +7,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import won.utils.dns.DnsMappingAdder;
@@ -26,6 +24,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Base class for all tests that require the won services to run. The services
@@ -41,21 +40,35 @@ public abstract class IntegrationTests {
     private static boolean startContainers = Optional.ofNullable(System.getenv("START_CONTAINERS"))
                     .map(Boolean::valueOf).orElse(true);
     @ClassRule
-    public static DockerComposeContainer environment = startContainers ? new DockerComposeContainer(
-                    new File("target/test-classes/docker-compose.yml"))
-                                    .withExposedService("owner", 8082,
-                                                    Wait.forLogMessage(
-                                                                    // "^.+connected with WoN
-                                                                    // node:.+https://wonnode:8443/won/resource.*$",
-                                                                    "^.+connected with WoN node:.+$",
-                                                                    1)
-                                                                    .withStartupTimeout(Duration.ofSeconds(120)))
-                                    .waitingFor("matcher_service",
-                                                    Wait.forLogMessage(
-                                                                    "^.+\\[akka://ClusterSystem/user/WonNodeControllerActor\\] registered won node .+ and start crawling it.+$",
-                                                                    1))
-                                    .withLocalCompose(true)
-                    : null;
+    public static DockerComposeContainer environment = new Supplier<DockerComposeContainer>() {
+        public DockerComposeContainer get() {
+            if (startContainers) {
+                DockerComposeContainer container = null;
+                try {
+                    container = new DockerComposeContainer(
+                                    new File("target/test-classes/docker-compose.yml"))
+                                                    .withExposedService("owner", 8082,
+                                                                    Wait.forLogMessage(
+                                                                                    // "^.+connected with WoN
+                                                                                    // node:.+https://wonnode:8443/won/resource.*$",
+                                                                                    "^.+connected with WoN node:.+$",
+                                                                                    1)
+                                                                                    .withStartupTimeout(Duration
+                                                                                                    .ofSeconds(120)))
+                                                    .waitingFor("matcher_service",
+                                                                    Wait.forLogMessage(
+                                                                                    "^.+\\[akka://ClusterSystem/user/WonNodeControllerActor\\] registered won node .+ and start crawling it.+$",
+                                                                                    1))
+                                                    .withLocalCompose(true);
+                } catch (Exception e) {
+                    return null;
+                }
+                return container;
+            } else {
+                return null;
+            }
+        }
+    }.get();
     static {
         // the containers in our docker-compose file must be reachable from outside the
         // docker environment
@@ -66,6 +79,20 @@ public abstract class IntegrationTests {
         DnsMappingAdder.addDnsMapping("wonnode", "127.0.0.1");
         DnsMappingAdder.addDnsMapping("postgres", "127.0.0.1");
         DnsMappingAdder.addDnsMapping("bigdata", "127.0.0.1");
+    }
+
+    @BeforeClass
+    public static void checkDockerAvailable() {
+        Assume.assumeTrue(isDockerAvailable());
+    }
+
+    private static boolean isDockerAvailable() {
+        try {
+            DockerClientFactory.instance().client();
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
     }
 
     @BeforeClass
