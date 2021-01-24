@@ -593,9 +593,12 @@ auth:operationRequestShape
     sh:targetClass       auth:OperationRequest ;
     sh:ignoredProperties ( rdf:type ) ;
     sh:closed            true ;
+    sh:or                ( [ sh:path     auth:requestor ;
+                             sh:minCount 1 ] [ sh:path     auth:bearsToken ;
+                                               sh:minCount 1 ] ) ;
     sh:property          [ sh:path     auth:requestor ;
                            sh:nodeKind sh:IRI ;
-                           sh:minCount 1 ;
+                           sh:minCount 0 ;
                            sh:maxCount 1 ; ] ;
     sh:property          [ sh:path     auth:reqPosition ;
                            sh:minCount 1 ;
@@ -682,6 +685,7 @@ auth:authTokenTestSpecShape
     a           sh:NodeShape ;
     sh:property auth:tokenIssPropertyShape ;
     sh:property auth:tokenSubPropertyShape ;
+    sh:property auth:tokenSigPropertyShape ;
     sh:property auth:tokenScopePropertyShape ;
     sh:property auth:expiresAfterPropertyShape .
 

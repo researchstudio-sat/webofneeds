@@ -15,22 +15,24 @@
 @prefix magicmirror:  <http://example.org/test/magicmirror#> .
 @prefix pinocchio:    <http://example.org/test/pinocchio#> .
 @prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+@prefix ftc:          <https://example.org/test/fairytalecreatures#> .
 
-# dragon gets a wx-buddy:BuddySocket token from donkey
+# shrek gets an owner token from the party
 
-dragon:expectedResult3
+shrek:expectedResult1
     a                       auth:ExpectedAclEvalResult ;
     auth:decision           auth:accessGranted ;
-    auth:requestedOperation dragon:request3 ;
-    auth:issueToken         [ auth:tokenScope   wx-buddy:BuddySocket ;
-                              auth:tokenIss     ex:donkey ;
-                              auth:tokenSub     ex:dragon ;
+    auth:requestedOperation shrek:request1 ;
+    auth:issueToken         [ auth:tokenScope   auth:ownerToken ;
+                              auth:tokenIss     ex:party ;
+                              auth:tokenSub     ex:party ;
+                              auth:tokenSig     ftc:node ;
                               auth:expiresAfter "3600"^^xsd:int ] .
 
-dragon:request3
+shrek:request1
     a                 auth:OperationRequest ;
-    auth:operation    [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
-    auth:requestor    ex:dragon ;
-    auth:reqAtom      ex:donkey ;
+    auth:operation    [ auth:requestToken [ auth:tokenScope auth:ownerToken ] ] ;
+    auth:requestor    ex:party ;
+    auth:reqAtom      ex:party ;
     auth:reqPosition  auth:positionRoot ;
     auth:reqAtomState won:Active .

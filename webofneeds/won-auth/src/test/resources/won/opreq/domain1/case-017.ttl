@@ -16,21 +16,30 @@
 @prefix pinocchio:    <http://example.org/test/pinocchio#> .
 @prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
 
-# dragon gets a wx-buddy:BuddySocket token from donkey
+# the bearer of shrek's ownerToken (hopefully, that's Shrek!) can see the time/date info
 
-dragon:expectedResult3
+shrek:expectedResult2
     a                       auth:ExpectedAclEvalResult ;
     auth:decision           auth:accessGranted ;
-    auth:requestedOperation dragon:request3 ;
-    auth:issueToken         [ auth:tokenScope   wx-buddy:BuddySocket ;
-                              auth:tokenIss     ex:donkey ;
-                              auth:tokenSub     ex:dragon ;
-                              auth:expiresAfter "3600"^^xsd:int ] .
+    auth:requestedOperation shrek:request2 ;
+    auth:provideAuthInfo    [ auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
+                                                           auth:connection [ auth:targetAtom      [ ] ;
+                                                                             auth:connectionState won:Connected,
+                                                                                                  won:RequestSent ] ] ] ] .
 
-dragon:request3
+shrek:request2
     a                 auth:OperationRequest ;
-    auth:operation    [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
-    auth:requestor    ex:dragon ;
-    auth:reqAtom      ex:donkey ;
-    auth:reqPosition  auth:positionRoot ;
+    auth:operation    auth:opRead ;
+    auth:bearsToken   shrek:shreksOwnerToken ;
+    auth:reqAtom      ex:party ;
+    auth:reqPosition  auth:positionAtomGraph ;
+    auth:reqGraph     party:timeDateAndLocation ;
     auth:reqAtomState won:Active .
+
+shrek:shreksOwnerToken
+    a               auth:AuthToken ;
+    auth:tokenScope auth:ownerToken ;
+    auth:tokenIss   ex:shrek ;
+    auth:tokenSub   ex:shrek ;
+    auth:tokenIat   "2020-12-03T17:00:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T18:00:00"^^xsd:dateTime .

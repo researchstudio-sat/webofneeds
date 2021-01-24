@@ -419,6 +419,9 @@ public class WonAclEvaluatorTest {
         if (!tokenSpec.getTokenSub().equals(actualToken.getTokenSub())) {
             return false;
         }
+        if (tokenSpec.getTokenSig() != null && !tokenSpec.getTokenSig().equals(actualToken.getTokenSig())) {
+            return false;
+        }
         if (tokenSpec.getTokenScopeString() != null) {
             if (!tokenSpec.getTokenScopeString()
                             .equals(actualToken.getTokenScopeString())) {

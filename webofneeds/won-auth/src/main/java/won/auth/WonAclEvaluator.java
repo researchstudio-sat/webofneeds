@@ -25,10 +25,13 @@ import static won.auth.model.RelativeAtomExpression.SELF;
 public class WonAclEvaluator {
     public static final long DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS = 3600;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final URI OWNER_TOKEN_SCOPE = URI.create("https://w3id.org/won/auth#ownerToken");
     private final Set<Authorization> authorizations;
     private final TargetAtomCheckEvaluator targetAtomCheckEvaluator;
     private final AtomNodeChecker atomNodeChecker;
     private final WebIdKeyLoader webIdKeyLoader;
+    private final Authorization implicitOwnerTokenAuthorization = createImplicitOwnerTokenAuthorization();
+    private final Authorization implicitGrantOwnerTokenAuthorization = createImplicitGrantOwnerTokenAuthorization();
 
     public WonAclEvaluator(Set<Authorization> authorizations,
                     TargetAtomCheckEvaluator targetAtomCheckEvaluator,
@@ -130,15 +133,64 @@ public class WonAclEvaluator {
         }
     }
 
-    public AclEvalResult decide(OperationRequest request) {
+    /**
+     * Create an Authorization that must be signed by the atom's node on behalf of
+     * the owner and grants any operation. The node will only issue such a token to
+     * the authenticated owner.
+     *
+     * @return
+     */
+    private static Authorization createImplicitOwnerTokenAuthorization() {
+        Authorization auth = new Authorization();
+        AseRoot grants = new AseRoot();
+        grants.addOperationsSimpleOperationExpression(Individuals.ANY_OPERATION);
+        auth.addGrant(grants);
+        TokenShape token = new TokenShape();
+        AtomExpression atomExpression = new AtomExpression();
+        atomExpression.addAtomsRelativeAtomExpression(SELF);
+        token.addIssuersAtomExpression(atomExpression);
+        token.addTokenScopesURI(OWNER_TOKEN_SCOPE);
+        token.setNodeSigned(true);
+        auth.addBearer(token);
+        return auth;
+    }
+
+    /**
+     * Create an Authorization that grants the owner of the atom an 'owner token',
+     * (see <a href=
+     * "#createImplicitOwnerTokenAuthorization"><code>createImplicitOwnerTokenAuthorization</code></a>).
+     *
+     * @return
+     */
+    private static Authorization createImplicitGrantOwnerTokenAuthorization() {
+        Authorization auth = new Authorization();
+        AseRoot grants = new AseRoot();
+        TokenSpecification ts = new TokenSpecification();
+        ts.setTokenScopeURI(OWNER_TOKEN_SCOPE);
+        ts.setNodeSigned(true);
+        TokenOperationExpression toe = new TokenOperationExpression();
+        toe.setRequestToken(ts);
+        grants.addOperationsTokenOperationExpression(toe);
+        auth.addGrant(grants);
+        AtomExpression ae = new AtomExpression();
+        ae.addAtomsRelativeAtomExpression(SELF);
+        auth.addGranteesAtomExpression(ae);
+        return auth;
+    }
+
+    private AclEvalResult decide(OperationRequest request) {
         return this.decide(this.authorizations, request);
     }
 
     public AclEvalResult decide(Set<Authorization> authorizations, OperationRequest request) {
         Set<Authorization> requestorIsGranteeOf = new HashSet<>();
-        boolean grantAuthInfo = canProvideAuthInfo(authorizations, request,
+        Set<Authorization> explicitAndImplicitAuthorizations = new HashSet<>();
+        explicitAndImplicitAuthorizations.addAll(authorizations);
+        explicitAndImplicitAuthorizations.add(this.implicitOwnerTokenAuthorization);
+        explicitAndImplicitAuthorizations.add(this.implicitGrantOwnerTokenAuthorization);
+        boolean grantAuthInfo = canProvideAuthInfo(explicitAndImplicitAuthorizations, request,
                         requestorIsGranteeOf);
-        Optional<AclEvalResult> result = authorizations.stream()
+        Optional<AclEvalResult> result = explicitAndImplicitAuthorizations.stream()
                         .map(auth -> decide(auth, request, grantAuthInfo, requestorIsGranteeOf))
                         .reduce((left, right) -> mergeAclEvalResults(left, right));
         return result.orElse(accessControlDecision(false, request));
@@ -151,7 +203,7 @@ public class WonAclEvaluator {
         return result;
     }
 
-    public boolean provideAuthInfo(Set<Authorization> authorizations,
+    private boolean provideAuthInfo(Set<Authorization> authorizations,
                     OperationRequest request) {
         return canProvideAuthInfo(authorizations, request, Collections.emptySet());
     }
@@ -178,7 +230,7 @@ public class WonAclEvaluator {
                         });
     }
 
-    public AclEvalResult decide(Authorization authorization, OperationRequest request,
+    private AclEvalResult decide(Authorization authorization, OperationRequest request,
                     boolean provideAuthInfo) {
         return decide(authorization, request, provideAuthInfo, Collections.emptySet());
     }
@@ -197,6 +249,7 @@ public class WonAclEvaluator {
             // requestor is grantee, we have established that earlier
             decisionSoFar = true;
         } else {
+            Set<TokenShape> acceptableTokens = new HashSet<>(); // we will collect acceptable tokens
             if (isRequestorAGrantee(authorization, request)) {
                 debug("requestor {} is grantee", authorization, request, request.getRequestor());
                 decisionSoFar = true;
@@ -283,6 +336,8 @@ public class WonAclEvaluator {
                 cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterLong().intValue());
             } else if (tokenSpec.getExpiresAfterInteger() != null) {
                 cal.add(Calendar.SECOND, tokenSpec.getExpiresAfterInteger());
+            } else {
+                cal.add(Calendar.SECOND, (int) DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS);
             }
             XSDDateTime exp = new XSDDateTime(cal);
             token.setTokenExp(exp);
