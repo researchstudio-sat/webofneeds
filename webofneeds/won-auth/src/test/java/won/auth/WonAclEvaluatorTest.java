@@ -33,7 +33,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -253,7 +252,7 @@ public class WonAclEvaluatorTest {
                 String message = makeWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
                 AclEvalResult decision = null;
                 long start = System.currentTimeMillis();
-                decision = loadedEvaluator.create().decide(Collections.singleton(auth), opReq);
+                decision = loadedEvaluator.create().decide(opReq);
                 logDuration("making authorization decision", start);
                 Assert.assertEquals(message, expected, decision.getDecision());
             }
@@ -270,7 +269,7 @@ public class WonAclEvaluatorTest {
             cal.add(Calendar.MINUTE, 30);
             opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
             long start = System.currentTimeMillis();
-            AclEvalResult actualResult = loadedEvaluator.create().decide(loadedEvaluator.getAuthorizations(), opReq);
+            AclEvalResult actualResult = loadedEvaluator.create().decide(opReq);
             logDuration("making authorization decision", start);
             logger.debug("checking OpRequest {} against Authorizations ", opReq.getNode());
             DecisionValue expected = spec.getDecision();

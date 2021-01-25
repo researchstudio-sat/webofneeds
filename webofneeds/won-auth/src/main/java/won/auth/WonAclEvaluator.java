@@ -178,11 +178,11 @@ public class WonAclEvaluator {
         return auth;
     }
 
-    private AclEvalResult decide(OperationRequest request) {
+    public AclEvalResult decide(OperationRequest request) {
         return this.decide(this.authorizations, request);
     }
 
-    public AclEvalResult decide(Set<Authorization> authorizations, OperationRequest request) {
+    private AclEvalResult decide(Set<Authorization> authorizations, OperationRequest request) {
         Set<Authorization> requestorIsGranteeOf = new HashSet<>();
         Set<Authorization> explicitAndImplicitAuthorizations = new HashSet<>();
         explicitAndImplicitAuthorizations.addAll(authorizations);
