@@ -1,6 +1,6 @@
 # before docker build can be executed, the war file, the tomcat libs folder
 # and the conf directory have to be copied into this folder (done by maven build)
-FROM tomcat:9.0.41-jdk11
+FROM tomcat:9.0.41-jdk11-openjdk
 RUN apt-get update && apt-get install -y \
     vim \
     less \
