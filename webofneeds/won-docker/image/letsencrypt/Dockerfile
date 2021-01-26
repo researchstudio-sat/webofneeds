@@ -1,5 +1,4 @@
-# fix java version here until the following issue is resolved: https://github.com/researchstudio-sat/webofneeds/issues/1229
-FROM openjdk:8u121-jdk
+FROM openjdk:11-jdk
 
 # install certbot
 # next 3 and a half lines as per https://unix.stackexchange.com/questions/508724/failed-to-fetch-jessie-backports-repository (second answer)
