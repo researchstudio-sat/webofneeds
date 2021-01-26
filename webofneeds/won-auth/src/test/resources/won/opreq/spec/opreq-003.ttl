@@ -1,0 +1,116 @@
+@base            <https://example.com/test/atom1> .
+@prefix ex:      <https://example.com/test/> .
+@prefix auth:    <https://w3id.org/won/auth#> .
+@prefix won:     <https://w3id.org/won/core#> .
+@prefix chat:    <https://w3id.org/won/ext/chat#> .
+@prefix wx-hold: <https://w3id.org/won/ext/hold#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix atom1:   <http://example.org/test/atom1#> .
+@prefix atom2:   <http://example.org/test/atom2#> .
+@prefix msg:     <https://w3id.org/won/message#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg:    <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+ex:expectedResult
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request> .
+
+ex:expectedResult2
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request2> .
+
+ex:expectedResult3
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request3> .
+
+ex:expectedResult4
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation <#request4> .
+
+<#authorization>
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType chat:ChatSocket ;
+                                 auth:connection [ auth:targetAtom      [ ] ;
+                                                   auth:connectionState won:Connected ] ] ] ;
+    auth:grant   [ auth:graph  [ auth:operation auth:opRead ] ;
+                   auth:socket [ auth:socketType         chat:ChatSocket ;
+                                 auth:operation          auth:opRead, auth:opConnectClose, auth:opCommunicate ;
+                                 auth:connectionMessages [ auth:inherit false ] ] ] .
+
+<#request>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionAtomGraph ;
+    auth:reqGraph    atom1:acl .
+
+<#request2>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionAtomGraph ;
+    auth:reqGraph    atom1:sysinfo .
+
+<#request3>
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqPosition   auth:positionConnections ;
+    auth:reqSocket     atom1:chatSocket ;
+    auth:reqSocketType chat:ChatSocket .
+
+<#request4>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionAtomMessages .
+
+ex:atom1
+    a                    won:Atom ;
+    won:socket           atom1:chatSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
+
+atom1:chatSocket
+    a                    won:Socket ;
+    won:socketDefinition chat:ChatSocket ;
+    won:connections      atom1:chatSocketConnections .
+
+atom1:chatSocketConnections
+    rdfs:member atom1:bsConn1 .
+
+atom1:bsConn1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom2 ;
+    won:connectionState won:Connected .
+
+ex:atom2
+    a                    won:Atom ;
+    won:socket           atom2:chatSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom2:msg ;
+    won:wonNode          ex:node .
+
+atom2:chatSocket
+    a                    won:Socket ;
+    won:socketDefinition chat:ChatSocket ;
+    won:connections      atom2:chatSocketConnections .
+
+atom2:chatSocketConnections
+    rdfs:member atom2:bsConn2 .
+
+atom2:bsConn2
+    a                   won:Connection ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .

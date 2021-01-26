@@ -17,6 +17,17 @@ import static won.auth.model.MessageWildcard.ANY_MESSAGE_TYPE;
 class OperationRequestChecker extends DefaultTreeExpressionVisitor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Deque<Set<OperationExpression>> grantedOperations = new ArrayDeque<>();
+    // if the requested position is lower than the end of its branch in the ASE
+    // tree,
+    // the decision is made at that point.
+    private DecisionAtHigherLevel decisionAtHigherLevel = new DecisionAtHigherLevel();
+    private OperationRequest operationRequest;
+    private Boolean finalDecision = null;
+    private Set<OperationExpression> NOTHING_GRANTED = Collections.unmodifiableSet(new HashSet<>());
+
+    public OperationRequestChecker(OperationRequest operationRequest) {
+        this.operationRequest = operationRequest;
+    }
 
     private static boolean isLowerThan(AsePosition lower, AsePosition higher) {
         return lowerBy(lower, higher, new HashSet()) > -1;
@@ -45,46 +56,27 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         return -1;
     }
 
-    private class DecisionAtHigherLevel {
-        private Boolean decision = null;
-        private AsePosition position = null;
+    private static Set<MessageType> collectMessageTypes(Set<MessageTypeSpecification> msgTypeSpecs) {
+        return msgTypeSpecs.stream()
+                        .flatMap(s -> s.when(new MessageTypeSpecification.Cases<Stream<MessageType>>() {
+                            @Override
+                            public Stream<MessageType> is(MessageWildcard option) {
+                                return new HashSet<MessageType>().stream();
+                            }
 
-        public DecisionAtHigherLevel() {
-        }
+                            @Override
+                            public Stream<MessageType> is(MessageTypesExpression option) {
+                                return option.getMembers().stream();
+                            }
 
-        public void updateIfLower(AsePosition position, boolean decision) {
-            if (this.position == null) {
-                this.position = position;
-                this.decision = decision;
-            } else if (isLowerThan(position, this.position)) {
-                this.position = position;
-                this.decision = decision;
-            }
-        }
-
-        public Boolean getDecision() {
-            return decision;
-        }
-
-        public AsePosition getPosition() {
-            return position;
-        }
-
-        public boolean hasDecision() {
-            return decision != null && position != null;
-        }
-    }
-
-    // if the requested position is lower than the end of its branch in the ASE
-    // tree,
-    // the decision is made at that point.
-    private DecisionAtHigherLevel decisionAtHigherLevel = new DecisionAtHigherLevel();
-    private OperationRequest operationRequest;
-    private Boolean finalDecision = null;
-    private Set<OperationExpression> NOTHING_GRANTED = Collections.unmodifiableSet(new HashSet<>());
-
-    public OperationRequestChecker(OperationRequest operationRequest) {
-        this.operationRequest = operationRequest;
+                            @Override
+                            public Stream<MessageType> is(MessageType option) {
+                                Set<MessageType> ret = new HashSet<>();
+                                ret.add(option);
+                                return ret.stream();
+                            }
+                        }))
+                        .collect(Collectors.toSet());
     }
 
     public Boolean getFinalDecision() {
@@ -180,8 +172,17 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         // and if so, decide.
         AsePosition childPosition = ((TreeExpression) child).getAsePosition();
         AsePosition candidate = childPosition.getParentPosition();
-        while (!candidate.equals(((TreeExpression) parent).getAsePosition()) && !isFinalDecisionMade()) {
+        int iterations = 0;
+        while (candidate != null && !candidate.equals(((TreeExpression) parent).getAsePosition())
+                        && !isFinalDecisionMade()) {
             decideForPosition(candidate);
+            candidate = candidate.getParentPosition();
+            iterations++;
+            if (iterations > 10) {
+                throw new IllegalStateException(
+                                String.format("Infinite loop detected while trying to interpolate between parent %s and child %s",
+                                                parent, child));
+            }
         }
     }
 
@@ -438,26 +439,33 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         }
     }
 
-    private static Set<MessageType> collectMessageTypes(Set<MessageTypeSpecification> msgTypeSpecs) {
-        return msgTypeSpecs.stream()
-                        .flatMap(s -> s.when(new MessageTypeSpecification.Cases<Stream<MessageType>>() {
-                            @Override
-                            public Stream<MessageType> is(MessageWildcard option) {
-                                return new HashSet<MessageType>().stream();
-                            }
+    private class DecisionAtHigherLevel {
+        private Boolean decision = null;
+        private AsePosition position = null;
 
-                            @Override
-                            public Stream<MessageType> is(MessageTypesExpression option) {
-                                return option.getMembers().stream();
-                            }
+        public DecisionAtHigherLevel() {
+        }
 
-                            @Override
-                            public Stream<MessageType> is(MessageType option) {
-                                Set<MessageType> ret = new HashSet<>();
-                                ret.add(option);
-                                return ret.stream();
-                            }
-                        }))
-                        .collect(Collectors.toSet());
+        public void updateIfLower(AsePosition position, boolean decision) {
+            if (this.position == null) {
+                this.position = position;
+                this.decision = decision;
+            } else if (isLowerThan(position, this.position)) {
+                this.position = position;
+                this.decision = decision;
+            }
+        }
+
+        public Boolean getDecision() {
+            return decision;
+        }
+
+        public AsePosition getPosition() {
+            return position;
+        }
+
+        public boolean hasDecision() {
+            return decision != null && position != null;
+        }
     }
 }

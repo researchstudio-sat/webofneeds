@@ -216,7 +216,7 @@ public class WonAclEvaluatorTest {
         withDurationLog("instantiating test atom entities (atomNodeChecker)",
                         () -> atomNodeChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
-                        () -> evaluatorFactory.load(graph));
+                        () -> evaluatorFactory.load(new Union(graph, shapes.getGraph())));
         withDurationLog("making auth decision",
                         () -> checkSpecifiedAuthDecision(evaluatorFactory, resource.getFilename()));
     }

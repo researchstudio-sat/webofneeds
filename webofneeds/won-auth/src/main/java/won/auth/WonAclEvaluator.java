@@ -64,6 +64,9 @@ public class WonAclEvaluator {
     }
 
     public static AuthInfo merge(AuthInfo left, AuthInfo right) {
+        if (left == null && right == null) {
+            return null;
+        }
         AuthInfo merged = new AuthInfo();
         copyAuthInfo(left, merged);
         copyAuthInfo(right, merged);
