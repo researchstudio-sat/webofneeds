@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -79,14 +81,7 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreA
                                                 + "'client.authentication.behind.proxy' is set to true, this header must be "
                                                 + "set by the reverse proxy!");
             }
-            // the load balancer (e.g. nginx) forwards the certificate into a header by
-            // replacing new lines with whitespaces
-            // (2 or more for nginx, 1 for apache 2.4 - for the latter case we have to add
-            // the lookbehind pattern). Also replace tabs, which sometimes nginx may send
-            // instead of whitespace
-            String certificateContent = certificateHeader
-                            .replaceAll("(?<!-----BEGIN|-----END)\\s+", System.lineSeparator())
-                            .replaceAll("\\t+", System.lineSeparator());
+            String certificateContent = URLDecoder.decode(certificateHeader, StandardCharsets.UTF_8);
             if (logger.isDebugEnabled()) {
                 logger.debug("found this certificate in the " + WON.CLIENT_CERTIFICATE_HEADER + " header: "
                                 + certificateHeader);
