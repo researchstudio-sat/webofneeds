@@ -41,7 +41,7 @@ services:
       - "CERTIFICATE_PASSWORD=$won_certificate_passwd"
       - "ACTIVEMQ_BROKER_PORT=61616"
       - "JMEM_OPTS=-XX:+HeapDumpOnOutOfMemoryError"
-      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=wonnode:62916,server=y,suspend=n
+      - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62916,server=y,suspend=n
         -Dcom.sun.management.jmxremote.port=9016 -Dcom.sun.management.jmxremote.authenticate=false
         -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.rmi.port=9016
         -Djava.rmi.server.hostname=satvm05.researchstudio.at"
