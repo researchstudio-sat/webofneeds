@@ -142,7 +142,7 @@ services:
       - "URI_HOST=satvm05.researchstudio.at"
       - "HTTP_PORT=8889"
       - "URI_PREFIX=https://satvm05.researchstudio.at/won"
-      - "CLIENT_AUTHENTICATION_BEHIND_PROXY=false"
+      - "CLIENT_AUTHENTICATION_BEHIND_PROXY=true"
       - "DB_SQL_JDBCDRIVERCLASS=org.postgresql.Driver"
       - "DB_SQL_JDBCURL=jdbc:postgresql://satvm05.researchstudio.at:5433/won_node"
       - "DB_DDL_STRATEGY=validate"
