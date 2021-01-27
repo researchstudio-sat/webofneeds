@@ -44,6 +44,7 @@ vocab.WON.RequestSent = vocab.WON.baseUri + "RequestSent";
 vocab.WON.RequestSentCompacted = vocab.WON.baseUri + ":RequestSent";
 
 vocab.WON.Connected = vocab.WON.baseUri + "Connected";
+vocab.WON.ConnectedCompacted = vocab.WON.prefix + ":Connected";
 
 //TOAST TYPES
 vocab.WON.infoToast = vocab.WON.baseUri + "InfoToast";
@@ -360,6 +361,48 @@ vocab.WXSCHEMA.ReviewInverseSocket =
   vocab.WXSCHEMA.baseUri + "ReviewInverseSocket";
 vocab.WXSCHEMA.ReviewInverseSocketCompacted =
   vocab.WXSCHEMA.prefix + ":ReviewInverseSocket";
+
+vocab.AUTH = {};
+vocab.AUTH.baseUri = "https://w3id.org/won/auth#";
+vocab.AUTH.prefix = "auth";
+vocab.AUTH.acl = vocab.AUTH.baseUri + "acl";
+vocab.AUTH.aclCompacted = vocab.AUTH.prefix + ":acl";
+vocab.AUTH.Authorization = vocab.AUTH.baseUri + "Authorization";
+vocab.AUTH.AuthorizationCompacted = vocab.AUTH.prefix + ":Authorization";
+vocab.AUTH.grantee = vocab.AUTH.baseUri + "grantee";
+vocab.AUTH.granteeCompacted = vocab.AUTH.prefix + ":grantee";
+vocab.AUTH.grant = vocab.AUTH.baseUri + "grant";
+vocab.AUTH.grantCompacted = vocab.AUTH.prefix + ":grant";
+vocab.AUTH.socket = vocab.AUTH.baseUri + "socket";
+vocab.AUTH.socketCompacted = vocab.AUTH.prefix + ":socket";
+vocab.AUTH.socketType = vocab.AUTH.baseUri + "socketType";
+vocab.AUTH.socketTypeCompacted = vocab.AUTH.prefix + ":socketType";
+vocab.AUTH.connection = vocab.AUTH.baseUri + "connection";
+vocab.AUTH.connectionCompacted = vocab.AUTH.prefix + ":connection";
+vocab.AUTH.connectionState = vocab.AUTH.baseUri + "connectionState";
+vocab.AUTH.connectionStateCompacted = vocab.AUTH.prefix + ":connectionState";
+vocab.AUTH.targetAto = vocab.AUTH.baseUri + "targetAtom";
+vocab.AUTH.targetAtomCompacted = vocab.AUTH.prefix + ":targetAtom";
+vocab.AUTH.graph = vocab.AUTH.baseUri + "graph";
+vocab.AUTH.graphCompacted = vocab.AUTH.prefix + ":graph";
+vocab.AUTH.operation = vocab.AUTH.baseUri + "operation";
+vocab.AUTH.operationCompacted = vocab.AUTH.prefix + ":operation";
+vocab.AUTH.atom = vocab.AUTH.baseUri + "atom";
+vocab.AUTH.atomCompacted = vocab.AUTH.prefix + ":atom";
+vocab.AUTH.opRead = vocab.AUTH.baseUri + "opRead";
+vocab.AUTH.opReadCompacted = vocab.AUTH.prefix + ":opRead";
+vocab.AUTH.opConnectClose = vocab.AUTH.baseUri + "opConnectClose";
+vocab.AUTH.opConnectCloseCompacted = vocab.AUTH.prefix + ":opConnectClose";
+vocab.AUTH.opCommunicate = vocab.AUTH.baseUri + "opCommunicate";
+vocab.AUTH.opCommunicateCompacted = vocab.AUTH.prefix + ":opCommunicate";
+vocab.AUTH.connectionMessages = vocab.AUTH.baseUri + "connectionMessages";
+vocab.AUTH.connectionMessagesCompacted =
+  vocab.AUTH.prefix + ":connectionMessages";
+vocab.AUTH.inherit = vocab.AUTH.baseUri + "inherit";
+vocab.AUTH.inheritCompacted = vocab.AUTH.prefix + ":inherit";
+vocab.AUTH.atomExpressionShape = vocab.AUTH.baseUri + "atomExpressionShape";
+vocab.AUTH.atomExpressionShapeCompacted =
+  vocab.AUTH.prefix + ":atomExpressionShape";
 
 vocab.VALUEFLOWS = {};
 vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";

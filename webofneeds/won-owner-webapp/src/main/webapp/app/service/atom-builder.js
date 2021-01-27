@@ -196,6 +196,7 @@ import { Generator } from "sparqljs";
     if (args.content) {
       contentGraph = addContent(contentGraph, args.content);
     }
+
     const graph = [contentGraph, seeksContentNode];
 
     return {

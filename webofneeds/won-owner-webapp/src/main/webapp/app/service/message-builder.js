@@ -96,9 +96,24 @@ import vocab from "./vocab.js";
       "@graph": envelopeGraph.concat(attachmentBlankNodes),
     });
 
-    /*
-         //TODO in atom: links to both unsigned (plain pngs) and signed (in rdf) attachments
-         */
+    /**
+     * ACL
+     */
+    if (args.acl) {
+      const aclGraphId = args.msgUri + "#acl";
+      const aclGraph = [
+        {
+          "@id": aclGraphId,
+          ...args.acl,
+        },
+      ];
+      msgGraph.push({
+        "@id": aclGraphId,
+        "@graph": aclGraph,
+      });
+    }
+
+    //TODO in atom: links to both unsigned (plain pngs) and signed (in rdf) attachments
 
     return {
       "@graph": msgGraph,
