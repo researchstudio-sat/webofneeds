@@ -1,16 +1,19 @@
 package won.shacl2java.instantiation;
 
-import java.util.Objects;
-import java.util.Set;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.compose.Union;
 import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 
+import java.util.Objects;
+import java.util.Set;
+
 public class DerivedInstantiationContext extends InstantiationContext {
     private InstantiationContext parentContext;
+    private Graph dataUnion;
 
     public DerivedInstantiationContext(Graph data, InstantiationContext parentContext) {
         super();
@@ -115,5 +118,13 @@ public class DerivedInstantiationContext extends InstantiationContext {
     @Override
     public ValidationContext newValidationContext() {
         return ValidationContext.create(parentContext.shapes, this.data);
+    }
+
+    @Override
+    public Graph getData() {
+        if (dataUnion == null) {
+            dataUnion = new Union(parentContext.getData(), this.data);
+        }
+        return dataUnion;
     }
 }

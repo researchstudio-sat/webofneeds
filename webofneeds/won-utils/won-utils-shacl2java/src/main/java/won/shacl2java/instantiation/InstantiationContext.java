@@ -1,12 +1,5 @@
 package won.shacl2java.instantiation;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -16,17 +9,21 @@ import org.apache.jena.shacl.parser.PropertyShape;
 import org.apache.jena.shacl.parser.Shape;
 import won.shacl2java.util.ShapeUtils;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import static won.shacl2java.util.CollectionUtils.addToMultivalueConcurrentHashMap;
 
 public class InstantiationContext {
+    protected Graph data;
+    protected Shapes shapes;
     private ConcurrentHashMap<String, Set<Class<?>>> shapeClasses = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Object, Class<?>> instanceToClass = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Object, Node> instanceToFocusNode = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Node, Set<Shape>> focusNodeToShapes = new ConcurrentHashMap<>();
     private ConcurrentHashMap<Node, Set<Object>> focusNodeToInstance = new ConcurrentHashMap<>();
     private ConcurrentHashMap<PropertyShape, Set<Node>> propertyShapeToNodeShape = new ConcurrentHashMap<>();
-    protected Graph data;
-    protected Shapes shapes;
 
     protected InstantiationContext() {
         this.data = null;
@@ -42,7 +39,7 @@ public class InstantiationContext {
         return focusNodeToInstance.size();
     }
 
-    public <T> Set<T> getInstanceOfType(Class<T> type) {
+    public <T> Set<T> getInstancesOfType(Class<T> type) {
         return this.focusNodeToInstance.values().stream()
                         .flatMap(Collection::stream)
                         .filter(v -> type.isAssignableFrom(v.getClass()))
@@ -56,8 +53,9 @@ public class InstantiationContext {
 
     public <T> Optional<T> getInstanceOfType(String uri, Class<T> type) {
         Set<Object> instances = getInstances(uri);
-        if (instances == null)
+        if (instances == null) {
             return Optional.empty();
+        }
         return instances.stream()
                         .filter(v -> v.getClass().isAssignableFrom(type))
                         .map(v -> type.cast(v))
@@ -190,7 +188,7 @@ public class InstantiationContext {
 
     public Graph getData() {
         return data;
-    };
+    }
 
     public Set<Node> getNodeShapesForPropertyShape(PropertyShape propertyShape) {
         return propertyShapeToNodeShape.computeIfAbsent(propertyShape,
