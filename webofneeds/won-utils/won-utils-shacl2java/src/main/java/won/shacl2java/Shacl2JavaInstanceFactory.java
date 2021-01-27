@@ -158,8 +158,10 @@ public class Shacl2JavaInstanceFactory {
 
     public Map<String, Set<Object>> getInstanceMap(boolean includeBaseContext) {
         Map<String, Set<Object>> result = new HashMap<>();
-        result.putAll(baseInstantiationContext.getInstanceMap());
-        if (dataInstantiationContext == null) {
+        if (includeBaseContext) {
+            result.putAll(baseInstantiationContext.getInstanceMap());
+        }
+        if (dataInstantiationContext != null) {
             result.putAll(dataInstantiationContext.getInstanceMap());
         }
         return result;
@@ -171,7 +173,9 @@ public class Shacl2JavaInstanceFactory {
 
     public Collection<Object> getInstances(boolean includeBaseContext) {
         Set<Object> result = new HashSet<>();
-        result.addAll(baseInstantiationContext.getInstances());
+        if (includeBaseContext) {
+            result.addAll(baseInstantiationContext.getInstances());
+        }
         if (dataInstantiationContext == null) {
             result.addAll(dataInstantiationContext.getInstances());
         }
