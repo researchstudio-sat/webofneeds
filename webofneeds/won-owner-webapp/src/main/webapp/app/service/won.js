@@ -247,6 +247,7 @@ won.minimalContext = {
   [vocab.WORKFLOW.prefix]: vocab.WORKFLOW.baseUri,
   [vocab.VALUEFLOWS.prefix]: vocab.VALUEFLOWS.baseUri,
   [vocab.WXVALUEFLOWS.prefix]: vocab.WXVALUEFLOWS.baseUri,
+  [vocab.AUTH.prefix]: vocab.AUTH.baseUri,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   gr: "http://purl.org/goodrelations/v1#",
   rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
