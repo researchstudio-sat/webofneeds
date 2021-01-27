@@ -25,13 +25,10 @@ import static won.auth.model.RelativeAtomExpression.SELF;
 public class WonAclEvaluator {
     public static final long DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS = 3600;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static final URI OWNER_TOKEN_SCOPE = URI.create("https://w3id.org/won/auth#ownerToken");
     private final Set<Authorization> authorizations;
     private final TargetAtomCheckEvaluator targetAtomCheckEvaluator;
     private final AtomNodeChecker atomNodeChecker;
     private final WebIdKeyLoader webIdKeyLoader;
-    private final Authorization implicitOwnerTokenAuthorization = createImplicitOwnerTokenAuthorization();
-    private final Authorization implicitGrantOwnerTokenAuthorization = createImplicitGrantOwnerTokenAuthorization();
 
     public WonAclEvaluator(Set<Authorization> authorizations,
                     TargetAtomCheckEvaluator targetAtomCheckEvaluator,
@@ -110,7 +107,7 @@ public class WonAclEvaluator {
     }
 
     private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
-        if (request.getReqAtom().equals(request.getRequestor())) {
+        if (request.getReqAtom() != null && request.getReqAtom().equals(request.getRequestor())) {
             // requestor is owner - allow anything
             return true;
         }
@@ -136,64 +133,15 @@ public class WonAclEvaluator {
         }
     }
 
-    /**
-     * Create an Authorization that must be signed by the atom's node on behalf of
-     * the owner and grants any operation. The node will only issue such a token to
-     * the authenticated owner.
-     *
-     * @return
-     */
-    private static Authorization createImplicitOwnerTokenAuthorization() {
-        Authorization auth = new Authorization();
-        AseRoot grants = new AseRoot();
-        grants.addOperationsSimpleOperationExpression(Individuals.ANY_OPERATION);
-        auth.addGrant(grants);
-        TokenShape token = new TokenShape();
-        AtomExpression atomExpression = new AtomExpression();
-        atomExpression.addAtomsRelativeAtomExpression(SELF);
-        token.addIssuersAtomExpression(atomExpression);
-        token.addTokenScopesURI(OWNER_TOKEN_SCOPE);
-        token.setNodeSigned(true);
-        auth.addBearer(token);
-        return auth;
-    }
-
-    /**
-     * Create an Authorization that grants the owner of the atom an 'owner token',
-     * (see <a href=
-     * "#createImplicitOwnerTokenAuthorization"><code>createImplicitOwnerTokenAuthorization</code></a>).
-     *
-     * @return
-     */
-    private static Authorization createImplicitGrantOwnerTokenAuthorization() {
-        Authorization auth = new Authorization();
-        AseRoot grants = new AseRoot();
-        TokenSpecification ts = new TokenSpecification();
-        ts.setTokenScopeURI(OWNER_TOKEN_SCOPE);
-        ts.setNodeSigned(true);
-        TokenOperationExpression toe = new TokenOperationExpression();
-        toe.setRequestToken(ts);
-        grants.addOperationsTokenOperationExpression(toe);
-        auth.addGrant(grants);
-        AtomExpression ae = new AtomExpression();
-        ae.addAtomsRelativeAtomExpression(SELF);
-        auth.addGranteesAtomExpression(ae);
-        return auth;
-    }
-
     public AclEvalResult decide(OperationRequest request) {
         return this.decide(this.authorizations, request);
     }
 
     private AclEvalResult decide(Set<Authorization> authorizations, OperationRequest request) {
         Set<Authorization> requestorIsGranteeOf = new HashSet<>();
-        Set<Authorization> explicitAndImplicitAuthorizations = new HashSet<>();
-        explicitAndImplicitAuthorizations.addAll(authorizations);
-        explicitAndImplicitAuthorizations.add(this.implicitOwnerTokenAuthorization);
-        explicitAndImplicitAuthorizations.add(this.implicitGrantOwnerTokenAuthorization);
-        boolean grantAuthInfo = canProvideAuthInfo(explicitAndImplicitAuthorizations, request,
+        boolean grantAuthInfo = canProvideAuthInfo(authorizations, request,
                         requestorIsGranteeOf);
-        Optional<AclEvalResult> result = explicitAndImplicitAuthorizations.stream()
+        Optional<AclEvalResult> result = authorizations.stream()
                         .map(auth -> decide(auth, request, grantAuthInfo, requestorIsGranteeOf))
                         .reduce((left, right) -> mergeAclEvalResults(left, right));
         return result.orElse(accessControlDecision(false, request));
@@ -216,7 +164,7 @@ public class WonAclEvaluator {
         return authorizations.stream()
                         .filter(authorization -> authorization.getProvideAuthInfo() != null)
                         .filter(authorization -> isRequestorAGrantee(authorization, request)
-                                        || isRequestorBearerOfAcceptedToken(authorization, request))
+                                        || isBearerOfAcceptedToken(authorization, request))
                         .map(authorization -> {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("evaluating provideAuthInfo for {}", authorization);
@@ -242,7 +190,7 @@ public class WonAclEvaluator {
                     boolean provideAuthInfo, Set<Authorization> requestorIsGranteeOf) {
         // determine if the requestor is in the set of grantees
         boolean decisionSoFar = false;
-        if (request.getReqAtom().equals(request.getRequestor())) {
+        if (request.getReqAtom() != null && request.getReqAtom().equals(request.getRequestor())) {
             // owner of atom is requestor - allow anything
             decisionSoFar = true;
         } else if (ANYONE.equals(authorization.getGranteeGranteeWildcard())) {
@@ -258,7 +206,7 @@ public class WonAclEvaluator {
                 decisionSoFar = true;
             } else {
                 debug("requestor {} is not grantee", authorization, request, request.getRequestor());
-                if (isRequestorBearerOfAcceptedToken(authorization, request)) {
+                if (isBearerOfAcceptedToken(authorization, request)) {
                     debug("requestor {} has an accepted token", authorization, request, request.getRequestor());
                     decisionSoFar = true;
                 } else {
@@ -319,7 +267,10 @@ public class WonAclEvaluator {
             TokenSpecification tokenSpec = op.getRequestToken();
             AuthToken token = new AuthToken();
             token.setTokenIss(request.getReqAtom());
-            token.setTokenSub(request.getRequestor());
+            if (request.getRequestor() != null) {
+                // we may only have a token, and no requestor!
+                token.setTokenSub(request.getRequestor());
+            }
             if (tokenSpec.getNodeSigned() == null || tokenSpec.getNodeSigned()) {
                 Optional<URI> nodeUri = this.atomNodeChecker.getNodeOfAtom(request.getReqAtom());
                 if (!nodeUri.isPresent()) {
@@ -357,6 +308,9 @@ public class WonAclEvaluator {
 
     private boolean isRequestorAGrantee(Authorization authorization, OperationRequest request) {
         // fast check: check for direct referenct
+        if (request.getRequestor() == null) {
+            return false;
+        }
         if (ANYONE.equals(authorization.getGranteeGranteeWildcard())) {
             debug("anyone is a grantee", authorization, request);
             return true;
@@ -397,7 +351,7 @@ public class WonAclEvaluator {
         return false;
     }
 
-    private boolean isRequestorBearerOfAcceptedToken(Authorization authorization, OperationRequest request) {
+    private boolean isBearerOfAcceptedToken(Authorization authorization, OperationRequest request) {
         Set<AuthToken> decoded = new HashSet<>();
         decoded.addAll(request.getBearsTokens());
         Set<String> encodedTokens = request.getBearsEncodedTokens();

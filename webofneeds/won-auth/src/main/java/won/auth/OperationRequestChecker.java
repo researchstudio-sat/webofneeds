@@ -113,6 +113,7 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
     }
 
     private void decideForPosition(AsePosition decisionPosition) {
+        Objects.requireNonNull(decisionPosition);
         AsePosition requestedPos = operationRequest.getReqPosition();
         if (!isFinalDecisionMade()) {
             if (!isBranchMarkedNothingGranted()) {

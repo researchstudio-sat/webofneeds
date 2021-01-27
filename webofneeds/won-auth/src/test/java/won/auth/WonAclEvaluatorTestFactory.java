@@ -25,7 +25,7 @@ public class WonAclEvaluatorTestFactory extends WonAclEvaluatorFactory {
 
     public synchronized Set<Authorization> getAuthorizations() {
         checkLoaded();
-        return this.instanceFactory.getInstancesOfType(Authorization.class);
+        return this.instanceFactory.getInstancesOfType(Authorization.class, true);
     }
 
     public synchronized Set<OperationRequest> getOperationRequests() {
