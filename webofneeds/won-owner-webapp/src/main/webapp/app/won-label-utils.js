@@ -120,7 +120,7 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Actor",
     [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Connection",
     [vocab.WXSCHEMA.EventSocketCompacted]: "Organizer",
-    [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Add Organized Event",
+    [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Organized Event",
     [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: "Attendee",
     [vocab.WXSCHEMA.AttendeeSocketCompacted]: "Event",
   },
