@@ -27,6 +27,7 @@ import vocab from "./vocab.js";
     const attachmentGraphIds = attachments.map(function(a, i) {
       return args.msgUri + "#attachment-" + i;
     });
+
     const nonEnvelopeGraphIds = Array.prototype.concat(
       [atomGraphId],
       attachmentGraphIds
@@ -37,6 +38,24 @@ import vocab from "./vocab.js";
       "@id": atomGraphId,
       "@graph": contentRdf["@graph"],
     });
+
+    /**
+     * ACL
+     */
+    if (args.acl) {
+      const aclGraphId = args.msgUri + "#acl";
+      const aclGraph = [
+        {
+          "@id": aclGraphId,
+          ...args.acl,
+        },
+      ];
+      msgGraph.push({
+        "@id": aclGraphId,
+        "@graph": aclGraph,
+      });
+      nonEnvelopeGraphIds.push(aclGraphId);
+    }
 
     attachments.forEach(function(attachment, i) {
       msgGraph.push({
@@ -96,24 +115,7 @@ import vocab from "./vocab.js";
       "@graph": envelopeGraph.concat(attachmentBlankNodes),
     });
 
-    /**
-     * ACL
-     */
-    if (args.acl) {
-      const aclGraphId = args.msgUri + "#acl";
-      const aclGraph = [
-        {
-          "@id": aclGraphId,
-          ...args.acl,
-        },
-      ];
-      msgGraph.push({
-        "@id": aclGraphId,
-        "@graph": aclGraph,
-      });
-    }
-
-    //TODO in atom: links to both unsigned (plain pngs) and signed (in rdf) attachments
+    //TODO in atom: links to both unsigned (plain pngs) and signed (in rdf)  attachments
 
     return {
       "@graph": msgGraph,
