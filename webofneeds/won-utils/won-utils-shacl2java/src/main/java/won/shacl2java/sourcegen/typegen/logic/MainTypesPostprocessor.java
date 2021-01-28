@@ -2,10 +2,7 @@ package won.shacl2java.sourcegen.typegen.logic;
 
 import com.squareup.javapoet.*;
 import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Node_Blank;
-import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.*;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.engine.constraint.ClassConstraint;
@@ -34,6 +31,7 @@ import won.shacl2java.util.CollectionUtils;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
 
+import javax.lang.model.element.Modifier;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -42,8 +40,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.squareup.javapoet.TypeSpec.Kind.CLASS;
-import static javax.lang.model.element.Modifier.PRIVATE;
-import static javax.lang.model.element.Modifier.PUBLIC;
+import static javax.lang.model.element.Modifier.*;
 import static won.shacl2java.sourcegen.typegen.support.TypegenUtils.*;
 import static won.shacl2java.util.NameUtils.*;
 
@@ -254,7 +251,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                                             .stream()
                                             .map(shapes::getShape)
                                             .collect(Collectors.toSet()));
-            configureTypeWithNodeShapes(typeBuilder, relevantShapes, shapes, config);
+            configureTypeWithNodeShapes(typeBuilder, typeSpec.name, relevantShapes, shapes, config);
             ClassName typeClass = ClassName.get(config.getPackageName(), typeBuilder.build().name);
             addToStringAllFields(typeBuilder);
             addDeepEquals(typeBuilder, typeClass);
@@ -263,7 +260,8 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         return changes;
     }
 
-    private void configureTypeWithNodeShapes(TypeSpec.Builder typeBuilder, Set<Shape> relevantShapes,
+    private void configureTypeWithNodeShapes(TypeSpec.Builder typeBuilder, String name,
+                    Set<Shape> relevantShapes,
                     Shapes shapes,
                     Shacl2JavaConfig config) {
         // first,prepare a methodbuilder for the toRdf method
@@ -277,6 +275,11 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .beginControlFlow("if (getGraph() == null)")
                         .addStatement("additionalTriplesToRdf(tripleConsumer)");
         generateRequiredRdfTypeStatements(toRdfBuilder, relevantShapes);
+        // we want each type to have a .builder() method returning a builder for the
+        // type
+        TypeName typeName = ClassName.get(config.getPackageName(), name);
+        ClassName builderTypeName = ClassName.get(config.getPackageName(), name + ".Builder");
+        TypeSpec.Builder builderBuilder = generateBuilderBuilder(typeBuilder, typeName, builderTypeName);
         for (Shape relevantShape : relevantShapes) {
             Set<PropertyShape> propertyShapes = new HashSet();
             propertyShapes.addAll(relevantShape.getPropertyShapes());
@@ -308,7 +311,8 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 }
                 boolean addTypeSuffix = propertySpecs.size() > 1;
                 for (PropertySpec propertySpec : propertySpecs) {
-                    addFieldWithPropertySpec(shapes, propertyName.get(), path, propertySpec, typeBuilder, toRdfBuilder,
+                    addFieldWithPropertySpec(shapes, propertyName.get(), path, propertySpec, typeBuilder,
+                                    builderBuilder, builderTypeName, toRdfBuilder,
                                     fieldsPerPath,
                                     config,
                                     addTypeSuffix);
@@ -342,7 +346,80 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         toRdfBuilder.nextControlFlow("else")
                         .addStatement("super.toRdf(tripleConsumer)")
                         .endControlFlow();
+        typeBuilder.addType(builderBuilder.build());
         typeBuilder.addMethod(toRdfBuilder.build());
+    }
+
+    private TypeSpec.Builder generateBuilderBuilder(TypeSpec.Builder typeBuilder,
+                    TypeName typeName, ClassName builderTypeName) {
+        TypeSpec.Builder builderBuilder = TypeSpec.classBuilder("Builder")
+                        .addModifiers(PUBLIC, Modifier.STATIC)
+                        .addField(FieldSpec.builder(typeName, "product", PRIVATE)
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("build")
+                                        .addModifiers(PUBLIC)
+                                        .returns(typeName)
+                                        .addStatement("return this.product")
+                                        .build())
+                        .addMethod(
+                                        MethodSpec.constructorBuilder()
+                                                        .addModifiers(PRIVATE)
+                                                        .addParameter(typeName, "product")
+                                                        .addStatement("this.product = product")
+                                                        .build());
+        typeBuilder.addMethod(
+                        MethodSpec.methodBuilder("builder")
+                                        .addParameter(ClassName.get(Node.class), "node")
+                                        .addParameter(ClassName.get(Graph.class), "graph")
+                                        .addModifiers(PUBLIC)
+                                        .addModifiers(STATIC)
+                                        .addStatement("return new Builder(new $T(node,graph))", typeName)
+                                        .returns(builderTypeName)
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("builder")
+                                        .addParameter(ClassName.get(String.class), "uri")
+                                        .addParameter(ClassName.get(Graph.class), "graph")
+                                        .addModifiers(PUBLIC)
+                                        .addModifiers(STATIC)
+                                        .addStatement("return new Builder(new $T(uri,graph))", typeName)
+                                        .returns(builderTypeName)
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("builder")
+                                        .addParameter(ClassName.get(URI.class), "uri")
+                                        .addParameter(ClassName.get(Graph.class), "graph")
+                                        .addModifiers(PUBLIC)
+                                        .addModifiers(STATIC)
+                                        .addStatement("return new Builder(new $T(uri,graph))", typeName)
+                                        .returns(builderTypeName)
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("builder")
+                                        .addParameter(ClassName.get(Node.class), "node")
+                                        .addModifiers(PUBLIC)
+                                        .addModifiers(STATIC)
+                                        .addStatement("return new Builder(new $T(node))", typeName)
+                                        .returns(builderTypeName)
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("builder")
+                                        .addParameter(ClassName.get(String.class), "uri")
+                                        .addModifiers(PUBLIC)
+                                        .addModifiers(STATIC)
+                                        .addStatement("return new Builder(new $T(uri))", typeName)
+                                        .returns(builderTypeName)
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("builder")
+                                        .addParameter(ClassName.get(URI.class), "uri")
+                                        .addModifiers(PUBLIC)
+                                        .addModifiers(STATIC)
+                                        .addStatement("return new Builder(new $T(uri))", typeName)
+                                        .returns(builderTypeName)
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("builder")
+                                        .addModifiers(PUBLIC)
+                                        .addModifiers(STATIC)
+                                        .addStatement("return new Builder(new $T())", typeName)
+                                        .returns(builderTypeName)
+                                        .build());
+        return builderBuilder;
     }
 
     private void generateRequiredRdfTypeStatements(MethodSpec.Builder toRdfBuilder,
@@ -441,7 +518,8 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
     }
 
     private void addFieldWithPropertySpec(Shapes shapes, String propertyName, Path path, PropertySpec propertySpec,
-                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfMethodBuilder,
+                    TypeSpec.Builder typeBuilder, TypeSpec.Builder builderBuilder,
+                    ClassName builderTypeName, MethodSpec.Builder toRdfMethodBuilder,
                     Map<Path, Set<FieldSpec>> fieldsPerPath, Shacl2JavaConfig config,
                     boolean addTypeSuffix) {
         logger.debug("adding field {} for propertySpec: {}", propertyName, propertySpec);
@@ -460,6 +538,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .build();
         CollectionUtils.addToMultivalueMap(fieldsPerPath, path, field);
         MethodSpec setter = generateSetter(field);
+        MethodSpec setterForBuilder = generateSetterForBuilder(field, builderTypeName, "product");
         if (propertySpec.hasNamedNodeShape() && propertySpec.getShNodeShape().getShapeNode().isURI()) {
             setter = setter.toBuilder().addJavadoc(
                             getAccessorJavadocGeneratedForNodeShape(propertySpec.getShNodeShape(), propertySpec))
@@ -475,8 +554,11 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addField(field)
                         .addMethod(setter)
                         .addMethod(getter);
+        builderBuilder
+                        .addMethod(setterForBuilder);
         if (!propertySpec.isSingletonProperty()) {
             typeBuilder.addMethod(generateAdder(field));
+            builderBuilder.addMethod(generateAdderForBuilder(field, builderTypeName, "product"));
         }
         boolean singleton = propertySpec.isSingletonProperty();
         generateToRdfForField(path, toRdfMethodBuilder, getter, singleton);

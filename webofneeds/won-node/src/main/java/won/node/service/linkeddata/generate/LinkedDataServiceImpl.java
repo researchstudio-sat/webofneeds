@@ -275,7 +275,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
         Iterator<String> graphUriIt = dataset.listNames();
         while (graphUriIt.hasNext()) {
             String graphUri = graphUriIt.next();
-            OperationRequest operationRequest = AuthUtils.cloneShallow(wonAclEvalContext.getOperationRequest());
+            OperationRequest operationRequest = wonAclEvalContext.getOperationRequest();
             operationRequest.setReqPosition(POSITION_ATOM_GRAPH);
             operationRequest.setReqGraphs(Collections.singleton(URI.create(graphUri)));
             if (graphUri.equals(aclGraphUri)) {

@@ -1,22 +1,11 @@
 package won.shacl2java.sourcegen.typegen.support;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.squareup.javapoet.*;
 import won.shacl2java.Shacl2JavaConfig;
 import won.shacl2java.util.NameUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static javax.lang.model.element.Modifier.PUBLIC;
 
@@ -30,6 +19,18 @@ public class TypegenUtils {
                         .build();
     }
 
+    public static MethodSpec generateSetterForBuilder(FieldSpec field, TypeName builderType, String productFieldName) {
+        String setterName = NameUtils.setterNameForField(field);
+        return MethodSpec
+                        .methodBuilder(setterName)
+                        .addParameter(field.type, field.name)
+                        .addModifiers(PUBLIC)
+                        .returns(builderType)
+                        .addStatement(String.format("this.%s.%s($N)", productFieldName, setterName), field)
+                        .addStatement("return this")
+                        .build();
+    }
+
     public static MethodSpec generateAdder(FieldSpec field) {
         TypeName baseType = ((ParameterizedTypeName) field.type).typeArguments.get(0);
         return MethodSpec
@@ -40,6 +41,20 @@ public class TypegenUtils {
                         .addStatement("    this.$N = new $T()", field, ClassName.get(HashSet.class))
                         .endControlFlow()
                         .addStatement("this.$N.add($N)", field, "toAdd")
+                        .build();
+    }
+
+    public static MethodSpec generateAdderForBuilder(FieldSpec field, TypeName builderTypeName,
+                    String productFieldName) {
+        TypeName baseType = ((ParameterizedTypeName) field.type).typeArguments.get(0);
+        String adderName = NameUtils.adderNameForFieldNameInPlural(field.name);
+        return MethodSpec
+                        .methodBuilder(adderName)
+                        .addParameter(baseType, "toAdd")
+                        .addModifiers(PUBLIC)
+                        .returns(builderTypeName)
+                        .addStatement(String.format("this.%s.%s(toAdd)", productFieldName, adderName))
+                        .addStatement("return this")
                         .build();
     }
 

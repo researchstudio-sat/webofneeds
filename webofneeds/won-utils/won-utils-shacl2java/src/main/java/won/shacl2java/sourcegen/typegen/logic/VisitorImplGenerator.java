@@ -1,18 +1,6 @@
 package won.shacl2java.sourcegen.typegen.logic;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
-import com.squareup.javapoet.TypeSpec;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.squareup.javapoet.*;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.sparql.graph.GraphFactory;
 import org.slf4j.Logger;
@@ -25,18 +13,22 @@ import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
 import won.shacl2java.sourcegen.typegen.mapping.VisitorClassTypeSpecs;
 import won.shacl2java.util.NameUtils;
 
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.PRIVATE;
-import static javax.lang.model.element.Modifier.PROTECTED;
-import static javax.lang.model.element.Modifier.PUBLIC;
-import static javax.lang.model.element.Modifier.STATIC;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static javax.lang.model.element.Modifier.*;
 import static won.shacl2java.util.NameUtils.getterNameForField;
 
 public class VisitorImplGenerator implements TypesGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private Shacl2JavaConfig config;
     VisitorClassTypeSpecs.Consumer visitorClassTypeSpecs;
     ShapeTypeSpecs.Consumer shapeTypeSpecs;
+    private Shacl2JavaConfig config;
 
     public VisitorImplGenerator(Shacl2JavaConfig config, VisitorClassTypeSpecs.Consumer visitorClassTypeSpecs,
                     ShapeTypeSpecs.Consumer shapeTypeSpecs) {
@@ -157,35 +149,36 @@ public class VisitorImplGenerator implements TypesGenerator {
                             .addModifiers(PUBLIC, FINAL)
                             .addParameter(childClassName, "host");
             visitRecursivelyBuilder.addStatement("onBeginVisit(host)");
-            for (FieldSpec subElement : typeSpec.fieldSpecs) {
+            for (FieldSpec fieldSpec : typeSpec.fieldSpecs) {
                 // let's allow the visitor to visit the subelement, too.
-                TypeName _subElTyp = subElement.type;
-                TypeName rawSubElementType = null;
-                if (subElement.type instanceof ParameterizedTypeName) {
-                    _subElTyp = ((ParameterizedTypeName) subElement.type).typeArguments.get(0);
-                    rawSubElementType = ((ParameterizedTypeName) subElement.type).rawType;
+                TypeName fieldType = fieldSpec.type;
+                TypeName rawFieldType = null;
+                if (fieldSpec.type instanceof ParameterizedTypeName) {
+                    fieldType = ((ParameterizedTypeName) fieldSpec.type).typeArguments.get(0);
+                    rawFieldType = ((ParameterizedTypeName) fieldSpec.type).rawType;
                 }
-                final TypeName subElementType = _subElTyp;
-                if (visitedTypeNames.contains(((ClassName) subElementType).simpleName())) {
-                    if (subElement.type instanceof ParameterizedTypeName) {
-                        logger.debug("adding recursion for field {}", subElement.name);
-                        String getter = getterNameForField(subElement.name);
-                        if (rawSubElementType != null && rawSubElementType.equals(TypeName.get(Set.class))) {
-                            visitRecursivelyBuilder
-                                            .beginControlFlow("host.$N().forEach(child -> ", getter)
-                                            .addStatement("onBeforeRecursion(host, child)")
-                                            .addStatement("child.accept(this)")
-                                            .addStatement("onAfterRecursion(host, child)")
-                                            .endControlFlow(")");
-                        } else {
-                            visitRecursivelyBuilder
-                                            .addStatement("$N child = host.$N()", subElementType, getter)
-                                            .beginControlFlow("if (child != null)")
-                                            .addStatement("onBeforeRecursion(host, child)")
-                                            .addStatement("child.accept(visitor, depthFirst)")
-                                            .addStatement("onAfterRecursion(host, child)")
-                                            .endControlFlow();
-                        }
+                if (visitedTypeNames.contains(((ClassName) fieldType).simpleName())) {
+                    String getter = getterNameForField(fieldSpec.name);
+                    if (fieldSpec.type instanceof ParameterizedTypeName
+                                    && rawFieldType != null
+                                    && rawFieldType.equals(TypeName.get(Set.class))) {
+                        logger.debug("adding recursion for field {}", fieldSpec.name);
+                        visitRecursivelyBuilder
+                                        .beginControlFlow("host.$N().forEach(child -> ", getter)
+                                        .addStatement("onBeforeRecursion(host, child)")
+                                        .addStatement("child.accept(this)")
+                                        .addStatement("onAfterRecursion(host, child)")
+                                        .endControlFlow(")");
+                    } else {
+                        visitRecursivelyBuilder
+                                        .beginControlFlow("")
+                                        .addStatement("$T child = host.$N()", fieldType, getter)
+                                        .beginControlFlow("if (child != null)")
+                                        .addStatement("onBeforeRecursion(host, child)")
+                                        .addStatement("child.accept(this)")
+                                        .addStatement("onAfterRecursion(host, child)")
+                                        .endControlFlow()
+                                        .endControlFlow();
                     }
                 }
             }
@@ -230,31 +223,32 @@ public class VisitorImplGenerator implements TypesGenerator {
                 continue;
             }
             visitRecursivelyBuilder.addStatement("host.accept(this.graphEntityVisitor)");
-            for (FieldSpec subElement : typeSpec.fieldSpecs) {
+            for (FieldSpec fieldSpec : typeSpec.fieldSpecs) {
                 // let's allow the visitor to visit the subelement, too.
-                TypeName _subElTyp = subElement.type;
-                TypeName rawSubElementType = null;
-                if (subElement.type instanceof ParameterizedTypeName) {
-                    _subElTyp = ((ParameterizedTypeName) subElement.type).typeArguments.get(0);
-                    rawSubElementType = ((ParameterizedTypeName) subElement.type).rawType;
+                TypeName fieldType = fieldSpec.type;
+                TypeName rawFieldType = null;
+                if (fieldType instanceof ParameterizedTypeName) {
+                    fieldType = ((ParameterizedTypeName) fieldType).typeArguments.get(0);
+                    rawFieldType = ((ParameterizedTypeName) fieldSpec.type).rawType;
                 }
-                final TypeName subElementType = _subElTyp;
-                if (visitedTypeNames.contains(((ClassName) subElementType).simpleName())) {
-                    if (subElement.type instanceof ParameterizedTypeName) {
-                        logger.debug("adding recursion for field {}", subElement.name);
-                        String getter = getterNameForField(subElement.name);
-                        if (rawSubElementType != null && rawSubElementType.equals(TypeName.get(Set.class))) {
-                            visitRecursivelyBuilder
-                                            .beginControlFlow("host.$N().forEach(child -> ", getter)
-                                            .addStatement("child.accept(this)")
-                                            .endControlFlow(")");
-                        } else {
-                            visitRecursivelyBuilder
-                                            .addStatement("$N child = host.$N()", subElementType, getter)
-                                            .beginControlFlow("if (child != null)")
-                                            .addStatement("child.accept(visitor, depthFirst)")
-                                            .endControlFlow();
-                        }
+                if (visitedTypeNames.contains(((ClassName) fieldType).simpleName())) {
+                    logger.debug("adding recursion for field {}", fieldSpec.name);
+                    String getter = getterNameForField(fieldSpec.name);
+                    if (fieldSpec.type instanceof ParameterizedTypeName
+                                    && rawFieldType != null
+                                    && rawFieldType.equals(TypeName.get(Set.class))) {
+                        visitRecursivelyBuilder
+                                        .beginControlFlow("host.$N().forEach(child -> ", getter)
+                                        .addStatement("child.accept(this)")
+                                        .endControlFlow(")");
+                    } else {
+                        visitRecursivelyBuilder
+                                        .beginControlFlow("")
+                                        .addStatement("$T child = host.$N()", fieldType, getter)
+                                        .beginControlFlow("if (child != null)")
+                                        .addStatement("child.accept(this)")
+                                        .endControlFlow()
+                                        .endControlFlow();
                     }
                 }
             }
