@@ -15,17 +15,18 @@ won-atom-header-big {
   }
 
   grid-template-areas:
-    "icon title . buddy share context"
-    "icon title . . . ."
-    "icon info actiontoggle actiontoggle actiontoggle actiontoggle";
-  grid-template-columns: min-content 1fr min-content min-content min-content min-content;
+    "icon title . buddy calendar share context"
+    "icon title . . . . ."
+    "icon info actiontoggle actiontoggle actiontoggle actiontoggle actiontoggle";
+  grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content;
 
   @media (max-width: $responsivenessBreakPoint) {
     padding: 0.5rem 0.5rem 0 0.5rem;
     grid-row-gap: 0.1rem;
     @include square-image($postIconSize, 0 0.5rem 0.5rem 0);
     grid-template-areas:
-      "icon title share context"
+      "icon title calendar context"
+      "icon info share context"
       "icon info buddy context"
       "actiontoggle actiontoggle actiontoggle actiontoggle";
     grid-template-columns: min-content 1fr min-content min-content;
@@ -35,10 +36,10 @@ won-atom-header-big {
     grid-row-gap: 0.5rem;
     @include square-image(4.7rem, 0 1rem 1rem 0);
     grid-template-areas:
-      "icon title . buddy share context"
-      "icon title . . . ."
-      "icon info actiontoggle actiontoggle actiontoggle actiontoggle";
-    grid-template-columns: min-content 1fr min-content min-content min-content min-content;
+      "icon title . buddy calendar share context"
+      "icon title . . . . ."
+      "icon info actiontoggle actiontoggle actiontoggle actiontoggle actiontoggle";
+    grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content;
   }
 
   &.won-failed-to-load,
@@ -80,6 +81,17 @@ won-atom-header-big {
   > won-atom-icon {
     grid-area: icon;
     align-self: center;
+  }
+
+  .calendar__link {
+    grid-area: calendar;
+  }
+
+  .calendar__link__icon {
+    --local-primary: #{$won-secondary-color};
+    @include fixed-square($postIconSizeMobile);
+    padding-left: 0.5rem;
+    padding-right: 0.25rem;
   }
 
   > won-add-buddy {

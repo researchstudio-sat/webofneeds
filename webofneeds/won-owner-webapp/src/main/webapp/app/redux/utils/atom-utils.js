@@ -134,12 +134,61 @@ export function getTitle(atom, externalDataState, separator = ", ") {
 export function getDuration(atom) {
   const fromDatetime = getIn(atom, ["content", "fromDatetime"]);
   const throughDatetime = getIn(atom, ["content", "throughDatetime"]);
-  if (fromDatetime) {
+  if (fromDatetime && throughDatetime) {
     return { fromDatetime, throughDatetime };
   } else {
     return undefined;
   }
 }
+
+export function generateIcalDownloadLink(atom) {
+  const duration = getDuration(atom);
+  const title = getTitle(atom);
+
+  const _zp = function(s) {
+    return ("0" + s).slice(-2);
+  };
+  //iso date for ical formats
+  const _isofix = function(d) {
+    const offset = ("0" + new Date().getTimezoneOffset() / 60).slice(-2);
+
+    if (typeof d == "string") {
+      return d.replace(/-/g, "") + "T" + offset + "0000Z";
+    } else {
+      return (
+        d.getFullYear() +
+        _zp(d.getMonth() + 1) +
+        _zp(d.getDate()) +
+        "T" +
+        _zp(d.getHours()) +
+        "0000Z"
+      );
+    }
+  };
+
+  const now = new Date();
+  const ics_lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//RSAFG.//iCalAdUnit//EN",
+    "METHOD:REQUEST",
+    "BEGIN:VEVENT",
+    "UID:event-" + now.getTime() + "@matchat.org",
+    "DTSTAMP:" + _isofix(now),
+    "DTSTART:" + _isofix(duration.fromDatetime),
+    "DTEND:" + _isofix(duration.throughDatetime),
+    "DESCRIPTION:" + getUri(atom),
+    "SUMMARY:" + title,
+    "LAST-MODIFIED:" + _isofix(now),
+    "SEQUENCE:0",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ];
+
+  return "data:text/calendar;base64," + btoa(ics_lines.join("\r\n"));
+}
+
+window.generateIcalDownloadLink4dbg = generateIcalDownloadLink;
 
 export function getBackground(atom) {
   return get(atom, "background");
