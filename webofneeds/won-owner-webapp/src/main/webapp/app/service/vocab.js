@@ -357,6 +357,19 @@ vocab.WXSCHEMA.ParentOrganizationSocketCompacted =
 vocab.WXSCHEMA.ReviewSocket = vocab.WXSCHEMA.baseUri + "ReviewSocket";
 vocab.WXSCHEMA.ReviewSocketCompacted = vocab.WXSCHEMA.prefix + ":ReviewSocket";
 
+vocab.WXSCHEMA.EventSocket = vocab.WXSCHEMA.baseUri + "EventSocket";
+vocab.WXSCHEMA.EventSocketCompacted = vocab.WXSCHEMA.prefix + ":EventSocket";
+
+vocab.WXSCHEMA.EventInverseSocket =
+  vocab.WXSCHEMA.baseUri + "EventInverseSocket";
+vocab.WXSCHEMA.EventInverseSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":EventInverseSocket";
+
+vocab.WXSCHEMA.EventInverseSocket =
+  vocab.WXSCHEMA.baseUri + "EventInverseSocket";
+vocab.WXSCHEMA.EventInverseSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":EventInverseSocket";
+
 vocab.WXSCHEMA.ReviewInverseSocket =
   vocab.WXSCHEMA.baseUri + "ReviewInverseSocket";
 vocab.WXSCHEMA.ReviewInverseSocketCompacted =

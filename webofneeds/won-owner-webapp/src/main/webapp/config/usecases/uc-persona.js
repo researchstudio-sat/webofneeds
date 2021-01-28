@@ -19,12 +19,15 @@ export const persona = {
           "#buddySocket": vocab.BUDDY.BuddySocketCompacted,
           "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted,
           "#memberOfSocket": vocab.WXSCHEMA.MemberOfSocketCompacted,
-          "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
-          "#PrimaryAccountableOfSocket":
-            vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted,
-          "#CustodianOfSocket": vocab.WXVALUEFLOWS.CustodianOfSocketCompacted,
-          "#ActorActivitySocket":
-            vocab.WXVALUEFLOWS.ActorActivitySocketCompacted,
+          // "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted, //TODO: exclude the ability to review a persona for now
+          "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
+          "#sAttendeeInverseSocket":
+            vocab.WXSCHEMA.AttendeeInverseSocketCompacted,
+          // "#PrimaryAccountableOfSocket":
+          //   vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted,
+          // "#CustodianOfSocket": vocab.WXVALUEFLOWS.CustodianOfSocketCompacted,
+          // "#ActorActivitySocket":
+          //   vocab.WXVALUEFLOWS.ActorActivitySocketCompacted, //TODO VALUEFLOWS SOCKETS CURRENTLY EXCLUDED
         },
       },
       seeks: {},
@@ -32,26 +35,26 @@ export const persona = {
   },
   reactions: {
     ...defaultReactions,
-    [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: {
-      [vocab.WXVALUEFLOWS.ActorSocketCompacted]: {
-        useCaseIdentifiers: ["activity"],
-      },
-    },
-    [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: {
-      [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: {
-        useCaseIdentifiers: ["resource"],
-      },
-    },
-    [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: {
-      [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: {
-        useCaseIdentifiers: ["resource"],
-      },
-    },
-    [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: {
-      [vocab.WXVALUEFLOWS.ActorSocket]: {
-        useCaseIdentifiers: ["action"],
-      },
-    },
+    // [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: {
+    //   [vocab.WXVALUEFLOWS.ActorSocketCompacted]: {
+    //     useCaseIdentifiers: ["activity"],
+    //   },
+    // },
+    // [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: {
+    //   [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: {
+    //     useCaseIdentifiers: ["resource"],
+    //   },
+    // },
+    // [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: {
+    //   [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: {
+    //     useCaseIdentifiers: ["resource"],
+    //   },
+    // },
+    // [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: {
+    //   [vocab.WXVALUEFLOWS.ActorSocket]: {
+    //     useCaseIdentifiers: ["action"],
+    //   },
+    // },
     [vocab.WXSCHEMA.WorksForSocketCompacted]: {
       [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
@@ -75,6 +78,11 @@ export const persona = {
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["*"],
+      },
+    },
+    [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
+      [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
+        useCaseIdentifiers: ["event"],
       },
     },
   },

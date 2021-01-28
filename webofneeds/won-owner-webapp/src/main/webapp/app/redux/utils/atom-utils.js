@@ -131,6 +131,16 @@ export function getTitle(atom, externalDataState, separator = ", ") {
     : get(atom, "humanReadable");
 }
 
+export function getDuration(atom) {
+  const fromDatetime = getIn(atom, ["content", "fromDatetime"]);
+  const throughDatetime = getIn(atom, ["content", "throughDatetime"]);
+  if (fromDatetime) {
+    return { fromDatetime, throughDatetime };
+  } else {
+    return undefined;
+  }
+}
+
 export function getBackground(atom) {
   return get(atom, "background");
 }
