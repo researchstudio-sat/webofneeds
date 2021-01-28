@@ -5,8 +5,8 @@ import { organization } from "./uc-organization.js";
 import { newsarticle } from "./uc-newsarticle.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
 import { customUseCase } from "./uc-custom.js";
-import { resource } from "./uc-resource.js";
-import { activity } from "./uc-activity.js";
+// import { resource } from "./uc-resource.js"; //TODO: ValueFlows useCase, currently excluded
+// import { activity } from "./uc-activity.js"; //TODO: ValueFlows useCase, currently excluded
 import {
   details,
   mergeInEmptyDraft,
@@ -21,8 +21,8 @@ export const otherGroup = {
   label: "More...",
   icon: ico36_plus,
   subItems: {
-    resource: resource,
-    activity: activity,
+    // resource: resource, //TODO: ValueFlows useCase, currently excluded
+    // activity: activity, //TODO: ValueFlows useCase, currently excluded
     complain: complain,
     handleComplaint: handleComplaint,
     customUseCase: customUseCase,

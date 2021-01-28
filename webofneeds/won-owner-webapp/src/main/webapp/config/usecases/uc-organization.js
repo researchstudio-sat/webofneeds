@@ -26,6 +26,7 @@ export const organization = {
           "#parentOrgSocket": vocab.WXSCHEMA.ParentOrganizationSocketCompacted,
           "#subOrgSocket": vocab.WXSCHEMA.SubOrganizationSocketCompacted,
           "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
+          "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
         },
       },
     }),

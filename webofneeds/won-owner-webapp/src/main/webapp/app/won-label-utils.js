@@ -61,7 +61,7 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
   },
   socketTabs: {
-    [vocab.GROUP.GroupSocketCompacted]: "Group Members",
+    [vocab.GROUP.GroupSocketCompacted]: "Group Chat Members",
     [vocab.CHAT.ChatSocketCompacted]: "Chats",
     [vocab.HOLD.HoldableSocketCompacted]: "Held By",
     [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: "Supported By",
@@ -87,6 +87,10 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: "Actor",
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Activities",
     [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Connections",
+    [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: "Attends",
+    [vocab.WXSCHEMA.AttendeeSocketCompacted]: "Attendees",
+    [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Organizers",
+    [vocab.WXSCHEMA.EventSocketCompacted]: "Organized Events",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -115,9 +119,13 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: "Activity",
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Actor",
     [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Connection",
+    [vocab.WXSCHEMA.EventSocketCompacted]: "Organizer",
+    [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Add Organized Event",
+    [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: "Attendee",
+    [vocab.WXSCHEMA.AttendeeSocketCompacted]: "Event",
   },
   socketItems: {
-    [vocab.GROUP.GroupSocketCompacted]: "Group Members",
+    [vocab.GROUP.GroupSocketCompacted]: "Group Chat Members",
     [vocab.CHAT.ChatSocketCompacted]: "Chats",
     [vocab.HOLD.HoldableSocketCompacted]: "Holders",
     [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: "Supporters",
@@ -142,6 +150,9 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.ActorSocketCompacted]: "Activities",
     [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "Actors",
     [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Connections",
+    [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Organizers",
+    [vocab.WXSCHEMA.AttendeeSocketCompacted]: "Attendees",
+    [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: "Events",
   },
 });
 

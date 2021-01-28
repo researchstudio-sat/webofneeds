@@ -16,7 +16,7 @@ import vocab from "../app/service/vocab.js";
 export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
 
-const chatSocketAcl = {
+/*const chatSocketAcl = {
   [vocab.AUTH.AuthorizationCompacted]: {
     [vocab.AUTH.granteeCompacted]: {
       [vocab.AUTH.socketCompacted]: {
@@ -50,7 +50,7 @@ const chatSocketAcl = {
       },
     },
   },
-};
+};*/
 
 const emptyDraftImm = Immutable.fromJS({
   content: {
@@ -61,7 +61,7 @@ const emptyDraftImm = Immutable.fromJS({
     },
   },
   seeks: {},
-  acl: chatSocketAcl,
+  // acl: chatSocketAcl, //TODO INCLUDE AGAIN AFTER USECASES ARE DONE
 });
 
 export const defaultReactions = {
@@ -87,6 +87,17 @@ export const defaultReactions = {
     [vocab.HOLD.HolderSocketCompacted]: {
       useCaseIdentifiers: ["persona"],
       refuseNonOwned: true,
+    },
+  },
+  [vocab.WXSCHEMA.EventSocketCompacted]: {
+    [vocab.WXSCHEMA.EventInverseSocketCompacted]: {
+      useCaseIdentifiers: ["event"],
+      refuseNonOwned: true,
+    },
+  },
+  [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
+    [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
+      useCaseIdentifier: ["persona"],
     },
   },
 };
