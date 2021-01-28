@@ -62,6 +62,9 @@ public class WonAclRequestHelper {
     public static void setAuthInfoAsResponseHeader(HttpServletResponse response,
                     AclEvalResult finalResult) {
         Graph authInfo = RdfOutput.toGraph(finalResult.getProvideAuthInfo());
+        if (authInfo == null) {
+            return;
+        }
         StringWriter authInfoStringWriter = new StringWriter();
         RDFDataMgr.write(authInfoStringWriter, authInfo, Lang.TTL);
         String authInfoString = Base64.getEncoder().encodeToString(authInfoStringWriter.toString().getBytes());
