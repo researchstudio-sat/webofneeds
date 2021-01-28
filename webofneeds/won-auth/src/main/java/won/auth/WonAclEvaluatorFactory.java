@@ -1,7 +1,6 @@
 package won.auth;
 
 import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.compose.Union;
 import org.apache.jena.shacl.Shapes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,6 @@ public class WonAclEvaluatorFactory {
     }
 
     public synchronized WonAclEvaluator create(Graph dataGraph) {
-        this.instanceFactory.load(new Union(shapes.getGraph(), dataGraph));
         return new WonAclEvaluator(
                         getAuthorizations(dataGraph),
                         targetAtomCheckEvaluator,
@@ -45,8 +43,8 @@ public class WonAclEvaluatorFactory {
     }
 
     private synchronized Set<Authorization> getAuthorizations(Graph dataGraph) {
-        this.instanceFactory.load(new Union(shapes.getGraph(), dataGraph));
-        Set<Authorization> auths = this.instanceFactory.getInstancesOfType(Authorization.class);
+        this.instanceFactory.load(dataGraph);
+        Set<Authorization> auths = this.instanceFactory.getInstancesOfType(Authorization.class, true);
         this.instanceFactory.reset();
         return auths;
     }

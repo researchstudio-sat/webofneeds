@@ -9,11 +9,11 @@
 <#authorization5>
     a            auth:Authorization ;
     auth:grantee [ auth:atom auth:anyAtom ] ;
-    auth:grant   [ auth:operation auth:opGetAuthInfo ; ] .
+    auth:provideAuthInfo   [ auth:operation auth:anyOperation ; ] .
 
 <#authorization6>
     a           auth:Authorization ;
-    auth:bearer [ auth:scope  "my highly trusted friends" ;
+    auth:bearer [ auth:tokenScope  "my-highly-trusted-friends" ;
                   auth:issuer [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
                                               auth:targetAtom [ ] ] ] ] ;
-    auth:grant  [ auth:operation auth:anyOperation ; ] .
+    auth:grant  [ auth:operation auth:anyOperation ] .

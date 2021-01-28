@@ -15,17 +15,14 @@
 @prefix magicmirror:  <http://example.org/test/magicmirror#> .
 @prefix pinocchio:    <http://example.org/test/pinocchio#> .
 @prefix lordfarquaad: <http://example.org/test/lordfarquaad#> .
+@prefix ftc:          <https://example.org/test/fairytalecreatures#> .
 
 # the bearer of shrek's ownerToken (hopefully, that's Shrek!) can see the time/date info
 
 shrek:expectedResult2
     a                       auth:ExpectedAclEvalResult ;
-    auth:decision           auth:accessGranted ;
-    auth:requestedOperation shrek:request2 ;
-    auth:provideAuthInfo    [ auth:grantee [ auth:socket [ auth:socketType wx-schema:AttendeeSocket ;
-                                                           auth:connection [ auth:targetAtom      [ ] ;
-                                                                             auth:connectionState won:Connected,
-                                                                                                  won:RequestSent ] ] ] ] .
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation shrek:request2 .
 
 shrek:request2
     a                 auth:OperationRequest ;
@@ -38,8 +35,9 @@ shrek:request2
 
 shrek:shreksOwnerToken
     a               auth:AuthToken ;
-    auth:tokenScope auth:ownerToken ;
+    auth:tokenScope auth:OwnerToken ;
     auth:tokenIss   ex:shrek ;
     auth:tokenSub   ex:shrek ;
+    auth:tokenSig   ftc:node ;
     auth:tokenIat   "2020-12-03T17:00:00"^^xsd:dateTime ;
     auth:tokenExp   "2020-12-03T18:00:00"^^xsd:dateTime .

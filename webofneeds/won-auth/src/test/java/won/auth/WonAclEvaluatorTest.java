@@ -34,9 +34,12 @@ import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.junit.Assert.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
@@ -216,7 +219,7 @@ public class WonAclEvaluatorTest {
         withDurationLog("instantiating test atom entities (atomNodeChecker)",
                         () -> atomNodeChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
-                        () -> evaluatorFactory.load(new Union(graph, shapes.getGraph())));
+                        () -> evaluatorFactory.load(graph));
         withDurationLog("making auth decision",
                         () -> checkSpecifiedAuthDecision(evaluatorFactory, resource.getFilename()));
     }
@@ -260,8 +263,13 @@ public class WonAclEvaluatorTest {
     }
 
     private void checkSpecifiedAuthDecision(WonAclEvaluatorTestFactory loadedEvaluator, String testIdentifier) {
-        for (ExpectedAclEvalResult spec : loadedEvaluator.getInstanceFactory()
-                        .getInstancesOfType(ExpectedAclEvalResult.class)) {
+        Set<ExpectedAclEvalResult> expectedResuls = loadedEvaluator.getInstanceFactory()
+                        .getInstancesOfType(ExpectedAclEvalResult.class, true);
+        if (expectedResuls.isEmpty()) {
+            fail("No ExpectedAclEvalResult instances found!");
+        }
+        logger.debug("About to check {} expected result(s)...", expectedResuls.size());
+        for (ExpectedAclEvalResult spec : expectedResuls) {
             logger.debug("{}: using spec {} for testing...", testIdentifier, spec.toStringAllFields());
             OperationRequest opReq = spec.getRequestedOperation();
             Calendar cal = Calendar.getInstance();
@@ -282,7 +290,7 @@ public class WonAclEvaluatorTest {
                     if (!actualResult.getIssueTokens()
                                     .stream()
                                     .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
-                        Assert.fail(String.format(
+                        fail(String.format(
                                         "%s, Spec %s: None of the actual tokens %s match the specified token %s",
                                         testIdentifier,
                                         spec.getNode(),
@@ -292,7 +300,7 @@ public class WonAclEvaluatorTest {
                     }
                 }
             } else if (!actualResult.getIssueTokens().isEmpty()) {
-                Assert.fail(String.format(
+                fail(String.format(
                                 "%s, Spec %s: Tokens granted but none specified",
                                 testIdentifier,
                                 spec.getNode()));
@@ -300,7 +308,7 @@ public class WonAclEvaluatorTest {
             if (spec.getProvideAuthInfo() != null) {
                 AuthInfo expectedAuthInfo = spec.getProvideAuthInfo();
                 if (!matches(expectedAuthInfo, actualResult.getProvideAuthInfo())) {
-                    Assert.fail(String.format(
+                    fail(String.format(
                                     "%s, Spec %s: None of the actual auth infos %s match the specified authInfo %s",
                                     testIdentifier, spec.getNode(),
                                     actualResult.getProvideAuthInfo() != null
@@ -309,7 +317,7 @@ public class WonAclEvaluatorTest {
                                     expectedAuthInfo.toStringAllFields()));
                 }
             } else if (actualResult.getProvideAuthInfo() != null) {
-                Assert.fail(String.format(
+                fail(String.format(
                                 "%s, Spec %s: Auth info provided but none specified",
                                 testIdentifier,
                                 spec.getNode()));

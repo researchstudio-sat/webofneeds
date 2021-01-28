@@ -105,38 +105,81 @@ public class Shacl2JavaInstanceFactory {
     }
 
     public Set<Object> getInstances(String uri) {
-        if (dataInstantiationContext == null) {
-            return Collections.emptySet();
+        return getInstances(uri, false);
+    }
+
+    public Set<Object> getInstances(String uri, boolean includeBaseContext) {
+        Set<Object> result = new HashSet<>();
+        if (includeBaseContext) {
+            result.addAll(baseInstantiationContext.getInstances(uri));
         }
-        return dataInstantiationContext.getInstances(uri);
+        if (dataInstantiationContext != null) {
+            result.addAll(dataInstantiationContext.getInstances(uri));
+        }
+        return result;
     }
 
     public <T> Set<T> getInstancesOfType(Class<T> type) {
-        if (dataInstantiationContext == null) {
-            return Collections.emptySet();
+        return getInstancesOfType(type, false);
+    }
+
+    public <T> Set<T> getInstancesOfType(Class<T> type, boolean includeBaseContext) {
+        Set<T> result = new HashSet<>();
+        if (includeBaseContext) {
+            result.addAll(baseInstantiationContext.getInstancesOfType(type));
         }
-        return dataInstantiationContext.getInstanceOfType(type);
+        if (dataInstantiationContext != null) {
+            result.addAll(dataInstantiationContext.getInstancesOfType(type));
+        }
+        return result;
     }
 
     public <T> Optional<T> getInstanceOfType(String uri, Class<T> type) {
-        if (dataInstantiationContext == null) {
-            return Optional.empty();
+        return getInstanceOfType(uri, type, false);
+    }
+
+    public <T> Optional<T> getInstanceOfType(String uri, Class<T> type,
+                    boolean includeBaseContext) {
+        if (includeBaseContext) {
+            Optional<T> inst = baseInstantiationContext.getInstanceOfType(uri, type);
+            if (inst.isPresent()) {
+                return inst;
+            }
         }
-        return dataInstantiationContext.getInstanceOfType(uri, type);
+        if (dataInstantiationContext != null) {
+            return dataInstantiationContext.getInstanceOfType(uri, type);
+        }
+        return Optional.empty();
     }
 
     public Map<String, Set<Object>> getInstanceMap() {
-        if (dataInstantiationContext == null) {
-            return Collections.emptyMap();
+        return getInstanceMap(false);
+    }
+
+    public Map<String, Set<Object>> getInstanceMap(boolean includeBaseContext) {
+        Map<String, Set<Object>> result = new HashMap<>();
+        if (includeBaseContext) {
+            result.putAll(baseInstantiationContext.getInstanceMap());
         }
-        return dataInstantiationContext.getInstanceMap();
+        if (dataInstantiationContext != null) {
+            result.putAll(dataInstantiationContext.getInstanceMap());
+        }
+        return result;
     }
 
     public Collection<Object> getInstances() {
-        if (dataInstantiationContext == null) {
-            return Collections.emptySet();
+        return getInstances(false);
+    }
+
+    public Collection<Object> getInstances(boolean includeBaseContext) {
+        Set<Object> result = new HashSet<>();
+        if (includeBaseContext) {
+            result.addAll(baseInstantiationContext.getInstances());
         }
-        return dataInstantiationContext.getInstances();
+        if (dataInstantiationContext == null) {
+            result.addAll(dataInstantiationContext.getInstances());
+        }
+        return result;
     }
 
     private void scanPackages(InstantiationContext ctx) {
@@ -192,6 +235,7 @@ public class Shacl2JavaInstanceFactory {
                         }
                         ctx.addInstanceForFocusNode(focusNode, instance);
                         ctx.setFocusNodeForInstance(instance, focusNode);
+                        ctx.setClassForInstance(instance, instance.getClass());
                         ctx.addShapeForFocusNode(focusNode, this.shapes.getShape(shapeNode));
                     } catch (Exception e) {
                         throw new IllegalStateException("Cannot set node using setNode() on instance " + instance, e);
@@ -464,7 +508,7 @@ public class Shacl2JavaInstanceFactory {
         return null;
     }
 
-    private void wireDependencies(Object instance, InstantiationContext ctx) {
+    public void wireDependencies(Object instance, InstantiationContext ctx) {
         Map<Path, Set<Field>> fieldsByPath = new HashMap<>();
         Class<?> type = ctx.getClassForInstance(instance);
         if (type == null) {

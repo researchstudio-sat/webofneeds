@@ -68,18 +68,16 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreA
     private X509Certificate extractClientCertificate(HttpServletRequest request) {
         X509Certificate[] certificateChainObj = null;
         if (behindProxy) {
+            String certificateHeader = request.getHeader(WON.CLIENT_CERTIFICATE_HEADER);
+            if (certificateHeader == null) {
+                warnAboutMissingClientCertificate();
+                return null;
+            }
             CertificateFactory certificateFactory = null;
             try {
                 certificateFactory = CertificateFactory.getInstance("X.509");
             } catch (CertificateException e) {
                 throw new InternalAuthenticationServiceException("could not extract certificate from request", e);
-            }
-            String certificateHeader = request.getHeader(WON.CLIENT_CERTIFICATE_HEADER);
-            if (certificateHeader == null) {
-                throw new AuthenticationCredentialsNotFoundException(
-                                "No HTTP header 'X-Client-Certificate' set that contains client authentication certificate! If property "
-                                                + "'client.authentication.behind.proxy' is set to true, this header must be "
-                                                + "set by the reverse proxy!");
             }
             String certificateContent = URLDecoder.decode(certificateHeader, StandardCharsets.UTF_8);
             if (logger.isDebugEnabled()) {
@@ -102,18 +100,22 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreA
         } else {
             certificateChainObj = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
             if (certificateChainObj == null) {
-                if (lastWarning == null || lastWarning
-                                .isBefore(Instant.from(warningInterval.subtractFrom(Instant.now())))) {
-                    logger.warn(
-                                    "Client certificate attribute is null. This is ok for many requests but it may indicate that you are behind a proxy server that terminates TLS and your system is misconfigured."
-                                                    + " If this is the case, you never receive requests that include client certificates. If so, set the property 'client.authentication.behind.proxy' to true and "
-                                                    + "make sure the proxy sets the HTTP header 'X-Client-Certificate' appropriately, passing the client certificate on to you. This warning is not generated more than once per hour.");
-                    lastWarning = Instant.now();
-                }
+                warnAboutMissingClientCertificate();
                 return null;
             }
         }
         return certificateChainObj[0];
+    }
+
+    private void warnAboutMissingClientCertificate() {
+        if (lastWarning == null || lastWarning
+                        .isBefore(Instant.from(warningInterval.subtractFrom(Instant.now())))) {
+            logger.warn(
+                            "Client certificate attribute is null. This is ok for many requests but it may indicate that you are behind a proxy server that terminates TLS and your system is misconfigured."
+                                            + " If this is the case, you never receive requests that include client certificates. If so, set the property 'client.authentication.behind.proxy' to true and "
+                                            + "make sure the proxy sets the HTTP header 'X-Client-Certificate' appropriately, passing the client certificate on to you. This warning is not generated more than once per hour.");
+            lastWarning = Instant.now();
+        }
     }
 
     public void setPrincipalExtractor(X509PrincipalExtractor principalExtractor) {

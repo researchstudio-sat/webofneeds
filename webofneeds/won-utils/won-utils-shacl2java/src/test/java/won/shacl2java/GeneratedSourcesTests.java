@@ -1,15 +1,5 @@
 package won.shacl2java;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.jena.ext.com.google.common.io.Files;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.NodeFactory;
@@ -18,7 +8,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.Shapes;
-import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,11 +24,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import test1.Address;
 import test1.Person;
-import test2.AseRoot;
-import test2.AtomState;
-import test2.Authorization;
-import test2.RdfOutput;
-import test2.SimpleOperationExpression;
+import test2.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Map;
+import java.util.Set;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
@@ -49,10 +42,6 @@ public class GeneratedSourcesTests {
     private static ResourceLoader loader;
     @Value("classpath:/won/shacl2java/")
     private Resource testBaseFolder;
-
-    @Configuration
-    static class AuthShapeTestContextConfiguration {
-    }
 
     public static Shapes loadShapes(Resource shapesResource) throws IOException {
         logger.debug("parsing shapes in {}", shapesResource.getFilename());
@@ -145,7 +134,7 @@ public class GeneratedSourcesTests {
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, config.getPackageName());
         factory.load(data.getGraph());
         Map<String, Set<Object>> entities = factory.getInstanceMap();
-        Assert.assertEquals(7, entities.size());
+        Assert.assertEquals(10, entities.size());
         Object o = entities.get("https://example.com/test/atom1#authorization5").stream().findFirst().get();
         Assert.assertEquals(Authorization.class, o.getClass());
         Authorization authShape = (Authorization) o;
@@ -172,5 +161,9 @@ public class GeneratedSourcesTests {
         grantees.forEach(g -> logger.info("grantee: {} ", g));
         // just make sure obtaining rdf throws no exceptions
         RDFDataMgr.write(new StringWriter(), RdfOutput.toGraph(authShape), Lang.TTL);
+    }
+
+    @Configuration
+    static class AuthShapeTestContextConfiguration {
     }
 }
