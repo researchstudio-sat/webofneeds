@@ -10,6 +10,9 @@ import WonDescriptionViewer from "../../app/components/details/viewer/descriptio
 import WonTagsViewer from "../../app/components/details/viewer/tags-viewer.jsx";
 import WonSuggestAtomViewer from "../../app/components/details/viewer/suggest-atom-viewer.jsx";
 import WonImageUrlViewer from "../../app/components/details/viewer/imageurl-viewer.jsx";
+import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
+import WikiDataPicker from "~/app/components/details/picker/wikidata-picker";
+import WonLinkViewer from "~/app/components/details/viewer/link-viewer";
 
 import WonTitlePicker from "../../app/components/details/picker/title-picker.jsx";
 import WonDescriptionPicker from "../../app/components/details/picker/description-picker.jsx";
@@ -22,8 +25,6 @@ import ico36_search from "../../images/won-icons/ico36_search.svg";
 import ico36_detail_description from "../../images/won-icons/ico36_detail_description.svg";
 import ico36_detail_tags from "../../images/won-icons/ico36_detail_tags.svg";
 import ico36_detail_media from "../../images/won-icons/ico36_detail_media.svg";
-import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
-import WikiDataPicker from "~/app/components/details/picker/wikidata-picker";
 
 const CF_LANGUAGE = ["en", "de", "*"];
 
@@ -106,7 +107,7 @@ export const website = {
   icon: ico36_detail_title,
   placeholder: "Website",
   component: WonTitlePicker,
-  viewerComponent: WonTitleViewer,
+  viewerComponent: WonLinkViewer,
   parseToRDF: function({ value }) {
     const val = value ? value : undefined;
     return {

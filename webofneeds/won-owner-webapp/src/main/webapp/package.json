@@ -32,6 +32,7 @@
     "react-router-dom": "^5.2.0",
     "react-swipeable-views": "^0.13.9",
     "react-tagsinput": "^3.19.0",
+    "react-tiny-link": "^3.6.0",
     "react-visibility-sensor": "^5.1.1",
     "reduce-reducers": "^0.1.5",
     "redux": "^3.7.2",
