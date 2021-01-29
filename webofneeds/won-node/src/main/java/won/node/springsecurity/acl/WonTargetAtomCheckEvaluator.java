@@ -1,14 +1,17 @@
 package won.node.springsecurity.acl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import won.auth.check.TargetAtomCheck;
 import won.auth.check.TargetAtomCheckEvaluator;
+import won.protocol.model.ConnectionState;
 import won.protocol.repository.ConnectionRepository;
+
+import java.lang.invoke.MethodHandles;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -25,25 +28,29 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
                                         .existsWithAtomAndTargetAtomAndStatesAndSocketTypesAndSockets(
                                                         check.getAtom(),
                                                         check.getRequestedTarget(),
-                                                        check.getAllowedConnectionStates(),
+                                                        check.getAllowedConnectionStates().stream()
+                                                                        .map(ConnectionState::fromURI).collect(toSet()),
                                                         check.getAllowedSocketTypes(),
                                                         check.getAllowedSockets());
         evaluators[RESTRICTS_CONNECTION_STATES | RESTRICTS_SOCKET_TYPES] = check -> connectionRepository
                         .existsWithAtomAndTargetAtomAndStatesAndSocketTypes(
                                         check.getAtom(),
                                         check.getRequestedTarget(),
-                                        check.getAllowedConnectionStates(),
+                                        check.getAllowedConnectionStates().stream()
+                                                        .map(ConnectionState::fromURI).collect(toSet()),
                                         check.getAllowedSocketTypes());
         evaluators[RESTRICTS_CONNECTION_STATES | RESTRICTS_SOCKETS] = check -> connectionRepository
                         .existsWithAtomAndTargetAtomAndStatesAndSockets(
                                         check.getAtom(),
                                         check.getRequestedTarget(),
-                                        check.getAllowedConnectionStates(),
+                                        check.getAllowedConnectionStates().stream()
+                                                        .map(ConnectionState::fromURI).collect(toSet()),
                                         check.getAllowedSockets());
         evaluators[RESTRICTS_CONNECTION_STATES] = check -> connectionRepository.existsWithAtomAndTargetAtomAndStates(
                         check.getAtom(),
                         check.getRequestedTarget(),
-                        check.getAllowedConnectionStates());
+                        check.getAllowedConnectionStates().stream()
+                                        .map(ConnectionState::fromURI).collect(toSet()));
         evaluators[RESTRICTS_SOCKET_TYPES | RESTRICTS_SOCKETS] = check -> connectionRepository
                         .existsWithAtomAndTargetAtomAndSocketTypesAndSockets(
                                         check.getAtom(),

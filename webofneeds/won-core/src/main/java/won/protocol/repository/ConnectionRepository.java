@@ -10,24 +10,21 @@
  */
 package won.protocol.repository;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import java.util.Set;
-import javax.persistence.LockModeType;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import won.protocol.message.WonMessageType;
 import won.protocol.model.Connection;
 import won.protocol.model.ConnectionState;
+
+import javax.persistence.LockModeType;
+import java.net.URI;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created with IntelliJ IDEA. User: Gabriel Date: 04.11.12 Time: 16:56 To
@@ -279,7 +276,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     boolean existsWithAtomAndTargetAtomAndStates(
                     @Param("fromAtom") URI fromAtom,
                     @Param("toAtom") URI toAtom,
-                    @Param("allowedStates") Collection<URI> allowedStates);
+                    @Param("allowedStates") Collection<ConnectionState> allowedStates);
 
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
@@ -310,7 +307,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     boolean existsWithAtomAndTargetAtomAndStatesAndSocketTypes(
                     @Param("fromAtom") URI fromAtom,
                     @Param("toAtom") URI toAtom,
-                    @Param("allowedStates") Collection<URI> allowedStates,
+                    @Param("allowedStates") Collection<ConnectionState> allowedStates,
                     @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes);
 
     @Query("select case when (count(con) > 0) then true else false end "
@@ -322,7 +319,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     boolean existsWithAtomAndTargetAtomAndStatesAndSockets(
                     @Param("fromAtom") URI fromAtom,
                     @Param("toAtom") URI toAtom,
-                    @Param("allowedStates") Collection<URI> allowedStates,
+                    @Param("allowedStates") Collection<ConnectionState> allowedStates,
                     @Param("allowedSockets") Collection<URI> allowedSockets);
 
     @Query("select case when (count(con) > 0) then true else false end "
@@ -347,7 +344,7 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     boolean existsWithAtomAndTargetAtomAndStatesAndSocketTypesAndSockets(
                     @Param("fromAtom") URI fromAtom,
                     @Param("toAtom") URI toAtom,
-                    @Param("allowedStates") Collection<URI> allowedStates,
+                    @Param("allowedStates") Collection<ConnectionState> allowedStates,
                     @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes,
                     @Param("allowedSockets") Collection<URI> allowedSockets);
 }
