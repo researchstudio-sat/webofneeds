@@ -65,6 +65,7 @@ export const organization = {
     location: { ...details.location },
     tags: { ...details.tags },
     images: { ...details.images },
+    website: { ...details.website },
   },
   seeksDetails: undefined,
 };
