@@ -18,8 +18,9 @@ export const organization = {
       content: {
         type: ["s:Organization"],
         sockets: {
-          "#worksForInverseSocket":
-            vocab.WXSCHEMA.WorksForInverseSocketCompacted,
+          // TODO: Currently not in use in favour of more generic member -> Role -> member relation
+          // "#worksForInverseSocket":
+          //   vocab.WXSCHEMA.WorksForInverseSocketCompacted,
           "#memberSocket": vocab.WXSCHEMA.MemberSocketCompacted,
           "#associatedArticleSocket":
             vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
@@ -33,11 +34,12 @@ export const organization = {
   },
   reactions: {
     ...defaultReactions,
-    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
-      [vocab.WXSCHEMA.WorksForSocketCompacted]: {
-        useCaseIdentifiers: ["persona"],
-      },
-    },
+    // TODO: Currently not in use in favour of more generic member -> Role -> member relation
+    // [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
+    //   [vocab.WXSCHEMA.WorksForSocketCompacted]: {
+    //     useCaseIdentifiers: ["persona"],
+    //   },
+    // },
     [vocab.WXSCHEMA.MemberSocketCompacted]: {
       [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
