@@ -1,0 +1,94 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-content-members {
+  .acm__search {
+    padding-bottom: 0.5rem;
+
+    + .acm__segment {
+      padding-top: 0;
+    }
+  }
+
+  .acm__segment {
+    padding-top: 1rem;
+
+    &__header {
+      display: grid;
+      grid-template-columns: min-content 1fr min-content;
+      grid-template-areas: "ouch_icon ouch_title ouch_carret";
+      border-bottom: $thinGrayBorder;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      @media (min-width: $maxContentWidth) {
+        padding-right: 0;
+      }
+      align-items: center;
+
+      &__icon {
+        grid-area: ouch_icon;
+        margin-right: 0.5rem;
+        @include fixed-square($iconSize);
+        --local-primary: #{$won-primary-text-color};
+      }
+
+      &__title {
+        grid-area: ouch_title;
+        margin-right: 0.5rem;
+        font-size: $normalFontSize;
+        font-weight: 300;
+        &__count {
+          display: inline-block;
+          margin-left: 0.25rem;
+        }
+      }
+
+      &__carret {
+        grid-area: ouch_carret;
+        @include fixed-square(1.5rem);
+        --local-primary: black;
+        cursor: pointer;
+
+        &:hover {
+          --local-primary: #{$won-primary-color};
+        }
+
+        &--expanded {
+          transform: rotate(-180deg);
+          transition: all linear 0.2s;
+        }
+
+        &--collapsed {
+          transition: all linear 0.2s;
+        }
+      }
+    }
+
+    &__content {
+      display: grid;
+      grid-gap: 1rem;
+
+      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+
+      &--fourcols {
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+      }
+
+      & > won-socket-add-button {
+        border: $thinGrayBorder;
+
+        &:hover {
+          border-color: $won-primary-color;
+        }
+      }
+
+      & > .acm__empty {
+        color: $won-line-gray;
+        text-align: center;
+        font-weight: 300;
+        grid-column: 1 / -1;
+      }
+    }
+  }
+}
