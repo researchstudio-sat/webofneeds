@@ -4,7 +4,10 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.auth.model.*;
+import won.auth.AuthUtils;
+import won.auth.model.Authorization;
+import won.auth.model.ConnectionState;
+import won.auth.model.TargetAtomExpression;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.behaviour.BehaviourBarrier;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
@@ -29,6 +32,8 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static won.auth.model.Individuals.OP_READ;
 
 public class AclTests extends AbstractBotBasedTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -83,15 +88,16 @@ public class AclTests extends AbstractBotBasedTest {
             final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
             final URI atomUri = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
             final String atomUriString = atomUri.toString();
-            final AtomContent atomContent = new AtomContent(atomUriString);
-            atomContent.addTitle("Unit Test Atom ACL Test 2");
-            final Socket holderSocket = new Socket(atomUriString + "#holderSocket");
-            holderSocket.setSocketDefinition(WXHOLD.HolderSocket.asURI());
-            final Socket buddySocket = new Socket(atomUriString + "#buddySocket");
-            buddySocket.setSocketDefinition(WXBUDDY.BuddySocket.asURI());
-            atomContent.addSocket(holderSocket);
-            atomContent.addSocket(buddySocket);
-            atomContent.addType(URI.create(WON.Atom.getURI()));
+            final AtomContent atomContent = AtomContent.builder(atomUri)
+                            .addTitle("Unit Test Atom ACL Test 2")
+                            .addSocket(Socket.builder(atomUriString + "#holderSocket")
+                                            .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                            .build())
+                            .addSocket(Socket.builder(atomUriString + "#buddySocket")
+                                            .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                            .build())
+                            .addType(URI.create(WON.Atom.getURI()))
+                            .build();
             WonMessage createMessage = WonMessageBuilder.createAtom()
                             .atom(atomUri)
                             .content()
@@ -131,29 +137,25 @@ public class AclTests extends AbstractBotBasedTest {
             final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
             final URI atomUri = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
             final String atomUriString = atomUri.toString();
-            final AtomContent atomContent = new AtomContent(atomUriString);
-            atomContent.addTitle("Unit Test Atom ACL Test 3 (with acl)");
-            final Socket holderSocket = new Socket(atomUriString + "#holderSocket");
-            holderSocket.setSocketDefinition(WXHOLD.HolderSocket.asURI());
-            final Socket buddySocket = new Socket(atomUriString + "#buddySocket");
-            buddySocket.setSocketDefinition(WXBUDDY.BuddySocket.asURI());
-            atomContent.addSocket(holderSocket);
-            atomContent.addSocket(buddySocket);
-            atomContent.addType(URI.create(WON.Atom.getURI()));
+            final AtomContent atomContent = AtomContent.builder(atomUri)
+                            .addTitle("Unit Test Atom ACL Test 3 (with acl)")
+                            .addSocket(Socket.builder(atomUriString + "#holderSocket")
+                                            .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                            .build())
+                            .addSocket(Socket.builder(atomUriString + "#buddySocket")
+                                            .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                            .build())
+                            .addType(URI.create(WON.Atom.getURI()))
+                            .build();
             // create an acl allowing only the atom itself to read everything
-            Authorization auth = new Authorization();
-            AtomExpression ae = new AtomExpression();
-            ae.addAtomsURI(URI.create("http://example.com/nobody"));
-            auth.addGranteesAtomExpression(ae);
-            AseRoot g = new AseRoot();
-            g.addOperationsSimpleOperationExpression(Individuals.OP_READ);
-            auth.addGrant(g);
+            Authorization auth = Authorization.builder()
+                            .addGrant(ase -> ase.addOperationsSimpleOperationExpression(OP_READ))
+                            .addGranteesAtomExpression(ae -> ae.addAtomsURI(URI.create("https://example.com/nobody")))
+                            .build();
             WonMessage createMessage = WonMessageBuilder.createAtom()
                             .atom(atomUri)
-                            .content()
-                            /**/.graph(RdfOutput.toGraph(atomContent))
-                            .content()
-                            /**/.aclGraph(won.auth.model.RdfOutput.toGraph(auth)) // add the acl graph
+                            .content().graph(RdfOutput.toGraph(atomContent))
+                            .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth)) // add the acl graph
                             .build();
             createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
             ctx.getBotContextWrapper().rememberAtomUri(atomUri);
@@ -193,19 +195,17 @@ public class AclTests extends AbstractBotBasedTest {
             final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
             {
                 final String atomUriString = atomUri1.toString();
-                final AtomContent atomContent = new AtomContent(atomUriString);
-                atomContent.addTitle("Granting atom");
-                final Socket chatSocket = new Socket(atomUriString + "#chatSocket");
-                chatSocket.setSocketDefinition(WXCHAT.ChatSocket.asURI());
-                atomContent.addSocket(chatSocket);
-                atomContent.addType(URI.create(WON.Atom.getURI()));
-                Authorization auth = new Authorization();
-                AtomExpression ae = new AtomExpression();
-                ae.addAtomsURI(atomUri2);
-                auth.addGranteesAtomExpression(ae);
-                AseRoot g = new AseRoot();
-                g.addOperationsSimpleOperationExpression(Individuals.OP_READ);
-                auth.addGrant(g);
+                final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                .addTitle("Granting atom")
+                                .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                .build())
+                                .addType(URI.create(WON.Atom.getURI()))
+                                .build();
+                Authorization auth = Authorization.builder()
+                                .addGranteesAtomExpression(ae -> ae.addAtomsURI(atomUri2))
+                                .addGrant(ase -> ase.addOperationsSimpleOperationExpression(OP_READ))
+                                .build();
                 WonMessage createMessage = WonMessageBuilder.createAtom()
                                 .atom(atomUri1)
                                 .content().graph(RdfOutput.toGraph(atomContent))
@@ -228,26 +228,25 @@ public class AclTests extends AbstractBotBasedTest {
             // create match source
             {
                 final String atomUriString = atomUri2.toString();
-                final AtomContent atomContent = new AtomContent(atomUriString);
-                atomContent.addTitle("Grantee atom");
-                atomContent.addSparqlQuery(
-                                "PREFIX won:<https://w3id.org/won/core#>\n"
-                                                + "PREFIX con:<https://w3id.org/won/content#>\n"
-                                                + "SELECT ?result (1.0 AS ?score) WHERE {"
-                                                + "?result a won:Atom ;"
-                                                + "    con:tag \"tag-to-match\"."
-                                                + "}");
-                final Socket chatSocket = new Socket(atomUriString + "#chatSocket");
-                chatSocket.setSocketDefinition(WXCHAT.ChatSocket.asURI());
-                atomContent.addSocket(chatSocket);
-                atomContent.addType(URI.create(WON.Atom.getURI()));
-                Authorization auth = new Authorization();
-                AtomExpression ae = new AtomExpression();
-                ae.addAtomsURI(URI.create("http://example.com/nobody"));
-                auth.addGranteesAtomExpression(ae);
-                AseRoot g = new AseRoot();
-                g.addOperationsSimpleOperationExpression(Individuals.OP_READ);
-                auth.addGrant(g);
+                final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                .addTitle("Grantee atom")
+                                .addSparqlQuery(
+                                                "PREFIX won:<https://w3id.org/won/core#>\n"
+                                                                + "PREFIX con:<https://w3id.org/won/content#>\n"
+                                                                + "SELECT ?result (1.0 AS ?score) WHERE {"
+                                                                + "?result a won:Atom ;"
+                                                                + "    con:tag \"tag-to-match\"."
+                                                                + "}")
+                                .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                .build())
+                                .addType(URI.create(WON.Atom.getURI()))
+                                .build();
+                Authorization auth = Authorization.builder()
+                                .addGranteesAtomExpression(
+                                                ae -> ae.addAtomsURI(URI.create("http://example.com/nobody")))
+                                .addGrant(ase -> ase.addOperationsSimpleOperationExpression(OP_READ))
+                                .build();
                 WonMessage createMessage = WonMessageBuilder.createAtom()
                                 .atom(atomUri2)
                                 .content().graph(RdfOutput.toGraph(atomContent))
@@ -299,7 +298,7 @@ public class AclTests extends AbstractBotBasedTest {
         });
     }
 
-    @Test(timeout = 600 * 1000)
+    @Test(timeout = 60 * 1000)
     public void testConnectionMessages() throws Exception {
         final AtomicReference<URI> createMessageUri1 = new AtomicReference();
         final AtomicReference<URI> createMessageUri2 = new AtomicReference();
@@ -316,24 +315,18 @@ public class AclTests extends AbstractBotBasedTest {
                 @Override
                 protected void onActivate(Optional<Object> message) {
                     final String atomUriString = atomUri1.toString();
-                    final AtomContent atomContent = new AtomContent(atomUriString);
-                    atomContent.addTitle("Connection initiating atom");
-                    final Socket chatSocket = new Socket(atomUriString + "#chatSocket");
-                    chatSocket.setSocketDefinition(WXCHAT.ChatSocket.asURI());
-                    atomContent.addSocket(chatSocket);
-                    atomContent.addType(URI.create(WON.Atom.getURI()));
-                    Authorization auth = new Authorization();
-                    AtomExpression ae = new AtomExpression();
-                    ae.addAtomsURI(atomUri2);
-                    auth.addGranteesAtomExpression(ae);
-                    AseRoot r = new AseRoot();
-                    GraphExpression gr = new GraphExpression();
-                    gr.addOperationsSimpleOperationExpression(Individuals.OP_READ);
-                    r.addGraph(gr);
-                    SocketExpression s = new SocketExpression();
-                    s.setInherit(false);
-                    r.addSocket(s);
-                    auth.addGrant(r);
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Connection initiating atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth = Authorization.builder()
+                                    .addGranteesAtomExpression(ae -> ae.addAtomsURI(atomUri2))
+                                    .addGrant(ase -> ase
+                                                    .addGraph(ge -> ge.addOperationsSimpleOperationExpression(OP_READ)))
+                                    .build();
                     WonMessage createMessage = WonMessageBuilder.createAtom()
                                     .atom(atomUri1)
                                     .content().graph(RdfOutput.toGraph(atomContent))
@@ -358,31 +351,25 @@ public class AclTests extends AbstractBotBasedTest {
                 @Override
                 protected void onActivate(Optional<Object> message) {
                     final String atomUriString = atomUri2.toString();
-                    final AtomContent atomContent = new AtomContent(atomUriString);
-                    atomContent.addTitle("Grantee atom");
-                    atomContent.addSparqlQuery(
-                                    "PREFIX won:<https://w3id.org/won/core#>\n"
-                                                    + "PREFIX con:<https://w3id.org/won/content#>\n"
-                                                    + "SELECT ?result (1.0 AS ?score) WHERE {"
-                                                    + "?result a won:Atom ;"
-                                                    + "    con:tag \"tag-to-match\"."
-                                                    + "}");
-                    final Socket chatSocket = new Socket(atomUriString + "#chatSocket");
-                    chatSocket.setSocketDefinition(WXCHAT.ChatSocket.asURI());
-                    atomContent.addSocket(chatSocket);
-                    atomContent.addType(URI.create(WON.Atom.getURI()));
-                    Authorization auth = new Authorization();
-                    AtomExpression ae = new AtomExpression();
-                    ae.addAtomsURI(atomUri1);
-                    auth.addGranteesAtomExpression(ae);
-                    AseRoot r = new AseRoot();
-                    GraphExpression gr = new GraphExpression();
-                    gr.addOperationsSimpleOperationExpression(Individuals.OP_READ);
-                    r.addGraph(gr);
-                    SocketExpression s = new SocketExpression();
-                    s.setInherit(false);
-                    r.addSocket(s);
-                    auth.addGrant(r);
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Grantee atom")
+                                    .addSparqlQuery(
+                                                    "PREFIX won:<https://w3id.org/won/core#>\n"
+                                                                    + "PREFIX con:<https://w3id.org/won/content#>\n"
+                                                                    + "SELECT ?result (1.0 AS ?score) WHERE {"
+                                                                    + "?result a won:Atom ;"
+                                                                    + "    con:tag \"tag-to-match\"."
+                                                                    + "}")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth = Authorization.builder()
+                                    .addGranteesAtomExpression(ae -> ae.addAtomsURI(atomUri1))
+                                    .addGrant(ase -> ase
+                                                    .addGraph(ge -> ge.addOperationsSimpleOperationExpression(OP_READ)))
+                                    .build();
                     WonMessage createMessage = WonMessageBuilder.createAtom()
                                     .atom(atomUri2)
                                     .content().graph(RdfOutput.toGraph(atomContent))
@@ -521,5 +508,335 @@ public class AclTests extends AbstractBotBasedTest {
             bbCreateAtom1.activate();
             bbCreateAtom2.activate();
         });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testTokenExchange() throws Exception {
+        final AtomicReference<URI> createMessageUri1 = new AtomicReference();
+        final AtomicReference<URI> createMessageUri2 = new AtomicReference();
+        final AtomicReference<URI> createMessageUri3 = new AtomicReference();
+        final AtomicReference<URI> connectionUri12 = new AtomicReference<>();
+        final AtomicReference<URI> connectionUri21 = new AtomicReference<>();
+        final AtomicReference<URI> connectionUri23 = new AtomicReference<>();
+        final AtomicReference<URI> connectionUri32 = new AtomicReference<>();
+        final AtomicReference<URI> connectMessageUri12 = new AtomicReference<>();
+        final AtomicReference<URI> connectMessageUri21 = new AtomicReference<>();
+        final AtomicReference<URI> connectMessageUri23 = new AtomicReference<>();
+        final AtomicReference<URI> connectMessageUri32 = new AtomicReference<>();
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri1 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri3 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final BotBehaviour bbCreateAtom1 = new BotBehaviour(ctx, "bbCreateAtom1") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri1.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri1)
+                                    .addTitle("atom 1/3")
+                                    .addSocket(Socket.builder(atomUriString + "#buddySocket")
+                                                    .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth1 = getBuddiesAndBOfBuddiesReadAllGraphsAuth();
+                    Authorization auth2 = getBuddiesReceiveBuddyTokenAuth();
+                    logger.info("auth1:\n {}", AuthUtils.toRdfString(auth1));
+                    logger.info("auth2:\n {}", AuthUtils.toRdfString(auth2));
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri1)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth1))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth2))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection initiating atom created");
+                        createMessageUri1.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create connection initiating atom");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom2 = new BotBehaviour(ctx, "bbCreateAtom2") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri2.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri2)
+                                    .addTitle("atom 2/3")
+                                    .addSocket(Socket.builder(atomUriString + "#buddySocket")
+                                                    .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth1 = getBuddiesAndBOfBuddiesReadAllGraphsAuth();
+                    Authorization auth2 = getBuddiesReceiveBuddyTokenAuth();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri2)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth1))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth2))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection accepting atom created");
+                        createMessageUri2.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create connection accepting atom");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom3 = new BotBehaviour(ctx, "bbCreateAtom3") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri3.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri3)
+                                    .addTitle("atom 3/3")
+                                    .addSocket(Socket.builder(atomUriString + "#buddySocket")
+                                                    .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth1 = getBuddiesAndBOfBuddiesReadAllGraphsAuth();
+                    Authorization auth2 = getBuddiesReceiveBuddyTokenAuth();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri3)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth1))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth2))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri3);
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection accepting atom created");
+                        createMessageUri3.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create connection accepting atom");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbSendConnect12 = new BotBehaviour(ctx, "bbSendConnect12") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri1.toString() + "#buddySocket"))
+                                    .recipient(URI.create(atomUri2.toString() + "#buddySocket"))
+                                    .direction().fromOwner()
+                                    .content().text("Hello there!")
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    connectMessageUri12.set(connectMessage.getMessageURIRequired());
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection requested");
+                        connectionUri12.set(((SuccessResponseEvent) event).getConnectionURI().get());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbAcceptConnect21 = new BotBehaviour(ctx, "bbAcceptConnect") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri2.toString() + "#buddySocket"))
+                                    .recipient(URI.create(atomUri1.toString() + "#buddySocket"))
+                                    .direction().fromOwner()
+                                    .content().text("Hello!")
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    connectMessageUri21.set(connectMessage.getMessageURIRequired());
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection accepted");
+                        connectionUri21.set(((SuccessResponseEvent) event).getConnectionURI().get());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Accepting connection");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbSendConnect32 = new BotBehaviour(ctx, "bbSendConnect32") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri3.toString() + "#buddySocket"))
+                                    .recipient(URI.create(atomUri2.toString() + "#buddySocket"))
+                                    .direction().fromOwner()
+                                    .content().text("Hello there!")
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    connectMessageUri32.set(connectMessage.getMessageURIRequired());
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection requested");
+                        connectionUri32.set(((SuccessResponseEvent) event).getConnectionURI().get());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbAcceptConnect23 = new BotBehaviour(ctx, "bbAcceptConnect23") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri2.toString() + "#buddySocket"))
+                                    .recipient(URI.create(atomUri3.toString() + "#buddySocket"))
+                                    .direction().fromOwner()
+                                    .content().text("Hello!")
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    connectMessageUri23.set(connectMessage.getMessageURIRequired());
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection accepted");
+                        connectionUri23.set(((SuccessResponseEvent) event).getConnectionURI().get());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Accepting connection");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbTestLinkedDataAccess = new BotBehaviour(ctx, "bbTestLinkedDataAccess") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    URI connContainerUri1 = uriService.createConnectionContainerURIForAtom(atomUri1);
+                    URI connContainerUri2 = uriService.createConnectionContainerURIForAtom(atomUri2);
+                    URI connContainerUri3 = uriService.createConnectionContainerURIForAtom(atomUri3);
+                    boolean passed = true;
+                    // both atoms allow each other read access
+                    passed = passed && testLinkedDataRequestOk(ctx, bus, "test1.", atomUri1,
+                                    atomUri1,
+                                    atomUri2,
+                                    // createMessageUri1.get(),
+                                    connectionUri12.get(),
+                                    connectMessageUri12.get(),
+                                    connectMessageUri21.get(),
+                                    connContainerUri1);
+                    passed = passed && testLinkedDataRequestFails(ctx, bus, "test2.", atomUri1,
+                                    LinkedDataFetchingException.class,
+                                    // createMessageUri2.get(),
+                                    connectionUri21.get(),
+                                    connContainerUri2,
+                                    atomUri3,
+                                    connContainerUri3);
+                    passed = passed && testLinkedDataRequestOk(ctx, bus, "test3.", atomUri2,
+                                    atomUri2,
+                                    atomUri1,
+                                    // createMessageUri2.get(),
+                                    connectionUri21.get(),
+                                    connectMessageUri21.get(),
+                                    connectMessageUri12.get(),
+                                    connContainerUri2,
+                                    atomUri3);
+                    passed = passed && testLinkedDataRequestFails(ctx, bus, "test4.", atomUri2,
+                                    LinkedDataFetchingException.class,
+                                    // createMessageUri1.get(),
+                                    connectionUri12.get(),
+                                    connContainerUri1,
+                                    connContainerUri3,
+                                    connectionUri32.get());
+                    deactivate();
+                }
+            };
+            BotBehaviour bbRequestBuddyToken = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    deactivate();
+                }
+            };
+            BotBehaviour bbTestLinkedDataAccessWithToken = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    passTest(bus);
+                }
+            };
+            BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+            barrier.waitFor(bbCreateAtom1, bbCreateAtom2, bbCreateAtom3);
+            barrier.thenStart(bbSendConnect12);
+            barrier.activate();
+            bbSendConnect12.onDeactivateActivate(bbAcceptConnect21);
+            bbAcceptConnect21.onDeactivateActivate(bbSendConnect32);
+            bbSendConnect32.onDeactivateActivate(bbAcceptConnect23);
+            bbAcceptConnect23.onDeactivateActivate(bbTestLinkedDataAccess);
+            bbTestLinkedDataAccess.onDeactivateActivate(bbRequestBuddyToken);
+            bbRequestBuddyToken.onDeactivateActivate(bbTestLinkedDataAccessWithToken);
+            bbCreateAtom1.activate();
+            bbCreateAtom2.activate();
+            bbCreateAtom3.activate();
+        });
+    }
+
+    private Authorization getBuddiesReceiveBuddyTokenAuth() {
+        // buddies and buddies of buddies can see my content
+        Authorization auth = Authorization.builder()
+                        .addGranteesAseRoot(ase -> ase
+                                        .addSocket(se -> se
+                                                        .addSocketType(WXBUDDY.BuddySocket.asURI())
+                                                        .addConnection(ce -> ce
+                                                                        .addConnectionState(
+                                                                                        ConnectionState.CONNECTED)
+                                                                        .setTargetAtom(new TargetAtomExpression()))))
+                        .addGrant(ase -> ase
+                                        .addOperationsTokenOperationExpression(top -> top
+                                                        .setRequestToken(rt -> rt
+                                                                        .setTokenScopeURI(
+                                                                                        WXBUDDY.BuddySocket.asURI()))))
+                        .build();
+        return auth;
+    }
+
+    private Authorization getBuddiesAndBOfBuddiesReadAllGraphsAuth() {
+        // buddies and buddies of buddies can see my content
+        Authorization auth = Authorization.builder()
+                        .addGranteesAseRoot(ase -> ase
+                                        .addSocket(se -> se
+                                                        .addSocketType(WXBUDDY.BuddySocket.asURI())
+                                                        .addConnection(ce -> ce
+                                                                        .addConnectionState(ConnectionState.CONNECTED)
+                                                                        .setTargetAtom(new TargetAtomExpression()))))
+                        .addBearer(ts -> ts
+                                        .setNodeSigned(true)
+                                        .addTokenScopesURI(WXBUDDY.BuddySocket.asURI())
+                                        .addIssuersAseRoot(i -> i
+                                                        .addSocket(se -> se
+                                                                        .addSocketType(WXBUDDY.BuddySocket.asURI())
+                                                                        .addConnection(ce -> ce
+                                                                                        .addConnectionState(
+                                                                                                        ConnectionState.CONNECTED)
+                                                                                        .setTargetAtom(new TargetAtomExpression())))))
+                        .addGrant(ase -> ase
+                                        .addGraph(ge -> ge.addOperationsSimpleOperationExpression(OP_READ)))
+                        .build();
+        return auth;
     }
 }
