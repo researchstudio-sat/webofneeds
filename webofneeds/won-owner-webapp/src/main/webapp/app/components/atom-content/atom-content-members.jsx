@@ -76,7 +76,6 @@ export default function WonAtomContentMembers({
         connectionUtils.getTargetSocketUri(conn)
       );
 
-      console.debug(connectionUtils.getTargetSocketUri(conn), targetSocketType);
       return (
         targetSocketType === vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted
       );

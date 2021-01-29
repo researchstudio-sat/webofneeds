@@ -15,6 +15,7 @@ import WonAtomIcon from "./atom-icon.jsx";
 import VisibilitySensor from "react-visibility-sensor";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
+import vocab from "~/app/service/vocab";
 
 export default function WonAtomHeader({
   atom,
@@ -148,6 +149,37 @@ export default function WonAtomHeader({
           <span className="ah__right__subtitle__type">
             Atom might have been deleted.
           </span>
+        </div>
+      </div>
+    );
+  } else if (atomUtils.isRole(atom)) {
+    //Role View
+    const connectedMembersSize = atomUtils.getConnectedConnections(
+      atom,
+      vocab.WXSCHEMA.MemberSocketCompacted
+    ).size;
+
+    atomHeaderIcon = <WonAtomIcon atom={atom} />;
+    atomHeaderContent = (
+      <div className="ah__right">
+        <div className="ah__right__topline">
+          <div className="ah__right__topline__title">
+            {title ? title : "No Title"}
+          </div>
+        </div>
+        <div className="ah__right__subtitle">
+          <span className="ah__right__subtitle__type">
+            {connectedMembersSize > 0 ? (
+              <span className="ah__right__subtitle__type__holder">{`${connectedMembersSize} Member${
+                connectedMembersSize !== 1 ? "s" : ""
+              }`}</span>
+            ) : (
+              <span>0 Members</span>
+            )}
+          </span>
+          {!hideTimestamp && (
+            <div className="ah__right__subtitle__date">{friendlyTimestamp}</div>
+          )}
         </div>
       </div>
     );
