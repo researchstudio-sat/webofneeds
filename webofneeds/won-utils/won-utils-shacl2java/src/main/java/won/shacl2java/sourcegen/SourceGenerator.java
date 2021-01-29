@@ -2,14 +2,6 @@ package won.shacl2java.sourcegen;
 
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.Set;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -19,30 +11,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.shacl2java.Shacl2JavaConfig;
 import won.shacl2java.sourcegen.typegen.TypegenContext;
-import won.shacl2java.sourcegen.typegen.logic.IndividualsGenerator;
-import won.shacl2java.sourcegen.typegen.logic.MainTypesGenerator;
-import won.shacl2java.sourcegen.typegen.logic.MainTypesPostprocessor;
-import won.shacl2java.sourcegen.typegen.logic.ShapeTypeInterfaceGenerator;
-import won.shacl2java.sourcegen.typegen.logic.ShapeTypeInterfaceImplementer;
-import won.shacl2java.sourcegen.typegen.logic.ShapeTypeInterfacePopulator;
-import won.shacl2java.sourcegen.typegen.logic.UnionEmulationPostprocessor;
-import won.shacl2java.sourcegen.typegen.logic.VisitorAcceptMethodAdder;
-import won.shacl2java.sourcegen.typegen.logic.VisitorImplGenerator;
-import won.shacl2java.sourcegen.typegen.logic.VisitorInterfaceGenerator;
-import won.shacl2java.sourcegen.typegen.mapping.IndividualClassNames;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeImplTypes;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeInterfaceTypes;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
-import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
-import won.shacl2java.sourcegen.typegen.mapping.VisitorClassTypeSpecs;
-import won.shacl2java.sourcegen.typegen.mapping.VisitorInterfaceTypes;
+import won.shacl2java.sourcegen.typegen.logic.*;
+import won.shacl2java.sourcegen.typegen.mapping.*;
 import won.shacl2java.sourcegen.typegen.support.NameClashDetector;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Set;
 
 public class SourceGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public SourceGenerator() {
+    }
+
+    public static Shapes readShapes(File shapesFile) throws FileNotFoundException {
+        Model shapesGraph = ModelFactory.createDefaultModel();
+        RDFDataMgr.read(shapesGraph, new FileInputStream(shapesFile), Lang.TTL);
+        return Shapes.parse(shapesGraph.getGraph());
+    }
+
+    public static void writeClasses(Set<TypeSpec> types, Shacl2JavaConfig config) throws IOException {
+        File outputDir = new File(config.getOutputDir());
+        outputDir.mkdirs();
+        for (TypeSpec typeSpec : types) {
+            JavaFile file = JavaFile.builder(config.getPackageName(), typeSpec).build();
+            file.writeTo(outputDir);
+        }
     }
 
     public SourceGeneratorStats generate(File shapesFile, Shacl2JavaConfig config) throws IOException {
@@ -65,16 +65,11 @@ public class SourceGenerator {
         return stats;
     }
 
-    public static Shapes readShapes(File shapesFile) throws FileNotFoundException {
-        Model shapesGraph = ModelFactory.createDefaultModel();
-        RDFDataMgr.read(shapesGraph, new FileInputStream(shapesFile), Lang.TTL);
-        return Shapes.parse(shapesGraph.getGraph());
-    }
-
     public Set<TypeSpec> generateTypes(Shapes shapes, Shacl2JavaConfig config) {
         TypegenContext ctx = new TypegenContext();
         NameClashDetector nameClashDetector = new NameClashDetector();
         IndividualClassNames individualClassNames = new IndividualClassNames();
+        BuildableClassNames buildableClassNames = new BuildableClassNames();
         TypeSpecNames typeSpecNames = new TypeSpecNames();
         ctx.manageMapping(typeSpecNames);
         ShapeTargetClasses shapeTargetClasses = new ShapeTargetClasses();
@@ -96,14 +91,16 @@ public class SourceGenerator {
                         shapeTypeSpecs.producer(),
                         visitorClassTypeSpecs.producer(),
                         typeSpecNames.producer(),
-                        shapeTargetClasses.producer());
+                        shapeTargetClasses.producer(),
+                        buildableClassNames.producer());
         MainTypesPostprocessor mainTypesPostprocessor = new MainTypesPostprocessor(
                         shapes,
                         config,
                         shapeTypeSpecs.consumer(),
                         individualClassNames.consumer(),
                         typeSpecNames.consumer(),
-                        shapeTargetClasses.consumer());
+                        shapeTargetClasses.consumer(),
+                        buildableClassNames.consumer());
         ShapeTypeInterfaceGenerator interfaceGenerator = new ShapeTypeInterfaceGenerator(
                         shapes,
                         config, shapeTypeInterfaceTypes.producer(),
@@ -146,14 +143,5 @@ public class SourceGenerator {
         ctx.applyGenerator(visitorImplGenerator);
         ctx.applyPostpropcessor(unionEmulationPostprocessor);
         return ctx.getTypeSpecs();
-    }
-
-    public static void writeClasses(Set<TypeSpec> types, Shacl2JavaConfig config) throws IOException {
-        File outputDir = new File(config.getOutputDir());
-        outputDir.mkdirs();
-        for (TypeSpec typeSpec : types) {
-            JavaFile file = JavaFile.builder(config.getPackageName(), typeSpec).build();
-            file.writeTo(outputDir);
-        }
     }
 }

@@ -22,6 +22,7 @@ import won.shacl2java.annotation.PropertyPath;
 import won.shacl2java.constraints.PropertySpec;
 import won.shacl2java.runtime.ToRdfUtils;
 import won.shacl2java.sourcegen.typegen.TypesPostprocessor;
+import won.shacl2java.sourcegen.typegen.mapping.BuildableClassNames;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
 import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
 import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
@@ -46,6 +47,7 @@ import static won.shacl2java.util.NameUtils.*;
 
 public class MainTypesPostprocessor implements TypesPostprocessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final BuildableClassNames.Consumer buildableClassNames;
     private ShapeTypeSpecs.Consumer shapeTypeSpecs;
     private ProducerConsumerMap.Consumer individualClassNames;
     private TypeSpecNames.Consumer typeSpecNames;
@@ -58,13 +60,15 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                     ShapeTypeSpecs.Consumer shapeTypeSpecs,
                     ProducerConsumerMap.Consumer individualClassNames,
                     TypeSpecNames.Consumer typeSpecNames,
-                    ShapeTargetClasses.Consumer shapeTargetClasses) {
+                    ShapeTargetClasses.Consumer shapeTargetClasses,
+                    BuildableClassNames.Consumer buildableClassNames) {
         this.shapeTypeSpecs = shapeTypeSpecs;
         this.individualClassNames = individualClassNames;
         this.typeSpecNames = typeSpecNames;
         this.shapes = shapes;
         this.config = config;
         this.shapeTargetClasses = shapeTargetClasses;
+        this.buildableClassNames = buildableClassNames;
     }
 
     private static void addStatementsSetAddAll(MethodSpec.Builder methodBuilder, String setName, String toAdd) {
@@ -538,7 +542,6 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .build();
         CollectionUtils.addToMultivalueMap(fieldsPerPath, path, field);
         MethodSpec setter = generateSetter(field);
-        MethodSpec setterForBuilder = generateSetterForBuilder(field, builderTypeName, "product");
         if (propertySpec.hasNamedNodeShape() && propertySpec.getShNodeShape().getShapeNode().isURI()) {
             setter = setter.toBuilder().addJavadoc(
                             getAccessorJavadocGeneratedForNodeShape(propertySpec.getShNodeShape(), propertySpec))
@@ -554,11 +557,21 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addField(field)
                         .addMethod(setter)
                         .addMethod(getter);
+        MethodSpec setterForBuilder = generateSetterForBuilder(field, builderTypeName, "product");
         builderBuilder
                         .addMethod(setterForBuilder);
-        if (!propertySpec.isSingletonProperty()) {
+        if (propertySpec.isSingletonProperty()) {
+            if (buildableClassNames.containsValue(field.type)) {
+                builderBuilder.addMethod(generateSetterByBuilderForBuilder(field, builderTypeName, "product", config));
+            }
+        } else {
             typeBuilder.addMethod(generateAdder(field));
             builderBuilder.addMethod(generateAdderForBuilder(field, builderTypeName, "product"));
+            TypeName baseType = ((ParameterizedTypeName) field.type).typeArguments.get(0);
+            if (buildableClassNames.containsValue(baseType)) {
+                builderBuilder.addMethod(generateAdderByBuilderForBuilder(field,
+                                builderTypeName, "product", config));
+            }
         }
         boolean singleton = propertySpec.isSingletonProperty();
         generateToRdfForField(path, toRdfMethodBuilder, getter, singleton);

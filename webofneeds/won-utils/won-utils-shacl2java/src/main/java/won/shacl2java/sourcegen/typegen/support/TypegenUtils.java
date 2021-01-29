@@ -5,6 +5,7 @@ import won.shacl2java.Shacl2JavaConfig;
 import won.shacl2java.util.NameUtils;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static javax.lang.model.element.Modifier.PUBLIC;
@@ -27,6 +28,24 @@ public class TypegenUtils {
                         .addModifiers(PUBLIC)
                         .returns(builderType)
                         .addStatement(String.format("this.%s.%s($N)", productFieldName, setterName), field)
+                        .addStatement("return this")
+                        .build();
+    }
+
+    public static MethodSpec generateSetterByBuilderForBuilder(FieldSpec field, TypeName builderType,
+                    String productFieldName, Shacl2JavaConfig config) {
+        String setterName = NameUtils.setterNameForField(field);
+        ClassName fieldBuilderClass = ClassName.get(config.getPackageName(), field.type.toString() + ".Builder");
+        return MethodSpec
+                        .methodBuilder(setterName)
+                        .addParameter(ParameterizedTypeName.get(ClassName.get(Consumer.class), fieldBuilderClass),
+                                        "builderConsumer")
+                        .addModifiers(PUBLIC)
+                        .returns(builderType)
+                        .addStatement("$T subBuilder = $T.builder()", fieldBuilderClass, field.type)
+                        .addStatement("builderConsumer.accept(subBuilder)")
+                        .addStatement(String.format("this.%s.%s(subBuilder.build())", productFieldName, setterName),
+                                        field)
                         .addStatement("return this")
                         .build();
     }
@@ -54,6 +73,24 @@ public class TypegenUtils {
                         .addModifiers(PUBLIC)
                         .returns(builderTypeName)
                         .addStatement(String.format("this.%s.%s(toAdd)", productFieldName, adderName))
+                        .addStatement("return this")
+                        .build();
+    }
+
+    public static MethodSpec generateAdderByBuilderForBuilder(FieldSpec field, TypeName builderTypeName,
+                    String productFieldName, Shacl2JavaConfig config) {
+        TypeName baseType = ((ParameterizedTypeName) field.type).typeArguments.get(0);
+        String adderName = NameUtils.adderNameForFieldNameInPlural(field.name);
+        ClassName fieldBuilderClass = ClassName.get(config.getPackageName(), baseType.toString() + ".Builder");
+        return MethodSpec
+                        .methodBuilder(adderName)
+                        .addParameter(ParameterizedTypeName.get(ClassName.get(Consumer.class), fieldBuilderClass),
+                                        "builderConsumer")
+                        .addModifiers(PUBLIC)
+                        .returns(builderTypeName)
+                        .addStatement("$T subBuilder = $T.builder()", fieldBuilderClass, baseType)
+                        .addStatement("builderConsumer.accept(subBuilder)")
+                        .addStatement(String.format("this.%s.%s(subBuilder.build())", productFieldName, adderName))
                         .addStatement("return this")
                         .build();
     }

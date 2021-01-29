@@ -1,32 +1,12 @@
 package won.shacl2java.sourcegen.typegen.logic;
 
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.apache.jena.datatypes.RDFDatatype;
+import com.squareup.javapoet.*;
 import org.apache.jena.datatypes.TypeMapper;
-import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.graph.impl.LiteralLabel;
 import org.apache.jena.graph.impl.LiteralLabelFactory;
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.impl.LiteralImpl;
 import org.apache.jena.riot.other.G;
 import org.apache.jena.shacl.Shapes;
 import org.apache.jena.shacl.engine.constraint.*;
@@ -40,14 +20,19 @@ import won.shacl2java.annotation.ShapeNode;
 import won.shacl2java.constraints.EnumShapeChecker;
 import won.shacl2java.runtime.model.GraphEntity;
 import won.shacl2java.sourcegen.typegen.TypesGenerator;
-import won.shacl2java.sourcegen.typegen.mapping.IndividualClassNames;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTargetClasses;
-import won.shacl2java.sourcegen.typegen.mapping.ShapeTypeSpecs;
-import won.shacl2java.sourcegen.typegen.mapping.TypeSpecNames;
-import won.shacl2java.sourcegen.typegen.mapping.VisitorClassTypeSpecs;
+import won.shacl2java.sourcegen.typegen.mapping.*;
 import won.shacl2java.sourcegen.typegen.support.NameClashDetector;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
@@ -62,13 +47,15 @@ public class MainTypesGenerator implements TypesGenerator {
     private VisitorClassTypeSpecs.Producer visitorClassTypeSpecs;
     private TypeSpecNames.Producer typeSpecNames;
     private ShapeTargetClasses.Producer shapeTargetClasses;
+    private BuildableClassNames.Producer buildableClassNames;
 
     public MainTypesGenerator(Shapes shapes, Shacl2JavaConfig config,
                     NameClashDetector nameClashDetector,
                     IndividualClassNames.Consumer individualClassNames,
                     ShapeTypeSpecs.Producer shapeTypeSpecs,
                     VisitorClassTypeSpecs.Producer visitorClassTypeSpecs,
-                    TypeSpecNames.Producer typeSpecNames, ShapeTargetClasses.Producer producer) {
+                    TypeSpecNames.Producer typeSpecNames, ShapeTargetClasses.Producer producer,
+                    BuildableClassNames.Producer buildableClassNames) {
         this.shapes = shapes;
         this.config = config;
         this.nameClashDetector = nameClashDetector;
@@ -77,6 +64,20 @@ public class MainTypesGenerator implements TypesGenerator {
         this.visitorClassTypeSpecs = visitorClassTypeSpecs;
         this.typeSpecNames = typeSpecNames;
         this.shapeTargetClasses = producer;
+        this.buildableClassNames = buildableClassNames;
+    }
+
+    private static boolean isAnonymousShape(Shape shape) {
+        return shape.getShapeNode().isBlank();
+    }
+
+    private static String getJavadocGeneratedForShape(Shape shape) {
+        Node shapeNode = shape.getShapeNode();
+        if (shapeNode.isBlank()) {
+            return "Generated for an anonymous shape";
+        }
+        String uri = shapeNode.getURI();
+        return String.format("Generated for shape <a href=\"%s\">%s</a>", uri, uri);
     }
 
     @Override
@@ -95,6 +96,8 @@ public class MainTypesGenerator implements TypesGenerator {
                                 spec = generateEnum(config, shape, enumShapeChecker);
                             } else {
                                 spec = generateClass(shape, shapes, config);
+                                buildableClassNames.put(shape.getShapeNode(),
+                                                ClassName.get(config.getPackageName(), spec.name));
                             }
                             typeSpecNames.put(ClassName.get(config.getPackageName(), spec.name), spec);
                             shapeTypeSpecs.put(shape, spec);
@@ -114,10 +117,6 @@ public class MainTypesGenerator implements TypesGenerator {
                                         || c instanceof ShAnd
                                         || c instanceof ShNot
                                         || c instanceof ClosedConstraint);
-    }
-
-    private static boolean isAnonymousShape(Shape shape) {
-        return shape.getShapeNode().isBlank();
     }
 
     public TypeSpec generateClass(Shape shape, Shapes shapes, Shacl2JavaConfig config) {
@@ -267,14 +266,5 @@ public class MainTypesGenerator implements TypesGenerator {
                             TypeSpec.anonymousClassBuilder(argumentsFormat, argMapper.apply(value)).build());
         }
         return typeBuilder.build();
-    }
-
-    private static String getJavadocGeneratedForShape(Shape shape) {
-        Node shapeNode = shape.getShapeNode();
-        if (shapeNode.isBlank()) {
-            return "Generated for an anonymous shape";
-        }
-        String uri = shapeNode.getURI();
-        return String.format("Generated for shape <a href=\"%s\">%s</a>", uri, uri);
     }
 }
