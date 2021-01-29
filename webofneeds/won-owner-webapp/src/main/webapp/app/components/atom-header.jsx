@@ -32,6 +32,11 @@ export default function WonAtomHeader({
   const holderAtom = useSelector(generalSelectors.getAtom(holderUri));
   const holderName = atomUtils.getTitle(holderAtom, externalDataState);
 
+  //Used for Role Atoms
+  const orgUri = atomUtils.getOrganizationUriForRole(atom);
+  const orgAtom = useSelector(generalSelectors.getAtom(orgUri));
+  //------
+
   const processState = useSelector(generalSelectors.getProcessState);
 
   const atomTypeLabel = atom && atomUtils.generateTypeLabel(atom);
@@ -66,10 +71,18 @@ export default function WonAtomHeader({
     }
   }
 
+  function ensureOrgIsFetched() {
+    if (isOrgFetchNecessary) {
+      console.debug("fetch orgUri, ", orgUri);
+      dispatch(actionCreators.atoms__fetchUnloadedAtom(orgUri));
+    }
+  }
+
   function onChange(isVisible) {
     if (isVisible) {
       ensureAtomIsFetched();
       ensureHolderIsFetched();
+      ensureOrgIsFetched();
     }
   }
 
@@ -86,8 +99,13 @@ export default function WonAtomHeader({
     holderUri,
     holderAtom
   );
+  const isOrgFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    orgUri,
+    orgAtom
+  );
 
-  if (isAtomFetchNecessary || isHolderFetchNecessary) {
+  if (isAtomFetchNecessary || isHolderFetchNecessary || isOrgFetchNecessary) {
     //Loading View
 
     atomHeaderIcon = <div className="ah__icon__skeleton" />;
@@ -158,6 +176,7 @@ export default function WonAtomHeader({
       atom,
       vocab.WXSCHEMA.MemberSocketCompacted
     ).size;
+    const orgName = atomUtils.getTitle(orgAtom, externalDataState);
 
     atomHeaderIcon = <WonAtomIcon atom={atom} />;
     atomHeaderContent = (
@@ -177,8 +196,8 @@ export default function WonAtomHeader({
               <span>0 Members</span>
             )}
           </span>
-          {!hideTimestamp && (
-            <div className="ah__right__subtitle__date">{friendlyTimestamp}</div>
+          {orgName && (
+            <div className="ah__right__subtitle__date">{`Role of: ${orgName}`}</div>
           )}
         </div>
       </div>
@@ -236,7 +255,7 @@ export default function WonAtomHeader({
     <won-atom-header
       class={
         (atomLoading ? " won-is-loading " : "") +
-        (isAtomFetchNecessary || isHolderFetchNecessary
+        (isAtomFetchNecessary || isHolderFetchNecessary || isOrgFetchNecessary
           ? " won-to-load "
           : "") +
         (onClick ? " clickable " : "") +
