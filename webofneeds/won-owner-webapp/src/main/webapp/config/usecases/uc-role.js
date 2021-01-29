@@ -31,7 +31,6 @@ export const role = {
         useCaseIdentifiers: ["persona"],
       },
     },
-    //TODO: CHANGE SOCKET TO ORG ROLE SOCKET IF POSSIBLE
     [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: {
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
@@ -40,7 +39,7 @@ export const role = {
     },
   },
   details: {
-    title: { ...details.title },
+    title: { ...details.title, mandatory: true },
     description: { ...details.description },
   },
   seeksDetails: undefined,
