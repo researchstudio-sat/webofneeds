@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import won.auth.check.AtomNodeChecker;
 import won.auth.check.TargetAtomCheck;
 import won.auth.check.TargetAtomCheckEvaluator;
+import won.auth.check.WonAclEvaluationException;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 
@@ -340,6 +341,20 @@ public class WonAclEvaluator {
     private boolean isTargetAtom(URI candidate, URI baseAtom, AseRoot aseRoot) {
         TargetAtomCheckGenerator v = new TargetAtomCheckGenerator(baseAtom, candidate);
         aseRoot.accept(v);
+        if (v.getTargetAtomChecks().isEmpty()) {
+            logger.warn("Expected a targetAtomExpression in  ASE {} of {} for candidate {}, but none was found",
+                            aseRoot.getNode(), baseAtom, candidate);
+            if (logger.isDebugEnabled()) {
+                logger.debug("ASE: \n{}", AuthUtils.toRdfString(aseRoot));
+            } else {
+                logger.warn("ASE is logged on level DEBUG");
+            }
+            throw new WonAclEvaluationException(
+                            String.format("Expected a targetAtomExpression in  ASE %s of %s for candidate %s, but none was found",
+                                            aseRoot.getNode(),
+                                            candidate,
+                                            baseAtom));
+        }
         for (TargetAtomCheck check : v.getTargetAtomChecks()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Evaluating targetAtomCheck: {}", check);
