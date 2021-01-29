@@ -26,6 +26,9 @@
   "@id" : "https://w3id.org/won/core#SocketDefinition",
   "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
 }, {
+  "@id" : "https://w3id.org/won/core#autoOpen",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
   "@id" : "https://w3id.org/won/core#compatibleSocketDefinition",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
@@ -33,6 +36,9 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "https://w3id.org/won/core#derivesInverseAtomProperty",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/core#socketCapacity",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "https://w3id.org/won/ext/schema",
@@ -9767,6 +9773,8 @@
   } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/schema#MemberOfSocket"
+  }, {
+    "@id" : "https://w3id.org/won/ext/schema#OrganizationRoleOfSocket"
   } ],
   "https://w3id.org/won/core#derivesAtomProperty" : [ {
     "@id" : "http://schema.org/member"
@@ -10477,6 +10485,25 @@
     "@id" : "http://schema.org/orderedItem"
   } ]
 }, {
+  "@id" : "https://w3id.org/won/ext/schema#OrganizationRoleOfSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@value" : "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [parentOrganization](http://schema.org/parentOrganization) Property of the http://schema.org vocabulary."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "OrganizationRoleOfSocket"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/schema#MemberSocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "http://schema.org/memberOf"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ]
+}, {
   "@id" : "https://w3id.org/won/ext/schema#OrganizerInverseSocket",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
@@ -10715,6 +10742,10 @@
   } ],
   "https://w3id.org/won/core#derivesAtomProperty" : [ {
     "@id" : "http://schema.org/parentOrganization"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/schema#ParentServiceInverseSocket",
@@ -13250,6 +13281,10 @@
   } ],
   "https://w3id.org/won/core#derivesInverseAtomProperty" : [ {
     "@id" : "http://schema.org/review"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/schema#ReviewRatingInverseSocket",
@@ -13289,6 +13324,10 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "ReviewSocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "true"
   } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/schema#ReviewInverseSocket"

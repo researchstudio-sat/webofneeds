@@ -41,6 +41,9 @@
 # http://www.w3.org/ns/prov#wasDerivedFrom
 <http://www.w3.org/ns/prov#wasDerivedFrom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
+# https://w3id.org/won/core#autoOpen
+<https://w3id.org/won/core#autoOpen> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
 # https://w3id.org/won/core#compatibleSocketDefinition
 <https://w3id.org/won/core#compatibleSocketDefinition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
@@ -49,6 +52,9 @@
 # 
 # https://w3id.org/won/core#derivesInverseAtomProperty
 <https://w3id.org/won/core#derivesInverseAtomProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# https://w3id.org/won/core#socketCapacity
+<https://w3id.org/won/core#socketCapacity> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
 # 
 # 
@@ -5245,6 +5251,7 @@
 <https://w3id.org/won/ext/schema#MemberSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:member B` when a Connection with an Atom B is established. Automatically generated from the [member](http://schema.org/member) Property of the http://schema.org vocabulary." .
 <https://w3id.org/won/ext/schema#MemberSocket> <http://www.w3.org/2000/01/rdf-schema#label> "MemberSocket" .
 <https://w3id.org/won/ext/schema#MemberSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#MemberOfSocket> .
+<https://w3id.org/won/ext/schema#MemberSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#OrganizationRoleOfSocket> .
 <https://w3id.org/won/ext/schema#MemberSocket> <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/member> .
 # 
 # https://w3id.org/won/ext/schema#MentionsInverseSocket
@@ -5623,6 +5630,15 @@
 <https://w3id.org/won/ext/schema#OrderedItemSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#OrderedItemInverseSocket> .
 <https://w3id.org/won/ext/schema#OrderedItemSocket> <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/orderedItem> .
 # 
+# https://w3id.org/won/ext/schema#OrganizationRoleOfSocket
+<https://w3id.org/won/ext/schema#OrganizationRoleOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/schema#OrganizationRoleOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/schema#OrganizationRoleOfSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [parentOrganization](http://schema.org/parentOrganization) Property of the http://schema.org vocabulary." .
+<https://w3id.org/won/ext/schema#OrganizationRoleOfSocket> <http://www.w3.org/2000/01/rdf-schema#label> "OrganizationRoleOfSocket" .
+<https://w3id.org/won/ext/schema#OrganizationRoleOfSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#MemberSocket> .
+<https://w3id.org/won/ext/schema#OrganizationRoleOfSocket> <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/memberOf> .
+<https://w3id.org/won/ext/schema#OrganizationRoleOfSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+# 
 # https://w3id.org/won/ext/schema#OrganizerInverseSocket
 <https://w3id.org/won/ext/schema#OrganizerInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/schema#OrganizerInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
@@ -5750,6 +5766,7 @@
 <https://w3id.org/won/ext/schema#ParentOrganizationSocket> <http://www.w3.org/2000/01/rdf-schema#label> "ParentOrganizationSocket" .
 <https://w3id.org/won/ext/schema#ParentOrganizationSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#SubOrganizationSocket> .
 <https://w3id.org/won/ext/schema#ParentOrganizationSocket> <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/parentOrganization> .
+<https://w3id.org/won/ext/schema#ParentOrganizationSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 # 
 # https://w3id.org/won/ext/schema#ParentServiceInverseSocket
 <https://w3id.org/won/ext/schema#ParentServiceInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -7102,6 +7119,7 @@
 <https://w3id.org/won/ext/schema#ReviewInverseSocket> <http://www.w3.org/2000/01/rdf-schema#label> "ReviewInverseSocket" .
 <https://w3id.org/won/ext/schema#ReviewInverseSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#ReviewSocket> .
 <https://w3id.org/won/ext/schema#ReviewInverseSocket> <https://w3id.org/won/core#derivesInverseAtomProperty> <http://schema.org/review> .
+<https://w3id.org/won/ext/schema#ReviewInverseSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 # 
 # https://w3id.org/won/ext/schema#ReviewRatingInverseSocket
 <https://w3id.org/won/ext/schema#ReviewRatingInverseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -7124,6 +7142,7 @@
 <https://w3id.org/won/ext/schema#ReviewSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
 <https://w3id.org/won/ext/schema#ReviewSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:review B` when a Connection with an Atom B is established. Automatically generated from the [review](http://schema.org/review) Property of the http://schema.org vocabulary." .
 <https://w3id.org/won/ext/schema#ReviewSocket> <http://www.w3.org/2000/01/rdf-schema#label> "ReviewSocket" .
+<https://w3id.org/won/ext/schema#ReviewSocket> <https://w3id.org/won/core#autoOpen> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 <https://w3id.org/won/ext/schema#ReviewSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#ReviewInverseSocket> .
 <https://w3id.org/won/ext/schema#ReviewSocket> <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/review> .
 # 
@@ -8695,4 +8714,4 @@
 <https://w3id.org/won/ext/schema#WorksForSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#WorksForInverseSocket> .
 <https://w3id.org/won/ext/schema#WorksForSocket> <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/worksFor> .
 # 
-# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/
+# Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/
