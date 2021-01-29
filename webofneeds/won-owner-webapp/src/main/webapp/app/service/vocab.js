@@ -313,6 +313,11 @@ vocab.WXSCHEMA.MemberOfSocket = vocab.WXSCHEMA.baseUri + "MemberOfSocket";
 vocab.WXSCHEMA.MemberOfSocketCompacted =
   vocab.WXSCHEMA.prefix + ":MemberOfSocket";
 
+vocab.WXSCHEMA.OrganizationRoleOfSocket =
+  vocab.WXSCHEMA.baseUri + "OrganizationRoleOfSocket";
+vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":OrganizationRoleOfSocket";
+
 vocab.WXSCHEMA.MemberSocket = vocab.WXSCHEMA.baseUri + "MemberSocket";
 vocab.WXSCHEMA.MemberSocketCompacted = vocab.WXSCHEMA.prefix + ":MemberSocket";
 
@@ -493,6 +498,7 @@ vocab.socketCapacity = {
   [vocab.HOLD.HoldableSocketCompacted]: 1,
   [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: 1,
   [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: 1,
+  [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.ActorSocketCompacted]: 1,
