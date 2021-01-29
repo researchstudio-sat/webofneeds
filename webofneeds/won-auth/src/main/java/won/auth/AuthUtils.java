@@ -2,9 +2,13 @@ package won.auth;
 
 import io.jsonwebtoken.*;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Key;
@@ -218,5 +222,18 @@ public class AuthUtils {
             webid = issuer;
         }
         return webIdKeyLoader.loadKey(webid).stream().findFirst().get();
+    }
+
+    /**
+     * Returns the RDF representation of the specified object in TTL format.
+     *
+     * @param authEntity
+     * @return
+     */
+    public static String toRdfString(GeneralVisitorHost authEntity) {
+        Graph g = RdfOutput.toGraph(authEntity);
+        StringWriter writer = new StringWriter();
+        RDFDataMgr.write(writer, g, Lang.TTL);
+        return writer.toString();
     }
 }
