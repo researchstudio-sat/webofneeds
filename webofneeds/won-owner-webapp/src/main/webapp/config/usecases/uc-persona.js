@@ -17,7 +17,7 @@ export const persona = {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,
           "#holderSocket": vocab.HOLD.HolderSocketCompacted,
           "#buddySocket": vocab.BUDDY.BuddySocketCompacted,
-          "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted,
+          // "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted, // TODO: Currently not in use in favour of more generic member -> Role -> member relation
           "#memberOfSocket": vocab.WXSCHEMA.MemberOfSocketCompacted,
           // "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted, //TODO: exclude the ability to review a persona for now
           "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
@@ -55,11 +55,12 @@ export const persona = {
     //     useCaseIdentifiers: ["action"],
     //   },
     // },
-    [vocab.WXSCHEMA.WorksForSocketCompacted]: {
-      [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
-        useCaseIdentifiers: ["organization"],
-      },
-    },
+    // TODO: Currently not in use in favour of more generic member -> Role -> member relation
+    // [vocab.WXSCHEMA.WorksForSocketCompacted]: {
+    //   [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
+    //     useCaseIdentifiers: ["organization"],
+    //   },
+    // },
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
         useCaseIdentifiers: ["organization"],

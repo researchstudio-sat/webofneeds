@@ -40,6 +40,8 @@ const labels = deepFreeze({
   sockets: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Chat enabled",
     [vocab.CHAT.ChatSocketCompacted]: "Chat enabled",
+    [vocab.WXSCHEMA.MemberSocketCompacted]: "Members",
+    [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: "Role Of",
     [vocab.HOLD.HoldableSocketCompacted]: "Holdable",
     [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: "Supportable",
     [vocab.HOLD.HolderSocketCompacted]: "Holder",
@@ -91,6 +93,7 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.AttendeeSocketCompacted]: "Attendees",
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Organizers",
     [vocab.WXSCHEMA.EventSocketCompacted]: "Organized Events",
+    [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: "Role Of",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -105,6 +108,7 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: "Article",
     [vocab.WXSCHEMA.MemberSocketCompacted]: "Membership",
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Member",
+    [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: "Role",
     [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: "Employer",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employee",
     [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Parent Organization",
