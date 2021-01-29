@@ -388,6 +388,13 @@ export function isPersona(atom) {
   return types && types.has(vocab.WON.PersonaCompacted);
 }
 
+export function isRole(atom) {
+  const atomContent = getContent(atom);
+  const types = get(atomContent, "type");
+
+  return types && types.has("s:Role");
+}
+
 export function isServiceAtom(atom) {
   const atomContent = getContent(atom);
   const types = get(atomContent, "type");
@@ -597,6 +604,28 @@ export function getHeldByUri(atomImm) {
   if (heldAtomHoldableConnections && heldAtomHoldableConnections.size === 1) {
     return connectionUtils.getTargetAtomUri(
       heldAtomHoldableConnections.first()
+    );
+  } else {
+    return undefined;
+  }
+}
+
+export function getOrganizationUriForRole(atomImm) {
+  if (!isRole(atomImm)) {
+    return;
+  }
+  const organizationRoleOfConnections =
+    hasSocket(atomImm, vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted) &&
+    getConnectedConnections(
+      atomImm,
+      vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted
+    );
+  if (
+    organizationRoleOfConnections &&
+    organizationRoleOfConnections.size === 1
+  ) {
+    return connectionUtils.getTargetAtomUri(
+      organizationRoleOfConnections.first()
     );
   } else {
     return undefined;
