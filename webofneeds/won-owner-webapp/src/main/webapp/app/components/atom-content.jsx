@@ -20,6 +20,7 @@ import vocab from "../service/vocab.js";
 import WonAtomContentActivities from "./atom-content/atom-content-activities.jsx";
 import WonAtomContentChats from "./atom-content/atom-content-chats.jsx";
 import WonAtomContentSocket from "./atom-content/atom-content-socket.jsx";
+import WonAtomContentMembers from "./atom-content/atom-content-members.jsx";
 import WonAtomContentGeneral from "./atom-content/atom-content-general.jsx";
 import WonSocketAddButton from "./socket-add-button.jsx";
 import WonAtomConnectionsIndicator from "./atom-connections-indicator.jsx";
@@ -318,6 +319,20 @@ export default function WonAtomContent({
         );
         break;
       }
+
+      case vocab.WXSCHEMA.MemberSocketCompacted:
+        visibleTabFragment = (
+          <WonAtomContentMembers
+            atom={atom}
+            socketType={visibleTab}
+            ItemComponent={WonGenericItem}
+            relevantConnections={relevantConnections}
+            showAddPicker={showAddPicker}
+            toggleAddPicker={toggleAddPicker}
+            setVisibleTab={setVisibleTab}
+          />
+        );
+        break;
 
       case "RDF":
         visibleTabFragment = (
