@@ -118,10 +118,10 @@ export default function WonAtomContentMembers({
       connections
         .toOrderedMap()
         .sortBy(conn => {
-          const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
-          return lastUpdateDate && lastUpdateDate.getTime();
+          return atomUtils.getTitle(
+            get(storedAtoms, connectionUtils.getTargetAtomUri(conn))
+          );
         })
-        .reverse()
         .map((conn, connUri) => {
           const flip = connectionUtils.hasTargetSocketUri(conn, socketUri);
           connectionElements.push(
