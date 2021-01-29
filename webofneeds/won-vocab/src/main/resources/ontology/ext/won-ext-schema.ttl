@@ -66,7 +66,8 @@ won:derivesAtomProperty rdf:type owl:AnnotationProperty .
 	won:derivesAtomProperty schema:member ;
 	rdfs:label "MemberSocket" ;
 	rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:member B` when a Connection with an Atom B is established. Automatically generated from the [member](http://schema.org/member) Property of the http://schema.org vocabulary." ;
-	won:compatibleSocketDefinition :MemberOfSocket .
+	won:compatibleSocketDefinition :MemberOfSocket ;
+	won:compatibleSocketDefinition :OrganizationRoleOfSocket .
 
 :AboutSocket a won:SocketDefinition ;
 	won:derivesAtomProperty schema:about ;
@@ -102,6 +103,13 @@ won:derivesAtomProperty rdf:type owl:AnnotationProperty .
 	won:derivesAtomProperty schema:memberOf ;
 	rdfs:label "MemberOfSocket" ;
 	rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [memberOf](http://schema.org/memberOf) Property of the http://schema.org vocabulary." ;
+	won:compatibleSocketDefinition :MemberSocket .
+
+:OrganizationRoleOfSocket a won:SocketDefinition ;
+	won:derivesAtomProperty schema:memberOf ;
+	rdfs:label "OrganizationRoleOfSocket" ;
+	rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [parentOrganization](http://schema.org/parentOrganization) Property of the http://schema.org vocabulary." ;
+	won:socketCapacity 1 ;
 	won:compatibleSocketDefinition :MemberSocket .
 
 :ParentOrganizationSocket a won:SocketDefinition ;
