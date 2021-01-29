@@ -1278,7 +1278,10 @@ public class LinkedDataWebController implements InitializingBean {
                 if (ACCESS_DENIED.equals(result.getDecision())) {
                     ec.getCombinedResults()
                                     .ifPresent(r -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
-                    new ResponseEntity<>(null, headers, HttpStatus.FORBIDDEN);
+                    // append the required headers
+                    addMutableResourceHeaders(headers);
+                    addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionsURI);
+                    return new ResponseEntity<>(null, headers, HttpStatus.FORBIDDEN);
                 }
             }
             // append the required headers
