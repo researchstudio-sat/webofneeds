@@ -20,6 +20,7 @@ import vocab from "./vocab.js";
   won.buildMessageRdf = function(contentRdf, args) {
     const atomGraphId = args.msgUri + "#atom";
     const msgDataUri = args.msgUri + "#envelope";
+    const aclGraphId = args.msgUri + "#acl";
     const msgGraph = [];
 
     const attachments = args.attachments ? args.attachments : [];
@@ -42,20 +43,25 @@ import vocab from "./vocab.js";
     /**
      * ACL
      */
-    if (args.acl) {
-      const aclGraphId = args.msgUri + "#acl";
-      const aclGraph = [
-        {
-          "@id": aclGraphId,
-          ...args.acl,
-        },
-      ];
-      msgGraph.push({
-        "@id": aclGraphId,
-        "@graph": aclGraph,
+    const aclGraph = [];
+    const acls = args.acls ? args.acls : [];
+    const authBlankNodeIds = acls.map(function(a, i) {
+      return "_:auth-" + i;
+    });
+
+    acls.forEach(function(acl, i) {
+      aclGraph.push({
+        "@id": authBlankNodeIds[i],
+        "@type": [vocab.AUTH.AuthorizationCompacted],
+        ...acl,
       });
-      nonEnvelopeGraphIds.push(aclGraphId);
-    }
+    });
+
+    msgGraph.push({
+      "@id": aclGraphId,
+      "@graph": aclGraph,
+    });
+    nonEnvelopeGraphIds.push(aclGraphId);
 
     attachments.forEach(function(attachment, i) {
       msgGraph.push({
