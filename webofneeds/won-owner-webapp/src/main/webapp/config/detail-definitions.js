@@ -16,41 +16,44 @@ import vocab from "../app/service/vocab.js";
 export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
 
-/*const chatSocketAcl = {
-  [vocab.AUTH.AuthorizationCompacted]: {
-    [vocab.AUTH.granteeCompacted]: {
-      [vocab.AUTH.socketCompacted]: {
-        [vocab.AUTH.socketTypeCompacted]: {
-          "@id": vocab.CHAT.ChatSocketCompacted,
-        },
-        [vocab.AUTH.connectionCompacted]: {
-          [vocab.AUTH.targetAtomCompacted]: {},
-          [vocab.AUTH.connectionStateCompacted]: {
-            "@id": vocab.WON.ConnectedCompacted,
-          },
-        },
-      },
-    },
-    [vocab.AUTH.grantCompacted]: {
-      [vocab.AUTH.graphCompacted]: {
-        [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
-      },
-      [vocab.AUTH.socketCompacted]: {
-        [vocab.AUTH.socketTypeCompacted]: {
-          "@id": vocab.CHAT.ChatSocketCompacted,
-        },
-        [vocab.AUTH.operationCompacted]: [
-          { "@id": vocab.AUTH.opReadCompacted },
-          { "@id": vocab.AUTH.opConnectCloseCompacted },
-          { "@id": vocab.AUTH.opCommunicateCompacted },
-        ],
-        [vocab.AUTH.connectionMessagesCompacted]: {
-          [vocab.AUTH.inheritCompacted]: false,
+const connectedConectionsAuthorization = {
+  [vocab.AUTH.granteeCompacted]: {
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.connectionCompacted]: {
+        [vocab.AUTH.targetAtomCompacted]: {},
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
         },
       },
     },
   },
-};*/
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.connectionCompacted]: {
+      [vocab.AUTH.targetAtomCompacted]: {
+        [vocab.AUTH.atomCompacted]: {
+          "@id": vocab.AUTH.operationRequestorCompacted,
+        },
+      },
+      [vocab.AUTH.operationCompacted]: [
+        { "@id": vocab.AUTH.opReadCompacted },
+        { "@id": vocab.AUTH.opConnectCloseCompacted },
+        { "@id": vocab.AUTH.opCommunicateCompacted },
+      ],
+      [vocab.AUTH.connectionMessagesCompacted]: {
+        [vocab.AUTH.inheritCompacted]: false,
+      },
+    },
+  },
+};
+
+const defaultPublicAtomAuthorization = {
+  [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+    },
+  },
+};
 
 const emptyDraftImm = Immutable.fromJS({
   content: {
@@ -61,7 +64,7 @@ const emptyDraftImm = Immutable.fromJS({
     },
   },
   seeks: {},
-  // acl: chatSocketAcl, //TODO INCLUDE AGAIN AFTER USECASES ARE DONE
+  acls: [defaultPublicAtomAuthorization, connectedConectionsAuthorization],
 });
 
 export const defaultReactions = {
