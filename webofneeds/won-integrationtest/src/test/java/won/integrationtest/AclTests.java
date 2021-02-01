@@ -570,7 +570,7 @@ public class AclTests extends AbstractBotBasedTest {
         });
     }
 
-    @Test(timeout = 60 * 1000)
+    @Test(timeout = 600 * 1000)
     public void testTokenExchange() throws Exception {
         final AtomicReference<URI> createMessageUri1 = new AtomicReference();
         final AtomicReference<URI> createMessageUri2 = new AtomicReference();
@@ -829,20 +829,22 @@ public class AclTests extends AbstractBotBasedTest {
             BotBehaviour bbRequestBuddyToken = new BotBehaviour(ctx) {
                 @Override
                 protected void onActivate(Optional<Object> message) {
+                    testLinkedDataRequest(ctx, bus, LinkedDataFetchingException.class, false, null, null, atomUri3,
+                                    "test 5.1 - read atom3");
                     URI tokenrequest = uriService
                                     .createTokenRequestURIForAtomURIWithScopes(atomUri2,
                                                     WXBUDDY.BuddySocket.asString());
                     testTokenRequest(ctx, bus, IllegalArgumentException.class, false, null, null, tokenrequest,
-                                    "test5.1 - request token");
+                                    "test5.2 - request token");
                     Set<String> resultingTokens = new HashSet();
                     testTokenRequest(ctx, bus, null, false, atomUri1, null, tokenrequest,
-                                    "test5.2 - request buddy socket token from atom2 using webID atom1",
+                                    "test5.3 - request buddy socket token from atom2 using webID atom1",
                                     resultingTokens);
                     String token = resultingTokens.stream().findFirst().get();
                     testLinkedDataRequest(ctx, bus, null, false, null, token, atomUri3,
-                                    "test 5.3 - read atom3 with token issued for atom 1");
+                                    "test 5.4- read atom3 with token issued for atom 1");
                     testLinkedDataRequest(ctx, bus, null, false, null, token, atomUri2,
-                                    "test 5.4 - read atom2 with token issued for atom 1");
+                                    "test 5.5 - read atom2 with token issued for atom 1");
                     deactivate();
                 }
             };

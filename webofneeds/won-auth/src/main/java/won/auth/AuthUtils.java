@@ -131,6 +131,7 @@ public class AuthUtils {
         clone.setReqConnectionMessage(toClone.getReqConnectionMessage());
         clone.setReqConnectionMessages(toClone.getReqConnectionMessages());
         clone.setReqConnectionState(toClone.getReqConnectionState());
+        clone.setReqConnectionTargetAtom(toClone.getReqConnectionTargetAtom());
         clone.setReqGraphs(Collections.unmodifiableSet(toClone.getReqGraphs()));
         clone.setReqGraphTypes(Collections.unmodifiableSet(toClone.getReqGraphTypes()));
         clone.setReqPosition(toClone.getReqPosition());

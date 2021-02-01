@@ -28,6 +28,7 @@ public class AclEnforcer implements MethodInterceptor {
         or.setReqSocket(con.getSocketURI());
         or.setReqSocketType(con.getTypeURI());
         or.setReqConnectionState(AuthUtils.toAuthConnectionState(con.getState()));
+        or.setReqConnectionTargetAtom(con.getTargetAtomURI());
         return or;
     }
 

@@ -312,7 +312,8 @@ auth:targetAtomExpressionShape
     a                  sh:NodeShape ;
     sh:closed          true ;
     sh:targetObjectsOf auth:targetAtom ;
-    sh:nodeKind        sh:BlankNode .
+    sh:or              ( [ sh:nodeKind sh:BlankNode ]
+                         [ sh:node auth:atomExpressionShape ] ) .
 
 # Definition 14 (connection messages expression)
 
@@ -354,8 +355,10 @@ auth:relativeAtomExpressionShape
     sh:ignoredProperties ( rdf:type ) ;
     sh:nodeKind          sh:IRI ;
     sh:in                ( auth:self
+                           auth:operationRequestor
                            auth:authorizationRequestor
                            auth:anyAtom ) .
+
 # Definition 18 (operation expression)
 
 # TODO: Update definition of operation expression
@@ -634,6 +637,9 @@ auth:operationRequestShape
                            sh:maxCount 1 ; ] ;
     sh:property          [ sh:path     auth:reqConnectionState ;
                            sh:node     auth:connectionStateShape ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path     auth:reqConnectionTargetAtom ;
+                           sh:nodeKind sh:IRI ;
                            sh:maxCount 1 ; ] ;
     sh:property          [ sh:path     auth:reqConnectionMessage ;
                            sh:nodeKind sh:IRI ;

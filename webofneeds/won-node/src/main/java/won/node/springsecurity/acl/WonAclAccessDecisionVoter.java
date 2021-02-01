@@ -232,6 +232,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                 operationRequest.setReqSocketType(con.get().getTypeURI());
                 operationRequest.setReqConnectionMessage(msg.getMessageURI());
                 operationRequest.setReqConnectionState(toAuthConnectionState(con.get().getState()));
+                operationRequest.setReqConnectionTargetAtom(con.get().getTargetAtomURI());
             } else if (uriService.isAtomURI(parent)) {
                 operationRequest.setReqPosition(POSITION_ATOM_MESSAGE);
             } else {
@@ -335,6 +336,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
             request.setReqSocket(con.get().getSocketURI());
             request.setReqConnection(con.get().getConnectionURI());
             request.setReqConnectionState(toAuthConnectionState(con.get().getState()));
+            request.setReqConnectionTargetAtom(con.get().getTargetAtomURI());
         } else if (uriService.isConnectionURI(resourceUri)) {
             request.setReqPosition(POSITION_CONNECTION);
             Optional<Connection> con = connectionRepository.findOneByConnectionURI(
@@ -347,6 +349,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
             request.setReqSocket(con.get().getSocketURI());
             request.setReqConnection(con.get().getConnectionURI());
             request.setReqConnectionState(toAuthConnectionState(con.get().getState()));
+            request.setReqConnectionTargetAtom(con.get().getTargetAtomURI());
         } else if (uriService.isConnectionContainerURI(resourceUri)) {
             // We want to enable requesting connections per socket but haven't got
             // the LD service implementation for that, yet. Moreover, a lot of code relies

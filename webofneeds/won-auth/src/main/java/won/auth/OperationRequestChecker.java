@@ -246,13 +246,25 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
         }
+        filterByAtomState(other);
+        if (other.getTargetAtom() != null) {
+            if (other.getTargetAtom().getAtomsRelativeAtomExpression()
+                            .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
+                if (!operationRequest.getRequestor().equals(operationRequest.getReqConnectionTargetAtom())) {
+                    markBranchNothingGranted();
+                }
+            }
+        }
+        collectOperations(other);
+        decideForPosition(other.getAsePosition());
+    }
+
+    private void filterByAtomState(AseRoot other) {
         if (!other.getAtomStates().isEmpty()) {
             if (!other.getAtomStates().contains(operationRequest.getReqAtomState())) {
                 markBranchNothingGranted();
             }
         }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
     }
 
     @Override
@@ -286,6 +298,14 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
                 markBranchNothingGranted();
             }
         }
+        if (other.getTargetAtom() != null) {
+            if (other.getTargetAtom().getAtomsRelativeAtomExpression()
+                            .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
+                if (!operationRequest.getRequestor().equals(operationRequest.getReqConnectionTargetAtom())) {
+                    markBranchNothingGranted();
+                }
+            }
+        }
         collectOperations(other);
         decideForPosition(other.getAsePosition());
     }
@@ -306,6 +326,14 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
                 markBranchNothingGranted();
             }
         }
+        if (other.getTargetAtom() != null) {
+            if (other.getTargetAtom().getAtomsRelativeAtomExpression()
+                            .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
+                if (!operationRequest.getRequestor().equals(operationRequest.getReqConnectionTargetAtom())) {
+                    markBranchNothingGranted();
+                }
+            }
+        }
         collectOperations(other);
         decideForPosition(other.getAsePosition());
     }
@@ -319,6 +347,14 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         if (!other.getConnectionStates().isEmpty()) {
             if (!other.getConnectionStates().contains(operationRequest.getReqConnectionState())) {
                 markBranchNothingGranted();
+            }
+        }
+        if (other.getTargetAtom() != null) {
+            if (other.getTargetAtom().getAtomsRelativeAtomExpression()
+                            .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
+                if (!operationRequest.getRequestor().equals(operationRequest.getReqConnectionTargetAtom())) {
+                    markBranchNothingGranted();
+                }
             }
         }
         collectOperations(other);
