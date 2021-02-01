@@ -309,11 +309,12 @@ auth:connectionStateShape
 # Definition 13 (target atom expression )
 
 auth:targetAtomExpressionShape
-    a                  sh:NodeShape ;
-    sh:closed          true ;
-    sh:targetObjectsOf auth:targetAtom ;
-    sh:or              ( [ sh:nodeKind sh:BlankNode ]
-                         [ sh:node auth:atomExpressionShape ] ) .
+    a                    sh:NodeShape ;
+    sh:closed            true ;
+    sh:targetObjectsOf   auth:targetAtom ;
+    sh:ignoredProperties ( auth:atom ) ;
+    sh:or                ( [ sh:nodeKind sh:BlankNode ]
+                           [ sh:node auth:atomExpressionShape ] ) .
 
 # Definition 14 (connection messages expression)
 
