@@ -28,6 +28,3 @@ export base_folder=$(pwd)
 export COMPOSE_FILE=${script_path}/docker-compose.yml
 echo "Setting COMPOSE_FILE to ${COMPOSE_FILE}"
 export setup_ok=true
-
-
-

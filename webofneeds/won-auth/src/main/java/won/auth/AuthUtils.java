@@ -5,20 +5,21 @@ import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 
 import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 public class AuthUtils {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String JWT_FIELD_SIG = "sig";
     private static final String JWT_FIELD_SCOPE = "scope";
 
@@ -175,14 +176,15 @@ public class AuthUtils {
         } else {
             throw new IllegalArgumentException("Cannot create token without scope field");
         }
-        jwtBuilder.signWith(key, SignatureAlgorithm.HS256);
+        jwtBuilder.signWith(key, SignatureAlgorithm.ES256);
         return jwtBuilder.compact();
     }
 
     public static Optional<AuthToken> parseToken(String token, WebIdKeyLoader webIdKeyLoader) {
         try {
+            SigningKeyResolver keyResolver = new WebIdKeyLoadingSigningKeyResolver(webIdKeyLoader);
             Jws<Claims> jwt = Jwts.parserBuilder()
-                            .setSigningKey(getKey(token, webIdKeyLoader))
+                            .setSigningKeyResolver(keyResolver)
                             .build()
                             .parseClaimsJws(token);
             AuthToken authToken = new AuthToken();
@@ -206,22 +208,9 @@ public class AuthUtils {
             }
             return Optional.of(authToken);
         } catch (Exception e) {
+            logger.debug("Error parsing token", e);
             return Optional.empty();
         }
-    }
-
-    private static Key getKey(String token, WebIdKeyLoader webIdKeyLoader)
-                    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        Jwt<Header, Claims> jwt = Jwts.parserBuilder().build().parseClaimsJwt(token);
-        String issuer = jwt.getBody().getIssuer();
-        String signer = jwt.getBody().get(JWT_FIELD_SIG, String.class);
-        String webid = null;
-        if (signer != null) {
-            webid = signer;
-        } else {
-            webid = issuer;
-        }
-        return webIdKeyLoader.loadKey(webid).stream().findFirst().get();
     }
 
     /**
@@ -235,5 +224,31 @@ public class AuthUtils {
         StringWriter writer = new StringWriter();
         RDFDataMgr.write(writer, g, Lang.TTL);
         return writer.toString();
+    }
+
+    private static class WebIdKeyLoadingSigningKeyResolver extends SigningKeyResolverAdapter {
+        private WebIdKeyLoader webIdKeyLoader;
+
+        public WebIdKeyLoadingSigningKeyResolver(WebIdKeyLoader webIdKeyLoader) {
+            this.webIdKeyLoader = webIdKeyLoader;
+        }
+
+        @Override
+        public Key resolveSigningKey(JwsHeader jwsHeader, Claims claims) {
+            String issuer = claims.getIssuer();
+            String signer = claims.get(JWT_FIELD_SIG, String.class);
+            String webid = null;
+            if (signer != null) {
+                webid = signer;
+            } else {
+                webid = issuer;
+            }
+            try {
+                return webIdKeyLoader.loadKey(webid).stream().findFirst().get();
+            } catch (Exception e) {
+                logger.debug("cannot resolve signing key for {}", webid, e);
+            }
+            return null;
+        }
     }
 }

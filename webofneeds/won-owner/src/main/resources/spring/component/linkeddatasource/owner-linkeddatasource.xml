@@ -21,11 +21,11 @@
     <!-- required so our linked data client can convert http responses into jena models -->
     <context:annotation-config />
 
-    <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" primary="true">
+    <bean id="linkedDataSource" class="won.auth.linkeddata.AuthEnabledLinkedDataSource" primary="true">
         <property name="linkedDataRestClient" ref="linkedDataRestClient"/>
     </bean>
 
-    <bean id="linkedDataSourceOnBehalfOfAtom" class="won.protocol.util.linkeddata.CachingLinkedDataSource">
+    <bean id="linkedDataSourceOnBehalfOfAtom" class="won.auth.linkeddata.AuthEnabledLinkedDataSource">
         <property name="linkedDataRestClient" ref="linkedDataRestClientOnBehalfOfAtom"/>
         <property name="sharedCache" value="false"/>
     </bean>

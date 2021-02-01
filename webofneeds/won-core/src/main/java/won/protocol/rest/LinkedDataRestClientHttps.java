@@ -10,11 +10,6 @@
  */
 package won.protocol.rest;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-
-import javax.annotation.PostConstruct;
-
 import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,20 +17,23 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
-
 import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
 import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
 
+import javax.annotation.PostConstruct;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+
 /**
  * User: ypanchenko Date: 07.10.15
  */
 public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    protected String acceptHeaderValue = null;
     private HttpMessageConverter datasetConverter;
-    String acceptHeaderValue = null;
     private Integer readTimeout;
     private Integer connectionTimeout;
     private KeyStoreService keyStoreService;
@@ -60,7 +58,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
         this.acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
     }
 
-    private RestTemplate createRestTemplateForReadingLinkedData(String webID) {
+    protected RestTemplate createRestTemplateForReadingLinkedData(String webID) {
         RestTemplate template;
         try {
             if (logger.isDebugEnabled()) {
@@ -119,7 +117,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
                         requestHeaders);
     }
 
-    private RestTemplate getRestTemplateForReadingLinkedData(String webID) {
+    protected RestTemplate getRestTemplateForReadingLinkedData(String webID) {
         return createRestTemplateForReadingLinkedData(webID);
     }
 

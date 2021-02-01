@@ -72,6 +72,7 @@
 		<!-- we want to extract client certs from a header field if we're behind a reverse proxy, so we need a custom
          extension of the X.509 filter -->
 		<sec:custom-filter ref="clientCertificateFilter" position="X509_FILTER"/>
+		<sec:custom-filter ref="wonAclAuthTokenFilter" after="X509_FILTER"/>
 		<!-- we allow self-signed certificates that need not be webids -->
 		<!--sec:intercept-url pattern=".*" access="hasRole('ROLE_CLIENT_CERTIFICATE_PRESENTED')"/-->
 		<sec:intercept-url pattern="/(resource|data|page)/?(\?.+)?$" access="permitAll"/>
@@ -109,12 +110,15 @@
 		<property name="authenticationDetailsSource" ref="webAuthenticationDetailsSource"/>
 		<property name="authenticationManager" ref="authenticationManager"/>
 	</bean>
+	<bean id="wonAclAuthTokenFilter" class="won.node.springsecurity.acl.WonAclAuthTokenFilter"/>
 	<bean id="webIdVerificationAgent" class="won.cryptography.webid.WebIDVerificationAgent"/>
 	<bean id="acl" class="won.node.springsecurity.WonDefaultAccessControlRules"/>
 	<bean id="webIdUserDetailsService" class="won.node.springsecurity.UserDetailsService"/>
 	<bean id="wonAclAccessDecisionVoter" class="won.node.springsecurity.acl.WonAclAccessDecisionVoter"/>
 	<bean id="targetAtomCheckEvaluator" class="won.node.springsecurity.acl.WonTargetAtomCheckEvaluator"/>
-	<bean id="atomNodeChecker" class="won.auth.check.impl.AtomNodeChecker"/>
+	<bean id="ldFetchingAtomNodeChecker" class="won.auth.check.impl.LDFetchingAtomNodeChecker"/>
+	<bean id="atomNodeChecker" class="won.node.springsecurity.acl.NodeBasedAtomNodeChecker" primary="true"/>
+
 	<bean id="webIdBasedAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
 		<constructor-arg>
 			<list>

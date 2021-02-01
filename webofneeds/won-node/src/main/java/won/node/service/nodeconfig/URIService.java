@@ -12,12 +12,18 @@ package won.node.service.nodeconfig;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import won.node.springsecurity.acl.WonAclRequestHelper;
 import won.protocol.model.Atom;
 import won.protocol.util.WonMessageUriHelper;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * User: fkleedorfer Date: 06.11.12
@@ -55,9 +61,11 @@ public class URIService implements InitializingBean {
     private Pattern connectionContainerSubUriPattern;
     private Pattern atomMessagesSubUriPattern;
     private Pattern atomSubUriPattern;
+    private Charset charsetUtf8;
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        charsetUtf8 = Charset.forName("utf-8");
         String resourcePatternSuffix = "/?(\\?[^\\s+]+)?";
         this.atomResourceURIPrefix = this.resourceURIPrefix + "/atom";
         this.connectionResourceURIPrefix = this.resourceURIPrefix + "/connection";
@@ -300,6 +308,53 @@ public class URIService implements InitializingBean {
         // name,
         // which may lead to undefined behavior
         return URI.create(atomURI + "#sysinfo");
+    }
+
+    /**
+     * Creates an uri for requesting won acl tokens with the provided query, which
+     * is appended to the token endpoint URI as-is (no url-encoding happening here).
+     *
+     * @param atomURI
+     * @param query may be null
+     * @return
+     */
+    public URI createTokenRequestURIForAtomURIWithQuery(URI atomURI, String query) {
+        return URI.create(atomURI.toString() + "/token" + (query == null ? "" : "?" + query));
+    }
+
+    /**
+     * Creates an uri for requesting won acl tokens with the provided scopes, the
+     * query parameters will be url-encoded.
+     *
+     * @param atomURI
+     * @param scopes
+     * @return
+     */
+    public URI createTokenRequestURIForAtomURIWithScopes(URI atomURI, String... scopes) {
+        String query = scopes == null || scopes.length == 0
+                        ? ""
+                        : WonAclRequestHelper.PARAM_SCOPES + "=" + Arrays.stream(scopes).map(
+                                        s -> URLEncoder.encode(s, charsetUtf8))
+                                        .collect(Collectors.joining(" "));
+        return createTokenRequestURIForAtomURIWithQuery(atomURI, query);
+    }
+
+    /**
+     * Creates an uri for requesting won acl tokens with the provided scopes, the
+     * query parameters will be url-encoded.
+     *
+     * @param atomURI
+     * @param scopes
+     * @return
+     */
+    public URI createTokenRequestURIForAtomURIWithScopes(URI atomURI, Collection<String> scopes) {
+        String query = scopes == null || scopes.isEmpty()
+                        ? ""
+                        : WonAclRequestHelper.PARAM_SCOPES
+                                        + "="
+                                        + scopes.stream().map(s -> URLEncoder.encode(s, charsetUtf8))
+                                                        .collect(Collectors.joining(" "));
+        return createTokenRequestURIForAtomURIWithQuery(atomURI, query);
     }
 
     public String getAtomResourceURIPrefix() {

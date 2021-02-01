@@ -29,6 +29,11 @@
         </dependency>
         <dependency>
             <groupId>at.researchstudio.sat</groupId>
+            <artifactId>won-auth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>at.researchstudio.sat</groupId>
             <artifactId>won-cryptography</artifactId>
             <version>${project.version}</version>
         </dependency>

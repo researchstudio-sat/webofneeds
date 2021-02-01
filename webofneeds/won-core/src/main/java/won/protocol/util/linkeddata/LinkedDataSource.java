@@ -33,9 +33,9 @@ public interface LinkedDataSource {
     Dataset getDataForPublicResource(URI resourceURI);
 
     /**
-     * Obtains resource description of the resource identified by the given URI for
-     * the requester identified by the given WebID. Used in case access to the
-     * resource is restricted by WebAccessControl (WebID-based access control).
+     * Obtains the description of the resource identified by the given URI for the
+     * requester identified by the given WebID. Used in case access to the resource
+     * is restricted by WebAccessControl (WebID-based access control).
      *
      * @param resourceURI URI of the resource
      * @param requesterWebID WebID of the entity requesting the resource

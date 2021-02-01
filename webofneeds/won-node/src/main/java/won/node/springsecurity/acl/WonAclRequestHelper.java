@@ -13,13 +13,22 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.StringWriter;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 public class WonAclRequestHelper {
     public static final String ATT_ACL_EVALUATOR = "won.acl.evaluator";
+    public static final String WWW_AUTHENTICATE_METHOD = "won-grantee";
+    public static final String PARAM_SCOPES = "scopes";
     static final ThreadLocal<WonAclEvalContext> wonAclEvalContextThreadLocal = new ThreadLocal();
-    private static final String WWW_AUTHENTICATE_METHOD = "won-grantee";
-    private static final String PARAM_SCOPE = "scope";
+    // pattern for 'token68' according to
+    // https://tools.ietf.org/html/rfc7235#appendix-C
+    private static final Pattern BEARER_TOKEN_PATTERN = Pattern
+                    .compile("Bearer\\s+([a-zA-Z0-9-._~+/]+=*)", Pattern.CASE_INSENSITIVE);
     public static String ATT_OPERATION_REQUEST = "won.acl.operationRequest";
     public static String ATT_EVALUATION_CONTEXT = "won.acl.evaluationContext";
     public static String ATT_GRANTED_TOKENS = "won.acl.grantedTokens";
@@ -51,7 +60,7 @@ public class WonAclRequestHelper {
     }
 
     public static String getRequestParamScope(HttpServletRequest request) {
-        return request.getParameter(PARAM_SCOPE);
+        return request.getParameter(PARAM_SCOPES);
     }
 
     public static void setAuthInfoAsResponseHeader(FilterInvocation filterInvocation,
@@ -82,5 +91,17 @@ public class WonAclRequestHelper {
 
     public static void setWonAclEvaluationContext(HttpServletRequest request, WonAclEvalContext context) {
         request.setAttribute(ATT_EVALUATION_CONTEXT, context);
+    }
+
+    public static Optional<String> getBearerToken(HttpServletRequest request) {
+        String authHeader = request.getHeader(AUTHORIZATION);
+        if (authHeader == null) {
+            return Optional.empty();
+        }
+        Matcher m = BEARER_TOKEN_PATTERN.matcher(authHeader);
+        if (!m.matches()) {
+            return Optional.empty();
+        }
+        return Optional.of(m.group(1));
     }
 }

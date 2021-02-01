@@ -8,8 +8,8 @@
 	OR CONDITIONS OF ANY KIND, either express or implied. ~ See the License for 
 	the specific language governing permissions and ~ limitations under the License. -->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd         http://www.springframework.org/schema/context         http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 	<!-- REST stuff <context:component-scan base-package="won.protocol.rest"> 
 		<context:include-filter type="regex" expression="won.protocol.rest.*"/> </context:component-scan> -->
@@ -48,25 +48,25 @@
 	</bean>
 	<!-- alias used here, but the owner webapp uses two different beans-->
 	<alias alias="CryptographyServiceOnBehalfOfAtom" name="cryptographyService" />
-    
-    <!-- if the fixedPrivateKeyAlias is empty or null, the processor generates 
+
+	<!-- if the fixedPrivateKeyAlias is empty or null, the processor generates
         a new Keypair for every atom, if it is a string, the processor uses the same 
         key pair for all atoms and storese it under the specified alias -->
-    <bean id="keyPairAliasDerivationStrategyFactory"
-        class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
-        <!-- The ':' at the end of the property key is intentional. It provides a default value in case the property key isn't set. The default is empty.-->
-        <property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias:}" /> 
-    </bean>
-    
-	<bean id="linkedDataRestClient" class="won.protocol.rest.LinkedDataRestClientHttps">
-		<constructor-arg ref="keyStoreService" />
-		<constructor-arg ref="trustStoreService" />
+	<bean id="keyPairAliasDerivationStrategyFactory"
+		  class="won.cryptography.keymanagement.KeyPairAliasDerivationStrategyFactory">
+		<!-- The ':' at the end of the property key is intentional. It provides a default value in case the property key isn't set. The default is empty.-->
+		<property name="predefinedAlias" value="${owner.fixedPrivateKeyAlias:}"/>
+	</bean>
+
+	<bean id="linkedDataRestClient" class="won.auth.rest.AuthEnabledLinkedDataRestClient">
+		<constructor-arg ref="keyStoreService"/>
+		<constructor-arg ref="trustStoreService"/>
 		<constructor-arg name="trustStrategy">
-			<bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
+			<bean class="won.cryptography.ssl.TrustAnyCertificateStrategy"/>
 		</constructor-arg>
 		<constructor-arg name="keyPairAliasDerivationStrategy">
-		  <bean factory-bean="keyPairAliasDerivationStrategyFactory"
-                factory-method="create" />
+			<bean factory-bean="keyPairAliasDerivationStrategyFactory"
+				  factory-method="create"/>
 		</constructor-arg>
 	</bean>
 	<!-- alias used here, but the owner webapp uses two different beans-->

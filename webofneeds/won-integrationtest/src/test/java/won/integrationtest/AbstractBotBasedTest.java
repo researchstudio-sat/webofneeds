@@ -19,6 +19,7 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import won.auth.linkeddata.AuthEnabledLinkedDataSource;
 import won.bot.framework.bot.Bot;
 import won.bot.framework.bot.base.EventBot;
 import won.bot.framework.bot.context.BotContext;
@@ -47,6 +48,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -193,7 +195,7 @@ public abstract class AbstractBotBasedTest
     protected boolean testLinkedDataRequestOkNoWebId(EventListenerContext ctx, EventBus bus, String testCaseIdPrefix,
                     URI... resourceUris) {
         for (int i = 0; i < resourceUris.length; i++) {
-            boolean passed = testLinkedDataRequest(ctx, bus, null, false, null, resourceUris[i],
+            boolean passed = testLinkedDataRequest(ctx, bus, null, false, null, null, resourceUris[i],
                             (testCaseIdPrefix + (i + 1)));
             if (!passed) {
                 return false;
@@ -206,7 +208,7 @@ public abstract class AbstractBotBasedTest
                     URI webId,
                     URI... resourceUris) {
         for (int i = 0; i < resourceUris.length; i++) {
-            boolean passed = testLinkedDataRequest(ctx, bus, null, false, webId, resourceUris[i],
+            boolean passed = testLinkedDataRequest(ctx, bus, null, false, webId, null, resourceUris[i],
                             (testCaseIdPrefix + (i + 1)));
             if (!passed) {
                 return false;
@@ -219,7 +221,7 @@ public abstract class AbstractBotBasedTest
                     String testCaseIdPrefix,
                     URI... resourceUris) {
         for (int i = 0; i < resourceUris.length; i++) {
-            boolean passed = testLinkedDataRequest(ctx, bus, null, true, null, resourceUris[i],
+            boolean passed = testLinkedDataRequest(ctx, bus, null, true, null, null, resourceUris[i],
                             (testCaseIdPrefix + (i + 1)));
             if (!passed) {
                 return false;
@@ -232,7 +234,7 @@ public abstract class AbstractBotBasedTest
                     String testCaseIdPrefix, URI webId,
                     URI... resourceUris) {
         for (int i = 0; i < resourceUris.length; i++) {
-            boolean passed = testLinkedDataRequest(ctx, bus, null, true, webId, resourceUris[i],
+            boolean passed = testLinkedDataRequest(ctx, bus, null, true, webId, null, resourceUris[i],
                             (testCaseIdPrefix + (i + 1)));
             if (!passed) {
                 return false;
@@ -244,7 +246,7 @@ public abstract class AbstractBotBasedTest
     protected boolean testLinkedDataRequestFailsNoWebId(EventListenerContext ctx, EventBus bus, String testCaseIdPrefix,
                     Class<? extends Exception> expectedException, URI... resourceUris) {
         for (int i = 0; i < resourceUris.length; i++) {
-            boolean passed = testLinkedDataRequest(ctx, bus, expectedException, false, null, resourceUris[i],
+            boolean passed = testLinkedDataRequest(ctx, bus, expectedException, false, null, null, resourceUris[i],
                             (testCaseIdPrefix + (i + 1)));
             if (!passed) {
                 return false;
@@ -257,7 +259,7 @@ public abstract class AbstractBotBasedTest
                     URI webId,
                     Class<? extends Exception> expectedException, URI... resourceUris) {
         for (int i = 0; i < resourceUris.length; i++) {
-            boolean passed = testLinkedDataRequest(ctx, bus, expectedException, false, webId, resourceUris[i],
+            boolean passed = testLinkedDataRequest(ctx, bus, expectedException, false, webId, null, resourceUris[i],
                             (testCaseIdPrefix + (i + 1)));
             if (!passed) {
                 return false;
@@ -267,24 +269,101 @@ public abstract class AbstractBotBasedTest
     }
 
     boolean testLinkedDataRequest(EventListenerContext ctx, EventBus bus, Class<? extends Exception> expectedException,
-                    boolean expectedEmpty, URI webId, URI resourceUri, String testCaseId) {
+                    boolean expectedEmpty, URI webId, String token, URI resourceUri, String testCaseId) {
+        boolean exceptionExpected = expectedException != null;
+        String authMethodString = token == null
+                        ? (webId == null
+                                        ? "(using neither webID nor token)"
+                                        : String.format("using webID %s", webId.toString()))
+                        : "(using an auth token)";
+        String expectationString = null;
+        if (exceptionExpected) {
+            expectationString = "throws exception";
+        } else {
+            if (expectedEmpty) {
+                expectationString = "empty result";
+            } else {
+                expectationString = "success";
+            }
+        }
+        expectationString = "expected: " + expectationString;
+        try {
+            Dataset data = null;
+            if (token != null) {
+                data = ((AuthEnabledLinkedDataSource) ctx.getLinkedDataSource()).getDataForResource(resourceUri, token);
+            } else {
+                data = ctx.getLinkedDataSource().getDataForResource(resourceUri, webId);
+            }
+            if (exceptionExpected) {
+                failTest(bus, String.format("Test Case %s: Expected exception %s not thrown for resource %s %s, %s",
+                                testCaseId, expectedException,
+                                resourceUri, authMethodString, expectationString));
+                return false;
+            } else {
+                if (data == null) {
+                    failTest(bus, String.format("Test Case %s: Got null result for resource %s %s, %s", testCaseId,
+                                    resourceUri, authMethodString, expectationString));
+                    return false;
+                } else if (data.isEmpty() && !expectedEmpty) {
+                    failTest(bus, String.format("Test Case %s: Got empty result for resource %s %s, %s", testCaseId,
+                                    resourceUri, authMethodString, expectationString));
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            if (!exceptionExpected) {
+                failTest(bus, String.format("Test Case %s: Got unexpected exception for resource %s %s, %s", testCaseId,
+                                resourceUri,
+                                authMethodString, expectationString), e);
+                return false;
+            }
+            if (!expectedException.isAssignableFrom(e.getClass())) {
+                failTest(bus, String.format("Test Case %s: Got wrong kind of exception for resource %s %s, expected %s",
+                                testCaseId,
+                                resourceUri,
+                                authMethodString, expectedException), e);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    boolean testTokenRequest(EventListenerContext ctx, EventBus bus, Class<? extends Exception> expectedException,
+                    boolean expectedEmpty, URI webId, String authToken, URI resourceUri, String testCaseId) {
+        return testTokenRequest(ctx, bus, expectedException, expectedEmpty, webId, authToken, resourceUri, testCaseId,
+                        null);
+    }
+
+    boolean testTokenRequest(EventListenerContext ctx, EventBus bus, Class<? extends Exception> expectedException,
+                    boolean expectedEmpty, URI webId, String authToken, URI resourceUri, String testCaseId,
+                    Set<String> obtainedTokens) {
         boolean exceptionExpected = expectedException != null;
         String webidString = webId == null ? "(requested without webId)"
                         : String.format("using WebID %s", webId.toString());
         try {
             // make sure we can read the atom using our webid
-            Dataset data = ctx.getLinkedDataSource().getDataForResource(resourceUri, webId);
+            Set<String> tokens = null;
+            if (authToken != null) {
+                tokens = ((AuthEnabledLinkedDataSource) ctx.getLinkedDataSource())
+                                .getAuthTokens(resourceUri, authToken);
+            } else {
+                tokens = ((AuthEnabledLinkedDataSource) ctx.getLinkedDataSource())
+                                .getAuthTokens(resourceUri, webId);
+            }
+            if (tokens != null && obtainedTokens != null) {
+                obtainedTokens.addAll(tokens);
+            }
             if (exceptionExpected) {
                 failTest(bus, String.format("Test Case %s: Expected exception %s not thrown for resource %s %s",
                                 testCaseId, expectedException,
                                 resourceUri, webidString));
                 return false;
             } else {
-                if (data == null) {
+                if (tokens == null) {
                     failTest(bus, String.format("Test Case %s: Got null result for resource %s %s", testCaseId,
                                     resourceUri, webidString));
                     return false;
-                } else if (data.isEmpty() && !expectedEmpty) {
+                } else if (tokens.isEmpty() && !expectedEmpty) {
                     failTest(bus, String.format("Test Case %s: Got empty result for resource %s %s", testCaseId,
                                     resourceUri, webidString));
                     return false;

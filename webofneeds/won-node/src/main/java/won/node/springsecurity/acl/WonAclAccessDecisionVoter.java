@@ -24,6 +24,7 @@ import won.auth.WonAclEvaluator;
 import won.auth.WonAclEvaluatorFactory;
 import won.auth.check.AtomNodeChecker;
 import won.auth.check.TargetAtomCheckEvaluator;
+import won.auth.check.impl.LDFetchingAtomNodeChecker;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.cryptography.service.CryptographyService;
@@ -104,6 +105,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
             return ACCESS_GRANTED;
         }
         String webId = null;
+        AuthToken authToken = null;
         if (authentication instanceof PreAuthenticatedAuthenticationToken) {
             Object principal = authentication.getPrincipal();
             if (principal instanceof WebIdUserDetails) {
@@ -115,6 +117,8 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                     webId = userDetails.getUsername();
                 }
             }
+        } else if (authentication instanceof WonAclTokenAuthentication) {
+            authToken = (AuthToken) ((WonAclTokenAuthentication) authentication).getDetails();
         }
         if (webId != null && webId.equals(cryptographyService.getDefaultPrivateKeyAlias())) {
             // if the WoN node itself is the requestor, bypass all checks and allow
@@ -145,10 +149,11 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         if (WonMessageUriHelper.isLocalMessageURI(resourceUri,
                         uriService.getMessageResourceURIPrefix())) {
             // handle request for message
-            result = voteForMessageRequest(webId, resourceUri, filterInvocation, legacyImpl);
+            result = voteForMessageRequest(webId, authToken, resourceUri, filterInvocation, legacyImpl);
         } else {
             // handle other requests
-            result = voteForNonMessageRequest(webId, resourceUri, filterInvocation, legacyImpl);
+            result = voteForNonMessageRequest(webId, authToken, resourceUri, filterInvocation,
+                            legacyImpl);
         }
         stopWatch.stop();
         if (logger.isDebugEnabled()) {
@@ -178,7 +183,8 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         return model.getGraph();
     }
 
-    public int voteForMessageRequest(String webId, URI resourceUri, FilterInvocation filterInvocation,
+    public int voteForMessageRequest(String webId, AuthToken authToken, URI resourceUri,
+                    FilterInvocation filterInvocation,
                     Supplier<Integer> legacyImpl) {
         // if we're requesting a message, we have to check access for each message
         // container
@@ -208,6 +214,9 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                 continue;
             }
             OperationRequest operationRequest = new OperationRequest();
+            if (authToken != null) {
+                operationRequest.addBearsToken(authToken);
+            }
             operationRequest.setReqAtomState(toAuthAtomState(atom.get().getState()));
             operationRequest.setRequestor(URI.create(webId));
             operationRequest.setReqAtom(atomUri);
@@ -268,7 +277,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         }
     }
 
-    public int voteForNonMessageRequest(String webId, URI resourceUri,
+    public int voteForNonMessageRequest(String webId, AuthToken authToken, URI resourceUri,
                     FilterInvocation filterInvocation, Supplier<Integer> legacyImpl) {
         URI atomUri = uriService.getAtomURIofSubURI(resourceUri);
         if (atomUri == null) {
@@ -295,6 +304,9 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         // set up request object
         OperationRequest request = new OperationRequest();
         request.setReqAtom(atomUri);
+        if (authToken != null) {
+            request.addBearsToken(authToken);
+        }
         request.setReqAtomState(toAuthAtomState(atom.get().getState()));
         if (webId != null) {
             request.setRequestor(URI.create(webId));
@@ -432,6 +444,10 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         aclShapesGraph = GraphFactory.createGraphMem();
         RDFDataMgr.read(aclShapesGraph, res.getInputStream(), Lang.TTL);
         aclShapes = Shapes.parse(aclShapesGraph);
+        if (this.atomNodeChecker instanceof LDFetchingAtomNodeChecker) {
+            ((LDFetchingAtomNodeChecker) this.atomNodeChecker)
+                            .setWebIdForRequests(URI.create(cryptographyService.getDefaultPrivateKeyAlias()));
+        }
     }
 
     private WonAclEvaluator getWonAclEvaluator(Graph aclGraph) {

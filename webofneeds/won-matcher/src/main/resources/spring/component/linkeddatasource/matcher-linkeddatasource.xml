@@ -15,7 +15,7 @@
   ~    limitations under the License.
   -->
 
-<beans xmlns="http://www.springframework.org/schema/beans"        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"        xmlns:context="http://www.springframework.org/schema/context"        xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd         http://www.springframework.org/schema/context         http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"        xmlns:context="http://www.springframework.org/schema/context"        xmlns="http://www.springframework.org/schema/beans"        xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd         http://www.springframework.org/schema/context         http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
     <!-- REST stuff -->
     <!-- required so our linked data client can convert http responses into jena models -->
@@ -46,8 +46,8 @@
     <bean id="trustAllSelfSignedStrategy" class="org.apache.http.conn.ssl.TrustSelfSignedStrategy"/-->
 
 
-    <bean id="linkedDataSource" class="won.protocol.util.linkeddata.CachingLinkedDataSource" >
-        <property name="linkedDataRestClient" ref="linkedDataRestClient" />
+    <bean id="linkedDataSource" class="won.auth.linkeddata.AuthEnabledLinkedDataSource">
+        <property name="linkedDataRestClient" ref="linkedDataRestClient"/>
         <property name="sharedCache" value="false"/>
     </bean>
 

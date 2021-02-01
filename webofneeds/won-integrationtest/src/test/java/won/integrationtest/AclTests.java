@@ -4,7 +4,7 @@ import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.auth.AuthUtils;
+import won.auth.linkeddata.AuthEnabledLinkedDataSource;
 import won.auth.model.Authorization;
 import won.auth.model.ConnectionState;
 import won.auth.model.TargetAtomExpression;
@@ -18,17 +18,16 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
-import won.protocol.vocabulary.WON;
-import won.protocol.vocabulary.WXBUDDY;
-import won.protocol.vocabulary.WXCHAT;
-import won.protocol.vocabulary.WXHOLD;
+import won.protocol.vocabulary.*;
 import won.utils.content.model.AtomContent;
 import won.utils.content.model.RdfOutput;
 import won.utils.content.model.Socket;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -169,6 +168,67 @@ public class AclTests extends AbstractBotBasedTest {
                 passed = passed && testLinkedDataRequestFailsNoWebId(ctx, bus, "test3.",
                                 LinkedDataFetchingException.class,
                                 atomUri, connContainerUri, createMessageUri);
+                if (passed) {
+                    passTest(bus);
+                }
+            };
+            EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                            action);
+            EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                            failureCallback, ctx);
+            ctx.getWonMessageSender().sendMessage(createMessage);
+        });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testImplicitOwnerToken() throws Exception {
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final String atomUriString = atomUri.toString();
+            final AtomContent atomContent = AtomContent.builder(atomUri)
+                            .addTitle("Unit test for implicit owner token")
+                            .addSocket(Socket.builder(atomUriString + "#holderSocket")
+                                            .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                            .build())
+                            .addSocket(Socket.builder(atomUriString + "#buddySocket")
+                                            .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                            .build())
+                            .addType(URI.create(WON.Atom.getURI()))
+                            .build();
+            // create an acl allowing only the atom itself to read everything
+            Authorization auth = Authorization.builder()
+                            .addGrant(ase -> ase.addOperationsSimpleOperationExpression(OP_READ))
+                            .addGranteesAtomExpression(ae -> ae.addAtomsURI(URI.create("https://example.com/nobody")))
+                            .build();
+            WonMessage createMessage = WonMessageBuilder.createAtom()
+                            .atom(atomUri)
+                            .content().graph(RdfOutput.toGraph(atomContent))
+                            .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth)) // add the acl graph
+                            .build();
+            createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+            ctx.getBotContextWrapper().rememberAtomUri(atomUri);
+            final String action = "Create Atom action";
+            EventListener successCallback = event -> {
+                URI connContainerUri = uriService.createConnectionContainerURIForAtom(atomUri);
+                URI createMessageUri = ((SuccessResponseEvent) event).getOriginalMessageURI();
+                boolean passed = true;
+                URI tokenQuery = uriService
+                                .createTokenRequestURIForAtomURIWithScopes(atomUri, WONAUTH.OwnerToken.toString());
+                passed = testTokenRequest(ctx, bus, null, false,
+                                atomUri, null, tokenQuery, "test1.1 - obtain token");
+                Set<String> tokens = ((AuthEnabledLinkedDataSource) ctx.getLinkedDataSource())
+                                .getAuthTokens(tokenQuery, atomUri);
+                String token = tokens.stream().findFirst().get();
+                passed = passed && testTokenRequest(ctx, bus, null, true,
+                                null, token, tokenQuery, "test1.2 - request token using only token (empty result)");
+                passed = passed && testLinkedDataRequest(ctx, bus, LinkedDataFetchingException.class, true,
+                                null, null, atomUri, "test1.3 - request atom data without any auth (fails)");
+                passed = passed && testLinkedDataRequest(ctx, bus, null, true,
+                                atomUri, null, atomUri, "test1.4 - request atom data with webid (success");
+                passed = passed && testLinkedDataRequest(ctx, bus, null, true,
+                                null, token, atomUri, "test1.5 - request atom data with token (success");
                 if (passed) {
                     passTest(bus);
                 }
@@ -542,8 +602,6 @@ public class AclTests extends AbstractBotBasedTest {
                                     .build();
                     Authorization auth1 = getBuddiesAndBOfBuddiesReadAllGraphsAuth();
                     Authorization auth2 = getBuddiesReceiveBuddyTokenAuth();
-                    logger.info("auth1:\n {}", AuthUtils.toRdfString(auth1));
-                    logger.info("auth2:\n {}", AuthUtils.toRdfString(auth2));
                     WonMessage createMessage = WonMessageBuilder.createAtom()
                                     .atom(atomUri1)
                                     .content().graph(RdfOutput.toGraph(atomContent))
@@ -771,6 +829,20 @@ public class AclTests extends AbstractBotBasedTest {
             BotBehaviour bbRequestBuddyToken = new BotBehaviour(ctx) {
                 @Override
                 protected void onActivate(Optional<Object> message) {
+                    URI tokenrequest = uriService
+                                    .createTokenRequestURIForAtomURIWithScopes(atomUri2,
+                                                    WXBUDDY.BuddySocket.asString());
+                    testTokenRequest(ctx, bus, IllegalArgumentException.class, false, null, null, tokenrequest,
+                                    "test5.1 - request token");
+                    Set<String> resultingTokens = new HashSet();
+                    testTokenRequest(ctx, bus, null, false, atomUri1, null, tokenrequest,
+                                    "test5.2 - request buddy socket token from atom2 using webID atom1",
+                                    resultingTokens);
+                    String token = resultingTokens.stream().findFirst().get();
+                    testLinkedDataRequest(ctx, bus, null, false, null, token, atomUri3,
+                                    "test 5.3 - read atom3 with token issued for atom 1");
+                    testLinkedDataRequest(ctx, bus, null, false, null, token, atomUri2,
+                                    "test 5.4 - read atom2 with token issued for atom 1");
                     deactivate();
                 }
             };
