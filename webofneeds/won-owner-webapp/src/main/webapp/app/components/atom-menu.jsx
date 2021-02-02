@@ -73,6 +73,7 @@ export default function WonAtomMenu({
   // Add generic Tabs based on available Sockets
   relevantConnectionsMap
     .filter(connectionUtils.filterSingleConnectedSocketCapacityFilter)
+    .filter(connectionUtils.filterTagViewSockets)
     .toOrderedMap()
     .sortBy((socketTypeConnections, socketType) => {
       switch (socketType) {

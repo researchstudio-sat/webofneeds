@@ -518,6 +518,14 @@ vocab.socketCapacity = {
   [vocab.WXPERSONA.InterestOfSocketCompacted]: 1,
 };
 
+/* This constant is switching the element view of the specific socket
+ from a extra tab entry, to listing all the exisiting connections within the detail tab of an atom
+*/
+vocab.tagViewSockets = {
+  [vocab.WXPERSONA.ExpertiseSocketCompacted]: true,
+  [vocab.WXPERSONA.InterestSocketCompacted]: true,
+};
+
 /* This constant is to prevent connections to non owned atoms for specific sockets */
 vocab.refuseAddToNonOwned = {
   [vocab.HOLD.HoldableSocketCompacted]: true,

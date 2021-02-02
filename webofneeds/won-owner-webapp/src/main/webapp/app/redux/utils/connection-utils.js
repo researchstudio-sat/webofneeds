@@ -190,6 +190,27 @@ export const filterSingleConnectedSocketCapacityFilter = (_, socketType) =>
   !vocab.socketCapacity[socketType] || vocab.socketCapacity[socketType] > 1;
 
 /**
+ * Removes the socketEntry of a map if the tagViewSocket is set to true (used so that tagView Sockets, are not displayed
+ * as tabs, and do not show up in the atom-content like the other sockets
+ * @param _
+ * @param socketType
+ * @returns {boolean}
+ */
+export const filterTagViewSockets = (_, socketType) =>
+  !vocab.tagViewSockets[socketType] ||
+  vocab.tagViewSockets[socketType] !== true;
+
+/**
+ * Removes the socketEntry of a map if the tagViewSocket is set to false or does not exist (used so that tagView Sockets, are not displayed
+ * as tabs, and do not show up in the atom-content like the other sockets
+ * @param _
+ * @param socketType
+ * @returns {boolean}
+ */
+export const filterNonTagViewSockets = (_, socketType) =>
+  !filterTagViewSockets(_, socketType);
+
+/**
  * Removes the socketEntry of a map if the socketCapacity is not excatly 1 (used so that only socketCapacity 1 sockets, are displayed
  * within the WonAtomContentGeneral component
  * @param _
