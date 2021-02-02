@@ -1,0 +1,196 @@
+@prefix : <https://w3id.org/won/ext/persona#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://w3id.org/won/ext/persona> .
+
+<https://w3id.org/won/ext/persona> rdf:type owl:Ontology ;
+                                    owl:versionIRI <https://w3id.org/won/ext/persona/1.0> ;
+                                    owl:imports <https://w3id.org/won/core> ;
+                                    <http://purl.org/dc/elements/1.1/abstract> "This ontology contains the definition of the *InterestSocket* the *InterestOfSocket* the *ExpertiseSocket* and the *ExpertiseOfSocket*, the *interest* the *interestOf* the *expertise* and the *expertOf* properties. These express control relationships in WoN. The Atoms with expertise/interest in other atoms represent agents (users or programs) and can themselves not be interests/expertises of other atoms."@en ;
+                                    <http://purl.org/dc/elements/1.1/creator> "Fabian Suda" ;
+                                    <http://purl.org/dc/elements/1.1/date> "2021-02-02"^^xsd:date ;
+                                    <http://purl.org/dc/elements/1.1/title> "Web of Needs Persona Extension" ;
+                                    <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
+                                    <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-persona" .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2000/01/rdf-schema#labels
+rdfs:labels rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://w3id.org/won/ext/persona#expertise
+:expertise rdf:type owl:ObjectProperty ;
+           rdfs:domain <https://w3id.org/won/core#Atom> ;
+           rdfs:range <https://w3id.org/won/core#Atom> ;
+           owl:propertyDisjointWith :expertiseOf .
+
+
+###  https://w3id.org/won/ext/persona#expertiseOf
+:expertiseOf rdf:type owl:ObjectProperty ;
+             rdfs:domain <https://w3id.org/won/core#Atom> ;
+             rdfs:range <https://w3id.org/won/core#Atom> .
+
+
+###  https://w3id.org/won/ext/persona#interest
+:interest rdf:type owl:ObjectProperty ;
+          rdfs:domain <https://w3id.org/won/core#Atom> ;
+          rdfs:range <https://w3id.org/won/core#Atom> ;
+          owl:propertyDisjointWith :interestOf .
+
+
+###  https://w3id.org/won/ext/persona#interestOf
+:interestOf rdf:type owl:ObjectProperty ;
+            rdfs:domain <https://w3id.org/won/core#Atom> ;
+            rdfs:range <https://w3id.org/won/core#Atom> .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  https://w3id.org/won/ext/persona#Expertise
+:Expertise rdf:type owl:Class ;
+           rdfs:comment "Announce an expertise in something, such as a technology or framework."@en ;
+           rdfs:label "Expertise" .
+
+
+###  https://w3id.org/won/ext/persona#Interest
+:Interest rdf:type owl:Class ;
+          rdfs:comment "Announce an interest in something, such as a hobby."@en ;
+          rdfs:label "Interest" .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/won/ext/persona#ExpertiseOfSocket
+:ExpertiseOfSocket rdf:type owl:NamedIndividual ,
+                            <https://w3id.org/won/core#SocketDefinition> ;
+                   <https://w3id.org/won/core#compatibleSocketDefinition> :ExpertiseSocket ;
+                   <https://w3id.org/won/core#derivesAtomProperty> :expertiseOf ;
+                   <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
+                   <https://w3id.org/won/core#socketCapacity> 1 ;
+                   rdfs:comment "An Atom uses a Socket with this configuration to identify an expertise of the Persona Atom that it is connected to"@en ;
+                   rdfs:label "ExpertiseOfSocket" .
+
+
+###  https://w3id.org/won/ext/persona#ExpertiseSocket
+:ExpertiseSocket rdf:type owl:NamedIndividual ,
+                          <https://w3id.org/won/core#SocketDefinition> ;
+                 <https://w3id.org/won/core#compatibleSocketDefinition> :ExpertiseOfSocket ;
+                 <https://w3id.org/won/core#derivesAtomProperty> :expertise ;
+                 <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
+                 rdfs:comment "A Persona Atom uses a Socket with this configuration to represent Expertises."@en ;
+                 rdfs:label "ExpertiseSocket" .
+
+
+###  https://w3id.org/won/ext/persona#InterestOfSocket
+:InterestOfSocket rdf:type owl:NamedIndividual ,
+                           <https://w3id.org/won/core#SocketDefinition> ;
+                  <https://w3id.org/won/core#compatibleSocketDefinition> :InterestSocket ;
+                  <https://w3id.org/won/core#derivesAtomProperty> :interestOf ;
+                  <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
+                  <https://w3id.org/won/core#socketCapacity> 1 ;
+                  rdfs:comment "An Atom uses a Socket with this configuration to identify an interest of the Persona Atom that it is connected to."@en ;
+                  rdfs:label "InterestOfSocket" .
+
+
+###  https://w3id.org/won/ext/persona#InterestSocket
+:InterestSocket rdf:type owl:NamedIndividual ,
+                         <https://w3id.org/won/core#SocketDefinition> ;
+                <https://w3id.org/won/core#compatibleSocketDefinition> :InterestOfSocket ;
+                <https://w3id.org/won/core#derivesAtomProperty> :interest ;
+                <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
+                rdfs:comment "A Persona Atom uses a Socket with this configuration to represent Interests."@en ;
+                rdfs:label "InterestSocket" .
+
+
+###  https://w3id.org/won/ext/persona#expertise
+:expertise rdf:type owl:NamedIndividual .
+
+
+###  https://w3id.org/won/ext/persona#expertiseOf
+:expertiseOf rdf:type owl:NamedIndividual .
+
+
+###  https://w3id.org/won/ext/persona#interest
+:interest rdf:type owl:NamedIndividual .
+
+
+###  https://w3id.org/won/ext/persona#interestOf
+:interestOf rdf:type owl:NamedIndividual .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+:expertise rdfs:comment "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en ;
+           rdfs:label "expertise" .
+
+
+:expertiseOf rdfs:comment "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en ;
+             rdfs:label "expertiseOf" .
+
+
+:interest rdfs:comment "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en ;
+          rdfs:label "interest" .
+
+
+:interestOf rdfs:comment "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en ;
+            rdfs:label "interestOf" .
+
+
+#################################################################
+#    General axioms
+#################################################################
+
+[ rdf:type owl:AllDifferent ;
+  owl:distinctMembers ( :ExpertiseOfSocket
+                        :ExpertiseSocket
+                        :InterestOfSocket
+                        :InterestSocket
+                      )
+] .
+
+
+###  Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/

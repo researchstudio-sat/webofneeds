@@ -1,0 +1,197 @@
+<https://w3id.org/won/ext/persona> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<https://w3id.org/won/ext/persona> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/ext/persona/1.0> .
+<https://w3id.org/won/ext/persona> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core> .
+<https://w3id.org/won/ext/persona> <http://purl.org/dc/elements/1.1/abstract> "This ontology contains the definition of the *InterestSocket* the *InterestOfSocket* the *ExpertiseSocket* and the *ExpertiseOfSocket*, the *interest* the *interestOf* the *expertise* and the *expertOf* properties. These express control relationships in WoN. The Atoms with expertise/interest in other atoms represent agents (users or programs) and can themselves not be interests/expertises of other atoms."@en .
+<https://w3id.org/won/ext/persona> <http://purl.org/dc/elements/1.1/creator> "Fabian Suda" .
+<https://w3id.org/won/ext/persona> <http://purl.org/dc/elements/1.1/date> "2021-02-02"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://w3id.org/won/ext/persona> <http://purl.org/dc/elements/1.1/title> "Web of Needs Persona Extension" .
+<https://w3id.org/won/ext/persona> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
+<https://w3id.org/won/ext/persona> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-persona" .
+# 
+# 
+# #################################################################
+# #
+# #    Annotation properties
+# #
+# #################################################################
+# 
+# 
+# http://purl.org/dc/elements/1.1/abstract
+<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/creator
+<http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/date
+<http://purl.org/dc/elements/1.1/date> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/description
+<http://purl.org/dc/elements/1.1/description> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/elements/1.1/title
+<http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/license
+<http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/vocab/vann/preferredNamespacePrefix
+<http://purl.org/vocab/vann/preferredNamespacePrefix> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://www.w3.org/2000/01/rdf-schema#labels
+<http://www.w3.org/2000/01/rdf-schema#labels> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Object Properties
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/persona#expertise
+<https://w3id.org/won/ext/persona#expertise> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/ext/persona#expertise> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/persona#expertise> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/persona#expertise> <http://www.w3.org/2002/07/owl#propertyDisjointWith> <https://w3id.org/won/ext/persona#expertiseOf> .
+# 
+# https://w3id.org/won/ext/persona#expertiseOf
+<https://w3id.org/won/ext/persona#expertiseOf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/ext/persona#expertiseOf> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/persona#expertiseOf> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+# 
+# https://w3id.org/won/ext/persona#interest
+<https://w3id.org/won/ext/persona#interest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/ext/persona#interest> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/persona#interest> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/persona#interest> <http://www.w3.org/2002/07/owl#propertyDisjointWith> <https://w3id.org/won/ext/persona#interestOf> .
+# 
+# https://w3id.org/won/ext/persona#interestOf
+<https://w3id.org/won/ext/persona#interestOf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/ext/persona#interestOf> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/persona#interestOf> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/persona#Expertise
+<https://w3id.org/won/ext/persona#Expertise> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/persona#Expertise> <http://www.w3.org/2000/01/rdf-schema#comment> "Announce an expertise in something, such as a technology or framework."@en .
+<https://w3id.org/won/ext/persona#Expertise> <http://www.w3.org/2000/01/rdf-schema#label> "Expertise" .
+# 
+# https://w3id.org/won/ext/persona#Interest
+<https://w3id.org/won/ext/persona#Interest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/ext/persona#Interest> <http://www.w3.org/2000/01/rdf-schema#comment> "Announce an interest in something, such as a hobby."@en .
+<https://w3id.org/won/ext/persona#Interest> <http://www.w3.org/2000/01/rdf-schema#label> "Interest" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Individuals
+# #
+# #################################################################
+# 
+# 
+# https://w3id.org/won/ext/persona#ExpertiseOfSocket
+<https://w3id.org/won/ext/persona#ExpertiseOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/persona#ExpertiseOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/persona#ExpertiseOfSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/persona#ExpertiseSocket> .
+<https://w3id.org/won/ext/persona#ExpertiseOfSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/persona#expertiseOf> .
+<https://w3id.org/won/ext/persona#expertiseOf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/persona#ExpertiseOfSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/persona#ExpertiseOfSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/ext/persona#ExpertiseOfSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom uses a Socket with this configuration to identify an expertise of the Persona Atom that it is connected to"@en .
+<https://w3id.org/won/ext/persona#ExpertiseOfSocket> <http://www.w3.org/2000/01/rdf-schema#label> "ExpertiseOfSocket" .
+# 
+# https://w3id.org/won/ext/persona#ExpertiseSocket
+<https://w3id.org/won/ext/persona#ExpertiseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/persona#ExpertiseSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/persona#ExpertiseSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/persona#ExpertiseOfSocket> .
+<https://w3id.org/won/ext/persona#ExpertiseSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/persona#expertise> .
+<https://w3id.org/won/ext/persona#expertise> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/persona#ExpertiseSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/persona#ExpertiseSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to represent Expertises."@en .
+<https://w3id.org/won/ext/persona#ExpertiseSocket> <http://www.w3.org/2000/01/rdf-schema#label> "ExpertiseSocket" .
+# 
+# https://w3id.org/won/ext/persona#InterestOfSocket
+<https://w3id.org/won/ext/persona#InterestOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/persona#InterestOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/persona#InterestOfSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/persona#InterestSocket> .
+<https://w3id.org/won/ext/persona#InterestOfSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/persona#interestOf> .
+<https://w3id.org/won/ext/persona#interestOf> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/persona#InterestOfSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/persona#InterestOfSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/ext/persona#InterestOfSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom uses a Socket with this configuration to identify an interest of the Persona Atom that it is connected to."@en .
+<https://w3id.org/won/ext/persona#InterestOfSocket> <http://www.w3.org/2000/01/rdf-schema#label> "InterestOfSocket" .
+# 
+# https://w3id.org/won/ext/persona#InterestSocket
+<https://w3id.org/won/ext/persona#InterestSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/persona#InterestSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
+<https://w3id.org/won/ext/persona#InterestSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/persona#InterestOfSocket> .
+<https://w3id.org/won/ext/persona#InterestSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/persona#interest> .
+<https://w3id.org/won/ext/persona#interest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/persona#InterestSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/persona#InterestSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to represent Interests."@en .
+<https://w3id.org/won/ext/persona#InterestSocket> <http://www.w3.org/2000/01/rdf-schema#label> "InterestSocket" .
+# 
+# https://w3id.org/won/ext/persona#expertise
+# 
+# https://w3id.org/won/ext/persona#expertiseOf
+# 
+# https://w3id.org/won/ext/persona#interest
+# 
+# https://w3id.org/won/ext/persona#interestOf
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Annotations
+# #
+# #################################################################
+# 
+# 
+<https://w3id.org/won/ext/persona#expertise> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en .
+<https://w3id.org/won/ext/persona#expertise> <http://www.w3.org/2000/01/rdf-schema#label> "expertise" .
+# 
+<https://w3id.org/won/ext/persona#expertiseOf> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en .
+<https://w3id.org/won/ext/persona#expertiseOf> <http://www.w3.org/2000/01/rdf-schema#label> "expertiseOf" .
+# 
+<https://w3id.org/won/ext/persona#interest> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en .
+<https://w3id.org/won/ext/persona#interest> <http://www.w3.org/2000/01/rdf-schema#label> "interest" .
+# 
+<https://w3id.org/won/ext/persona#interestOf> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en .
+<https://w3id.org/won/ext/persona#interestOf> <http://www.w3.org/2000/01/rdf-schema#label> "interestOf" .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    General axioms
+# #
+# #################################################################
+# 
+# 
+_:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
+_:genid1 <http://www.w3.org/2002/07/owl#distinctMembers> _:genid5 .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/persona#ExpertiseOfSocket> .
+_:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid4 .
+_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/persona#ExpertiseSocket> .
+_:genid4 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid3 .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/persona#InterestOfSocket> .
+_:genid3 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid2 .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/ext/persona#InterestSocket> .
+_:genid2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+# 
+# Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/

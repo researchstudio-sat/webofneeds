@@ -2,10 +2,9 @@
 @prefix dc: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix : <> .
-<https://w3id.org/won/ext/demo/1.0> a prov:Entity;
-	 dc:title "Web of Needs Demo Extension";
+<https://w3id.org/won/ext/persona/1.0> a prov:Entity;
+	 dc:title "Web of Needs Persona Extension";
 	 prov:wasAttributedTo :agent0;
 	 prov:wasAttributedTo <https://github.com/dgarijo/Widoco/>,<http://www.essepuntato.it/lode/>;
-	 prov:wasGeneratedAt "2019-05-20";
 .
-:agent0 a prov:Agent; foaf:name "Florian Kleedorfer".
+:agent0 a prov:Agent; foaf:name "Fabian Suda".

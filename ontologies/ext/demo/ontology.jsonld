@@ -49,26 +49,6 @@
     "@id" : "https://w3id.org/won/ext/demo/1.0"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/ext/demo#AfterParty",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Class for describing parties after some event."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "AfterParty"
-  } ]
-}, {
-  "@id" : "https://w3id.org/won/ext/demo#Breakfast",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Class for descrbing breakfasts, for example for early morning meetings."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "Breakfast"
-  } ]
-}, {
   "@id" : "https://w3id.org/won/ext/demo#Complaint",
   "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
@@ -107,16 +87,6 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "HandleComplaint"
-  } ]
-}, {
-  "@id" : "https://w3id.org/won/ext/demo#Interest",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Announce an interest in something, such as a hobby."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "Interest"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/demo#Meetup",
@@ -199,16 +169,6 @@
     "@value" : "PostDocSearch"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/ext/demo#PureSearch",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Class for Atoms that are just searches (defining a search String via match:searchString)."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "PureSearch"
-  } ]
-}, {
   "@id" : "https://w3id.org/won/ext/demo#RealEstateRentDemand",
   "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
@@ -247,16 +207,6 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "RehearsalRoomRentOffer"
-  } ]
-}, {
-  "@id" : "https://w3id.org/won/ext/demo#SightSeeing",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
-  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
-    "@language" : "en",
-    "@value" : "Sightseeing tour/trip."
-  } ],
-  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "SightSeeing"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/demo#genre",

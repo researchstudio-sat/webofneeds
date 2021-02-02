@@ -1,0 +1,331 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://w3id.org/won/ext/persona#"
+     xml:base="https://w3id.org/won/ext/persona"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:core="https://w3id.org/won/core#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:terms="http://purl.org/dc/terms/">
+    <owl:Ontology rdf:about="https://w3id.org/won/ext/persona">
+        <owl:versionIRI rdf:resource="https://w3id.org/won/ext/persona/1.0"/>
+        <owl:imports rdf:resource="https://w3id.org/won/core"/>
+        <dc:abstract xml:lang="en">This ontology contains the definition of the *InterestSocket* the *InterestOfSocket* the *ExpertiseSocket* and the *ExpertiseOfSocket*, the *interest* the *interestOf* the *expertise* and the *expertOf* properties. These express control relationships in WoN. The Atoms with expertise/interest in other atoms represent agents (users or programs) and can themselves not be interests/expertises of other atoms.</dc:abstract>
+        <dc:creator>Fabian Suda</dc:creator>
+        <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2021-02-02</dc:date>
+        <dc:title>Web of Needs Persona Extension</dc:title>
+        <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+        <vann:preferredNamespacePrefix>wx-persona</vann:preferredNamespacePrefix>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/abstract"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/creator -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/creator"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/date -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/date"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/description -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/description"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/title -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/license -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/license"/>
+    
+
+
+    <!-- http://purl.org/vocab/vann/preferredNamespacePrefix -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/vocab/vann/preferredNamespacePrefix"/>
+    
+
+
+    <!-- http://www.w3.org/2000/01/rdf-schema#labels -->
+
+
+    <owl:AnnotationProperty rdf:about="http://www.w3.org/2000/01/rdf-schema#labels"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#expertise -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/persona#expertise">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+        <owl:propertyDisjointWith rdf:resource="https://w3id.org/won/ext/persona#expertiseOf"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#expertiseOf -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/persona#expertiseOf">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#interest -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/persona#interest">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+        <owl:propertyDisjointWith rdf:resource="https://w3id.org/won/ext/persona#interestOf"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#interestOf -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/persona#interestOf">
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#Expertise -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/ext/persona#Expertise">
+        <rdfs:comment xml:lang="en">Announce an expertise in something, such as a technology or framework.</rdfs:comment>
+        <rdfs:label>Expertise</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#Interest -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/ext/persona#Interest">
+        <rdfs:comment xml:lang="en">Announce an interest in something, such as a hobby.</rdfs:comment>
+        <rdfs:label>Interest</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#ExpertiseOfSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#ExpertiseOfSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#ExpertiseSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#expertiseOf"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
+        <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to identify an expertise of the Persona Atom that it is connected to</rdfs:comment>
+        <rdfs:label>ExpertiseOfSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#ExpertiseSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#ExpertiseSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#ExpertiseOfSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#expertise"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to represent Expertises.</rdfs:comment>
+        <rdfs:label>ExpertiseSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#InterestOfSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#InterestOfSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#InterestSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#interestOf"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
+        <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to identify an interest of the Persona Atom that it is connected to.</rdfs:comment>
+        <rdfs:label>InterestOfSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#InterestSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#InterestSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#InterestOfSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#interest"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to represent Interests.</rdfs:comment>
+        <rdfs:label>InterestSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#expertise -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#expertise"/>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#expertiseOf -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#expertiseOf"/>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#interest -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#interest"/>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#interestOf -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#interestOf"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotations
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    <rdf:Description rdf:about="https://w3id.org/won/ext/persona#expertise">
+        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
+        <rdfs:label>expertise</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="https://w3id.org/won/ext/persona#expertiseOf">
+        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
+        <rdfs:label>expertiseOf</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="https://w3id.org/won/ext/persona#interest">
+        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
+        <rdfs:label>interest</rdfs:label>
+    </rdf:Description>
+    <rdf:Description rdf:about="https://w3id.org/won/ext/persona#interestOf">
+        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
+        <rdfs:label>interestOf</rdfs:label>
+    </rdf:Description>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // General axioms
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    <rdf:Description>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
+        <owl:distinctMembers rdf:parseType="Collection">
+            <rdf:Description rdf:about="https://w3id.org/won/ext/persona#ExpertiseOfSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/persona#ExpertiseSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/persona#InterestOfSocket"/>
+            <rdf:Description rdf:about="https://w3id.org/won/ext/persona#InterestSocket"/>
+        </owl:distinctMembers>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/ -->
+
+

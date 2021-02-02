@@ -1,0 +1,246 @@
+[ {
+  "@id" : "_:genid1",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
+  "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
+    "@list" : [ {
+      "@id" : "https://w3id.org/won/ext/persona#ExpertiseOfSocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/persona#ExpertiseSocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/persona#InterestOfSocket"
+    }, {
+      "@id" : "https://w3id.org/won/ext/persona#InterestSocket"
+    } ]
+  } ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/abstract",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/creator",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/date",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/description",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/elements/1.1/title",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/license",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/vocab/vann/preferredNamespacePrefix",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://www.w3.org/2000/01/rdf-schema#labels",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
+  "http://purl.org/dc/elements/1.1/abstract" : [ {
+    "@language" : "en",
+    "@value" : "This ontology contains the definition of the *InterestSocket* the *InterestOfSocket* the *ExpertiseSocket* and the *ExpertiseOfSocket*, the *interest* the *interestOf* the *expertise* and the *expertOf* properties. These express control relationships in WoN. The Atoms with expertise/interest in other atoms represent agents (users or programs) and can themselves not be interests/expertises of other atoms."
+  } ],
+  "http://purl.org/dc/elements/1.1/creator" : [ {
+    "@value" : "Fabian Suda"
+  } ],
+  "http://purl.org/dc/elements/1.1/date" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#date",
+    "@value" : "2021-02-02"
+  } ],
+  "http://purl.org/dc/elements/1.1/title" : [ {
+    "@value" : "Web of Needs Persona Extension"
+  } ],
+  "http://purl.org/dc/terms/license" : [ {
+    "@id" : "https://creativecommons.org/licenses/by/4.0/"
+  } ],
+  "http://purl.org/vocab/vann/preferredNamespacePrefix" : [ {
+    "@value" : "wx-persona"
+  } ],
+  "http://www.w3.org/2002/07/owl#imports" : [ {
+    "@id" : "https://w3id.org/won/core"
+  } ],
+  "http://www.w3.org/2002/07/owl#versionIRI" : [ {
+    "@id" : "https://w3id.org/won/ext/persona/1.0"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#Expertise",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Announce an expertise in something, such as a technology or framework."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "Expertise"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#ExpertiseOfSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "An Atom uses a Socket with this configuration to identify an expertise of the Persona Atom that it is connected to"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "ExpertiseOfSocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#ExpertiseSocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#expertiseOf"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#ExpertiseSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "A Persona Atom uses a Socket with this configuration to represent Expertises."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "ExpertiseSocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#ExpertiseOfSocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#expertise"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#Interest",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Announce an interest in something, such as a hobby."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "Interest"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#InterestOfSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "An Atom uses a Socket with this configuration to identify an interest of the Persona Atom that it is connected to."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "InterestOfSocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#InterestSocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#interestOf"
+  } ],
+  "https://w3id.org/won/core#socketCapacity" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#InterestSocket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "A Persona Atom uses a Socket with this configuration to represent Interests."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "InterestSocket"
+  } ],
+  "https://w3id.org/won/core#autoOpen" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ],
+  "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#InterestOfSocket"
+  } ],
+  "https://w3id.org/won/core#derivesAtomProperty" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#interest"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#expertise",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "expertise"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2002/07/owl#propertyDisjointWith" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#expertiseOf"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#expertiseOf",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "expertiseOf"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#interest",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "interest"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2002/07/owl#propertyDisjointWith" : [ {
+    "@id" : "https://w3id.org/won/ext/persona#interestOf"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/ext/persona#interestOf",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "interestOf"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/core#Atom"
+  } ]
+} ]
