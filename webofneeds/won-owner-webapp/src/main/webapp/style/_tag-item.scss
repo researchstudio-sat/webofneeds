@@ -1,0 +1,33 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+.ti {
+  border-radius: 0.5rem;
+  background: $won-secondary-color;
+  color: $won-secondary-text-color;
+  margin: 0.25rem 0.25rem 0.25rem 0;
+  padding: 0.25rem 0.5rem;
+
+  div.headerElement {
+    padding: 0.5rem;
+
+    &.status--sent {
+      opacity: 0.25;
+    }
+
+    &.status--closed {
+      //TODO: Filter grayscale or something
+    }
+
+    &.status--suggested,
+    &.status--received {
+      @include animateOpacityHeartBeat();
+    }
+  }
+
+  &.won-unread {
+    backgroud: $won-unread-attention;
+    /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
+  }
+}

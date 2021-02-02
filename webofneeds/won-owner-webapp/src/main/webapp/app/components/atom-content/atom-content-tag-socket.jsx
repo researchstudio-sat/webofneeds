@@ -13,10 +13,10 @@ import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import WonSocketAddAtom from "../socket-add-atom.jsx";
 import WonSocketAddButton from "../socket-add-button.jsx";
+import WonTagItem from "../socket-items/tag-item.jsx";
 
 import "~/style/_atom-content-tag-socket.scss";
 import * as generalSelectors from "../../redux/selectors/general-selectors";
-import WonGenericItem from "~/app/components/socket-items/generic-item";
 
 export default function WonAtomContentTagSocket({
   atom,
@@ -59,7 +59,7 @@ export default function WonAtomContentTagSocket({
         .map((conn, connUri) => {
           const flip = connectionUtils.hasTargetSocketUri(conn, socketUri);
           connectionElements.push(
-            <WonGenericItem
+            <WonTagItem
               key={connUri}
               connection={conn}
               currentLocation={currentLocation}
