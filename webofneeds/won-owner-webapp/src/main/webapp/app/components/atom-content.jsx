@@ -20,6 +20,7 @@ import vocab from "../service/vocab.js";
 import WonAtomContentActivities from "./atom-content/atom-content-activities.jsx";
 import WonAtomContentChats from "./atom-content/atom-content-chats.jsx";
 import WonAtomContentSocket from "./atom-content/atom-content-socket.jsx";
+import WonAtomContentTagSockets from "./atom-content/atom-content-tag-sockets.jsx";
 import WonAtomContentGeneral from "./atom-content/atom-content-general.jsx";
 import WonSocketAddButton from "./socket-add-button.jsx";
 import WonAtomConnectionsIndicator from "./atom-connections-indicator.jsx";
@@ -157,12 +158,18 @@ export default function WonAtomContent({
           connectionUtils.filterNonSingleConnectedSocketCapacityFilter
         );
 
+        const relevantTagViewSocketsConnectionsMap = relevantConnectionsMap.filter(
+          connectionUtils.filterNonTagViewSockets
+        );
+
+        const hasTagViewSockets = relevantTagViewSocketsConnectionsMap.size > 0;
+
         // Filter out singleConnectSocketReactions
         const filteredReactions =
           reactions &&
-          reactions.filter(
-            connectionUtils.filterSingleConnectedSocketCapacityFilter
-          );
+          reactions
+            .filter(connectionUtils.filterSingleConnectedSocketCapacityFilter)
+            .filter(connectionUtils.filterTagViewSockets);
 
         visibleTabFragment = (
           <React.Fragment>
@@ -182,7 +189,6 @@ export default function WonAtomContent({
                   setVisibleTab={setVisibleTab}
                 />
               )}
-
             {hasContent && (
               <WonAtomContentDetails atom={atom} branch="content" />
             )}
@@ -192,6 +198,16 @@ export default function WonAtomContent({
               )}
             {hasSeeksBranch && (
               <WonAtomContentDetails atom={atom} branch="seeks" />
+            )}
+            {hasTagViewSockets && (
+              <WonAtomContentTagSockets
+                atom={atom}
+                relevantConnectionsMap={relevantTagViewSocketsConnectionsMap}
+                storedAtoms={storedAtoms}
+                isOwned={isOwned}
+                showAddPicker={showAddPicker}
+                toggleAddPicker={toggleAddPicker}
+              />
             )}
             {atomUtils.isActive(atom) &&
               filteredReactions &&

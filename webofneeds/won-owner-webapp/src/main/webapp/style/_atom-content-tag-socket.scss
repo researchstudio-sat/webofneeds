@@ -1,0 +1,25 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-content-tag-socket {
+  .actsocket__content {
+    display: flex;
+    grid-gap: 0.5rem;
+
+    & > won-socket-add-button {
+      border: $thinGrayBorder;
+
+      &:hover {
+        border-color: $won-primary-color;
+      }
+    }
+
+    & > .actsocket__empty {
+      color: $won-line-gray;
+      text-align: center;
+      font-weight: 300;
+      grid-column: 1 / -1;
+    }
+  }
+}
