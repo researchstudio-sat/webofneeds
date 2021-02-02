@@ -1,0 +1,331 @@
+@base             <https://example.com/test/atom1> .
+@prefix ex:       <https://example.com/test/> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix chat:     <https://w3id.org/won/ext/chat#> .
+@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix atom1:    <http://example.org/test/atom1#> .
+@prefix atom2:    <http://example.org/test/atom2#> .
+@prefix atom3:    <http://example.org/test/atom3#> .
+@prefix atom32:   <http://example.org/test/atom32#> .
+@prefix atom4:    <http://example.org/test/atom4#> .
+@prefix atom5:    <http://example.org/test/atom5#> .
+@prefix msg:      <https://w3id.org/won/message#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg:     <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+ex:expectedResult1
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request1> .
+
+ex:expectedResult1-2
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation <#request1-2> .
+
+ex:expectedResult2
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request2> .
+
+ex:expectedResult2-1
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation <#request2-1> .
+
+
+ex:expectedResult3
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request3> .
+
+ex:expectedResult4
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation <#request4> .
+
+ex:expectedResult5
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request5> .
+
+ex:expectedResult6
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation <#request6> .
+
+
+# See only atoms graph when buddies
+
+<#authorization>
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                 auth:connection [ auth:targetAtom      [ ] ;
+                                                   auth:connectionState won:Connected ] ] ] ;
+    auth:grant   [ auth:graph  [ auth:operation auth:opRead ] ;
+                   auth:socket [ auth:socketType  wx-hold:HolderSocket ;
+                                 auth:connections [ auth:connectionState    won:Connected ;
+                                                    auth:operation          auth:opRead, auth:opConnectClose,
+                                                                            auth:opCommunicate ;
+                                                    auth:connectionMessages [ auth:inherit false ] ] ] ] .
+
+
+<#request1>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom1 ;
+    auth:reqAtom     ex:atom2 ;
+    auth:reqPosition auth:positionAtomGraph .
+
+<#request1-2>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom5 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionAtomGraph .
+
+<#request2>
+    a                auth:OperationRequest ;
+    auth:reqSocket   atom1:holderSocket ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionAtomGraph .
+
+<#request2-1>
+    a                auth:OperationRequest ;
+    auth:reqSocket   atom1:holderSocket ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom5 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionAtomGraph .
+
+<#request3>
+    a                            auth:OperationRequest ;
+    auth:reqSocket               atom1:holderSocket ;
+    auth:reqConnection           atom1:holdsConnection ;
+    auth:reqConnectionTargetAtom ex:atom3 ;
+    auth:reqConnectionState      won:Connected ;
+    auth:operation               auth:opRead ;
+    auth:requestor               ex:atom2 ;
+    auth:reqAtom                 ex:atom1 ;
+    auth:reqPosition             auth:positionConnection .
+
+<#request4>
+    a                            auth:OperationRequest ;
+    auth:reqSocket               atom1:holderSocket ;
+    auth:reqConnection           atom1:holdsConnection ;
+    auth:reqConnectionTargetAtom ex:atom3 ;
+    auth:reqConnectionState      won:RequestSent ;
+    auth:operation               auth:opRead ;
+    auth:requestor               ex:atom5 ;
+    auth:reqAtom                 ex:atom1 ;
+    auth:reqPosition             auth:positionConnection .
+
+<#request5>
+    a                            auth:OperationRequest ;
+    auth:reqSocket               atom2:holderSocket ;
+    auth:reqConnection           atom2:holdsConnection ;
+    auth:reqConnectionTargetAtom ex:atom4 ;
+    auth:reqConnectionState      won:Connected ;
+    auth:operation               auth:opRead ;
+    auth:requestor               ex:atom1 ;
+    auth:reqAtom                 ex:atom2 ;
+    auth:reqPosition             auth:positionConnection .
+
+<#request6>
+    a                            auth:OperationRequest ;
+    auth:reqSocket               atom1:holderSocket ;
+    auth:reqConnection           atom1:holdsConnection32 ;
+    auth:reqConnectionTargetAtom ex:atom32 ;
+    auth:reqConnectionState      won:Closed ;
+    auth:operation               auth:opRead ;
+    auth:requestor               ex:atom2 ;
+    auth:reqAtom                 ex:atom1 ;
+    auth:reqPosition             auth:positionConnection .
+
+#Persona 1
+
+ex:atom1
+    a                    won:Atom ;
+    won:socket           atom1:buddySocket, atom1:holderSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
+
+# Buddy Socket
+
+atom1:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom1:buddySocketConnections .
+
+atom1:buddySocketConnections
+    rdfs:member atom1:buddyConnection1 .
+
+atom1:buddyConnection1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom2 ;
+    won:connectionState won:Connected .
+
+# Holder Socket
+
+atom1:holderSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HolderSocket ;
+    won:connections      atom1:holderSocketConnections .
+
+
+atom1:holderSocketConnections
+    rdfs:member atom1:holdsConnection, atom1:holdsConnection32 .
+
+
+atom1:holdsConnection
+    a                   won:Connection ;
+    won:targetAtom      ex:atom3 ;
+    won:connectionState won:Connected .
+
+atom1:holdsConnection32
+    a                   won:Connection ;
+    won:targetAtom      ex:atom32 ;
+    won:connectionState won:Closed .
+
+
+#Persona 2
+
+ex:atom2
+    a                    won:Atom ;
+    won:socket           atom2:buddySocket, atom1:holderSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom2:msg ;
+    won:wonNode          ex:node .
+
+# Buddy Socket
+
+atom2:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom2:buddySocketConnections .
+
+atom2:buddySocketConnections
+    rdfs:member atom2:buddyConnection1 .
+
+atom2:buddyConnection1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+# Holder Socket
+
+atom2:holderSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HolderSocket ;
+    won:connections      atom2:holderSocketConnections .
+
+atom2:holderSocketConnections
+    rdfs:member atom2:holdsConnection .
+
+atom2:holdsConnection
+    a                   won:Connection ;
+    won:targetAtom      ex:atom4 ;
+    won:connectionState won:Connected .
+
+
+#Atom 3 held by atom 1
+
+ex:atom3
+    a                    won:Atom ;
+    won:socket           atom3:holdableSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom3:msg ;
+    won:wonNode          ex:node .
+
+atom3:holdableSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HoldableSocket ;
+    won:connections      atom3:holdableSocketConnections .
+
+atom3:holdableSocketConnections
+    rdfs:member atom3:heldByConnection .
+
+atom3:heldByConnection
+    a                   won:Connection ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+#Atom 32 held request sent, but not connected to atom 1
+
+ex:atom32
+    a                    won:Atom ;
+    won:socket           atom3:holdableSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom32:msg ;
+    won:wonNode          ex:node .
+
+atom32:holdableSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HoldableSocket ;
+    won:connections      atom32:holdableSocketConnections .
+
+atom32:holdableSocketConnections
+    rdfs:member atom3:heldByConnection .
+
+atom32:heldByConnection
+    a                   won:Connection ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Closed .
+
+
+#Atom 4 held by atom 2
+
+ex:atom4
+    a                    won:Atom ;
+    won:socket           atom4:holdableSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom4:msg ;
+    won:wonNode          ex:node .
+
+atom4:holdableSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HoldableSocket ;
+    won:connections      atom4:holdableSocketConnections .
+
+atom4:holdableSocketConnections
+    rdfs:member atom3:heldByConnection .
+
+atom4:heldByConnection
+    a                   won:Connection ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+
+#Persona 3 sended request to Persona 1
+
+ex:atom5
+    a                    won:Atom ;
+    won:socket           atom5:buddySocket, atom1:holderSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom5:msg ;
+    won:wonNode          ex:node .
+
+# Buddy Socket
+
+atom5:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom5:buddySocketConnections .
+
+atom5:buddySocketConnections
+    rdfs:member atom5:buddyConnection1 .
+
+atom5:buddyConnection1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:RequestSent .
+
+

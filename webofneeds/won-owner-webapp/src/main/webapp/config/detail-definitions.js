@@ -16,6 +16,45 @@ import vocab from "../app/service/vocab.js";
 export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
 
+export const seeAtomsOfBuddiesAuthorization = {
+  [vocab.AUTH.granteeCompacted]: {
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.socketTypeCompacted]: {
+        "@id": vocab.BUDDY.BuddySocketCompacted,
+      },
+      [vocab.AUTH.connectionCompacted]: {
+        [vocab.AUTH.targetAtomCompacted]: {},
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
+        },
+      },
+    },
+  },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+    },
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.socketTypeCompacted]: {
+        "@id": vocab.WON.HolderSocketCompacted,
+      },
+      [vocab.AUTH.connectionsCompacted]: {
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
+        },
+        [vocab.AUTH.operationCompacted]: [
+          { "@id": vocab.AUTH.opReadCompacted },
+          { "@id": vocab.AUTH.opConnectCloseCompacted },
+          { "@id": vocab.AUTH.opCommunicateCompacted },
+        ],
+        [vocab.AUTH.connectionMessagesCompacted]: {
+          [vocab.AUTH.inheritCompacted]: false,
+        },
+      },
+    },
+  },
+};
+
 const connectedConectionsAuthorization = {
   [vocab.AUTH.granteeCompacted]: {
     [vocab.AUTH.socketCompacted]: {
@@ -46,7 +85,7 @@ const connectedConectionsAuthorization = {
   },
 };
 
-const defaultPublicAtomAuthorization = {
+export const defaultPublicAtomAuthorization = {
   [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
   [vocab.AUTH.grantCompacted]: {
     [vocab.AUTH.graphCompacted]: {
@@ -55,7 +94,7 @@ const defaultPublicAtomAuthorization = {
   },
 };
 
-const emptyDraftImm = Immutable.fromJS({
+export const emptyDraftImm = Immutable.fromJS({
   content: {
     sockets: {
       "#chatSocket": vocab.CHAT.ChatSocketCompacted,
