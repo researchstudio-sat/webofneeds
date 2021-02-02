@@ -1,16 +1,14 @@
 package won.owner.protocol.message;
 
-import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.util.AtomModelWrapper;
-import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
@@ -51,8 +49,8 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
                     logger.debug("invalidating events list for atom " + message.getRecipientAtomURI()
                                     + " for connection "
                                     + connectionURI.get());
-                    URI messageContainerUri = WonRdfUtils.ConnectionUtils
-                                    .getMessageContainerURIforConnectionURI(connectionURI.get());
+                    URI messageContainerUri = WonRelativeUriHelper
+                                    .createMessageContainerURIForConnection(connectionURI.get());
                     invalidate(messageContainerUri, webId);
                     if (type.causesConnectionStateChange()) {
                         invalidate(connectionURI.get(), webId);
@@ -69,10 +67,8 @@ public class LinkedDataCacheInvalidator implements WonMessageProcessor {
             // of messages mean that the new connection has been created recently
             logger.debug("invalidating connections list for atom " + message.getRecipientAtomURI());
             try {
-                Dataset atom = linkedDataSource.getDataForResource(message.getRecipientAtomURI(),
-                                message.getRecipientAtomURI());
-                AtomModelWrapper wrapper = new AtomModelWrapper(atom);
-                URI connectionsListUri = URI.create(wrapper.getConnectionContainerUri());
+                URI connectionsListUri = WonRelativeUriHelper
+                                .createConnectionContainerURIForAtom(message.getRecipientAtomURI());
                 invalidate(connectionsListUri, webId);
             } catch (Exception e) {
                 logger.info("Error occurred while trying to invalidate cache for {}: {}", message.getRecipientAtomURI(),

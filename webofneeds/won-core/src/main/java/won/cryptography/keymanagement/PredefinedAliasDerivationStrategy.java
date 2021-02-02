@@ -13,10 +13,10 @@ package won.cryptography.keymanagement;
 /**
  * Always uses the predefined alias
  */
-public class PredefinedAliasStrategy implements KeyPairAliasDerivationStrategy {
+public class PredefinedAliasDerivationStrategy implements KeyPairAliasDerivationStrategy {
     private String predefinedAlias;
 
-    public PredefinedAliasStrategy(String predefinedAlias) {
+    public PredefinedAliasDerivationStrategy(String predefinedAlias) {
         this.predefinedAlias = predefinedAlias;
         if (this.predefinedAlias == null || this.predefinedAlias.trim().length() == 0) {
             throw new IllegalArgumentException("Cannot use null or empty string as predefined alias");

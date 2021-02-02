@@ -13,8 +13,8 @@ package won.node.service.nodeconfig;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import won.node.springsecurity.acl.WonAclRequestHelper;
-import won.protocol.model.Atom;
 import won.protocol.util.WonMessageUriHelper;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -284,11 +284,11 @@ public class URIService implements InitializingBean {
     }
 
     public URI createConnectionContainerURIForAtom(URI atomURI) {
-        return URI.create(atomURI.toString() + "/c");
+        return WonRelativeUriHelper.createConnectionContainerURIForAtom(atomURI);
     }
 
     public URI createMessageContainerURIForConnection(URI connURI) {
-        return URI.create(connURI.toString() + "/msg");
+        return WonRelativeUriHelper.createMessageContainerURIForConnection(connURI);
     }
 
     public URI createMessageURIForId(String id) {
@@ -300,14 +300,11 @@ public class URIService implements InitializingBean {
     }
 
     public URI createAclGraphURIForAtomURI(URI atomUri) {
-        return URI.create(atomUri + Atom.ACL_GRAPH_URI_FRAGMENT);
+        return WonRelativeUriHelper.createAclGraphURIForAtomURI(atomUri);
     }
 
     public URI createSysInfoGraphURIForAtomURI(final URI atomURI) {
-        // TODO: [SECURITY] it's possible to submit atom data that clashes with this
-        // name,
-        // which may lead to undefined behavior
-        return URI.create(atomURI + "#sysinfo");
+        return WonRelativeUriHelper.createSysInfoGraphURIForAtomURI(atomURI);
     }
 
     /**
@@ -319,7 +316,7 @@ public class URIService implements InitializingBean {
      * @return
      */
     public URI createTokenRequestURIForAtomURIWithQuery(URI atomURI, String query) {
-        return URI.create(atomURI.toString() + "/token" + (query == null ? "" : "?" + query));
+        return WonRelativeUriHelper.createTokenRequestURIForAtomURIWithQuery(atomURI, query);
     }
 
     /**

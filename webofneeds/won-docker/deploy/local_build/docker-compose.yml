@@ -138,7 +138,9 @@ services:
       - "DELETE_CONTENTS_ON_STARTUP=true"
     volumes:
       - owner-won-deps:/destData:rw
-      #- ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/srcData/logback-config:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-docker/deploy/local_build/logback-config:/srcData/logback-config:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/target/classes:/srcData/won-auth:ro
+      - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-auth/generated-sources/shacl2java:/srcData/won-auth-s2j:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner-webapp/target/classes:/srcData/won-owner-webapp:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-owner/target/classes:/srcData/won-owner:ro
       - ${WON_GIT_REPO:-./../../../..}/webofneeds/won-core/target/classes:/srcData/won-core:ro

@@ -137,7 +137,6 @@ public class AuthUtils {
         clone.setReqPosition(toClone.getReqPosition());
         clone.setReqSocket(toClone.getReqSocket());
         clone.setReqSocketType(toClone.getReqSocketType());
-        clone.setBearsEncodedTokens(Collections.unmodifiableSet(toClone.getBearsEncodedTokens()));
         clone.setBearsTokens(Collections.unmodifiableSet(toClone.getBearsTokens()));
         return clone;
     }

@@ -33,7 +33,7 @@
         <constructor-arg ref="keyStoreService" />
         <constructor-arg name="defaultAlias" value="${matcher.uri}" />
     </bean>
-    <bean id="predefinedAliasStrategy" class="won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy">
+    <bean id="predefinedAliasStrategy" class="won.cryptography.ssl.PrivateKeyAliasContextStrategy">
         <constructor-arg value="${matcher.uri}" />
     </bean>
     <bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps" depends-on="cryptographyService">

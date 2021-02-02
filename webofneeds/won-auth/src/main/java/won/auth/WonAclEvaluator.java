@@ -49,6 +49,21 @@ public class WonAclEvaluator {
         } else {
             merged.setDecision(ACCESS_DENIED);
         }
+        if (ACCESS_DENIED.equals(merged.getDecision())) {
+            merged.setInsufficientScope(false);
+            merged.setInvalidToken(false);
+            if (left != null) {
+                merged.setInsufficientScope(left.getInsufficientScope() == null ? false : left.getInsufficientScope());
+                merged.setInvalidToken(left.getInvalidToken() == null ? false : left.getInvalidToken());
+            }
+            if (right != null) {
+                merged.setInsufficientScope(
+                                merged.getInsufficientScope() || right.getInsufficientScope() == null ? false
+                                                : right.getInsufficientScope());
+                merged.setInvalidToken(merged.getInvalidToken() || right.getInvalidToken() == null ? false
+                                : right.getInvalidToken());
+            }
+        }
         HashSet<AuthToken> tokens = new HashSet<>();
         tokens.addAll(left.getIssueTokens());
         tokens.addAll(right.getIssueTokens());
@@ -164,7 +179,8 @@ public class WonAclEvaluator {
                     Set<Authorization> requestorIsGranteeOf) {
         return authorizations.stream()
                         .filter(authorization -> authorization.getProvideAuthInfo() != null)
-                        .filter(authorization -> isRequestorAGrantee(authorization, request)
+                        .filter(authorization -> ANYONE.equals(authorization.getGranteeGranteeWildcard())
+                                        || isRequestorAGrantee(authorization, request)
                                         || isBearerOfAcceptedToken(authorization, request))
                         .map(authorization -> {
                             if (logger.isDebugEnabled()) {
@@ -244,8 +260,20 @@ public class WonAclEvaluator {
         } else {
             acd.setDecision(ACCESS_GRANTED);
         }
-        if (!accessGranted && authInfo != null) {
-            acd.setProvideAuthInfo(authInfo);
+        if (!accessGranted) {
+            if (!request.getBearsTokens().isEmpty()) {
+                Set<Boolean> validity = request.getBearsTokens().stream().map(t -> isTokenValid(t))
+                                .collect(Collectors.toSet());
+                if (validity.contains(Boolean.FALSE)) {
+                    acd.setInvalidToken(true);
+                }
+                if (validity.contains(Boolean.TRUE)) {
+                    acd.setInsufficientScope(true);
+                }
+            }
+            if (authInfo != null) {
+                acd.setProvideAuthInfo(authInfo);
+            }
         }
         if (accessGranted) {
             acd.setIssueTokens(getRequestedTokens(authorization, request));
@@ -367,28 +395,23 @@ public class WonAclEvaluator {
     }
 
     private boolean isBearerOfAcceptedToken(Authorization authorization, OperationRequest request) {
-        Set<AuthToken> decoded = new HashSet<>();
-        decoded.addAll(request.getBearsTokens());
-        Set<String> encodedTokens = request.getBearsEncodedTokens();
-        decoded.addAll(decodeAuthTokens(encodedTokens));
-        decoded = decoded.stream()
+        final Set<AuthToken> tokens = request.getBearsTokens().stream()
                         .filter(token -> isTokenValid(token))
                         .collect(Collectors.toSet());
-        debug("valid tokens: {}", authorization, request, decoded.size());
-        Set<AuthToken> finalDecoded = decoded;
-        if (decoded.size() > 0) {
-            return authorization.getBearers().stream().anyMatch(tokenShape -> {
-                Set<AseRoot> aseRoots = tokenShape.getIssuersAseRoot();
-                Set<AtomExpression> atomExpressions = tokenShape.getIssuersAtomExpression();
-                Set<AuthToken> elegibleTokens = filterTokensByScope(finalDecoded, tokenShape);
-                debug("tokens with correct scope: {}", authorization, request, elegibleTokens.size());
-                return elegibleTokens.stream()
-                                .filter(isIssuerAccepted(aseRoots, atomExpressions, request.getReqAtom()))
-                                .filter(isSignerAccepted(tokenShape))
-                                .findFirst().isPresent();
-            });
+        debug("valid tokens: {}", authorization, request, tokens.size());
+        if (tokens.isEmpty()) {
+            return false;
         }
-        return false;
+        return authorization.getBearers().stream().anyMatch(tokenShape -> {
+            Set<AseRoot> aseRoots = tokenShape.getIssuersAseRoot();
+            Set<AtomExpression> atomExpressions = tokenShape.getIssuersAtomExpression();
+            Set<AuthToken> elegibleTokens = filterTokensByScope(tokens, tokenShape);
+            debug("tokens with correct scope: {}", authorization, request, elegibleTokens.size());
+            return elegibleTokens.stream()
+                            .filter(isIssuerAccepted(aseRoots, atomExpressions, request.getReqAtom()))
+                            .filter(isSignerAccepted(tokenShape))
+                            .findFirst().isPresent();
+        });
     }
 
     private Set<AuthToken> filterTokensByScope(Set<AuthToken> decoded, TokenShape tokenShape) {

@@ -1,13 +1,14 @@
 package won.cryptography.ssl;
 
-import java.lang.invoke.MethodHandles;
-import java.net.Socket;
-import java.util.Map;
-
 import org.apache.http.ssl.PrivateKeyDetails;
 import org.apache.http.ssl.PrivateKeyStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.rest.PrivateKeyAliasContext;
+
+import java.lang.invoke.MethodHandles;
+import java.net.Socket;
+import java.util.Map;
 
 /**
  * When the server requests a certificate, and if it does not specify which one
@@ -20,20 +21,22 @@ import org.slf4j.LoggerFactory;
  * with specified alias from the keystore, when asked. User: ypanchenko Date:
  * 27.07.2015
  */
-public class PredefinedAliasPrivateKeyStrategy implements PrivateKeyStrategy {
+public class PrivateKeyAliasContextStrategy implements PrivateKeyStrategy {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private String alias;
 
-    public PredefinedAliasPrivateKeyStrategy(String alias) {
-        this.alias = alias;
+    public PrivateKeyAliasContextStrategy() {
     }
 
     public String chooseAlias(final Map<String, PrivateKeyDetails> map, final Socket socket) {
-        logger.debug("Chosen alias: " + alias);
+        String alias = PrivateKeyAliasContext.getPrivateKeyAlias();
+        if (alias == null) {
+            throw new IllegalStateException("Cannot choose private key: no alias set in PrivateKeyAliasContext");
+        }
+        logger.debug("Using alias: " + alias);
         return alias;
     }
 
     public String getAlias() {
-        return alias;
+        return PrivateKeyAliasContext.getPrivateKeyAlias();
     }
 }

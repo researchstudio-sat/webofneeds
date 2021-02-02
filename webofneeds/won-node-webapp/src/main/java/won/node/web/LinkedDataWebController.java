@@ -192,9 +192,11 @@ public class LinkedDataWebController implements InitializingBean {
                         .getAtomDataset(atomURI, null, waeCtx)
                         .getData();
         if (rdfDataset == null || rdfDataset.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            waeCtx.getCombinedResults()
-                            .ifPresent(result -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
+            Optional<AclEvalResult> result = waeCtx.getCombinedResults();
+            if (result.isPresent()) {
+                WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result.get());
+                response.setStatus(WonAclRequestHelper.getHttpStatusCodeForAclEvaluationResult(result.get()));
+            }
             return "forbiddenView";
         }
         model.addAttribute("rdfDataset", rdfDataset);
@@ -226,10 +228,11 @@ public class LinkedDataWebController implements InitializingBean {
             // TODO AUTH: Research how to handle lower layers
             logger.warn("TODO: apply ACLs to atom/{identifier}/deep request!");
             if (rdfDataset == null || rdfDataset.isEmpty()) {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                waeCtx.getCombinedResults()
-                                .ifPresent(result -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
-                return "forbiddenView";
+                Optional<AclEvalResult> result = waeCtx.getCombinedResults();
+                if (result.isPresent()) {
+                    WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result.get());
+                    response.setStatus(WonAclRequestHelper.getHttpStatusCodeForAclEvaluationResult(result.get()));
+                }
             }
             model.addAttribute("rdfDataset", rdfDataset);
             model.addAttribute("resourceURI", atomURI.toString());
@@ -1276,12 +1279,19 @@ public class LinkedDataWebController implements InitializingBean {
                 or.setReqPosition(POSITION_ROOT);
                 AclEvalResult result = ec.decideAndRemember(or);
                 if (ACCESS_DENIED.equals(result.getDecision())) {
-                    ec.getCombinedResults()
-                                    .ifPresent(r -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
+                    int statusCode = HttpStatus.FORBIDDEN.value();
+                    Optional<AclEvalResult> accResult = WonAclRequestHelper.getWonAclEvaluationContext(request)
+                                    .getCombinedResults();
+                    if (accResult.isPresent()) {
+                        WonAclRequestHelper.setAuthInfoAsResponseHeader(response, accResult.get());
+                        statusCode = WonAclRequestHelper.getHttpStatusCodeForAclEvaluationResult(accResult.get());
+                    }
+                    HttpStatus status = HttpStatus.valueOf(statusCode);
+                    logger.debug("sending status {}", status);
                     // append the required headers
                     addMutableResourceHeaders(headers);
                     addLocationHeaderIfNecessary(headers, URI.create(request.getRequestURI()), connectionsURI);
-                    return new ResponseEntity<>(null, headers, HttpStatus.FORBIDDEN);
+                    return new ResponseEntity<>(null, headers, status);
                 }
             }
             // append the required headers
@@ -1524,15 +1534,20 @@ public class LinkedDataWebController implements InitializingBean {
             } else if (datasetWithEtag.isNotFound()) {
                 logger.debug("sending status 404 NOT FOUND");
                 return new ResponseEntity<>(headers, HttpStatus.NOT_FOUND);
+            } else if (datasetWithEtag.isForbidden()) {
+                int statusCode = HttpStatus.FORBIDDEN.value();
+                Optional<AclEvalResult> accResult = WonAclRequestHelper.getWonAclEvaluationContext(request)
+                                .getCombinedResults();
+                if (accResult.isPresent()) {
+                    WonAclRequestHelper.setAuthInfoAsResponseHeader(response, accResult.get());
+                    statusCode = WonAclRequestHelper.getHttpStatusCodeForAclEvaluationResult(accResult.get());
+                }
+                HttpStatus status = HttpStatus.valueOf(statusCode);
+                logger.debug("sending status {}", status);
+                return new ResponseEntity<>(headers, status);
             } else if (datasetWithEtag.isChanged()) {
                 logger.debug("sending status 200 OK");
                 return new ResponseEntity<>(datasetWithEtag.getData(), headers, HttpStatus.OK);
-            } else if (datasetWithEtag.isForbidden()) {
-                logger.debug("sending status 403 FORBIDDEN");
-                WonAclEvalContext waeCtx = WonAclRequestHelper.getWonAclEvaluationContext(request);
-                waeCtx.getCombinedResults()
-                                .ifPresent(result -> WonAclRequestHelper.setAuthInfoAsResponseHeader(response, result));
-                return new ResponseEntity<>(headers, HttpStatus.FORBIDDEN);
             } else {
                 logger.debug("sending status 304 NOT MODIFIED");
                 return new ResponseEntity<>(headers, HttpStatus.NOT_MODIFIED);

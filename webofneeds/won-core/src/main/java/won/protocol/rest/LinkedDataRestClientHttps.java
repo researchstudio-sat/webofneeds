@@ -21,7 +21,7 @@ import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
-import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
+import won.cryptography.ssl.PrivateKeyAliasContextStrategy;
 
 import javax.annotation.PostConstruct;
 import java.lang.invoke.MethodHandles;
@@ -40,6 +40,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     private TrustStoreService trustStoreService;
     private TrustStrategy trustStrategy;
     private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
+    private RestTemplate restTemplateWithoutWebId;
 
     public LinkedDataRestClientHttps(KeyStoreService keyStoreService, TrustStoreService trustStoreService,
                     TrustStrategy trustStrategy, KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy) {
@@ -52,10 +53,15 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
     }
 
     @PostConstruct
-    public void initialize() {
+    public void initialize() throws Exception {
         datasetConverter = new RdfDatasetConverter();
         // HttpHeaders headers = new HttpHeaders();
         this.acceptHeaderValue = MediaType.toString(datasetConverter.getSupportedMediaTypes());
+        this.restTemplateWithoutWebId = CryptographyUtils
+                        .createSslRestTemplate(this.trustStrategy,
+                                        readTimeout,
+                                        connectionTimeout);
+        restTemplateWithoutWebId.getMessageConverters().add(0, datasetConverter);
     }
 
     protected RestTemplate createRestTemplateForReadingLinkedData(String webID) {
@@ -64,10 +70,14 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
             if (logger.isDebugEnabled()) {
                 logger.debug("creating rest template for webID {} ", webID == null ? "[none provided]" : webID);
             }
+            String actualPrivateKeyAlias = keyPairAliasDerivationStrategy.getAliasForAtomUri(webID);
+            if (actualPrivateKeyAlias == null) {
+                return restTemplateWithoutWebId;
+            }
+            PrivateKeyAliasContext.setPrivateKeyAlias(actualPrivateKeyAlias);
             template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
                             this.keyStoreService.getPassword(),
-                            new PredefinedAliasPrivateKeyStrategy(
-                                            keyPairAliasDerivationStrategy.getAliasForAtomUri(webID)),
+                            new PrivateKeyAliasContextStrategy(),
                             this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout,
                             connectionTimeout, true);
             if (logger.isDebugEnabled()) {

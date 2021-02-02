@@ -100,11 +100,15 @@ public class DataWithEtag<T> {
 
     /**
      * Returns true if this DataWithEtag object is the result of an ETAG checking
-     * call and the data has changed since. This is the case if
-     * 
+     * call and the data has changed since. Returns true for the special cases of
+     * <code>forbidden</code>, <code>deleted</code> or <code>not found</code>.
+     *
      * @return
      */
     public boolean isChanged() {
+        if (isForbidden() || isNotFound() || isDeleted()) {
+            return true;
+        }
         if (etag == null || oldEtag == null) {
             // no etag now? no matter what the old etag was, assume the data has changed
             // no old etag, but new one? there was a change, too!

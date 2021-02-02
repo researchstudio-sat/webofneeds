@@ -15,7 +15,7 @@
   ~    limitations under the License.
   -->
 
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
     <!-- REST stuff
 
@@ -25,27 +25,30 @@
 
 
     <bean id="keyStoreService" class="won.cryptography.service.keystore.FileBasedKeyStoreService" init-method="init">
-        <constructor-arg type="java.lang.String" value="${keystore.location}" />
-        <constructor-arg type="java.lang.String" value="${keystore.password}" />
+        <constructor-arg type="java.lang.String" value="${keystore.location}"/>
+        <constructor-arg type="java.lang.String" value="${keystore.password}"/>
     </bean>
     <bean id="trustStoreService" class="won.cryptography.service.TrustStoreService" init-method="init">
-        <constructor-arg type="java.lang.String" value="${truststore.location}" />
-        <constructor-arg type="java.lang.String" value="${truststore.password}" />
+        <constructor-arg type="java.lang.String" value="${truststore.location}"/>
+        <constructor-arg type="java.lang.String" value="${truststore.password}"/>
     </bean>
     <bean id="cryptographyService" class="won.cryptography.service.CryptographyService">
-        <constructor-arg ref="keyStoreService" />
-        <constructor-arg name="defaultAlias" value="${matcher.uri}" />
+        <constructor-arg ref="keyStoreService"/>
+        <constructor-arg name="defaultAlias" value="${matcher.uri}"/>
     </bean>
-    <bean id="predefinedAliasStrategy" class="won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy">
-        <constructor-arg value="${matcher.uri}" />
+    <bean id="predefinedAliasStrategy" class="won.cryptography.ssl.PredefinedAliasStrategy">
+        <constructor-arg value="${matcher.uri}"/>
+    </bean>
+    <bean id="keyPairAliasDerivationStrategy" class="won.cryptography.keymanagement.PredefinedAliasDerivationStrategy">
+        <constructor-arg value="${matcher.uri}"/>
     </bean>
     <bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps">
-        <constructor-arg ref="keyStoreService" />
+        <constructor-arg ref="keyStoreService"/>
         <constructor-arg ref="predefinedAliasStrategy"/>
         <constructor-arg ref="trustStoreService"/>
         <constructor-arg>
             <bean class="won.cryptography.ssl.TOFUStrategy">
-                <property name="trustStoreService" ref="trustStoreService" />
+                <property name="trustStoreService" ref="trustStoreService"/>
             </bean>
         </constructor-arg>
         <constructor-arg name="registrationQuery" value="?register=node"></constructor-arg>
@@ -56,7 +59,7 @@
         <constructor-arg name ="trustStrategy">
             <bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
         </constructor-arg>
-        <constructor-arg name="keyPairAliasDerivationStrategy" ref="predefinedAliasStrategy" />
+        <constructor-arg name="keyPairAliasDerivationStrategy" ref="keyPairAliasDerivationStrategy"/>
     </bean>
     <bean id="messagingContext" class="won.cryptography.ssl.MessagingContext" >
         <constructor-arg ref="keyStoreService"/>

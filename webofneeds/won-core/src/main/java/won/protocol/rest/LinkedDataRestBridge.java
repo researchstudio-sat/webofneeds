@@ -10,7 +10,7 @@ import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
-import won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy;
+import won.cryptography.ssl.PrivateKeyAliasContextStrategy;
 
 import javax.annotation.PostConstruct;
 import java.lang.invoke.MethodHandles;
@@ -78,9 +78,10 @@ public class LinkedDataRestBridge {
     }
 
     private RestTemplate createRestTemplateForReadingLinkedData(String webID) throws Exception {
+        PrivateKeyAliasContext.setPrivateKeyAlias(keyPairAliasDerivationStrategy.getAliasForAtomUri(webID));
         RestTemplate template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
                         this.keyStoreService.getPassword(),
-                        new PredefinedAliasPrivateKeyStrategy(keyPairAliasDerivationStrategy.getAliasForAtomUri(webID)),
+                        new PrivateKeyAliasContextStrategy(),
                         this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout,
                         connectionTimeout, true);
         // prevent the RestTemplate from throwing an exception when the server responds

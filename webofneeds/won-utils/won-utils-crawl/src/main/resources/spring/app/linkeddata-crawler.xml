@@ -59,11 +59,11 @@
             value="${truststore.password}" />
     </bean>
     <bean id="fixedToOwnerPrivateKeyStrategy"
-        class="won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy">
+        class="won.cryptography.ssl.PrivateKeyAliasContextStrategy">
         <constructor-arg value="${uri.prefix.owner}" />
     </bean>
     <bean id="ownerUriAliasStrategy"
-        class="won.cryptography.keymanagement.PredefinedAliasStrategy">
+        class="won.cryptography.keymanagement.PredefinedAliasDerivationStrategy">
         <constructor-arg name="predefinedAlias"
             value="${uri.prefix.owner}" />
     </bean>

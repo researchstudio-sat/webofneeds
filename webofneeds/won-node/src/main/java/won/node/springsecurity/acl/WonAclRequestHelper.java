@@ -4,8 +4,10 @@ import org.apache.http.client.cache.HeaderConstants;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.FilterInvocation;
 import won.auth.model.AclEvalResult;
+import won.auth.model.DecisionValue;
 import won.auth.model.RdfOutput;
 
 import javax.servlet.http.HttpServletRequest;
@@ -103,5 +105,23 @@ public class WonAclRequestHelper {
             return Optional.empty();
         }
         return Optional.of(m.group(1));
+    }
+
+    public static int getHttpStatusCodeForAclEvaluationResult(AclEvalResult result) {
+        // implementing return values roughly as per RFC6750, Sec. 3.1
+        if (DecisionValue.ACCESS_GRANTED.equals(result.getDecision())) {
+            return HttpStatus.OK.value();
+        }
+        if (DecisionValue.ACCESS_DENIED.equals(result.getDecision())) {
+            if (result.getInvalidToken()) {
+                return HttpStatus.UNAUTHORIZED.value();
+            }
+            if (result.getInsufficientScope()) {
+                return HttpStatus.FORBIDDEN.value();
+            } else {
+                return HttpStatus.FORBIDDEN.value();
+            }
+        }
+        return HttpStatus.BAD_REQUEST.value();
     }
 }

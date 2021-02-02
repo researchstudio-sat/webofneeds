@@ -10,11 +10,6 @@
  */
 package won.protocol.rest;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.text.MessageFormat;
-import java.util.Optional;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -29,9 +24,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
 import won.protocol.util.LogMarkers;
 import won.protocol.util.linkeddata.IncludedWonOntologies;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.text.MessageFormat;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class LinkedDataRestClient {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -106,19 +106,53 @@ public abstract class LinkedDataRestClient {
         } catch (RestClientException e) {
             // first, let's see if we can answer the request from loaded ontologies:
             logger.debug("Could not fetch {} from the Web, searching fallback in included resources", resourceURI);
-            Optional<Model> fallbackResult = IncludedWonOntologies.get(resourceURI);
-            if (fallbackResult.isPresent()) {
-                logger.debug("Found fallback resource for {}, returning as result", resourceURI);
-                // we want the application to get a (possibly updated) version of this resource
-                // eventually, but we
-                // also want to avoid to keep making failing requests. We return the fallback
-                // result and use
-                // a caching period of one hour.
-                Dataset dataset = DatasetFactory.createGeneral();
-                dataset.setDefaultModel(fallbackResult.get());
-                HttpHeaders headers = new HttpHeaders();
-                headers.add(HttpHeaders.CACHE_CONTROL, "max-age=" + FALLBACK_CACHE_MAX_AGE_SECONDS);
-                return new DatasetResponseWithStatusCodeAndHeaders(dataset, 200, headers);
+            if (e instanceof HttpClientErrorException.NotFound) {
+                Optional<Model> fallbackResult = IncludedWonOntologies.get(resourceURI);
+                if (fallbackResult.isPresent()) {
+                    logger.debug("Found fallback resource for {}, returning as result", resourceURI);
+                    // we want the application to get a (possibly updated) version of this resource
+                    // eventually, but we
+                    // also want to avoid to keep making failing requests. We return the fallback
+                    // result and use
+                    // a caching period of one hour.
+                    Dataset dataset = DatasetFactory.createGeneral();
+                    dataset.setDefaultModel(fallbackResult.get());
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add(HttpHeaders.CACHE_CONTROL, "max-age=" + FALLBACK_CACHE_MAX_AGE_SECONDS);
+                    return new DatasetResponseWithStatusCodeAndHeaders(dataset, 200, headers);
+                }
+            }
+            if (e instanceof HttpClientErrorException.Forbidden) {
+                List<String> wwwAuthenticateHeaders = ((HttpClientErrorException.Forbidden) e).getResponseHeaders()
+                                .get(HttpHeaders.WWW_AUTHENTICATE);
+                if (wwwAuthenticateHeaders != null && !wwwAuthenticateHeaders.isEmpty()) {
+                    String headerValue = wwwAuthenticateHeaders.get(0);
+                    throw new LinkedDataFetchingException.ForbiddenAuthMethodProvided(resourceURI,
+                                    String.format("Access to %s was denied (forbidden), but WWW-Authenticate Header indicates how to authorize",
+                                                    resourceURI),
+                                    e, headerValue);
+                } else {
+                    throw new LinkedDataFetchingException.Forbidden(resourceURI,
+                                    String.format("Access to %s was denied (forbidden)",
+                                                    resourceURI),
+                                    e);
+                }
+            }
+            if (e instanceof HttpClientErrorException.Unauthorized) {
+                List<String> wwwAuthenticateHeaders = ((HttpClientErrorException.Forbidden) e).getResponseHeaders()
+                                .get(HttpHeaders.WWW_AUTHENTICATE);
+                if (wwwAuthenticateHeaders != null && !wwwAuthenticateHeaders.isEmpty()) {
+                    String headerValue = wwwAuthenticateHeaders.get(0);
+                    throw new LinkedDataFetchingException.UnauthorizedAuthMethodProvided(resourceURI,
+                                    String.format("Access to %s was denied (unauthorized, possibly due to an invalid token), but WWW-Authenticate Header indicates how to authorize",
+                                                    resourceURI),
+                                    e, headerValue);
+                } else {
+                    throw new LinkedDataFetchingException.Unauthorized(resourceURI,
+                                    String.format("Access to %s was denied (unauthorized, possibly due to an invalid token)",
+                                                    resourceURI),
+                                    e);
+                }
             }
             if (e instanceof HttpClientErrorException) {
                 throw new LinkedDataFetchingException(MessageFormat.format(

@@ -9,25 +9,25 @@
 	OR CONDITIONS OF ANY KIND, either express or implied. ~ See the License for 
 	the specific language governing permissions and ~ limitations under the License. -->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
             http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
 
 	<context:property-placeholder
-		location="file:${WON_CONFIG_DIR}/owner.properties"
-		ignore-unresolvable="true" />
+			location="file:${WON_CONFIG_DIR}/owner.properties"
+			ignore-unresolvable="true"/>
 
 	<!-- owner webapp crypto config -->
 	<bean id="keyStoreService"
-		class="won.cryptography.service.keystore.FileBasedKeyStoreService"
-		init-method="init">
+		  class="won.cryptography.service.keystore.FileBasedKeyStoreService"
+		  init-method="init">
 		<constructor-arg type="java.lang.String"
-			value="${keystore.location}" />
+						 value="${keystore.location}"/>
 		<constructor-arg type="java.lang.String"
-			value="${keystore.password}" />
+						 value="${keystore.password}"/>
 	</bean>
 
 
@@ -42,29 +42,29 @@
 			value="${truststore.password}" />
 	</bean>
 	<bean id="fixedToOwnerPrivateKeyStrategy"
-		class="won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy">
-		<constructor-arg value="${uri.prefix.owner}" />
+		  class="won.cryptography.ssl.PredefinedAliasStrategy">
+		<constructor-arg value="${uri.prefix.owner}"/>
 	</bean>
 	<bean id="ownerUriAliasStrategy"
-		class="won.cryptography.keymanagement.PredefinedAliasStrategy">
+		  class="won.cryptography.keymanagement.PredefinedAliasDerivationStrategy">
 		<constructor-arg name="predefinedAlias"
-			value="${uri.prefix.owner}" />
+						 value="${uri.prefix.owner}"/>
 	</bean>
 
 	<bean id="registrationClient"
-		class="won.cryptography.service.RegistrationRestClientHttps"
-		depends-on="cryptographyService">
-		<constructor-arg ref="keyStoreService" />
+		  class="won.cryptography.service.RegistrationRestClientHttps"
+		  depends-on="cryptographyService">
+		<constructor-arg ref="keyStoreService"/>
 		<constructor-arg name="privateKeyStrategy"
-			ref="fixedToOwnerPrivateKeyStrategy" />
-		<constructor-arg ref="trustStoreService" />
+						 ref="fixedToOwnerPrivateKeyStrategy"/>
+		<constructor-arg ref="trustStoreService"/>
 		<constructor-arg>
 			<bean class="won.cryptography.ssl.TOFUStrategy">
-				<property name="trustStoreService" ref="trustStoreService" />
+				<property name="trustStoreService" ref="trustStoreService"/>
 			</bean>
 		</constructor-arg>
 		<constructor-arg name="registrationQuery"
-			value="?register=owner" />
+						 value="?register=owner"/>
 	</bean>
 
 	<bean id="CryptographyServiceOnBehalfOfAtom"

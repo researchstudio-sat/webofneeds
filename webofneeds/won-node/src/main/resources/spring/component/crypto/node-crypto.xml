@@ -27,26 +27,27 @@
         <constructor-arg type="java.lang.String" value="${truststore.location}"/>
         <constructor-arg type="java.lang.String" value="${truststore.password}"/>
     </bean>
-    <bean id="predefinedAliasStrategy" class="won.cryptography.ssl.PredefinedAliasPrivateKeyStrategy">
-        <constructor-arg value="${uri.prefix.resource}" />
+    <bean id="predefinedAliasStrategy" class="won.cryptography.ssl.PredefinedAliasStrategy">
+        <constructor-arg value="${uri.prefix.resource}"/>
     </bean>
     <!--  we're going to use this bean in the activemq.xml config to allow access to all clients who registered in the webapp -->
     <bean id="nodeTrustManagerTLS" class="won.cryptography.ssl.TrustManagerWrapperWithTrustService">
-    	<constructor-arg ref="trustStoreService" />
+        <constructor-arg ref="trustStoreService"/>
     </bean>
-    
-   <bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps" depends-on="cryptographyService">
-        <constructor-arg ref="keyStoreService" />
-        <constructor-arg name="privateKeyStrategy" ref="predefinedAliasStrategy" />
+
+    <bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps"
+          depends-on="cryptographyService">
+        <constructor-arg ref="keyStoreService"/>
+        <constructor-arg name="privateKeyStrategy" ref="predefinedAliasStrategy"/>
         <constructor-arg ref="trustStoreService"/>
         <constructor-arg>
             <bean class="won.cryptography.ssl.TOFUStrategy">
-                <property name="trustStoreService" ref="trustStoreService" />
+                <property name="trustStoreService" ref="trustStoreService"/>
             </bean>
         </constructor-arg>
-        <constructor-arg name="registrationQuery" value="?register=node" />
+        <constructor-arg name="registrationQuery" value="?register=node"/>
     </bean>
-    
+
     <bean id="registrationServer" class="won.cryptography.service.RegistrationServerCertificateBased">
         <constructor-arg>
             <bean class="won.cryptography.ssl.TOFUStrategy">
@@ -76,7 +77,7 @@
             <bean class="won.cryptography.ssl.TrustAnyCertificateStrategy" />
         </constructor-arg>
         <constructor-arg name="keyPairAliasDerivationStrategy">
-            <bean class="won.cryptography.keymanagement.PredefinedAliasStrategy">
+            <bean class="won.cryptography.keymanagement.PredefinedAliasDerivationStrategy">
                 <constructor-arg name="predefinedAlias" value="${uri.prefix.resource}"/>
             </bean>
         </constructor-arg>

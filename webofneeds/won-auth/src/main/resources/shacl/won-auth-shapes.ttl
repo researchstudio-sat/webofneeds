@@ -645,9 +645,6 @@ auth:operationRequestShape
     sh:property          [ sh:path     auth:reqConnectionMessage ;
                            sh:nodeKind sh:IRI ;
                            sh:maxCount 1 ; ] ;
-    sh:property          [ sh:path     auth:bearsEncodedToken ;
-                           sh:nodeKind sh:Literal ;
-                           sh:datatype xsd:string ] ;
     sh:property          [ sh:path auth:bearsToken ;
                            sh:node auth:authTokenShape ; ] .
 
@@ -705,7 +702,15 @@ auth:aclEvalResult
                      sh:maxCount 1 ;
                      sh:node     auth:authInfoShape ] ;
     sh:property    [ sh:path auth:issueToken ;
-                     sh:node auth:authTokenShape ] .
+                     sh:node auth:authTokenShape ] ;
+    sh:property    [ sh:path     auth:invalidToken ;
+                     sh:maxCount 1 ;
+                     sh:nodeKind sh:Literal ;
+                     sh:datatype xsd:boolean ] ;
+    sh:property    [ sh:path     auth:insufficientScope ;
+                     sh:maxCount 1 ;
+                     sh:nodeKind sh:Literal ;
+                     sh:datatype xsd:boolean ] .
 
 auth:expectedAclEvalResultShape
     a              sh:NodeShape ;

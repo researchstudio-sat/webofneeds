@@ -13,7 +13,7 @@ package won.cryptography.keymanagement;
 /**
  * Uses the AtomURI as alias.
  */
-public class AtomUriAsAliasStrategy implements KeyPairAliasDerivationStrategy {
+public class AtomUriAsAliasDerivationStrategy implements KeyPairAliasDerivationStrategy {
     @Override
     public String getAliasForAtomUri(String atomURI) {
         // we allow null to be passed here so clients can check for a default alias
