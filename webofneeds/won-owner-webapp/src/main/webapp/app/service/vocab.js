@@ -286,6 +286,23 @@ vocab.DEMO = {};
 vocab.DEMO.baseUri = "https://w3id.org/won/ext/demo#";
 vocab.DEMO.prefix = "demo";
 
+vocab.WXPERSONA = {};
+vocab.WXPERSONA.baseUri = "https://w3id.org/won/ext/persona#";
+vocab.WXPERSONA.prefix = "wx-persona";
+vocab.WXPERSONA.InterestSocket = vocab.WXPERSONA.baseUri + "InterestSocket";
+vocab.WXPERSONA.InterestSocketCompacted =
+  vocab.WXPERSONA.prefix + ":InterestSocket";
+vocab.WXPERSONA.ExpertiseSocket = vocab.WXPERSONA.baseUri + "ExpertiseSocket";
+vocab.WXPERSONA.ExpertiseSocketCompacted =
+  vocab.WXPERSONA.prefix + ":ExpertiseSocket";
+vocab.WXPERSONA.InterestOfSocket = vocab.WXPERSONA.baseUri + "InterestOfSocket";
+vocab.WXPERSONA.InterestOfSocketCompacted =
+  vocab.WXPERSONA.prefix + ":InterestOfSocket";
+vocab.WXPERSONA.ExpertiseOfSocket =
+  vocab.WXPERSONA.baseUri + "ExpertiseOfSocket";
+vocab.WXPERSONA.ExpertiseOfSocketCompacted =
+  vocab.WXPERSONA.prefix + ":ExpertiseOfSocket";
+
 vocab.CHAT = {};
 vocab.CHAT.baseUri = "https://w3id.org/won/ext/chat#";
 vocab.CHAT.prefix = "chat";
@@ -497,11 +514,15 @@ vocab.socketCapacity = {
   [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.ActorSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: 1,
+  [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: 1,
+  [vocab.WXPERSONA.InterestOfSocketCompacted]: 1,
 };
 
 /* This constant is to prevent connections to non owned atoms for specific sockets */
 vocab.refuseAddToNonOwned = {
   [vocab.HOLD.HoldableSocketCompacted]: true,
+  [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: true,
+  [vocab.WXPERSONA.InterestOfSocketCompacted]: true,
 };
 
 export default vocab;
