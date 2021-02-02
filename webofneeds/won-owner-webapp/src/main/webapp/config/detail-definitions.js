@@ -89,6 +89,18 @@ export const defaultReactions = {
       refuseNonOwned: true,
     },
   },
+  [vocab.WXPERSONA.InterestOfSocketCompacted]: {
+    [vocab.WXPERSONA.InterestSocketCompacted]: {
+      useCaseIdentifiers: ["persona"],
+      refuseNonOwned: true,
+    },
+  },
+  [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: {
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: {
+      useCaseIdentifiers: ["persona"],
+      refuseNonOwned: true,
+    },
+  },
   [vocab.WXSCHEMA.EventSocketCompacted]: {
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: {
       useCaseIdentifiers: ["event"],

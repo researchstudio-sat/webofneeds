@@ -19,6 +19,8 @@ export const persona = {
           "#buddySocket": vocab.BUDDY.BuddySocketCompacted,
           "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted,
           "#memberOfSocket": vocab.WXSCHEMA.MemberOfSocketCompacted,
+          "#interestSocket": vocab.WXPERSONA.InterestSocketCompacted,
+          "#expertiseSocket": vocab.WXPERSONA.ExpertiseSocketCompacted,
           // "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted, //TODO: exclude the ability to review a persona for now
           "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
           "#sAttendeeInverseSocket":
@@ -67,6 +69,26 @@ export const persona = {
     },
     [vocab.HOLD.HolderSocketCompacted]: {
       [vocab.HOLD.HoldableSocketCompacted]: {
+        useCaseIdentifiers: ["*"],
+        refuseNonOwned: true,
+      },
+    },
+    [vocab.WXPERSONA.InterestSocketCompacted]: {
+      [vocab.WXPERSONA.InterestOfSocketCompacted]: {
+        useCaseIdentifiers: [
+          "afterpartyInterest",
+          "breakfastInterest",
+          "cyclingInterest",
+          "genericInterest",
+          "lunchInterest",
+          "pokemonInterest",
+          "sightseeingInterest",
+        ],
+        refuseNonOwned: true,
+      },
+    },
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: {
+      [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: {
         useCaseIdentifiers: ["*"],
         refuseNonOwned: true,
       },

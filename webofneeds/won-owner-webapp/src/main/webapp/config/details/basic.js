@@ -556,8 +556,9 @@ export const eventObjectAboutUris = {
     const types = get(jsonLDImm, "@type");
     if (
       (Immutable.List.isList(types) &&
-        (types.includes("s:PlanAction") || types.includes("demo:Interest"))) ||
-      (types === "s:PlanAction" || types === "demo:Interest")
+        (types.includes("s:PlanAction") ||
+          types.includes("wx-persona:Interest"))) ||
+      (types === "s:PlanAction" || types === "wx-persona:Interest")
     ) {
       const planObjs = get(jsonLDImm, "s:object");
       let plns = [];

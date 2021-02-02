@@ -78,10 +78,14 @@ export default function WonAtomMenu({
       switch (socketType) {
         case vocab.HOLD.HolderSocketCompacted:
           return "1";
-        case vocab.CHAT.ChatSocketCompacted:
+        case vocab.WXPERSONA.InterestSocketCompacted:
           return "2";
-        case vocab.GROUP.GroupSocketCompacted:
+        case vocab.WXPERSONA.ExpertiseSocketCompacted:
           return "3";
+        case vocab.CHAT.ChatSocketCompacted:
+          return "4";
+        case vocab.GROUP.GroupSocketCompacted:
+          return "5";
         default:
           return wonLabelUtils.getSocketTabLabel(socketType);
       }

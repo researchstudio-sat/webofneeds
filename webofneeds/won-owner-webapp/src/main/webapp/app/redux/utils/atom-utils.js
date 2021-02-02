@@ -414,6 +414,14 @@ export function hasHoldableSocket(atom) {
   return hasSocket(atom, vocab.HOLD.HoldableSocketCompacted);
 }
 
+export function hasExpertiseOfSocket(atom) {
+  return hasSocket(atom, vocab.WXPERSONA.ExpertiseOfSocketCompacted);
+}
+
+export function hasInterestOfSocket(atom) {
+  return hasSocket(atom, vocab.WXPERSONA.InterestOfSocketCompacted);
+}
+
 export function hasHolderSocket(atom) {
   return hasSocket(atom, vocab.HOLD.HolderSocketCompacted);
 }
@@ -603,8 +611,41 @@ export function getHeldByUri(atomImm) {
   }
 }
 
+export function getExpertiseOfUri(atomImm) {
+  const expertiseOfConnections =
+    hasExpertiseOfSocket(atomImm) &&
+    getConnectedConnections(
+      atomImm,
+      vocab.WXPERSONA.ExpertiseOfSocketCompacted
+    );
+  if (expertiseOfConnections && expertiseOfConnections.size === 1) {
+    return connectionUtils.getTargetAtomUri(expertiseOfConnections.first());
+  } else {
+    return undefined;
+  }
+}
+
+export function getInterestOfUri(atomImm) {
+  const interestOfConnections =
+    hasInterestOfSocket(atomImm) &&
+    getConnectedConnections(atomImm, vocab.WXPERSONA.InterestOfSocketCompacted);
+  if (interestOfConnections && interestOfConnections.size === 1) {
+    return connectionUtils.getTargetAtomUri(interestOfConnections.first());
+  } else {
+    return undefined;
+  }
+}
+
 export function isHeld(atomImm) {
   return !!getHeldByUri(atomImm);
+}
+
+export function isInterestOf(atomImm) {
+  return !!getInterestOfUri(atomImm);
+}
+
+export function isExpertiseOf(atomImm) {
+  return !!getExpertiseOfUri(atomImm);
 }
 
 export function getSeeksSocketsWithKeysReset(atomImm) {

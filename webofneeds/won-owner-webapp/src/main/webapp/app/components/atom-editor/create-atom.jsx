@@ -100,9 +100,9 @@ export default function WonCreateAtom({
     if (
       useCaseContentTypesImm &&
       (useCaseContentTypesImm.includes("s:PlanAction") ||
-        useCaseContentTypesImm.includes("demo:Interest")) &&
+        useCaseContentTypesImm.includes("wx-persona:Interest")) &&
       (contentTypes.includes("s:PlanAction") ||
-        contentTypes.includes("demo:Interest"))
+        contentTypes.includes("wx-persona:Interest"))
     ) {
       const eventObjectAboutUris = getIn(fromAtom, [
         "content",

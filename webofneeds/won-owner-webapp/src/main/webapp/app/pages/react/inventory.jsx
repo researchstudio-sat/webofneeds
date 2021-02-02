@@ -42,6 +42,8 @@ export default function PageInventory() {
       .getOwnedPosts(state)
       .filter(atomUtils.isActive)
       .filter(atom => !atomUtils.isHeld(atom))
+      .filter(atom => !atomUtils.isInterestOf(atom))
+      .filter(atom => !atomUtils.isExpertiseOf(atom))
       .toOrderedMap()
       .sortBy(atom => {
         const creationDate = atomUtils.getCreationDate(atom);
