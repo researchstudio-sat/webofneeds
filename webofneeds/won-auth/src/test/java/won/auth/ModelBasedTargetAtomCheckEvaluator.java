@@ -30,6 +30,10 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
         this.instanceFactory.load(data, true);
     }
 
+    public Shacl2JavaInstanceFactory getInstanceFactory() {
+        return instanceFactory;
+    }
+
     @Override
     public boolean isRequestorAllowedTarget(TargetAtomCheck check) {
         Optional<Atom> atomOpt = instanceFactory.getInstanceOfType(check.getAtom().toString(), Atom.class);

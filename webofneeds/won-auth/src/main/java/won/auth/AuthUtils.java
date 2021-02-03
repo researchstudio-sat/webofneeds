@@ -125,11 +125,8 @@ public class AuthUtils {
         clone.setRequestor(toClone.getRequestor());
         clone.setReqAtom(toClone.getReqAtom());
         clone.setReqAtomState(toClone.getReqAtomState());
-        clone.setReqAtomMessages(toClone.getReqAtomMessages());
         clone.setReqConnection(toClone.getReqConnection());
-        clone.setReqConnections(toClone.getReqConnections());
         clone.setReqConnectionMessage(toClone.getReqConnectionMessage());
-        clone.setReqConnectionMessages(toClone.getReqConnectionMessages());
         clone.setReqConnectionState(toClone.getReqConnectionState());
         clone.setReqConnectionTargetAtom(toClone.getReqConnectionTargetAtom());
         clone.setReqGraphs(Collections.unmodifiableSet(toClone.getReqGraphs()));
@@ -145,7 +142,7 @@ public class AuthUtils {
      * Creates a JSON Web Token using `iss`, `sub`, `exp` and `iat` from the
      * provided AuthToken. `sig` is set as the provided `webid` if it is different
      * from the value of `iss`.
-     * 
+     *
      * @param authToken
      * @param key
      * @param webId

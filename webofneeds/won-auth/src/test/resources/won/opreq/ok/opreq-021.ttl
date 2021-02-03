@@ -30,9 +30,7 @@
     auth:reqPosition           auth:positionConnectionMessage ;
     auth:reqSocketType         wx-chat:ChatSocket ;
     auth:reqSocket             <#chatSocket> ;
-    auth:reqConnections        <#chatSocket/c> ;
     auth:reqConnection         <#chatSocket/c/conn123> ;
     auth:reqConnectionState    won:Connected ;
-    auth:reqConnectionMessages <#chatSocket/c/conn123/msg> ;
     auth:reqConnectionMessage  <wm:/message1234> ;
     auth:operation             auth:opRead .

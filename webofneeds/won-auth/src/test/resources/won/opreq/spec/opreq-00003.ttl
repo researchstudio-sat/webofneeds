@@ -60,13 +60,12 @@ ex:expectedResult4
     auth:reqGraph    atom1:sysinfo .
 
 <#request3>
-    a                  auth:OperationRequest ;
-    auth:operation     auth:opRead ;
-    auth:requestor     ex:atom2 ;
-    auth:reqAtom       ex:atom1 ;
-    auth:reqPosition   auth:positionConnections ;
-    auth:reqSocket     atom1:chatSocket ;
-    auth:reqSocketType chat:ChatSocket .
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionConnections ;
+    auth:reqSocket   atom1:chatSocket .
 
 <#request4>
     a                auth:OperationRequest ;

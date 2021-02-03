@@ -25,16 +25,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import won.auth.model.*;
+import won.auth.test.model.Atom;
+import won.auth.test.model.Connection;
+import won.auth.test.model.Socket;
+import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
+import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayDeque;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -192,9 +194,11 @@ public class WonAclEvaluatorTest {
         Graph graph = withDurationLog("loading data graph ",
                         () -> loadGraph(resource));
         withDurationLog("validating with auth shapes",
-                        () -> validateTestData(shapes, graph, true, shapesDef.getFilename()));
+                        () -> validateTestData(shapes, graph, true,
+                                        resource.getFilename() + " validated against auth shapes"));
         withDurationLog("validating with atom test data shapes",
-                        () -> validateTestData(atomDataShapes, graph, false, atomDataShapesDef.getFilename()));
+                        () -> validateTestData(atomDataShapes, graph, false,
+                                        resource.getFilename() + " validated against atom shapes"));
         withDurationLog("instantiating test atom entities",
                         () -> targetAtomChecker.loadData(graph));
         withDurationLog("instantiating auth/req entities",
@@ -221,7 +225,8 @@ public class WonAclEvaluatorTest {
         withDurationLog("instantiating auth/req entities",
                         () -> evaluatorFactory.load(graph));
         withDurationLog("making auth decision",
-                        () -> checkSpecifiedAuthDecision(evaluatorFactory, resource.getFilename()));
+                        () -> checkSpecifiedAuthDecision(evaluatorFactory, atomNodeChecker.getInstanceFactory(),
+                                        resource.getFilename()));
     }
 
     private <T> T withDurationLog(String message, Supplier<T> supplier) {
@@ -231,7 +236,7 @@ public class WonAclEvaluatorTest {
         return val;
     }
 
-    public void validateTestData(Shapes shapes, Graph graph, boolean failTest, String shapesName) {
+    public void validateTestData(Shapes shapes, Graph graph, boolean failTest, String testCaseIdentifier) {
         ValidationReport shaclReport = ShaclSystem.get().validate(shapes, new Union(shapes.getGraph(), graph));
         if (failTest) {
             if (!shaclReport.conforms()) {
@@ -239,10 +244,10 @@ public class WonAclEvaluatorTest {
                 System.out.println();
                 RDFDataMgr.write(System.out, shaclReport.getModel(), Lang.TTL);
             }
-            Assert.assertTrue(String.format("%s: test data invalid", shapesName), shaclReport.conforms());
+            Assert.assertTrue(String.format("%s: test data invalid", testCaseIdentifier), shaclReport.conforms());
         } else {
             if (!shaclReport.conforms()) {
-                logger.info("graph failed SHACL validation with {}", shapesName);
+                logger.info("failed SHACL validation: {}", testCaseIdentifier);
             }
         }
     }
@@ -262,7 +267,8 @@ public class WonAclEvaluatorTest {
         }
     }
 
-    private void checkSpecifiedAuthDecision(WonAclEvaluatorTestFactory loadedEvaluator, String testIdentifier) {
+    private void checkSpecifiedAuthDecision(WonAclEvaluatorTestFactory loadedEvaluator,
+                    Shacl2JavaInstanceFactory atomTestData, String testIdentifier) {
         Set<ExpectedAclEvalResult> expectedResuls = loadedEvaluator.getInstanceFactory()
                         .getInstancesOfType(ExpectedAclEvalResult.class, true);
         if (expectedResuls.isEmpty()) {
@@ -270,64 +276,101 @@ public class WonAclEvaluatorTest {
         }
         logger.debug("About to check {} expected result(s)...", expectedResuls.size());
         for (ExpectedAclEvalResult spec : expectedResuls) {
-            logger.debug("{}: using spec {} for testing...", testIdentifier, spec.toStringAllFields());
-            OperationRequest opReq = spec.getRequestedOperation();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date());
-            cal.add(Calendar.MINUTE, 30);
-            opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
-            long start = System.currentTimeMillis();
-            AclEvalResult actualResult = loadedEvaluator.create().decide(opReq);
-            logDuration("making authorization decision", start);
-            logger.debug("checking OpRequest {} against Authorizations ", opReq.getNode());
-            DecisionValue expected = spec.getDecision();
-            Assert.assertEquals(String.format("%s: wrong ACL decision", testIdentifier), expected,
-                            actualResult.getDecision());
-            if (!spec.getIssueTokens().isEmpty()) {
-                logger.debug("Spec requires {} tokens", spec.getIssueTokens().size());
-                for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
-                    logger.debug("AclEvalResult contains {} tokens", actualResult.getIssueTokens().size());
-                    if (!actualResult.getIssueTokens()
-                                    .stream()
-                                    .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
-                        fail(String.format(
-                                        "%s, Spec %s: None of the actual tokens %s match the specified token %s",
-                                        testIdentifier,
-                                        spec.getNode(),
-                                        actualResult.getIssueTokens().stream().map(AuthToken::toStringAllFields)
-                                                        .collect(Collectors.joining(",", "[", "]")),
-                                        tokenSpec.toStringAllFields()));
+            try {
+                logger.debug("{}: using spec {} for testing...", testIdentifier, spec.toStringAllFields());
+                OperationRequest opReq = spec.getRequestedOperation();
+                setImplicitValues(opReq, atomTestData);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                cal.add(Calendar.MINUTE, 30);
+                opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
+                long start = System.currentTimeMillis();
+                AclEvalResult actualResult = loadedEvaluator.create().decide(opReq);
+                logDuration("making authorization decision", start);
+                logger.debug("checking OpRequest {} against Authorizations ", opReq.getNode());
+                DecisionValue expected = spec.getDecision();
+                Assert.assertEquals(String.format("%s, Spec %s: wrong ACL decision", testIdentifier, spec.getNode()),
+                                expected,
+                                actualResult.getDecision());
+                if (!spec.getIssueTokens().isEmpty()) {
+                    logger.debug("Spec requires {} tokens", spec.getIssueTokens().size());
+                    for (AuthTokenTestSpec tokenSpec : spec.getIssueTokens()) {
+                        logger.debug("AclEvalResult contains {} tokens", actualResult.getIssueTokens().size());
+                        if (!actualResult.getIssueTokens()
+                                        .stream()
+                                        .anyMatch(actualToken -> matches(tokenSpec, actualToken))) {
+                            fail(String.format(
+                                            "%s, Spec %s: None of the actual tokens %s match the specified token %s",
+                                            testIdentifier,
+                                            spec.getNode(),
+                                            actualResult.getIssueTokens().stream().map(AuthToken::toStringAllFields)
+                                                            .collect(Collectors.joining(",", "[", "]")),
+                                            tokenSpec.toStringAllFields()));
+                        }
                     }
-                }
-            } else if (!actualResult.getIssueTokens().isEmpty()) {
-                fail(String.format(
-                                "%s, Spec %s: Tokens granted but none specified",
-                                testIdentifier,
-                                spec.getNode()));
-            }
-            if (spec.getProvideAuthInfo() != null) {
-                AuthInfo expectedAuthInfo = spec.getProvideAuthInfo();
-                if (!matches(expectedAuthInfo, actualResult.getProvideAuthInfo())) {
+                } else if (!actualResult.getIssueTokens().isEmpty()) {
                     fail(String.format(
-                                    "%s, Spec %s: None of the actual auth infos %s match the specified authInfo %s",
-                                    testIdentifier, spec.getNode(),
-                                    actualResult.getProvideAuthInfo() != null
-                                                    ? actualResult.getProvideAuthInfo().toStringAllFields()
-                                                    : "null",
-                                    expectedAuthInfo.toStringAllFields()));
+                                    "%s, Spec %s: Tokens granted but none specified",
+                                    testIdentifier,
+                                    spec.getNode()));
                 }
-            } else if (actualResult.getProvideAuthInfo() != null) {
-                fail(String.format(
-                                "%s, Spec %s: Auth info provided but none specified",
+                if (spec.getProvideAuthInfo() != null) {
+                    AuthInfo expectedAuthInfo = spec.getProvideAuthInfo();
+                    if (!matches(expectedAuthInfo, actualResult.getProvideAuthInfo())) {
+                        fail(String.format(
+                                        "%s, Spec %s: None of the actual auth infos %s match the specified authInfo:\n%s",
+                                        testIdentifier, spec.getNode(),
+                                        actualResult.getProvideAuthInfo() != null
+                                                        ? actualResult.getProvideAuthInfo().toStringAllFields()
+                                                        : "null",
+                                        AuthUtils.toRdfString(expectedAuthInfo)));
+                    }
+                } else if (actualResult.getProvideAuthInfo() != null) {
+                    fail(String.format(
+                                    "%s, Spec %s: Auth info provided but none specified.\nAuth info:\n%s",
+                                    testIdentifier,
+                                    spec.getNode(), AuthUtils.toRdfString(actualResult.getProvideAuthInfo())));
+                }
+                logger.debug("authinfo : {}",
+                                actualResult.getProvideAuthInfo() != null
+                                                ? actualResult.getProvideAuthInfo().toStringAllFields()
+                                                : "null");
+            } catch (Exception e) {
+                throw new RuntimeException(String.format("Caught exception in %s, Spec %s",
                                 testIdentifier,
-                                spec.getNode()));
+                                spec.getNode()), e);
             }
-            logger.debug("authinfo : {}",
-                            actualResult.getProvideAuthInfo() != null
-                                            ? actualResult.getProvideAuthInfo().toStringAllFields()
-                                            : "null");
         }
         logger.debug("test case {} passed", testIdentifier);
+    }
+
+    private void setImplicitValues(OperationRequest opReq, Shacl2JavaInstanceFactory instanceFactory) {
+        URI reqAtomUri = opReq.getReqAtom();
+        if (reqAtomUri != null) {
+            Optional<Atom> atom = instanceFactory.getInstanceOfType(reqAtomUri.toString(), Atom.class);
+            if (atom.isPresent()) {
+                opReq.setReqAtomState(AtomState.forValue(atom.get().getState()));
+            }
+        }
+        URI reqConUri = opReq.getReqConnection();
+        if (reqConUri != null) {
+            Optional<Connection> con = instanceFactory.getInstanceOfType(reqConUri.toString(), Connection.class);
+            if (con.isPresent()) {
+                opReq.setReqConnectionState(ConnectionState.forValue(con.get().getConnectionState()));
+                opReq.setReqSocket(URI.create(con.get().getSocket().getNode().getURI()));
+                opReq.setReqSocketType(con.get().getSocket().getSocketDefinition());
+                if (con.get().getTargetAtom() != null) {
+                    opReq.setReqConnectionTargetAtom(URI.create(con.get().getTargetAtom().getNode().getURI()));
+                }
+            }
+        }
+        URI reqSocketUri = opReq.getReqSocket();
+        if (reqSocketUri != null) {
+            Optional<Socket> s = instanceFactory.getInstanceOfType(reqSocketUri.toString(), Socket.class);
+            if (s.isPresent()) {
+                opReq.setReqSocketType(s.get().getSocketDefinition());
+            }
+        }
     }
 
     private boolean matches(AuthInfo expectedAuthInfo, AuthInfo actualAuthInfo) {

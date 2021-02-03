@@ -24,13 +24,12 @@ magicmirror:expectedResult2
     auth:requestedOperation magicmirror:request2 .
 
 magicmirror:request2
-    a                   auth:OperationRequest ;
-    auth:operation      auth:opRead ;
-    auth:requestor      ex:magicmirror ;
-    auth:reqAtom        ex:party ;
-    auth:reqAtomState   won:Active ;
-    auth:reqPosition    auth:positionConnections ;
-    auth:reqSocket      party:attendeeSocket ;
-    auth:reqSocketType  wx-schema:AttendeeSocket ;
-    auth:reqConnections party:attendeeSocketConnections .
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:magicmirror ;
+    auth:reqAtom       ex:party ;
+    auth:reqAtomState  won:Active ;
+    auth:reqPosition   auth:positionConnections ;
+    auth:reqSocket     party:attendeeSocket ;
+    auth:reqSocketType wx-schema:AttendeeSocket ; .
 

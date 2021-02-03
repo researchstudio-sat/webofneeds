@@ -19,6 +19,8 @@ won:atomShape
                          sh:node won:socketShape ; ] ;
     sh:property        [ sh:path     won:state ;
                          sh:nodeKind sh:IRI ;
+                         sh:maxCount 1 ;
+                         sh:minCount 1 ;
                          sh:in       ( won:Active won:Inactive ) ] ;
     sh:property        [ sh:path     [ sh:inversePath rdfg:subGraphOf ] ;
                          sh:nodeKind sh:IRI ;

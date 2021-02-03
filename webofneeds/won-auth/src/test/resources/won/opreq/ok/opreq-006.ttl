@@ -26,5 +26,4 @@
     auth:reqPosition    auth:positionConnections ;
     auth:reqSocketType  wx-hold:HolderSocket ;
     auth:reqSocket      <#holderSocket> ;
-    auth:reqConnections <#holderSocket/c> ;
     auth:operation      auth:opRead .

@@ -24,5 +24,4 @@
     auth:reqPosition    auth:positionConnections ;
     auth:reqSocketType  wx-buddy:BuddySocket ;
     auth:reqSocket      <#buddySocket> ;
-    auth:reqConnections <#buddySocket/c> ;
     auth:operation      auth:opRead .

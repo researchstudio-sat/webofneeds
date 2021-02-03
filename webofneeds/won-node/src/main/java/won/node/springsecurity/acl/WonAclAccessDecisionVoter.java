@@ -217,8 +217,8 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
             if (authToken != null) {
                 operationRequest.addBearsToken(authToken);
             }
-            operationRequest.setReqAtomState(toAuthAtomState(atom.get().getState()));
             operationRequest.setRequestor(URI.create(webId));
+            operationRequest.setReqAtomState(toAuthAtomState(atom.get().getState()));
             operationRequest.setReqAtom(atomUri);
             operationRequest.setOperationSimpleOperationExpression(OP_READ);
             if (uriService.isConnectionURI(parent)) {
@@ -227,10 +227,10 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                     continue;
                 }
                 operationRequest.setReqPosition(POSITION_CONNECTION_MESSAGE);
+                operationRequest.setReqConnectionMessage(msg.getMessageURI());
                 operationRequest.setReqConnection(con.get().getConnectionURI());
                 operationRequest.setReqSocket(con.get().getSocketURI());
                 operationRequest.setReqSocketType(con.get().getTypeURI());
-                operationRequest.setReqConnectionMessage(msg.getMessageURI());
                 operationRequest.setReqConnectionState(toAuthConnectionState(con.get().getState()));
                 operationRequest.setReqConnectionTargetAtom(con.get().getTargetAtomURI());
             } else if (uriService.isAtomURI(parent)) {

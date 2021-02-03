@@ -199,6 +199,7 @@ donkey:buddy3
 
 ex:party
     a                won:Atom, ex:SecretParty ;
+    won:state        won:Active ;
     won:socket       party:attendeeSocket, party:holdableSocket ;
     won:contentGraph party:invitationWithoutSpecifics, party:timeDateAndLocation ;
     won:wonNode      ftc:node .

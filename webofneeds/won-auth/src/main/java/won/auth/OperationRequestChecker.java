@@ -203,9 +203,6 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
             return;
         }
-        if (operationRequest.getReqConnectionMessages() == null) {
-            markBranchNothingGranted();
-        }
         collectOperations(other);
         decideForPosition(other.getAsePosition());
     }

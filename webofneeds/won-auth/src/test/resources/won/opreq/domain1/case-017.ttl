@@ -22,7 +22,17 @@
 shrek:expectedResult2
     a                       auth:ExpectedAclEvalResult ;
     auth:decision           auth:accessDenied ;
-    auth:requestedOperation shrek:request2 .
+    auth:requestedOperation shrek:request2 ;
+    auth:provideAuthInfo    [ auth:bearer  [ auth:issuer     [ auth:atom auth:self ] ;
+                                             auth:nodeSigned true ;
+                                             auth:tokenScope auth:OwnerToken ] ;
+                              auth:grantee
+                                           [ auth:socket
+                                                   [ auth:connection
+                                                                     [ auth:connectionState
+                                                                                       won:Connected, won:RequestSent ;
+                                                                       auth:targetAtom [ ] ] ;
+                                                     auth:socketType wx-schema:AttendeeSocket ] ] ] .
 
 shrek:request2
     a                 auth:OperationRequest ;
@@ -41,3 +51,4 @@ shrek:shreksOwnerToken
     auth:tokenSig   ftc:node ;
     auth:tokenIat   "2020-12-03T17:00:00"^^xsd:dateTime ;
     auth:tokenExp   "2020-12-03T18:00:00"^^xsd:dateTime .
+

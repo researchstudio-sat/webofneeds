@@ -27,15 +27,11 @@ import won.shacl2java.util.ShapeUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static javax.lang.model.element.Modifier.PRIVATE;
-import static javax.lang.model.element.Modifier.PUBLIC;
+import static javax.lang.model.element.Modifier.*;
 
 public class MainTypesGenerator implements TypesGenerator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -261,6 +257,15 @@ public class MainTypesGenerator implements TypesGenerator {
                                         .returns(valueClassName)
                                         .addStatement("return $N", "value")
                                         .addModifiers(PUBLIC).build());
+        typeBuilder.addMethod(
+                        MethodSpec.methodBuilder("forValue")
+                                        .addModifiers(PUBLIC, STATIC)
+                                        .addParameter(valueClassName, "value")
+                                        .returns(name)
+                                        .addStatement("return $T.stream(values()).filter(s -> s.getValue().equals(value)).findFirst().orElseThrow(() -> new $T($S + value))",
+                                                        Arrays.class, IllegalArgumentException.class,
+                                                        "Unsupported value: ")
+                                        .build());
         for (Object value : convertedValues) {
             typeBuilder.addEnumConstant(NameUtils.enumConstantName(value),
                             TypeSpec.anonymousClassBuilder(argumentsFormat, argMapper.apply(value)).build());

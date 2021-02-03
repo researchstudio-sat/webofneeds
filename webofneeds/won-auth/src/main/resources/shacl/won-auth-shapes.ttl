@@ -610,9 +610,6 @@ auth:operationRequestShape
                            sh:maxCount 1 ; ] ;
     sh:property          [ sh:path auth:requestToken ;
                            sh:node auth:tokenSpecificationShape ] ;
-    sh:property          [ sh:path     auth:reqAtomMessages ;
-                           sh:nodeKind sh:IRI ;
-                           sh:maxCount 1 ; ] ;
     sh:property          [ sh:path     auth:reqAtomState ;
                            sh:node     auth:atomStateShape ;
                            sh:maxCount 1 ; ] ;
@@ -627,13 +624,7 @@ auth:operationRequestShape
     sh:property          [ sh:path     auth:reqSocket ;
                            sh:nodeKind sh:IRI ;
                            sh:maxCount 1 ; ] ;
-    sh:property          [ sh:path     auth:reqConnections ;
-                           sh:nodeKind sh:IRI ;
-                           sh:maxCount 1 ; ] ;
     sh:property          [ sh:path     auth:reqConnection ;
-                           sh:nodeKind sh:IRI ;
-                           sh:maxCount 1 ; ] ;
-    sh:property          [ sh:path     auth:reqConnectionMessages ;
                            sh:nodeKind sh:IRI ;
                            sh:maxCount 1 ; ] ;
     sh:property          [ sh:path     auth:reqConnectionState ;

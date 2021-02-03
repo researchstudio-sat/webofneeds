@@ -28,12 +28,11 @@ lordfarquaad:expectedResult4
                                                                                                   won:RequestSent ] ] ] ] .
 
 lordfarquaad:request4
-    a                   auth:OperationRequest ;
-    auth:operation      auth:opRead ;
-    auth:requestor      ex:lordfarquaad ;
-    auth:reqAtom        ex:party ;
-    auth:reqAtomState   won:Active ;
-    auth:reqPosition    auth:positionConnections ;
-    auth:reqSocket      party:attendeeSocket ;
-    auth:reqSocketType  wx-schema:AttendeeSocket ;
-    auth:reqConnections party:attendeeSocketConnections .
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:lordfarquaad ;
+    auth:reqAtom       ex:party ;
+    auth:reqAtomState  won:Active ;
+    auth:reqPosition   auth:positionConnections ;
+    auth:reqSocket     party:attendeeSocket ;
+    auth:reqSocketType wx-schema:AttendeeSocket ; .
