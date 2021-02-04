@@ -205,8 +205,6 @@ export default function WonAtomContent({
                 relevantConnectionsMap={relevantTagViewSocketsConnectionsMap}
                 storedAtoms={storedAtoms}
                 isOwned={isOwned}
-                showAddPicker={showAddPicker}
-                toggleAddPicker={toggleAddPicker}
               />
             )}
             {atomUtils.isActive(atom) &&

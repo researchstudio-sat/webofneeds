@@ -2,7 +2,7 @@
  * Created by quasarchimaere on 06.05.2020.
  */
 
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import vocab from "../../service/vocab.js";
@@ -22,13 +22,11 @@ export default function WonAtomContentTagSocket({
   atom,
   socketType,
   relevantConnections,
-  showAddPicker,
-  toggleAddPicker,
   segmentContentClassName,
-  setVisibleTab,
   storedAtoms,
   isOwned,
 }) {
+  const [showAddPicker, toggleAddPicker] = useState(false);
   const accountState = useSelector(generalSelectors.getAccountState);
   const currentLocation = useSelector(generalSelectors.getCurrentLocation);
 
@@ -121,9 +119,6 @@ export default function WonAtomContentTagSocket({
           reactions={reactions}
           accountState={accountState}
           onClose={() => {
-            if (vocab.socketCapacity[socketType] === 1) {
-              setVisibleTab("DETAIL");
-            }
             toggleAddPicker(!showAddPicker);
           }}
         />
@@ -139,9 +134,6 @@ WonAtomContentTagSocket.propTypes = {
   isOwned: PropTypes.bool.isRequired,
   relevantConnections: PropTypes.object.isRequired,
   socketType: PropTypes.string.isRequired,
-  showAddPicker: PropTypes.bool.isRequired,
-  toggleAddPicker: PropTypes.func.isRequired,
   segmentContentClassName: PropTypes.string,
-  setVisibleTab: PropTypes.func.isRequired,
   storedAtoms: PropTypes.object.isRequired,
 };

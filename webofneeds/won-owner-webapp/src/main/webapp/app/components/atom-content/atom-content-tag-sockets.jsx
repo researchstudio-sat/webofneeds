@@ -11,8 +11,6 @@ export default function WonAtomContentTagSockets({
   relevantConnectionsMap,
   storedAtoms,
   isOwned,
-  showAddPicker,
-  toggleAddPicker,
 }) {
   console.debug(
     "relevantTagViewSocketsConnectionsMap: ",
@@ -63,9 +61,6 @@ export default function WonAtomContentTagSockets({
           isOwned={isOwned}
           socketType={socketType}
           relevantConnections={connections}
-          showAddPicker={showAddPicker}
-          toggleAddPicker={toggleAddPicker}
-          setVisibleTab={() => undefined}
           storedAtoms={storedAtoms}
         />
       </div>
@@ -83,6 +78,4 @@ WonAtomContentTagSockets.propTypes = {
   relevantConnectionsMap: PropTypes.object.isRequired,
   storedAtoms: PropTypes.object.isRequired,
   isOwned: PropTypes.bool,
-  toggleAddPicker: PropTypes.func.isRequired,
-  showAddPicker: PropTypes.bool.isRequired,
 };
