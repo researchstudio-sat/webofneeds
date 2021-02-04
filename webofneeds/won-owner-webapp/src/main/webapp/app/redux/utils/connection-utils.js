@@ -5,6 +5,7 @@
 import vocab from "../../service/vocab.js";
 import { get } from "../../utils.js";
 import * as messageUtils from "./message-utils.js";
+import { isTagViewSocket } from "../../won-utils.js";
 
 export function getState(connection) {
   return get(connection, "state");
@@ -197,8 +198,7 @@ export const filterSingleConnectedSocketCapacityFilter = (_, socketType) =>
  * @returns {boolean}
  */
 export const filterTagViewSockets = (_, socketType) =>
-  !vocab.tagViewSockets[socketType] ||
-  vocab.tagViewSockets[socketType] !== true;
+  !isTagViewSocket(socketType);
 
 /**
  * Removes the socketEntry of a map if the tagViewSocket is set to false or does not exist (used so that tagView Sockets, are not displayed
@@ -208,7 +208,7 @@ export const filterTagViewSockets = (_, socketType) =>
  * @returns {boolean}
  */
 export const filterNonTagViewSockets = (_, socketType) =>
-  !filterTagViewSockets(_, socketType);
+  isTagViewSocket(socketType);
 
 /**
  * Removes the socketEntry of a map if the socketCapacity is not excatly 1 (used so that only socketCapacity 1 sockets, are displayed

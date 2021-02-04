@@ -12,6 +12,7 @@ import * as useCaseUtils from "./usecase-utils.js";
 import { getTitle } from "./redux/utils/atom-utils.js";
 
 import won from "./won-es6.js";
+import vocab from "~/app/service/vocab";
 
 /**
  * Generates a privateId of `[usernameFragment]-[password]`
@@ -211,4 +212,11 @@ export function genDetailBaseUri(baseUri) {
   }
   const randomId = generateIdString(10);
   return baseUri + "#" + randomId;
+}
+
+export function isTagViewSocket(socketType) {
+  return (
+    !!vocab.tagViewSockets[socketType] &&
+    vocab.tagViewSockets[socketType] === true
+  );
 }

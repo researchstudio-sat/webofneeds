@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 import { get, getIn, getUri, generateLink } from "../../utils.js";
+import { isTagViewSocket } from "../../won-utils.js";
 import vocab from "../../service/vocab";
 
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
@@ -192,7 +193,9 @@ export default function WonCreateAtom({
             {
               postUri: fromAtomUri,
               connectionUri: undefined,
-              tab: targetSocketType,
+              tab: isTagViewSocket(targetSocketType)
+                ? "DETAIL"
+                : targetSocketType,
             },
             "/post"
           )
