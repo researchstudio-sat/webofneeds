@@ -5,33 +5,33 @@ won-account-menu {
   display: block;
   position: relative;
 
-  &.wam--open {
-    > .wam__content {
+  &.wlm--open {
+    > .wlm__content {
       border: $thinGrayBorder;
       border-top: 0;
     }
   }
 
-  &.wam--closed {
+  &.wlm--closed {
   }
 
-  .wam__header {
+  .wlm__header {
     display: flex;
     box-sizing: border-box;
     align-items: center;
     white-space: nowrap;
 
-    > .wam__header__icon {
+    > .wlm__header__icon {
       @include fixed-square($bigiconSize);
       --local-primary: #{$won-primary-color};
     }
-    > .wam__header__caption {
+    > .wlm__header__caption {
       margin-right: 0.5rem;
       color: #{$won-primary-color};
     }
   }
 
-  .wam__content {
+  .wlm__content {
     box-sizing: border-box;
     background: white;
     padding: 0.5rem;

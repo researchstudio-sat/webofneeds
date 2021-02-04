@@ -8,7 +8,7 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processSelectors from "../redux/selectors/process-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import WonAccountMenu from "./account-menu.jsx";
+import WonLoginMenu from "./login-menu.jsx";
 
 import "~/style/_responsiveness-utils.scss";
 import "~/style/_topnav.scss";
@@ -157,10 +157,7 @@ export default function WonTopnav({ pageTitle }) {
           </div>
         )}
         {hasSlideIns && (
-          <div
-            className="topnav__slideintoggle show-in-responsive"
-            onClick={toggleSlideIns}
-          >
+          <div className="topnav__slideintoggle" onClick={toggleSlideIns}>
             <svg className="topnav__slideintoggle__icon">
               <use
                 xlinkHref={ico16_indicator_warning}
@@ -189,7 +186,7 @@ export default function WonTopnav({ pageTitle }) {
               Sign up
             </Link>
           )}
-        <WonAccountMenu />
+        {!loggedIn && <WonLoginMenu />}
       </nav>
     </won-topnav>
   );

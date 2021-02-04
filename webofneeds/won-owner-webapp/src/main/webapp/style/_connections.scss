@@ -5,9 +5,6 @@
 
 aside.overview__left {
   border-right: $thinGrayBorder;
-  @media (max-width: $responsivenessBreakPoint) {
-    grid-column: 1 / -1;
-  }
 }
 
 main.overview__nochats {

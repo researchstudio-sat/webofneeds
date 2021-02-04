@@ -4,7 +4,6 @@
 @import "flex-layout";
 
 main.ownerwelcome {
-  grid-column: 1 / -1;
   box-sizing: border-box;
   align-items: stretch;
   max-width: 45rem;
@@ -68,7 +67,6 @@ main.ownerwelcome {
 }
 
 main.ownerinventory {
-  grid-column: 1 / -1;
   padding: 0;
   box-sizing: border-box;
   align-items: stretch;

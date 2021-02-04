@@ -2,97 +2,45 @@
 @import "sizing-utils";
 
 @mixin desktopMenuTab() {
-  border-bottom: $won-light-gray 0.25rem solid;
-  grid-template-areas: "menu_indicator menu_label";
-
-  &.menu__tab--selected {
-    border-bottom-color: $won-primary-color;
-  }
-
-  &:hover {
-    border-bottom-color: $won-primary-color-light;
-    color: $won-primary-color-light;
-  }
-}
-
-@mixin mobileMenuTab() {
-  border-left: $won-light-gray 0.25rem solid;
-  border-bottom: $thinGrayBorder;
-
-  grid-template-areas: "menu_label menu_indicator";
-  justify-content: left;
-
-  &.menu__tab--selected {
-    border-left-color: $won-primary-color;
-  }
-
-  &:hover {
-    border-left-color: $won-primary-color-light;
-    color: $won-primary-color-light;
-  }
+  padding: 0.5rem 2rem;
 }
 
 @mixin desktopMenu() {
-  grid-auto-flow: column;
-  grid-gap: 0.5rem;
+  grid-auto-flow: row;
   justify-content: center;
-  margin: 0 auto;
-  padding: 0 0.5rem;
-  max-width: $maxContentWidth;
-
-  > .menu__slideintoggle {
-    align-self: center;
-    border-bottom: $won-light-gray 0.25rem solid;
-
-    > .menu__slideintoggle__label {
-      display: none;
-    }
-    > .menu__slideintoggle__carret {
-      @include fixed-square(1.5rem);
-      --local-primary: #{$won-secondary-color};
-
-      &.menu__slideintoggle__carret--expanded {
-        transform: rotate(-180deg);
-        transition: transform linear 0.2s;
-      }
-      &:not(.menu__slideintoggle__carret--expanded) {
-        transform: rotate(0deg);
-        transition: transform linear 0.2s;
-      }
-    }
-  }
+  padding: 0.5rem 0;
+  max-width: 20rem;
 }
 
 @mixin mobileMenu() {
   grid-auto-flow: row;
-
-  > .menu__slideintoggle {
-    border-bottom: $thinGrayBorder;
-    padding: 0.5rem;
-    grid-gap: 0.25rem;
-    grid-template-columns: min-content 1fr;
-
-    > .menu__slideintoggle__label {
-      color: $won-secondary-color;
-    }
-    > .menu__slideintoggle__carret {
-      display: none;
-    }
-  }
 }
 
 @mixin genericMenu() {
   display: grid;
   box-sizing: border-box;
 
-  > .menu__slideintoggle {
-    display: grid;
-    cursor: pointer;
-    grid-auto-flow: column;
+  .menu__signout {
+    margin: 0.5rem 1rem;
+  }
+  .menu__user {
+    padding: 0 1rem 0.5rem 1rem;
+    border-bottom: $thinGrayBorder;
+  }
 
-    > .menu__slideintoggle__icon {
-      @include fixed-square(1.5rem);
-      --local-primary: #{$won-secondary-color};
+  .menu__user {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    white-space: nowrap;
+
+    > .menu__user__icon {
+      @include fixed-square($bigiconSize);
+      --local-primary: #{$won-primary-color};
+    }
+    > .menu__user__caption {
+      margin-left: 0.5rem;
+      color: #{$won-primary-color};
     }
   }
 }
@@ -101,11 +49,26 @@
   display: grid;
   grid-column-gap: 0.25rem;
   align-items: center;
+  grid-template-areas: "menu_label menu_indicator";
   grid-template-columns: min-content min-content;
   cursor: pointer;
   padding: 0.5rem;
   color: $won-primary-text-color;
   box-sizing: border-box;
+  white-space: nowrap;
+  justify-content: left;
+
+  border-right: $won-light-gray 0.25rem solid;
+  border-bottom: $thinGrayBorder;
+
+  &.menu__tab--selected {
+    border-right-color: $won-primary-color;
+  }
+
+  &:hover {
+    border-right-color: $won-primary-color-light;
+    color: $won-primary-color-light;
+  }
 
   &.menu__tab--inactive {
     color: $won-line-gray;
@@ -145,6 +108,7 @@
     }
   }
 }
+
 won-menu.won-menu--show-mobile {
   background: $won-light-gray;
 
@@ -154,7 +118,6 @@ won-menu.won-menu--show-mobile {
 
     & > .menu__tab {
       @include genericMenuTab();
-      @include mobileMenuTab();
     }
   }
 }
@@ -178,9 +141,6 @@ won-menu:not(.won-menu--show-mobile) {
 
       @media (min-width: $responsivenessBreakPoint) {
         @include desktopMenuTab();
-      }
-      @media (max-width: $responsivenessBreakPoint) {
-        @include mobileMenuTab();
       }
     }
   }
