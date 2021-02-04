@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
+import won.protocol.message.WonMessageType;
 
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
@@ -221,6 +222,14 @@ public class AuthUtils {
         StringWriter writer = new StringWriter();
         RDFDataMgr.write(writer, g, Lang.TTL);
         return writer.toString();
+    }
+
+    public static MessageType toAuthMessageType(WonMessageType messageType) {
+        return MessageType.forValue(messageType.getURI());
+    }
+
+    public static WonMessageType fromAuthMessageType(MessageType messageType) {
+        return WonMessageType.getWonMessageType(messageType.getValue());
     }
 
     private static class WebIdKeyLoadingSigningKeyResolver extends SigningKeyResolverAdapter {

@@ -10,7 +10,10 @@
  */
 package won.protocol.model;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.rdf.model.Model;
 import won.protocol.model.parentaware.VersionedEntity;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlTransient;
@@ -18,6 +21,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  *
@@ -133,6 +137,23 @@ public class Atom implements VersionedEntity {
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
         lastUpdate = creationDate;
+    }
+
+    public Optional<Graph> getAclGraph() {
+        DatasetHolder atomDatasetHolder = getDatatsetHolder();
+        URI aclGraphUri = WonRelativeUriHelper.createAclGraphURIForAtomURI(getAtomURI());
+        // caution: at least some dataset implementations will create a new model
+        // in the dataset if getNamedModel(name) is called and there is no model for
+        // 'name' yet.
+        if (!atomDatasetHolder.getDataset().containsNamedModel(aclGraphUri.toString())) {
+            return Optional.empty();
+        }
+        Model model = atomDatasetHolder.getDataset()
+                        .getNamedModel(aclGraphUri.toString());
+        if (model == null) {
+            return Optional.empty();
+        }
+        return Optional.of(model.getGraph());
     }
 
     @XmlTransient

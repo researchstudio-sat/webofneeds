@@ -4,37 +4,34 @@ import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
 import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
 import io.ipfs.multibase.Base58;
 import io.ipfs.multihash.Multihash.Type;
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.protocol.message.WonMessage;
 import won.protocol.message.WonSignatureData;
+
+import java.io.StringWriter;
+import java.lang.invoke.MethodHandles;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Created by ypanchenko on 12.06.2014.
  */
 public class WonSigner {
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     // TODO make it configurable which algorithm is used RSA or ECDSA
     public static final String SIGNING_ALGORITHM_NAME = "NONEwithECDSA";
     public static final String SIGNING_ALGORITHM_PROVIDER = "BC";
     // TODO which hashing algorithm to use?
     public static final String ENV_HASH_ALGORITHM = "sha-256";
     public static final Type HASH_ALGORITHM_FOR_MULTIHASH = Type.sha2_256;
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Dataset dataset;
     private WonHasher hasher = new WonHasher();
 
@@ -68,7 +65,7 @@ public class WonSigner {
                 RDFDataMgr.write(sw, dataset.getNamedModel(signedGraphUri), Lang.TRIG);
                 logger.debug("signing graph {} with content: {}", graphsToSign, sw.toString());
             }
-            String signatureUri = signedGraphUri + "-sig";
+            String signatureUri = signedGraphUri + WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX;
             // create GraphCollection with one NamedGraph that corresponds to this Model
             GraphCollection inputGraph = ModelConverter.modelToGraphCollection(signedGraphUri, dataset);
             // sign the NamedGraph inside that GraphCollection

@@ -18,6 +18,8 @@ import org.apache.jena.riot.Lang;
 public class WonCamelConstants {
     public static final String ATOM_HEADER = "won.atom";
     public static final String RECIPIENT_ATOM_URI_HEADER = "won.recipientAtomUri";
+    public static final String WON_ACL_EVALUATOR_HEADER = "won.acl.evaluator";
+    public static final String WON_ACL_OPERATION_REQUEST_HEADER = "won.acl.operationRequest";
     public static final String SENDER_NODE_URI_HEADER = "won.senderNodeUri";
     public static final String RECIPIENT_NODE_URI_HEADER = "won.recipientNodeUri";
     public static final String MESSAGE_HEADER = "won.message";

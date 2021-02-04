@@ -1,17 +1,9 @@
 package won.node.springsecurity.acl;
 
 import org.apache.jena.graph.Graph;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.shacl.Shapes;
-import org.apache.jena.sparql.graph.GraphFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.core.Authentication;
@@ -24,7 +16,6 @@ import won.auth.WonAclEvaluator;
 import won.auth.WonAclEvaluatorFactory;
 import won.auth.check.AtomNodeChecker;
 import won.auth.check.TargetAtomCheckEvaluator;
-import won.auth.check.impl.LDFetchingAtomNodeChecker;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.cryptography.service.CryptographyService;
@@ -34,7 +25,6 @@ import won.node.springsecurity.WonDefaultAccessControlRules;
 import won.node.springsecurity.userdetails.WebIdUserDetails;
 import won.protocol.model.Atom;
 import won.protocol.model.Connection;
-import won.protocol.model.DatasetHolder;
 import won.protocol.model.MessageEvent;
 import won.protocol.repository.ConnectionRepository;
 import won.protocol.repository.DatasetHolderRepository;
@@ -52,11 +42,10 @@ import java.util.stream.Collectors;
 import static won.auth.AuthUtils.*;
 import static won.auth.model.Individuals.*;
 
-public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvocation>, InitializingBean {
+public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvocation> {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String anonymousUserPrincipal = "anonymousUser";
     // the aclEvaluator is not thread-safe, each thread needs its own.
-    private ThreadLocal<WonAclEvaluatorFactory> aclEvaluatorFactory = new ThreadLocal<>();
     @Autowired
     private TargetAtomCheckEvaluator targetAtomCheckEvaluator;
     @Autowired
@@ -77,8 +66,8 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
     private WonDefaultAccessControlRules defaultAccessControlRules;
     @Autowired
     private CryptographyService cryptographyService;
-    private Shapes aclShapes;
-    private Graph aclShapesGraph;
+    @Autowired
+    private WonAclEvaluatorFactory wonAclEvaluatorFactory;
 
     public WonAclAccessDecisionVoter() {
     }
@@ -166,23 +155,6 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         return result;
     }
 
-    public Graph getAclGraphOfAtom(Atom atom) {
-        DatasetHolder atomDatasetHolder = atom.getDatatsetHolder();
-        URI aclGraphUri = uriService.createAclGraphURIForAtomURI(atom.getAtomURI());
-        // caution: at least some dataset implementations will create a new model
-        // in the dataset if getNamedModel(name) is called and there is no model for
-        // 'name' yet.
-        if (!atomDatasetHolder.getDataset().containsNamedModel(aclGraphUri.toString())) {
-            return null;
-        }
-        Model model = atomDatasetHolder.getDataset()
-                        .getNamedModel(aclGraphUri.toString());
-        if (model == null) {
-            return null;
-        }
-        return model.getGraph();
-    }
-
     public int voteForMessageRequest(String webId, AuthToken authToken, URI resourceUri,
                     FilterInvocation filterInvocation,
                     Supplier<Integer> legacyImpl) {
@@ -203,12 +175,12 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                 return ACCESS_DENIED;
             }
             if (!aclGraphs.containsKey(atomUri)) {
-                Graph aclGraph = getAclGraphOfAtom(atom.get());
-                if (aclGraph == null) {
+                Optional<Graph> aclGraph = atom.get().getAclGraph();
+                if (aclGraph.isEmpty()) {
                     legacyResults.put(atomUri, legacyImpl.get());
                     continue;
                 }
-                aclGraphs.put(atomUri, aclGraph);
+                aclGraphs.put(atomUri, aclGraph.get());
             }
             if (!atom.isPresent()) {
                 continue;
@@ -251,7 +223,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         for (URI atomUri : aclGraphs.keySet()) {
             Graph aclGraph = aclGraphs.get(atomUri);
             for (OperationRequest opReq : opReqs.get(atomUri)) {
-                aclEvalResults.add(getWonAclEvaluator(aclGraph).decide(opReq));
+                aclEvalResults.add(wonAclEvaluatorFactory.getWonAclEvaluator(aclGraph).decide(opReq));
             }
         }
         Optional<AclEvalResult> aclEvalResult = aclEvalResults.stream().reduce(WonAclEvaluator::mergeAclEvalResults);
@@ -293,15 +265,15 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         if (!atom.isPresent()) {
             return ACCESS_DENIED;
         }
-        Graph aclGraph = getAclGraphOfAtom(atom.get());
-        if (aclGraph == null) {
+        Optional<Graph> aclGraph = atom.get().getAclGraph();
+        if (aclGraph.isEmpty()) {
             // fall back to legacy implementation
             WonAclRequestHelper.setWonAclEvaluationContext(
                             filterInvocation.getRequest(),
                             WonAclEvalContext.allowAll());
             return legacyImpl.get();
         }
-        WonAclEvaluator wonAclEvaluator = getWonAclEvaluator(aclGraph);
+        WonAclEvaluator wonAclEvaluator = wonAclEvaluatorFactory.getWonAclEvaluator(aclGraph.get());
         // set up request object
         OperationRequest request = new OperationRequest();
         request.setReqAtom(atomUri);
@@ -439,30 +411,5 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         } else {
             return ACCESS_DENIED;
         }
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Resource res = new ClassPathResource("shacl/won-auth-shapes.ttl");
-        aclShapesGraph = GraphFactory.createGraphMem();
-        RDFDataMgr.read(aclShapesGraph, res.getInputStream(), Lang.TTL);
-        aclShapes = Shapes.parse(aclShapesGraph);
-        if (this.atomNodeChecker instanceof LDFetchingAtomNodeChecker) {
-            ((LDFetchingAtomNodeChecker) this.atomNodeChecker)
-                            .setWebIdForRequests(URI.create(cryptographyService.getDefaultPrivateKeyAlias()));
-        }
-    }
-
-    private WonAclEvaluator getWonAclEvaluator(Graph aclGraph) {
-        WonAclEvaluatorFactory evaluatorFactory = this.aclEvaluatorFactory.get();
-        if (evaluatorFactory == null) {
-            evaluatorFactory = new WonAclEvaluatorFactory(
-                            this.aclShapes,
-                            this.targetAtomCheckEvaluator,
-                            this.atomNodeChecker,
-                            webIdKeyLoader);
-            this.aclEvaluatorFactory.set(evaluatorFactory);
-        }
-        return evaluatorFactory.create(aclGraph);
     }
 }

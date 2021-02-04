@@ -1,53 +1,26 @@
 package won.protocol.message;
 
-import java.io.Serializable;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.StmtIterator;
+import com.google.common.collect.Sets;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.tdb.TDB;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Sets;
-
 import won.protocol.exception.MissingMessagePropertyException;
 import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.vocabulary.WONMSG;
+
+import java.io.Serializable;
+import java.net.URI;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Wraps an RDF dataset representing a WoN message.
@@ -57,6 +30,7 @@ import won.protocol.vocabulary.WONMSG;
 public class WonMessage implements Serializable {
     public static final String SIGNATURE_URI_SUFFIX = "#signature";
     public static final String ENVELOPE_URI_SUFFIX = "#envelope";
+    public static final String SIGNATURE_URI_GRAPHURI_SUFFIX = "-sig";
     final Logger logger = LoggerFactory.getLogger(getClass());
     private Dataset messageContent;
     private Dataset completeDataset;
@@ -107,30 +81,9 @@ public class WonMessage implements Serializable {
     private WonMessage() {
     }
 
-    private void requireOnlyOneMessage(Dataset dataset) {
-        Iterator<String> names = dataset.listNames();
-        Optional<String> knownMessageUri = Optional.empty();
-        while (names.hasNext()) {
-            String name = names.next();
-            String currentMessageUri = stripUriFragment(name);
-            if (currentMessageUri == null || currentMessageUri.length() == 0) {
-                throw new IllegalArgumentException("Found unacceptable graph name " + name);
-            }
-            if (knownMessageUri.isPresent()) {
-                if (!knownMessageUri.get().equals(currentMessageUri)) {
-                    throw new IllegalArgumentException("Dataset must contain only one message, but found graphs of "
-                                    + knownMessageUri.get() + " and " + currentMessageUri
-                                    + ". Use WonMessage.of(dataset) instead!");
-                }
-            } else {
-                knownMessageUri = Optional.of(currentMessageUri);
-            }
-        }
-    }
-
     /**
      * Create a WonMessage object from a dataset that may contain multiple messages.
-     * 
+     *
      * @param dataset
      * @return
      */
@@ -191,8 +144,9 @@ public class WonMessage implements Serializable {
             }
             candidates.removeAll(msg.getForwardedMessageURIs());
         }
-        if (candidates.size() != 1)
+        if (candidates.size() != 1) {
             throw new WonMessageNotWellFormedException("message dataset must contain one head message");
+        }
         return candidates.stream().findFirst().get();
     }
 
@@ -219,7 +173,7 @@ public class WonMessage implements Serializable {
     /**
      * Returns all messages contained in the dataset, each with a new copy of the
      * dataset containing only the data pertaining to the message.
-     * 
+     *
      * @param dataset
      * @return
      */
@@ -250,6 +204,27 @@ public class WonMessage implements Serializable {
 
     public static WonMessage deepCopy(WonMessage original) {
         return WonMessage.of(RdfUtils.cloneDataset(original.completeDataset));
+    }
+
+    private void requireOnlyOneMessage(Dataset dataset) {
+        Iterator<String> names = dataset.listNames();
+        Optional<String> knownMessageUri = Optional.empty();
+        while (names.hasNext()) {
+            String name = names.next();
+            String currentMessageUri = stripUriFragment(name);
+            if (currentMessageUri == null || currentMessageUri.length() == 0) {
+                throw new IllegalArgumentException("Found unacceptable graph name " + name);
+            }
+            if (knownMessageUri.isPresent()) {
+                if (!knownMessageUri.get().equals(currentMessageUri)) {
+                    throw new IllegalArgumentException("Dataset must contain only one message, but found graphs of "
+                                    + knownMessageUri.get() + " and " + currentMessageUri
+                                    + ". Use WonMessage.of(dataset) instead!");
+                }
+            } else {
+                knownMessageUri = Optional.of(currentMessageUri);
+            }
+        }
     }
 
     /**
@@ -1152,79 +1127,6 @@ public class WonMessage implements Serializable {
         return sb.toString();
     }
 
-    private static class ToStringForDebugUtils {
-        private static String indent = "    ";
-        private static int INDENT_LENGTH = indent.length();
-
-        private static void formatFields(String[] names, Object[] values, boolean multiline, StringBuilder sb) {
-            if (names.length != values.length) {
-                sb.append("error in toStringForDebug: names[] and values[] differ in length");
-                return;
-            }
-            for (int i = 0; i < names.length; i++) {
-                if (multiline) {
-                    sb
-                                    .append("\n")
-                                    .append(indent)
-                                    .append(names[i])
-                                    .append(": ")
-                                    .append(values[i]);
-                } else {
-                    sb
-                                    .append(names[i])
-                                    .append("=")
-                                    .append(values[i])
-                                    .append(", ");
-                }
-            }
-            if (names.length > 0) {
-                int length = sb.length();
-                if (!multiline) {
-                    sb.delete(length - 2, length);
-                }
-            }
-        }
-    }
-
-    // Used to remember attachment graph uri and destination uri during the process
-    // of extracting attachments.
-    public class AttachmentMetaData {
-        URI attachmentGraphUri;
-        URI destinationUri;
-
-        AttachmentMetaData(URI attachmentGraphUri, URI destinationUri) {
-            this.attachmentGraphUri = attachmentGraphUri;
-            this.destinationUri = destinationUri;
-        }
-
-        public URI getAttachmentGraphUri() {
-            return attachmentGraphUri;
-        }
-
-        public URI getDestinationUri() {
-            return destinationUri;
-        }
-    }
-
-    public static class AttachmentHolder {
-        private URI destinationUri;
-        // holds the attachment graph and the signature graph
-        private Dataset attachmentDataset;
-
-        public AttachmentHolder(URI destinationUri, Dataset attachmentDataset) {
-            this.destinationUri = destinationUri;
-            this.attachmentDataset = attachmentDataset;
-        }
-
-        public URI getDestinationUri() {
-            return destinationUri;
-        }
-
-        public Dataset getAttachmentDataset() {
-            return attachmentDataset;
-        }
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -1235,18 +1137,23 @@ public class WonMessage implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         WonMessage other = (WonMessage) obj;
         if (getMessageURI() == null) {
-            if (other.getMessageURI() != null)
+            if (other.getMessageURI() != null) {
                 return false;
-        } else if (!getMessageURI().equals(other.getMessageURI()))
+            }
+        } else if (!getMessageURI().equals(other.getMessageURI())) {
             return false;
+        }
         return true;
     }
 
@@ -1283,6 +1190,59 @@ public class WonMessage implements Serializable {
         Set<Property> notAllowed = Sets.difference(present, required);
         notAllowed = Sets.difference(notAllowed, optional);
         return new EnvelopePropertyCheckResult(getMessageTypeRequired(), present, missing, notAllowed);
+    }
+
+    private static class ToStringForDebugUtils {
+        private static String indent = "    ";
+        private static int INDENT_LENGTH = indent.length();
+
+        private static void formatFields(String[] names, Object[] values, boolean multiline, StringBuilder sb) {
+            if (names.length != values.length) {
+                sb.append("error in toStringForDebug: names[] and values[] differ in length");
+                return;
+            }
+            for (int i = 0; i < names.length; i++) {
+                if (multiline) {
+                    sb
+                                    .append("\n")
+                                    .append(indent)
+                                    .append(names[i])
+                                    .append(": ")
+                                    .append(values[i]);
+                } else {
+                    sb
+                                    .append(names[i])
+                                    .append("=")
+                                    .append(values[i])
+                                    .append(", ");
+                }
+            }
+            if (names.length > 0) {
+                int length = sb.length();
+                if (!multiline) {
+                    sb.delete(length - 2, length);
+                }
+            }
+        }
+    }
+
+    public static class AttachmentHolder {
+        private URI destinationUri;
+        // holds the attachment graph and the signature graph
+        private Dataset attachmentDataset;
+
+        public AttachmentHolder(URI destinationUri, Dataset attachmentDataset) {
+            this.destinationUri = destinationUri;
+            this.attachmentDataset = attachmentDataset;
+        }
+
+        public URI getDestinationUri() {
+            return destinationUri;
+        }
+
+        public Dataset getAttachmentDataset() {
+            return attachmentDataset;
+        }
     }
 
     public static class EnvelopePropertyCheckResult {
@@ -1335,6 +1295,26 @@ public class WonMessage implements Serializable {
 
         public boolean isValid() {
             return missing.isEmpty() && notAllowed.isEmpty() && !present.isEmpty();
+        }
+    }
+
+    // Used to remember attachment graph uri and destination uri during the process
+    // of extracting attachments.
+    public class AttachmentMetaData {
+        URI attachmentGraphUri;
+        URI destinationUri;
+
+        AttachmentMetaData(URI attachmentGraphUri, URI destinationUri) {
+            this.attachmentGraphUri = attachmentGraphUri;
+            this.destinationUri = destinationUri;
+        }
+
+        public URI getAttachmentGraphUri() {
+            return attachmentGraphUri;
+        }
+
+        public URI getDestinationUri() {
+            return destinationUri;
         }
     }
 }

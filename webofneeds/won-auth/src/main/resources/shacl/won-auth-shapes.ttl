@@ -425,17 +425,18 @@ auth:messageTypesExpressionShape
                      sh:node     auth:messageTypeShape ] .
 
 auth:messageTypeShape
-    a     sh:NodeShape, auth:MessageTypeSpecificationShape ;
-    sh:in ( msg:ActivateMessage
-            msg:AtomHintMessage
-            msg:AtomMessage
-            msg:ChangeNotificationMessage
-            msg:AtomCreatedNotificationMessage
-            msg:CloseMessage
-            msg:ConnectMessage
-            msg:ConnectionMessage
-            msg:CreateMessage
-            msg:DeactivateMessage
+    a         sh:NodeShape, auth:MessageTypeSpecificationShape ;
+    sh:closed true ;
+    sh:in     ( msg:ActivateMessage
+                msg:AtomHintMessage
+                msg:AtomMessage
+                msg:ChangeNotificationMessage
+                msg:AtomCreatedNotificationMessage
+                msg:CloseMessage
+                msg:ConnectMessage
+                msg:ConnectionMessage
+                msg:CreateMessage
+                msg:DeactivateMessage
             msg:FailureResponse
             msg:ReplaceMessage
             msg:SocketHintMessage

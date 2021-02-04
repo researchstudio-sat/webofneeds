@@ -115,6 +115,7 @@
 	<bean id="acl" class="won.node.springsecurity.WonDefaultAccessControlRules"/>
 	<bean id="webIdUserDetailsService" class="won.node.springsecurity.UserDetailsService"/>
 	<bean id="wonAclAccessDecisionVoter" class="won.node.springsecurity.acl.WonAclAccessDecisionVoter"/>
+	<bean id="wonAclEvaluatorFactory" class="won.auth.WonAclEvaluatorFactory"/>
 	<bean id="targetAtomCheckEvaluator" class="won.node.springsecurity.acl.WonTargetAtomCheckEvaluator"/>
 	<bean id="ldFetchingAtomNodeChecker" class="won.auth.check.impl.LDFetchingAtomNodeChecker"/>
 	<bean id="atomNodeChecker" class="won.node.springsecurity.acl.NodeBasedAtomNodeChecker" primary="true"/>

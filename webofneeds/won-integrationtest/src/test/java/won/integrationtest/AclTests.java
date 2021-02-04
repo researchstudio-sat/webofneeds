@@ -30,8 +30,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static won.auth.model.Individuals.ANY_OPERATION;
-import static won.auth.model.Individuals.OP_READ;
+import static won.auth.model.Individuals.*;
 
 public class AclTests extends AbstractBotBasedTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -391,6 +390,9 @@ public class AclTests extends AbstractBotBasedTest {
                                     .atom(atomUri1)
                                     .content().graph(RdfOutput.toGraph(atomContent))
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content()
+                                    .aclGraph(won.auth.model.RdfOutput.toGraph(getConnectedMayCommunicateAuth()))
                                     .build();
                     createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
                     ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
@@ -434,6 +436,9 @@ public class AclTests extends AbstractBotBasedTest {
                                     .atom(atomUri2)
                                     .content().graph(RdfOutput.toGraph(atomContent))
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content()
+                                    .aclGraph(won.auth.model.RdfOutput.toGraph(getConnectedMayCommunicateAuth()))
                                     .build();
                     createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
                     ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
@@ -609,6 +614,9 @@ public class AclTests extends AbstractBotBasedTest {
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth1))
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth2))
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth3))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content()
+                                    .aclGraph(won.auth.model.RdfOutput.toGraph(getConnectedMayCommunicateAuth()))
                                     .build();
                     createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
                     ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
@@ -644,6 +652,9 @@ public class AclTests extends AbstractBotBasedTest {
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth1))
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth2))
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth3))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content()
+                                    .aclGraph(won.auth.model.RdfOutput.toGraph(getConnectedMayCommunicateAuth()))
                                     .build();
                     createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
                     ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
@@ -679,6 +690,9 @@ public class AclTests extends AbstractBotBasedTest {
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth1))
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth2))
                                     .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth3))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content()
+                                    .aclGraph(won.auth.model.RdfOutput.toGraph(getConnectedMayCommunicateAuth()))
                                     .build();
                     createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
                     ctx.getBotContextWrapper().rememberAtomUri(atomUri3);
@@ -875,6 +889,29 @@ public class AclTests extends AbstractBotBasedTest {
             bbCreateAtom2.activate();
             bbCreateAtom3.activate();
         });
+    }
+
+    private Authorization getAnyoneMayConnectAuth() {
+        return Authorization.builder()
+                        .addGranteesAtomExpression(AtomExpression.builder()
+                                        .addAtomsRelativeAtomExpression(RelativeAtomExpression.ANY_ATOM)
+                                        .build())
+                        .addGrant(AseRoot.builder().addOperationsMessageOperationExpression(OP_CONNECT_CLOSE).build())
+                        .build();
+    }
+
+    private Authorization getConnectedMayCommunicateAuth() {
+        return Authorization.builder()
+                        .addGranteesAseRoot(ase -> ase
+                                        .addSocket(se -> se
+                                                        .addOperationsMessageOperationExpression(OP_COMMUNICATE)
+                                                        .addConnection(
+                                                                        ce -> ce
+                                                                                        .setTargetAtom(new TargetAtomExpression())
+                                                                                        .addConnectionState(
+                                                                                                        ConnectionState.CONNECTED))))
+                        .addGrant(AseRoot.builder().addOperationsMessageOperationExpression(OP_CONNECT_CLOSE).build())
+                        .build();
     }
 
     private Authorization getBuddiesReceiveBuddyTokenAuth() {

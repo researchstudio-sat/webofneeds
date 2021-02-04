@@ -9,6 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.auth.AuthUtils;
+import won.auth.WonAclEvaluator;
+import won.auth.model.AclEvalResult;
+import won.auth.model.DecisionValue;
+import won.auth.model.GraphType;
+import won.auth.model.OperationRequest;
 import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
@@ -19,6 +25,7 @@ import won.protocol.model.*;
 import won.protocol.repository.*;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.WONMSG;
 
 import javax.persistence.EntityManager;
@@ -27,6 +34,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static won.auth.model.Individuals.POSITION_ATOM_GRAPH;
 
 @Component
 public class AtomService {
@@ -186,13 +195,15 @@ public class AtomService {
         return atom;
     }
 
-    public Atom replaceAtom(final WonMessage wonMessage) throws NoSuchAtomException {
+    public Atom replaceAtom(final WonMessage wonMessage, WonAclEvaluator evaluator, OperationRequest request)
+                    throws NoSuchAtomException {
         Dataset atomContent = wonMessage.getMessageContent();
         List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
         // remove attachment and its signature from the atomContent
         removeAttachmentsFromAtomContent(atomContent, attachmentHolders);
         final AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomContent);
         URI atomURI = getAtomURIAndCheck(atomModelWrapper);
+        checkReplaceAllowed(atomContent, atomURI, evaluator, request);
         checkCanThisMessageCreateOrModifyThisAtom(wonMessage, atomURI);
         checkResourcesInAtomContent(atomModelWrapper);
         Collection<String> sockets = getSocketsAndCheck(atomModelWrapper, atomURI);
@@ -246,6 +257,32 @@ public class AtomService {
         atom.setAttachmentDatasetHolders(attachments);
         dataDerivationService.deriveDataIfNecessary(atom);
         return atomRepository.save(atom);
+    }
+
+    private void checkReplaceAllowed(Dataset atomContent, URI atomUri, WonAclEvaluator evaluator,
+                    OperationRequest request) {
+        Iterator<String> graphNames = atomContent.listNames();
+        URI aclGraphUri = WonRelativeUriHelper.createAclGraphURIForAtomURI(atomUri);
+        OperationRequest or = AuthUtils.cloneShallow(request);
+        or.setReqPosition(POSITION_ATOM_GRAPH);
+        while (graphNames.hasNext()) {
+            String graphName = graphNames.next();
+            if (graphName.endsWith(WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX)) {
+                // don't check permissions for signatures
+                continue;
+            }
+            URI graphUri = URI.create(graphName);
+            if (aclGraphUri.equals(graphUri)) {
+                or.addReqGraphType(GraphType.ACL_GRAPH);
+            } else {
+                or.addReqGraphType(GraphType.CONTENT_GRAPH);
+            }
+            or.addReqGraph(graphUri);
+        }
+        AclEvalResult result = evaluator.decide(or);
+        if (DecisionValue.ACCESS_DENIED.equals(result.getDecision())) {
+            throw new ForbiddenMessageException("Replace operation is not allowed");
+        }
     }
 
     private Set<Socket> determineNewSockets(URI atomURI, List<Socket> existingSockets,
