@@ -71,14 +71,13 @@ ex:expectedResult10
     a            auth:Authorization ;
     auth:grantee [ auth:socket [ auth:connection [ auth:targetAtom      [ ] ;
                                                    auth:connectionState won:Connected ] ] ] ;
-    auth:grant   [ auth:connection [ auth:targetAtom         [ auth:atom auth:operationRequestor ];
+    auth:grant   [ auth:connection [ auth:targetAtom         [ auth:atom auth:operationRequestor ] ;
                                      auth:operation          auth:opRead, auth:opConnectClose, auth:opCommunicate ;
                                      auth:connectionMessages [ auth:inherit false ] ] ] .
 
 <#request1>
     a                auth:OperationRequest ;
     auth:operation   auth:opRead ;
-    auth:reqConnectionTargetAtom ex:atom2 ;
     auth:requestor   ex:atom2 ;
     auth:reqAtom     ex:atom1 ;
     auth:reqPosition auth:positionAtomGraph .
@@ -86,87 +85,66 @@ ex:expectedResult10
 <#request2>
     a                auth:OperationRequest ;
     auth:operation   auth:opRead ;
-    auth:reqConnectionTargetAtom ex:atom2 ;
     auth:requestor   ex:atom2 ;
     auth:reqAtom     ex:atom1 ;
     auth:reqPosition auth:positionSocket .
 
 <#request3>
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opCommunicate ;
+    auth:reqConnection atom1:bsConn12 ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqPosition   auth:positionConnection .
+
+<#request4>
     a                auth:OperationRequest ;
-    auth:operation   auth:opCommunicate ;
-    auth:reqConnectionTargetAtom ex:atom2 ;
+    auth:operation   auth:opRead ;
     auth:requestor   ex:atom2 ;
     auth:reqAtom     ex:atom1 ;
     auth:reqPosition auth:positionConnection .
 
-<#request4>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom1:bsConn13 ;
-    auth:reqConnectionTargetAtom ex:atom3 ;
-    auth:reqConnectionState      won:Connected ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom2 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnection .
-
 <#request5>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom1:bsConn12 ;
-    auth:reqConnectionTargetAtom ex:atom2 ;
-    auth:reqConnectionState      won:Connected ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom3 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnection .
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom3 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionConnection .
 
 <#request6>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom1:bsConn13 ;
-    auth:reqConnectionTargetAtom ex:atom3 ;
-    auth:reqConnectionState      won:Connected ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom2 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnections .
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionConnections .
 
 <#request7>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom1:bsConn12 ;
-    auth:reqConnectionTargetAtom ex:atom2 ;
-    auth:reqConnectionState      won:Connected ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom3 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnections .
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom3 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionConnections .
 
 <#request8>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom1:bsConn13 ;
-    auth:reqConnectionTargetAtom ex:atom3 ;
-    auth:reqConnectionState      won:Connected ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom2 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnectionMessages .
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionConnectionMessages .
 
 <#request9>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom1:bsConn12 ;
-    auth:reqConnectionTargetAtom ex:atom2 ;
-    auth:reqConnectionState      won:Connected ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom3 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnectionMessages .
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom3 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionConnectionMessages .
 
 <#request10>
-    a                            auth:OperationRequest ;
-    auth:operation               auth:opRead ;
-    auth:reqConnectionTargetAtom ex:atom2 ;
-    auth:reqConnectionState      won:Connected ;
-    auth:requestor               ex:atom3 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnection .
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom3 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionConnection .
 
 ex:atom1
     a                    won:Atom ;
@@ -186,7 +164,8 @@ atom1:chatSocketConnections
 atom1:bsConn12
     a                   won:Connection ;
     won:targetAtom      ex:atom2 ;
-    won:connectionState won:Connected .
+    won:connectionState won:Connected ;
+    won:socket          atom1:chatSocket .
 
 atom1:bsConn13
     a                   won:Connection ;
