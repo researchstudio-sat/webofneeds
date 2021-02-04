@@ -37,13 +37,16 @@ export default function PageInventory() {
       .toOrderedMap()
       .sortBy(persona => atomUtils.getTitle(persona))
   );
+
   const ownedUnassignedActivePosts = useSelector(state =>
     generalSelectors
       .getOwnedPosts(state)
       .filter(atomUtils.isActive)
-      .filter(atom => !atomUtils.isHeld(atom))
-      .filter(atom => !atomUtils.isInterestOf(atom))
-      .filter(atom => !atomUtils.isExpertiseOf(atom))
+      .filter(
+        atom =>
+          !atomUtils.isHeld(atom) ||
+          !accountUtils.isAtomOwned(accountState, atomUtils.getHeldByUri(atom))
+      )
       .toOrderedMap()
       .sortBy(atom => {
         const creationDate = atomUtils.getCreationDate(atom);
@@ -51,6 +54,7 @@ export default function PageInventory() {
       })
       .reverse()
   );
+
   const ownedInactiveAtoms = useSelector(state =>
     generalSelectors
       .getOwnedAtoms(state)

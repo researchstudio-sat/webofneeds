@@ -381,6 +381,13 @@ export function isInvisibleAtom(atom) {
   return flags && flags.contains(vocab.WONMATCH.NoHintForCounterpartCompacted);
 }
 
+export function isOrganization(atom) {
+  const atomContent = getContent(atom);
+  const types = get(atomContent, "type");
+
+  return types && types.has("s:Organization");
+}
+
 export function isPersona(atom) {
   const atomContent = getContent(atom);
   const types = get(atomContent, "type");
@@ -411,7 +418,13 @@ export function hasGroupSocket(atom) {
 }
 
 export function hasHoldableSocket(atom) {
-  return hasSocket(atom, vocab.HOLD.HoldableSocketCompacted);
+  for (const holdableSocketType of vocab.holdableSocketTypes) {
+    if (hasSocket(atom, holdableSocketType)) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function hasExpertiseOfSocket(atom) {
@@ -599,53 +612,21 @@ export function getSocketType(atomImm, socketUri) {
 }
 
 export function getHeldByUri(atomImm) {
-  const heldAtomHoldableConnections =
-    hasHoldableSocket(atomImm) &&
-    getConnectedConnections(atomImm, vocab.HOLD.HoldableSocketCompacted);
-  if (heldAtomHoldableConnections && heldAtomHoldableConnections.size === 1) {
-    return connectionUtils.getTargetAtomUri(
-      heldAtomHoldableConnections.first()
-    );
-  } else {
-    return undefined;
+  for (const holdableSocketType of vocab.holdableSocketTypes) {
+    const heldAtomHoldableConnections =
+      hasSocket(atomImm, holdableSocketType) &&
+      getConnectedConnections(atomImm, holdableSocketType);
+    if (heldAtomHoldableConnections && heldAtomHoldableConnections.size === 1) {
+      return connectionUtils.getTargetAtomUri(
+        heldAtomHoldableConnections.first()
+      );
+    }
   }
-}
-
-export function getExpertiseOfUri(atomImm) {
-  const expertiseOfConnections =
-    hasExpertiseOfSocket(atomImm) &&
-    getConnectedConnections(
-      atomImm,
-      vocab.WXPERSONA.ExpertiseOfSocketCompacted
-    );
-  if (expertiseOfConnections && expertiseOfConnections.size === 1) {
-    return connectionUtils.getTargetAtomUri(expertiseOfConnections.first());
-  } else {
-    return undefined;
-  }
-}
-
-export function getInterestOfUri(atomImm) {
-  const interestOfConnections =
-    hasInterestOfSocket(atomImm) &&
-    getConnectedConnections(atomImm, vocab.WXPERSONA.InterestOfSocketCompacted);
-  if (interestOfConnections && interestOfConnections.size === 1) {
-    return connectionUtils.getTargetAtomUri(interestOfConnections.first());
-  } else {
-    return undefined;
-  }
+  return undefined;
 }
 
 export function isHeld(atomImm) {
   return !!getHeldByUri(atomImm);
-}
-
-export function isInterestOf(atomImm) {
-  return !!getInterestOfUri(atomImm);
-}
-
-export function isExpertiseOf(atomImm) {
-  return !!getExpertiseOfUri(atomImm);
 }
 
 export function getSeeksSocketsWithKeysReset(atomImm) {
@@ -761,16 +742,22 @@ export function isHolderVerified(heldAtom, holderAtom) {
   const heldByUri = getHeldByUri(heldAtom);
 
   if (holderAtom && heldByUri === getUri(holderAtom)) {
-    const holderAtomHolderConnections = getConnectedConnections(
-      holderAtom,
-      vocab.HOLD.HolderSocketCompacted
-    );
+    for (const holdableSocketType of vocab.holdableSocketTypes) {
+      const holderSocketType = vocab.holderSockets[holdableSocketType];
 
-    const connections = holderAtomHolderConnections.filter(
-      conn => connectionUtils.getTargetAtomUri(conn) === getUri(heldAtom)
-    );
+      const holderAtomHolderConnections = getConnectedConnections(
+        holderAtom,
+        holderSocketType
+      );
 
-    return connections && connections.size === 1;
+      const connections = holderAtomHolderConnections.filter(
+        conn => connectionUtils.getTargetAtomUri(conn) === getUri(heldAtom)
+      );
+
+      if (connections && connections.size === 1) {
+        return true;
+      }
+    }
   }
 
   return false;

@@ -113,6 +113,7 @@ export const persona = {
     description: { ...details.description },
     website: { ...details.website },
     images: { ...details.images },
+    location: { ...details.location },
   },
   seeksDetails: {},
 };

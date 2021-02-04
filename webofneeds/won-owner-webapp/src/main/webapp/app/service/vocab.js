@@ -518,6 +518,27 @@ vocab.socketCapacity = {
   [vocab.WXPERSONA.InterestOfSocketCompacted]: 1,
 };
 
+/* These sockets are defined as holdable sockets (to show the connected atom as a holder of the atom in question)
+* Although it is not a strict rule, an atom should only have either one of those sockets, or at least only one
+* connected connection over all defined socket
+* */
+vocab.holdableSocketTypes = [
+  vocab.WXPERSONA.ExpertiseOfSocketCompacted,
+  vocab.WXPERSONA.InterestOfSocketCompacted,
+  vocab.HOLD.HoldableSocketCompacted,
+  vocab.WXSCHEMA.ParentOrganizationSocketCompacted,
+];
+
+vocab.holderSockets = {
+  [vocab.WXPERSONA.ExpertiseOfSocketCompacted]:
+    vocab.WXPERSONA.ExpertiseSocketCompacted,
+  [vocab.WXPERSONA.InterestOfSocketCompacted]:
+    vocab.WXPERSONA.InterestSocketCompacted,
+  [vocab.HOLD.HoldableSocketCompacted]: vocab.HOLD.HolderSocketCompacted,
+  [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]:
+    vocab.WXSCHEMA.SubOrganizationSocketCompacted,
+};
+
 /* This constant is switching the element view of the specific socket
  from a extra tab entry, to listing all the exisiting connections within the detail tab of an atom
 */
