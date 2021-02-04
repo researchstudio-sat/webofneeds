@@ -1,16 +1,15 @@
 package won.matcher.service.common.event;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.LangBuilder;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-
 import won.matcher.service.common.service.sparql.SparqlService;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
 
 /**
  * This event is used in the matching service to indicate that a new atom has
@@ -27,10 +26,6 @@ public class AtomEvent implements Serializable {
     private TYPE eventType;
     private Cause cause;
 
-    public static enum TYPE {
-        ACTIVE, INACTIVE
-    }
-
     public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, String resource, Lang format,
                     Cause cause) {
         this.uri = uri;
@@ -39,7 +34,7 @@ public class AtomEvent implements Serializable {
         this.crawlDate = crawlDate;
         serializedAtomResource = resource;
         serializationLangName = format.getName();
-        serializationLangContentType = format.getContentType().getContentType();
+        serializationLangContentType = format.getContentType().getContentTypeStr();
         this.cause = cause;
     }
 
@@ -52,7 +47,7 @@ public class AtomEvent implements Serializable {
         RDFDataMgr.write(sw, ds, RDFFormat.TRIG.getLang());
         serializedAtomResource = sw.toString();
         serializationLangName = RDFFormat.TRIG.getLang().getName();
-        serializationLangContentType = RDFFormat.TRIG.getLang().getContentType().getContentType();
+        serializationLangContentType = RDFFormat.TRIG.getLang().getContentType().getContentTypeStr();
         this.cause = cause;
     }
 
@@ -99,5 +94,9 @@ public class AtomEvent implements Serializable {
     @Override
     public String toString() {
         return getUri();
+    }
+
+    public static enum TYPE {
+        ACTIVE, INACTIVE
     }
 }

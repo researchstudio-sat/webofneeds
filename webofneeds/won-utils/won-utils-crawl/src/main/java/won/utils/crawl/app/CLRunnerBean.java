@@ -7,8 +7,6 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.tdb.TDB;
-import org.apache.jena.update.GraphStore;
-import org.apache.jena.update.GraphStoreFactory;
 import org.apache.jena.update.UpdateAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,8 +132,7 @@ public class CLRunnerBean implements CommandLineRunner {
             } else if (line.startsWith("#")) {
                 try {
                     String updateString = WonQueries.SPARQL_PREFIX + line.substring(1);
-                    GraphStore graphStore = GraphStoreFactory.create(atomDataset);
-                    UpdateAction.parseExecute(updateString, graphStore);
+                    UpdateAction.parseExecute(updateString, atomDataset);
                 } catch (QueryParseException e) {
                     e.printStackTrace();
                     System.out.println("INVALID SPARQL-QUERY: " + e.getMessage());

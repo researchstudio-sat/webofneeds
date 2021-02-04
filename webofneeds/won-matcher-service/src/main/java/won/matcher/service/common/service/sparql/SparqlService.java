@@ -5,7 +5,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.expr.nodevalue.NodeValueBoolean;
 import org.apache.jena.sparql.modify.UpdateProcessRemote;
 import org.apache.jena.tdb.TDB;
@@ -145,9 +144,8 @@ public class SparqlService {
     }
 
     public Dataset retrieveDataset(String graphName) {
-        DatasetGraph dsg = TDBFactory.createDatasetGraph();
-        dsg.getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
-        Dataset ds = DatasetFactory.create(dsg);
+        Dataset ds = TDBFactory.createDataset();
+        ds.asDatasetGraph().getContext().set(TDB.symUnionDefaultGraph, new NodeValueBoolean(true));
         Model model = retrieveModel(graphName);
         ds.addNamedModel(graphName, model);
         return ds;

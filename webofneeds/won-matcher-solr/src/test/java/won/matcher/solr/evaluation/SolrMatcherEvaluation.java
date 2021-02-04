@@ -1,26 +1,13 @@
 package won.matcher.solr.evaluation;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
+import com.github.jsonldjava.core.JsonLdError;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.github.jsonldjava.core.JsonLdError;
-
 import won.matcher.solr.hints.HintBuilder;
 import won.matcher.solr.index.AtomIndexer;
 import won.matcher.solr.query.TestMatcherQueryExecutor;
@@ -29,6 +16,16 @@ import won.matcher.solr.query.factory.TestAtomQueryFactory;
 import won.matcher.utils.tensor.TensorMatchingData;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.DefaultAtomModelWrapper;
+import won.protocol.util.RdfUtils;
+
+import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hfriedrich on 05.08.2016. This class can be used to do evaluation
@@ -51,23 +48,21 @@ public class SolrMatcherEvaluation {
     @Autowired
     AtomIndexer atomIndexer;
     @Autowired
+    HintBuilder hintBuilder;
+    @Autowired
     private MailDirAtomProducer seeksAtomProducer;
     @Autowired
     private MailDirAtomProducer isAtomProducer;
-    @Autowired
-    HintBuilder hintBuilder;
     private String outputDir;
     private String connectionsFile;
     private Map<String, Dataset> atomFileDatasetMap;
     private TensorMatchingData matchingDataConnections;
     private TensorMatchingData matchingDataPredictions;
 
-    public void setSeeksAtomProducer(final MailDirAtomProducer seeksAtomProducer) {
-        this.seeksAtomProducer = seeksAtomProducer;
-    }
-
-    public void setIsAtomProducer(final MailDirAtomProducer isAtomProducer) {
-        this.isAtomProducer = isAtomProducer;
+    public SolrMatcherEvaluation() {
+        matchingDataConnections = new TensorMatchingData();
+        matchingDataPredictions = new TensorMatchingData();
+        atomFileDatasetMap = new HashMap<>();
     }
 
     public static String createAtomId(Dataset atom) {
@@ -90,10 +85,12 @@ public class SolrMatcherEvaluation {
         return title + "_" + (title + description).hashCode();
     }
 
-    public SolrMatcherEvaluation() {
-        matchingDataConnections = new TensorMatchingData();
-        matchingDataPredictions = new TensorMatchingData();
-        atomFileDatasetMap = new HashMap<>();
+    public void setSeeksAtomProducer(final MailDirAtomProducer seeksAtomProducer) {
+        this.seeksAtomProducer = seeksAtomProducer;
+    }
+
+    public void setIsAtomProducer(final MailDirAtomProducer isAtomProducer) {
+        this.isAtomProducer = isAtomProducer;
     }
 
     @PostConstruct
@@ -125,7 +122,7 @@ public class SolrMatcherEvaluation {
 
     public void indexAtoms() throws IOException, JsonLdError {
         for (Dataset atom : atomFileDatasetMap.values()) {
-            atomIndexer.indexAtomModel(atom.getDefaultModel(), createAtomId(DatasetFactory.create(atom)), true);
+            atomIndexer.indexAtomModel(atom.getDefaultModel(), createAtomId(RdfUtils.cloneDataset(atom)), true);
         }
     }
 
