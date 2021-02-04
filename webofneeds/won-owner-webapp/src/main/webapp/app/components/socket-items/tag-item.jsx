@@ -4,14 +4,14 @@ import { generateLink, getUri } from "../../utils";
 import vocab from "../../service/vocab";
 import VisibilitySensor from "react-visibility-sensor";
 import * as connectionUtils from "../../redux/utils/connection-utils";
-import WonAtomContextSwipeableView from "../atom-context-swipeable-view";
+import WonAtomContextSwipeableView from "../atom-context-swipeable-view.jsx";
+import WonAtomTagHeader from "../atom-tag-header.jsx";
+import WonTagSocketActions from "../socket-actions/tag-actions.jsx";
 import { actionCreators } from "../../actions/actions";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import "~/style/_tag-item.scss";
-import WonAtomHeader from "../atom-header";
-import WonGenericSocketActions from "../socket-actions/generic-actions";
 
 export default function WonTagItem({
   connection,
@@ -24,7 +24,7 @@ export default function WonTagItem({
   const history = useHistory();
 
   const addActionButtons = isOwned || flip;
-  let headerClassName;
+  let headerClassName = "";
 
   function markAsRead(conn) {
     if (connectionUtils.isUnread(conn)) {
@@ -71,22 +71,24 @@ export default function WonTagItem({
     >
       <div
         className={
-          "ti " + (connectionUtils.isUnread(connection) ? " won-unread " : "")
+          "ti " +
+          (connectionUtils.isUnread(connection)
+            ? " won-unread "
+            : "" + headerClassName)
         }
       >
         <WonAtomContextSwipeableView
           className={headerClassName}
           actionButtons={
             addActionButtons ? (
-              <WonGenericSocketActions connection={connection} />
+              <WonTagSocketActions connection={connection} />
             ) : (
               undefined
             )
           }
         >
-          <WonAtomHeader
+          <WonAtomTagHeader
             atom={flip ? atom : targetAtom}
-            hideTimestamp={true}
             toLink={generateLink(
               history.location,
               {

@@ -30,6 +30,16 @@ won-socket-add-button {
     cursor: pointer;
   }
 
+  &.won-socket-add-button--tag {
+    grid-gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+
+    .socketadd__icon {
+      @include fixed-square($postIconSizeMobile);
+    }
+  }
+
   &.won-socket-add-button--big {
     grid-template-areas: "icon" "main";
     grid-template-columns: 1fr;

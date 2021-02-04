@@ -24,7 +24,6 @@ export default function WonAtomContentTagSocket({
   relevantConnections,
   showAddPicker,
   toggleAddPicker,
-  addButtonClassName,
   segmentContentClassName,
   setVisibleTab,
   storedAtoms,
@@ -36,14 +35,10 @@ export default function WonAtomContentTagSocket({
   const socketUri = atomUtils.getSocketUri(atom, socketType);
   const reactions = atomUtils.getReactions(atom, socketType);
 
+  // If an atom is owned we display all connStates, if the atom is not owned we only display connected states
   const connections = isOwned
     ? relevantConnections
     : relevantConnections.filter(connectionUtils.isConnected);
-
-  // If an atom is owned we display all connStates, if the atom is not owned we only display connected states
-  const activeConnections = connections.filter(conn =>
-    connectionUtils.isConnected(conn)
-  );
 
   function generateConnectionItems(connections) {
     const connectionElements = [];
@@ -84,10 +79,11 @@ export default function WonAtomContentTagSocket({
   return (
     <won-atom-content-tag-socket>
       {!showAddPicker ? (
-        activeConnections.size > 0 || reactions ? (
+        connections.size > 0 || reactions ? (
           <div
             className={`actsocket__content ${segmentContentClassName || ""}`}
           >
+            {generateConnectionItems(connections)}
             {atomUtils.isActive(atom) &&
             reactions &&
             ((isOwned || !vocab.refuseAddToNonOwned[socketType]) &&
@@ -99,12 +95,11 @@ export default function WonAtomContentTagSocket({
                 isAtomOwned={isOwned}
                 onClick={() => toggleAddPicker(!showAddPicker)}
                 targetSocketType={socketType}
-                className={addButtonClassName}
+                className="won-socket-add-button--tag"
               />
             ) : (
               undefined
             )}
-            {generateConnectionItems(activeConnections)}
           </div>
         ) : (
           <div
@@ -146,7 +141,6 @@ WonAtomContentTagSocket.propTypes = {
   socketType: PropTypes.string.isRequired,
   showAddPicker: PropTypes.bool.isRequired,
   toggleAddPicker: PropTypes.func.isRequired,
-  addButtonClassName: PropTypes.string,
   segmentContentClassName: PropTypes.string,
   setVisibleTab: PropTypes.func.isRequired,
   storedAtoms: PropTypes.object.isRequired,

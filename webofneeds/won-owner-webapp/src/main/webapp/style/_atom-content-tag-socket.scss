@@ -6,6 +6,7 @@ won-atom-content-tag-socket {
   .actsocket__content {
     display: flex;
     grid-gap: 0.5rem;
+    align-items: center;
 
     & > won-socket-add-button {
       border: $thinGrayBorder;
