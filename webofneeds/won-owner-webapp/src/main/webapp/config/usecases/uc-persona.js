@@ -22,6 +22,8 @@ export const persona = {
           "#buddySocket": vocab.BUDDY.BuddySocketCompacted,
           // "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted, // TODO: Currently not in use in favour of more generic member -> Role -> member relation
           "#memberOfSocket": vocab.WXSCHEMA.MemberOfSocketCompacted,
+          "#interestSocket": vocab.WXPERSONA.InterestSocketCompacted,
+          "#expertiseSocket": vocab.WXPERSONA.ExpertiseSocketCompacted,
           // "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted, //TODO: exclude the ability to review a persona for now
           "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
           "#sAttendeeInverseSocket":
@@ -80,6 +82,26 @@ export const persona = {
         refuseNonOwned: true,
       },
     },
+    [vocab.WXPERSONA.InterestSocketCompacted]: {
+      [vocab.WXPERSONA.InterestOfSocketCompacted]: {
+        useCaseIdentifiers: [
+          "afterpartyInterest",
+          "breakfastInterest",
+          "cyclingInterest",
+          "genericInterest",
+          "lunchInterest",
+          "pokemonInterest",
+          "sightseeingInterest",
+        ],
+        refuseNonOwned: true,
+      },
+    },
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: {
+      [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: {
+        useCaseIdentifiers: ["*"],
+        refuseNonOwned: true,
+      },
+    },
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
@@ -100,6 +122,7 @@ export const persona = {
     description: { ...details.description },
     website: { ...details.website },
     images: { ...details.images },
+    location: { ...details.location },
   },
   seeksDetails: {},
 };

@@ -1,0 +1,64 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+won-atom-content-tag-sockets {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 1rem; /*describes the gap between each content-detail-viewer*/
+  padding: 0.5rem 0;
+
+  & > .actsockets__item {
+    & > .actsockets__item__header {
+      display: flex;
+      font-weight: bold;
+      align-items: center;
+      padding: 0 0 0.5rem 0;
+      word-break: keep-all;
+      white-space: nowrap;
+
+      &.actsockets__item__header--unread {
+        & > .actsockets__item__header__count,
+        & > .actsockets__item__header__label {
+          color: $won-unread-attention;
+        }
+        & > .actsockets__item__header__unread {
+          display: inline-block;
+          background-color: $won-unread-attention;
+          border-radius: 100%;
+          opacity: 1;
+          @include fixed-square(0.5rem);
+          margin-right: 0.25rem;
+          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+            margin-right 0.25s ease-in-out;
+        }
+      }
+
+      &:not(.actsockets__item__header--unread) {
+        & > .actsockets__item__header__unread {
+          display: inline-block;
+          max-width: 0;
+          height: 0;
+          opacity: 0;
+          overflow: hidden;
+          margin-right: 0;
+          transition: max-width 0.25s ease-in-out, opacity 0.25s ease-in-out,
+            margin-right 0.25s ease-in-out;
+        }
+      }
+
+      & > .actsockets__item__header__count,
+      & > .actsockets__item__header__label {
+        font-size: $normalFontSize;
+      }
+
+      & > .actsockets__item__header__count {
+        display: inline-block;
+        margin-left: 0.25rem;
+        overflow: hidden;
+        opacity: 1;
+        transition: opacity 0.25s ease-in-out, margin-left 0.25s ease-in-out;
+      }
+    }
+  }
+}

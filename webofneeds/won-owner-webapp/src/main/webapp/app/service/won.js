@@ -236,6 +236,7 @@ won.minimalContext = {
   [vocab.WONCON.prefix]: vocab.WONCON.baseUri,
   [vocab.WONMATCH.prefix]: vocab.WONMATCH.baseUri,
   [vocab.DEMO.prefix]: vocab.DEMO.baseUri,
+  [vocab.WXPERSONA.prefix]: vocab.WXPERSONA.baseUri,
   [vocab.BOT.prefix]: vocab.BOT.baseUri,
   [vocab.WXSCHEMA.prefix]: vocab.WXSCHEMA.baseUri,
   [vocab.HOLD.prefix]: vocab.HOLD.baseUri,

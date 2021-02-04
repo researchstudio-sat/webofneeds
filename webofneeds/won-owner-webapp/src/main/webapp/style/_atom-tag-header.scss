@@ -1,0 +1,36 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+a.won-atom-tag-header,
+won-atom-tag-header {
+  &.won-to-load,
+  &.won-is-loading {
+    @include animateOpacityHeartBeat();
+    pointer-events: none;
+
+    .ath__title {
+      height: $normalFontSize;
+      width: 7rem;
+      background-color: $won-subtitle-gray;
+    }
+  }
+
+  min-width: 0;
+
+  .ath__notitle,
+  .ath__title {
+    color: $won-secondary-text-color;
+    grid-area: topline;
+    min-width: 0;
+    min-width: 0;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-weight: 400;
+  }
+
+  .ath__notitle {
+    color: $won-subtitle-gray;
+  }
+}
