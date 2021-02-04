@@ -16,7 +16,35 @@ import vocab from "../app/service/vocab.js";
 export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
 
-export const seeAtomsOfBuddiesAuthorization = {
+// Atoms can only be seen by buddies of holder
+export const buddyTokenNeededAuthorization = {
+  [vocab.AUTH.bearerCompacted]: {
+    [vocab.AUTH.tokenScopeCompacted]: {
+      "@id": vocab.BUDDY.BuddySocketCompacted,
+    },
+    [vocab.AUTH.issuerCompacted]: {
+      [vocab.AUTH.socketCompacted]: {
+        [vocab.AUTH.socketTypeCompacted]: {
+          "@id": vocab.HOLD.HoldableSocketCompacted,
+        },
+        [vocab.AUTH.targetAtomCompacted]: {},
+        [vocab.AUTH.connectionCompacted]: {
+          [vocab.AUTH.connectionStateCompacted]: {
+            "@id": vocab.AUTH.ConnectedCompacted,
+          },
+        },
+      },
+    },
+  },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+    },
+  },
+};
+
+// See holderSocket connections of atoms buddies
+export const seeHolderSocketConnectionsAuthorization = {
   [vocab.AUTH.granteeCompacted]: {
     [vocab.AUTH.socketCompacted]: {
       [vocab.AUTH.socketTypeCompacted]: {
@@ -55,6 +83,7 @@ export const seeAtomsOfBuddiesAuthorization = {
   },
 };
 
+// Atoms that are connected can see their connections to communicate
 const connectedConectionsAuthorization = {
   [vocab.AUTH.granteeCompacted]: {
     [vocab.AUTH.socketCompacted]: {
@@ -85,6 +114,7 @@ const connectedConectionsAuthorization = {
   },
 };
 
+// Atom can be seen by any other atom
 export const defaultPublicAtomAuthorization = {
   [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
   [vocab.AUTH.grantCompacted]: {

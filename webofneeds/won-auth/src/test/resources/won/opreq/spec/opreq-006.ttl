@@ -60,7 +60,7 @@ ex:expectedResult6
     auth:requestedOperation <#request6> .
 
 
-# See only atoms graph when buddies
+# See only atom graph when buddies
 
 <#authorization>
     a            auth:Authorization ;
@@ -70,8 +70,7 @@ ex:expectedResult6
     auth:grant   [ auth:graph  [ auth:operation auth:opRead ] ;
                    auth:socket [ auth:socketType  wx-hold:HolderSocket ;
                                  auth:connections [ auth:connectionState    won:Connected ;
-                                                    auth:operation          auth:opRead, auth:opConnectClose,
-                                                                            auth:opCommunicate ;
+                                                    auth:operation          auth:opRead ;
                                                     auth:connectionMessages [ auth:inherit false ] ] ] ] .
 
 
@@ -91,7 +90,6 @@ ex:expectedResult6
 
 <#request2>
     a                auth:OperationRequest ;
-    auth:reqSocket   atom1:holderSocket ;
     auth:operation   auth:opRead ;
     auth:requestor   ex:atom2 ;
     auth:reqAtom     ex:atom1 ;
@@ -99,7 +97,6 @@ ex:expectedResult6
 
 <#request2-1>
     a                auth:OperationRequest ;
-    auth:reqSocket   atom1:holderSocket ;
     auth:operation   auth:opRead ;
     auth:requestor   ex:atom5 ;
     auth:reqAtom     ex:atom1 ;
@@ -107,21 +104,15 @@ ex:expectedResult6
 
 <#request3>
     a                            auth:OperationRequest ;
-    auth:reqSocket               atom1:holderSocket ;
-    auth:reqConnection           atom1:holdsConnection ;
-    auth:reqConnectionTargetAtom ex:atom3 ;
-    auth:reqConnectionState      won:Connected ;
+    auth:reqConnection           atom2:buddyConnection1 ;
     auth:operation               auth:opRead ;
     auth:requestor               ex:atom2 ;
     auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnection .
+    auth:reqPosition             auth:positionConnections .
 
 <#request4>
     a                            auth:OperationRequest ;
-    auth:reqSocket               atom1:holderSocket ;
-    auth:reqConnection           atom1:holdsConnection ;
-    auth:reqConnectionTargetAtom ex:atom3 ;
-    auth:reqConnectionState      won:RequestSent ;
+    auth:reqConnection           atom5:buddyConnection1 ;
     auth:operation               auth:opRead ;
     auth:requestor               ex:atom5 ;
     auth:reqAtom                 ex:atom1 ;
@@ -129,25 +120,19 @@ ex:expectedResult6
 
 <#request5>
     a                            auth:OperationRequest ;
-    auth:reqSocket               atom2:holderSocket ;
-    auth:reqConnection           atom2:holdsConnection ;
-    auth:reqConnectionTargetAtom ex:atom4 ;
-    auth:reqConnectionState      won:Connected ;
+    auth:reqConnection           atom1:buddyConnection1 ;
     auth:operation               auth:opRead ;
     auth:requestor               ex:atom1 ;
     auth:reqAtom                 ex:atom2 ;
     auth:reqPosition             auth:positionConnection .
 
 <#request6>
-    a                            auth:OperationRequest ;
-    auth:reqSocket               atom1:holderSocket ;
-    auth:reqConnection           atom1:holdsConnection32 ;
-    auth:reqConnectionTargetAtom ex:atom32 ;
-    auth:reqConnectionState      won:Closed ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom2 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnection .
+    a                  auth:OperationRequest ;
+    auth:reqConnection atom1:holdsConnection32 ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqPosition   auth:positionConnection .
 
 #Persona 1
 
@@ -171,7 +156,8 @@ atom1:buddySocketConnections
 atom1:buddyConnection1
     a                   won:Connection ;
     won:targetAtom      ex:atom2 ;
-    won:connectionState won:Connected .
+    won:connectionState won:Connected ;
+    won:socket          atom1:buddySocket .
 
 # Holder Socket
 
@@ -188,13 +174,14 @@ atom1:holderSocketConnections
 atom1:holdsConnection
     a                   won:Connection ;
     won:targetAtom      ex:atom3 ;
-    won:connectionState won:Connected .
+    won:connectionState won:Connected ;
+    won:socket          atom1:holderSocket .
 
 atom1:holdsConnection32
     a                   won:Connection ;
     won:targetAtom      ex:atom32 ;
-    won:connectionState won:Closed .
-
+    won:connectionState won:Closed ;
+    won:socket          atom1:holderSocket .
 
 #Persona 2
 
@@ -218,7 +205,8 @@ atom2:buddySocketConnections
 atom2:buddyConnection1
     a                   won:Connection ;
     won:targetAtom      ex:atom1 ;
-    won:connectionState won:Connected .
+    won:connectionState won:Connected ;
+    won:socket          atom2:buddySocket .
 
 # Holder Socket
 
@@ -233,7 +221,8 @@ atom2:holderSocketConnections
 atom2:holdsConnection
     a                   won:Connection ;
     won:targetAtom      ex:atom4 ;
-    won:connectionState won:Connected .
+    won:connectionState won:Connected ;
+    won:socket          atom2:holderSocket .
 
 
 #Atom 3 held by atom 1
@@ -256,7 +245,8 @@ atom3:holdableSocketConnections
 atom3:heldByConnection
     a                   won:Connection ;
     won:targetAtom      ex:atom1 ;
-    won:connectionState won:Connected .
+    won:connectionState won:Connected ;
+    won:socket          atom3:holdableSocket .
 
 #Atom 32 held request sent, but not connected to atom 1
 
@@ -278,7 +268,8 @@ atom32:holdableSocketConnections
 atom32:heldByConnection
     a                   won:Connection ;
     won:targetAtom      ex:atom1 ;
-    won:connectionState won:Closed .
+    won:connectionState won:Closed ;
+    won:socket          atom32:holdableSocket .
 
 
 #Atom 4 held by atom 2
@@ -301,7 +292,8 @@ atom4:holdableSocketConnections
 atom4:heldByConnection
     a                   won:Connection ;
     won:targetAtom      ex:atom1 ;
-    won:connectionState won:Connected .
+    won:connectionState won:Connected ;
+    won:socket          atom4:holdableSocket .
 
 
 #Persona 3 sended request to Persona 1
@@ -326,6 +318,7 @@ atom5:buddySocketConnections
 atom5:buddyConnection1
     a                   won:Connection ;
     won:targetAtom      ex:atom1 ;
-    won:connectionState won:RequestSent .
+    won:connectionState won:RequestSent ;
+    won:socket          atom5:buddySocket .
 
 
