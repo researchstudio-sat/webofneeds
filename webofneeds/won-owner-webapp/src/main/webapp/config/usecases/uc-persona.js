@@ -2,6 +2,9 @@ import {
   details,
   mergeInEmptyDraft,
   defaultReactions,
+  connectedConectionsAuthorization,
+  defaultPublicAtomAuthorization,
+  seeHolderSocketConnectionsAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 
@@ -31,6 +34,11 @@ export const persona = {
         },
       },
       seeks: {},
+      acls: [
+        defaultPublicAtomAuthorization,
+        seeHolderSocketConnectionsAuthorization,
+        connectedConectionsAuthorization,
+      ],
     }),
   },
   reactions: {

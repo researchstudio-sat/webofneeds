@@ -387,6 +387,8 @@ vocab.AUTH.acl = vocab.AUTH.baseUri + "acl";
 vocab.AUTH.aclCompacted = vocab.AUTH.prefix + ":acl";
 vocab.AUTH.Authorization = vocab.AUTH.baseUri + "Authorization";
 vocab.AUTH.AuthorizationCompacted = vocab.AUTH.prefix + ":Authorization";
+vocab.AUTH.bearer = vocab.AUTH.baseUri + "bearer";
+vocab.AUTH.bearerCompacted = vocab.AUTH.prefix + ":bearer";
 vocab.AUTH.grantee = vocab.AUTH.baseUri + "grantee";
 vocab.AUTH.granteeCompacted = vocab.AUTH.prefix + ":grantee";
 vocab.AUTH.grant = vocab.AUTH.baseUri + "grant";
@@ -428,6 +430,10 @@ vocab.AUTH.anyoneCompacted = vocab.AUTH.prefix + ":anyone";
 vocab.AUTH.operationRequestor = vocab.AUTH.baseUri + "operationRequestor";
 vocab.AUTH.operationRequestorCompacted =
   vocab.AUTH.prefix + ":operationRequestor";
+vocab.AUTH.tokenScope = vocab.AUTH.baseUri + "tokenScope";
+vocab.AUTH.tokenScopeCompacted = vocab.AUTH.prefix + ":tokenScope";
+vocab.AUTH.issuer = vocab.AUTH.baseUri + "issuer";
+vocab.AUTH.issuerCompacted = vocab.AUTH.prefix + ":issuer";
 
 vocab.VALUEFLOWS = {};
 vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";
