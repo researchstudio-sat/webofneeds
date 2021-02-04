@@ -414,6 +414,7 @@ function WonAtomContentReactions({
           targetSocketType={targetSocketType}
           isAtomOwned={isOwned}
           key={targetSocketType}
+          className="won-socket-add-button--tag"
           onClick={() => {
             setVisibleTab(targetSocketType);
             toggleAddPicker(true);

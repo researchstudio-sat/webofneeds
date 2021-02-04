@@ -5,8 +5,10 @@
 won-atom-content-tag-socket {
   .actsocket__content {
     display: flex;
-    grid-gap: 0.5rem;
+    padding-left: 1.5rem;
+    grid-gap: 0.25rem;
     align-items: center;
+    flex-wrap: wrap;
 
     & > won-socket-add-button {
       border: $thinGrayBorder;
