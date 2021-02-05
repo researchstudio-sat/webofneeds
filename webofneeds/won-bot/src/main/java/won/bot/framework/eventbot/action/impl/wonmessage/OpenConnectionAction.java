@@ -27,8 +27,6 @@ import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
-import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
 
 /**
  * User: fkleedorfer Date: 30.01.14

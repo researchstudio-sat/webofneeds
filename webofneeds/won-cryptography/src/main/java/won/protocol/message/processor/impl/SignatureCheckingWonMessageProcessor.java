@@ -38,6 +38,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,7 +76,8 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
                 try {
                     // obtain public keys
                     sw.start("get public keys");
-                    Map<String, PublicKey> keys = getRequiredPublicKeys(toCheck.getCompleteDataset());
+                    Map<String, PublicKey> keys = WonKeysReaderWriter.readKeyFromMessage(toCheck);
+                    keys.putAll(getRequiredPublicKeys(toCheck.getCompleteDataset()));
                     sw.stop();
                     // verify with those public keys
                     sw.start("verify");
@@ -166,12 +168,7 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
     private Map<String, PublicKey> getRequiredPublicKeys(final Dataset msgDataset)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         StopWatch sw = new StopWatch();
-        sw.start("read embedded keys");
-        // extracted and then
-        WonKeysReaderWriter keyReader = new WonKeysReaderWriter();
-        // extract keys if directly provided in the message content:
-        Map<String, PublicKey> keys = keyReader.readFromDataset(msgDataset);
-        sw.stop();
+        Map<String, PublicKey> keys = new HashMap<>();
         // don't put the embedded keys in the cache - they have not been retrieved from
         // the WebID URI, they could be wrong!
         // just continue loading referenced keys. We will have to load each key once
@@ -181,7 +178,7 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
         }
         sw.start("extract referenced keys");
         // extract referenced key by dereferencing a (kind of) webid of a signer
-        Set<String> refKeys = keyReader.readKeyReferences(msgDataset);
+        Set<String> refKeys = WonKeysReaderWriter.readKeyReferences(msgDataset);
         sw.stop();
         if (logger.isDebugEnabled()) {
             logger.debug("referenced keys: " + Arrays.toString(refKeys.toArray()));

@@ -232,7 +232,7 @@ auth:graphTypeShape
     a                    sh:NodeShape ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type ) ;
-    sh:in                ( auth:contentGraph auth:sysinfoGraph auth:aclGraph ) .
+    sh:in                ( auth:contentGraph auth:sysinfoGraph auth:aclGraph auth:keyGraph ) .
 
 # Definition 10 (socket expression)
 
@@ -796,6 +796,9 @@ auth:anyAtom
 auth:aclGraph
     a owl:NamedIndividual .
 
+auth:keyGraph
+    a owl:NamedIndividual .
+
 auth:sysinfoGraph
     a owl:NamedIndividual .
 
@@ -978,6 +981,9 @@ auth:opObserve
     a auth:SimpleOperation .
 
 auth:opRead
+    a auth:SimpleOperation .
+
+auth:opNop
     a auth:SimpleOperation .
 
 auth:opHint

@@ -38,32 +38,37 @@
    -->
   <Service name="Catalina">
 
-  <Connector 
-    port="8443"
-    protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-    SSLEnabled="true"
-    maxThreads="200"
-    compressibleMimeType="text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/x-font-ttf, image/svg+xml, text/turtle, application/rdf+xml, application/x-turtle, text/rdf+n3, application/json, application/trig, application/ld+json, application/n-quads"
-    compression="on" 
-    disableUploadTimeout="true" 
-    enableLookups="true"
-    maxPostSize="5242880000" 
-    maxSpareThreads="75"
-    minSpareThreads="5"  
-    scheme="https"
-    secure="true">
-    <SSLHostConfig 
-            certificateVerification="optionalNoCA"
-            certificateVerificationDepth="2"
-            trustManagerClassName="won.utils.tls.AcceptAllCertsTrustManager"
-            protocols="all">
-            <Certificate 
-                         certificateKeystoreFile="/usr/local/tomcat/conf/ssl/t-keystore.jks"
-                         certificateKeystorePassword="${CERTIFICATE_PASSWORD}"/>
-        </SSLHostConfig>
- 	<UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />	
-        
-  </Connector>
+    <Connector
+            port="8443"
+            protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+            SSLEnabled="true"
+            maxThreads="200"
+            compressibleMimeType="text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/x-font-ttf, image/svg+xml, text/turtle, application/rdf+xml, application/x-turtle, text/rdf+n3, application/json, application/trig, application/ld+json, application/n-quads"
+            compression="on"
+            disableUploadTimeout="true"
+            enableLookups="true"
+            maxPostSize="5242880000"
+            maxSpareThreads="75"
+            minSpareThreads="5"
+            scheme="https"
+            secure="true">
+      <SSLHostConfig
+              certificateVerification="optionalNoCA"
+              certificateVerificationDepth="2"
+              trustManagerClassName="won.utils.tls.AcceptAllCertsTrustManager"
+              protocols="all">
+        <Certificate
+                certificateKeystoreFile="/usr/local/tomcat/conf/ssl/t-keystore.jks"
+                certificateKeystorePassword="${CERTIFICATE_PASSWORD}"/>
+      </SSLHostConfig>
+
+      <!-- conf properties added bc of issue https://stackoverflow.com/questions/60049290/closenowexception-this-stream-is-not-writeable -->
+      <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol"
+                       overheadCountFactor="-1"
+                       overheadDataThreshold="0"
+                       overheadWindowUpdateThreshold="0"/>
+
+    </Connector>
    
     <Engine name="Catalina" defaultHost="localhost">
 

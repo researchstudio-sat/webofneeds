@@ -107,10 +107,11 @@ public class DefaultWebIdKeyLoader implements WebIdKeyLoader {
     public Set<PublicKey> loadKeyRemotely(String refKey)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         try {
-            Dataset keyDataset = linkedDataSource.getDataForResource(
-                            URI.create(refKey),
+            URI keyUri = URI.create(refKey);
+            Dataset atomDataset = linkedDataSource.getDataForResource(
+                            keyUri,
                             URI.create(cryptographyService.getDefaultPrivateKeyAlias()));
-            Set<PublicKey> resolvedKeys = wonKeysReaderWriter.readFromDataset(keyDataset, refKey);
+            Set<PublicKey> resolvedKeys = wonKeysReaderWriter.readKeyFromAtom(keyUri, atomDataset, refKey);
             return resolvedKeys;
         } catch (LinkedDataFetchingException e) {
             logger.info("Error fetching public key for uri {}: {}", refKey, e.getMessage());

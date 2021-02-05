@@ -28,8 +28,10 @@ import java.util.stream.Collectors;
  * Note: this implementation is not thread-safe.
  */
 public class WonMessage implements Serializable {
+    public static final String CONTENT_URI_SUFFIX_BASE = "#content-";
     public static final String SIGNATURE_URI_SUFFIX = "#signature";
     public static final String ENVELOPE_URI_SUFFIX = "#envelope";
+    public static final String KEY_URI_SUFFIX = "#key";
     public static final String SIGNATURE_URI_GRAPHURI_SUFFIX = "-sig";
     final Logger logger = LoggerFactory.getLogger(getClass());
     private Dataset messageContent;
@@ -228,8 +230,9 @@ public class WonMessage implements Serializable {
     }
 
     /**
-     * Returns the complete dataset, even if this is a multi-message object.
-     * 
+     * Returns a copy of the complete dataset, even if this is a multi-message
+     * object.
+     *
      * @return
      */
     public synchronized Dataset getCompleteDataset() {
@@ -580,6 +583,19 @@ public class WonMessage implements Serializable {
             headMessage.messageContent = newMsgContent;
         }
         return RdfUtils.cloneDataset(headMessage.messageContent);
+    }
+
+    /**
+     * Returns the key graph, if the message has one. A sealed CREATE message must
+     * have one, a sealed REPLACE message might.
+     *
+     * @return
+     */
+    public Optional<Model> getKeyGraph() {
+        Dataset ds = headMessage.getCompleteDataset();
+        String keyGraphURI = getMessageURIRequired().toString() + KEY_URI_SUFFIX;
+        Model m = ds.getNamedModel(keyGraphURI);
+        return Optional.ofNullable(m);
     }
 
     private Map<String, Resource> getContentSignatures() {
@@ -1190,6 +1206,42 @@ public class WonMessage implements Serializable {
         Set<Property> notAllowed = Sets.difference(present, required);
         notAllowed = Sets.difference(notAllowed, optional);
         return new EnvelopePropertyCheckResult(getMessageTypeRequired(), present, missing, notAllowed);
+    }
+
+    /**
+     * Adds the specified model as a content graph of the message, guaranteed not to
+     * overwrite exising content graphs.
+     *
+     * @param contentGraph
+     */
+    public void addContentGraph(Model contentGraph) {
+        Dataset ds = getCompleteDataset();
+        String msgUriStr = getMessageURIRequired().toString();
+        URI contentGraphUri = RdfUtils.createNewGraphURI(msgUriStr,
+                        CONTENT_URI_SUFFIX_BASE, 4,
+                        graphUri -> !ds.containsNamedModel(graphUri));
+        addOrReplaceContentGraph(contentGraphUri.toString().substring(msgUriStr.length()), contentGraph);
+    }
+
+    /**
+     * Adds or replaces the specified model using the specified suffix, which must
+     * start with a hash character ('#').
+     *
+     * @param contentGraphSuffix
+     * @param contentGraph
+     */
+    public void addOrReplaceContentGraph(String contentGraphSuffix, Model contentGraph) {
+        Objects.requireNonNull(contentGraphSuffix);
+        Objects.requireNonNull(contentGraph);
+        if (contentGraphSuffix.length() == 0 || contentGraphSuffix.charAt(0) != '#') {
+            throw new IllegalArgumentException("Illegal contentGraphSuffix: " + contentGraphSuffix);
+        }
+        String contentGraphUri = getMessageURIRequired().toString() + contentGraphSuffix;
+        Dataset ds = headMessage.completeDataset;
+        ds.begin(ReadWrite.WRITE);
+        headMessage.addMessageProperty(WONMSG.content, new ResourceImpl(contentGraphUri));
+        ds.addNamedModel(contentGraphUri, contentGraph);
+        ds.commit();
     }
 
     private static class ToStringForDebugUtils {

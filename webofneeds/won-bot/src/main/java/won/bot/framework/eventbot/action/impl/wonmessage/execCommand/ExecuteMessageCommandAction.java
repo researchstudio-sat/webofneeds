@@ -10,11 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage.execCommand;
 
-import java.lang.invoke.MethodHandles;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
@@ -33,6 +30,8 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+
+import java.lang.invoke.MethodHandles;
 
 /**
  * Action executing a MessageCommandEvent and publishing MessageCommandSuccess

@@ -10,17 +10,10 @@
  */
 package won.bot.framework.bot.base;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Executor;
-
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
-
 import won.bot.framework.bot.BotLifecyclePhase;
 import won.bot.framework.bot.context.BotContext;
 import won.bot.framework.bot.context.BotContextWrapper;
@@ -34,15 +27,7 @@ import won.bot.framework.eventbot.event.impl.atomlifecycle.AtomCreatedEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ActEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.InitializeEvent;
 import won.bot.framework.eventbot.event.impl.lifecycle.ShutdownEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.AtomHintFromMatcherEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.CloseFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.SocketHintFromMatcherEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentEvent;
-import won.bot.framework.eventbot.event.impl.wonmessage.WonMessageSentOnConnectionEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.*;
 import won.bot.framework.eventbot.filter.impl.AtomUriInNamedListFilter;
 import won.bot.framework.eventbot.filter.impl.NotFilter;
 import won.matcher.component.MatcherNodeURISource;
@@ -57,6 +42,12 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
 import won.protocol.vocabulary.WXCHAT;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Executor;
 
 /**
  * Base class for bots that define their behaviour through event listeners. Once
@@ -251,6 +242,30 @@ public abstract class EventBot extends ScheduledTriggerBot {
         return eventListenerContext;
     }
 
+    private EventGeneratingWonMessageSenderWrapper getWonMessageSenderWrapperLazily() {
+        if (wonMessageSenderWrapper == null) {
+            wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(getWonMessageSender());
+        }
+        return wonMessageSenderWrapper;
+    }
+
+    /**
+     * Initializes and returns a NotFilter that can be used to exclude Events that
+     * are caused by Atoms created by this bot
+     *
+     * @return NotFilter that excludes all created Atoms by this Bot
+     * @throws IllegalStateException if EventListenerContext or BotContextWrapper
+     * are null, and therefore a Filter cant be Created
+     */
+    protected NotFilter getNoOwnAtomsFilter() throws IllegalStateException {
+        if (Objects.nonNull(eventListenerContext) && Objects.nonNull(eventListenerContext.getBotContextWrapper())) {
+            return new NotFilter(new AtomUriInNamedListFilter(eventListenerContext,
+                            eventListenerContext.getBotContextWrapper().getAtomCreateListName()));
+        } else {
+            throw new IllegalStateException("Can't create Filter, EventListenerContext or BotContextWrapper are null");
+        }
+    }
+
     /**
      * Class holding references to all important services that EventListeners inside
      * bots need to access.
@@ -312,7 +327,7 @@ public abstract class EventBot extends ScheduledTriggerBot {
         /**
          * Returns an executor that passes the tasks to the TaskScheduler for immediate
          * execution.
-         * 
+         *
          * @return
          */
         public Executor getExecutor() {
@@ -328,13 +343,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
         public WonNodeInformationService getWonNodeInformationService() {
             return EventBot.this.getWonNodeInformationService();
         }
-    }
-
-    private EventGeneratingWonMessageSenderWrapper getWonMessageSenderWrapperLazily() {
-        if (wonMessageSenderWrapper == null) {
-            wonMessageSenderWrapper = new EventGeneratingWonMessageSenderWrapper(getWonMessageSender());
-        }
-        return wonMessageSenderWrapper;
     }
 
     /**
@@ -354,8 +362,20 @@ public abstract class EventBot extends ScheduledTriggerBot {
         }
 
         @Override
+        public void prepareAndSendMessageOnBehalf(WonMessage message, URI webId)
+                        throws WonMessageSenderException {
+            sendMessage(prepareMessageOnBehalf(message, webId));
+        }
+
+        @Override
         public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
             return delegate.prepareMessage(message);
+        }
+
+        @Override
+        public WonMessage prepareMessageOnBehalf(WonMessage message, URI webId)
+                        throws WonMessageSenderException {
+            return delegate.prepareMessageOnBehalf(message, webId);
         }
 
         @Override
@@ -389,23 +409,6 @@ public abstract class EventBot extends ScheduledTriggerBot {
                     event = new WonMessageSentEvent(message);
             }
             getEventBus().publish(event);
-        }
-    }
-
-    /**
-     * Initializes and returns a NotFilter that can be used to exclude Events that
-     * are caused by Atoms created by this bot
-     * 
-     * @return NotFilter that excludes all created Atoms by this Bot
-     * @throws IllegalStateException if EventListenerContext or BotContextWrapper
-     * are null, and therefore a Filter cant be Created
-     */
-    protected NotFilter getNoOwnAtomsFilter() throws IllegalStateException {
-        if (Objects.nonNull(eventListenerContext) && Objects.nonNull(eventListenerContext.getBotContextWrapper())) {
-            return new NotFilter(new AtomUriInNamedListFilter(eventListenerContext,
-                            eventListenerContext.getBotContextWrapper().getAtomCreateListName()));
-        } else {
-            throw new IllegalStateException("Can't create Filter, EventListenerContext or BotContextWrapper are null");
         }
     }
 }

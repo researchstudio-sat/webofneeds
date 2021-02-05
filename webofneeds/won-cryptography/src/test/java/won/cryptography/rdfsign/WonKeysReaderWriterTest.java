@@ -1,10 +1,5 @@
 package won.cryptography.rdfsign;
 
-import java.security.PublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECParameterSpec;
-import java.util.Map;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -12,9 +7,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import won.cryptography.utils.TestSigningUtils;
 import won.cryptography.utils.TestingKeys;
+import won.protocol.message.WonMessage;
+
+import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECParameterSpec;
+import java.util.Map;
 
 /**
  * User: ypanchenko Date: 27.03.2015
@@ -39,7 +39,7 @@ public class WonKeysReaderWriterTest {
         // create dataset
         Dataset tempDataset = TestSigningUtils.prepareTestDataset(RESOURCE_FILE);
         // extract public keys
-        Map<String, PublicKey> constructedKeys = extractor.readFromDataset(tempDataset);
+        Map<String, PublicKey> constructedKeys = extractor.readKeyFromMessage(WonMessage.of(tempDataset));
         Assert.assertEquals(1, constructedKeys.size());
         // expected public key
         ECPublicKey expectedKey = (ECPublicKey) keys.getPublicKey(TestSigningUtils.atomCertUri);

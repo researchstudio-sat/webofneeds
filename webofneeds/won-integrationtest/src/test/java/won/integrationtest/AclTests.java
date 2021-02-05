@@ -1,6 +1,8 @@
 package won.integrationtest;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.graph.GraphFactory;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,8 @@ import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.util.linkeddata.CachingLinkedDataSource;
 import won.protocol.vocabulary.*;
+import won.shacl2java.Shacl2JavaInstanceFactory;
+import won.utils.content.ContentUtils;
 import won.utils.content.model.AtomContent;
 import won.utils.content.model.RdfOutput;
 import won.utils.content.model.Socket;
@@ -24,6 +28,7 @@ import won.utils.content.model.Socket;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -353,6 +358,436 @@ public class AclTests extends AbstractBotBasedTest {
                     e.printStackTrace();
                 }
             });
+            logger.debug("Finished initializing test 'testQueryBasedMatch()'");
+        });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testModifyOnBehalf_fail() throws Exception {
+        final AtomicBoolean atom1Created = new AtomicBoolean(false);
+        final AtomicBoolean atom2Created = new AtomicBoolean(false);
+        final CountDownLatch latch = new CountDownLatch(2);
+        final AtomicReference<URI> createMessageUri1 = new AtomicReference();
+        final AtomicReference<URI> createMessageUri2 = new AtomicReference();
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri1 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            BotBehaviour bbAtom1 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri1.toString();
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Granting atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth = Authorization.builder()
+                                    .addGranteesAtomExpression(ae -> ae.addAtomsURI(atomUri2))
+                                    .addGrant(ase -> ase.addOperationsSimpleOperationExpression(OP_READ))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri1)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
+                    final String action = "Create granting atom";
+                    EventListener successCallback = event -> {
+                        logger.debug("Granting atom created");
+                        createMessageUri1.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    action);
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbAtom2 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri2.toString();
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Grantee atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri2)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getNobodyMayDoNothing()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
+                    final String action = "Create grantee atom";
+                    EventListener successCallback = event -> {
+                        logger.debug("Grantee atom created");
+                        createMessageUri2.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    action);
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbReplaceAtom1FromAtom2 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage replaceMessage = WonMessageBuilder.replace()
+                                    .atom(atomUri1)
+                                    .content().graph(RdfOutput.toGraph(AtomContent.builder()
+                                                    .addTitle("Replaced title")
+                                                    .addTag("ANewTag")
+                                                    .addType(URI.create(WON.Persona.getURI()))
+                                                    .addSocket(Socket.builder()
+                                                                    .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                                                    .build())
+                                                    .addSocket(Socket.builder()
+                                                                    .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                                                    .build())
+                                                    .build()))
+                                    .build();
+                    EventListener passIfFailure = event -> {
+                        logger.debug("Illegal replace denied successfully");
+                        deactivate();
+                        passTest(bus);
+                    };
+                    replaceMessage = ctx.getWonMessageSender().prepareMessageOnBehalf(replaceMessage, atomUri2);
+                    EventListener failIfSuccess = makeSuccessCallbackToFailTest(bot, ctx, bus,
+                                    "modifying atom1 using atom2's WebID");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(replaceMessage, failIfSuccess,
+                                    passIfFailure, ctx);
+                    ctx.getWonMessageSender().sendMessage(replaceMessage);
+                }
+            };
+            BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+            barrier.waitFor(bbAtom1, bbAtom2);
+            barrier.thenStart(bbReplaceAtom1FromAtom2);
+            barrier.activate();
+            bbAtom1.activate();
+            bbAtom2.activate();
+            logger.debug("Finished initializing test 'testQueryBasedMatch()'");
+        });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testModifyOnBehalf() throws Exception {
+        final AtomicBoolean atom1Created = new AtomicBoolean(false);
+        final AtomicBoolean atom2Created = new AtomicBoolean(false);
+        final CountDownLatch latch = new CountDownLatch(2);
+        final AtomicReference<URI> createMessageUri1 = new AtomicReference();
+        final AtomicReference<URI> createMessageUri2 = new AtomicReference();
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri1 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            BotBehaviour bbAtom1 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri1.toString();
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Granting atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth = Authorization.builder()
+                                    .addGranteesAtomExpression(ae -> ae.addAtomsURI(atomUri2))
+                                    .addGrant(ase -> ase.addOperationsSimpleOperationExpression(OP_READ)
+                                                    .addGraph(g -> g
+                                                                    .addGraphType(GraphType.CONTENT_GRAPH)
+                                                                    .addOperationsMessageOperationExpression(moe -> moe
+                                                                                    .addMessageOnBehalfsMessageType(
+                                                                                                    MessageType.REPLACE_MESSAGE))))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri1)
+                                    .content().graph("#content", RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
+                    final String action = "Create granting atom";
+                    EventListener successCallback = event -> {
+                        logger.debug("Granting atom created");
+                        createMessageUri1.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    action);
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbAtom2 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri2.toString();
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Grantee atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri2)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getNobodyMayDoNothing()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
+                    final String action = "Create grantee atom";
+                    EventListener successCallback = event -> {
+                        logger.debug("Grantee atom created");
+                        createMessageUri2.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    action);
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbReplaceAtom1FromAtom2 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage replaceMessage = WonMessageBuilder.replace()
+                                    .atom(atomUri1)
+                                    .content().graph("#content", RdfOutput.toGraph(AtomContent.builder(atomUri1)
+                                                    .addTitle("Replaced Title")
+                                                    .addTag("A-New-Tag")
+                                                    .addType(URI.create(WON.Atom.getURI()))
+                                                    .addType(URI.create(WON.Persona.getURI()))
+                                                    .addSocket(Socket.builder(atomUri1.toString() + "#buddySocket")
+                                                                    .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                                                    .build())
+                                                    .addSocket(Socket.builder(atomUri1.toString() + "#holderSocket")
+                                                                    .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                                                    .build())
+                                                    .build()))
+                                    .build();
+                    String action = "replace content of atom1 using webid of atom2";
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus, action);
+                    replaceMessage = ctx.getWonMessageSender().prepareMessageOnBehalf(replaceMessage, atomUri2);
+                    EventListener successCallback = makeLoggingCallback(bot, bus, action, () -> deactivate());
+                    EventBotActionUtils.makeAndSubscribeResponseListener(replaceMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(replaceMessage);
+                }
+            };
+            BotBehaviour readModified = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    Dataset atomData = ctx.getLinkedDataSource().getDataForResource(atomUri1, atomUri1);
+                    Set<String> expectedGraphNames = Set.of(atomUri1 + "#acl",
+                                    atomUri1 + "#acl-sig",
+                                    atomUri1 + "#content",
+                                    atomUri1 + "#content-sig",
+                                    atomUri1 + "#key",
+                                    atomUri1 + "#key-sig",
+                                    atomUri1 + "#sysinfo");
+                    Iterator<String> it = atomData.listNames();
+                    Set<String> actualNames = new HashSet<>();
+                    while (it.hasNext()) {
+                        actualNames.add(it.next());
+                    }
+                    Assert.assertEquals(expectedGraphNames, actualNames);
+                    Shacl2JavaInstanceFactory instanceFactory = ContentUtils.newInstanceFactory();
+                    instanceFactory.load(atomData.getNamedModel(atomUri1 + "#content").getGraph());
+                    Optional<AtomContent> atomContent = instanceFactory
+                                    .getInstanceOfType(atomUri1.toString(), AtomContent.class);
+                    Assert.assertTrue("replacing content failed: replaced title not found",
+                                    atomContent.get().getTitles().contains("Replaced Title"));
+                    Assert.assertFalse("replacing content failed: old title still there",
+                                    atomContent.get().getTitles().contains("Granting atom"));
+                    passTest(bus);
+                }
+            };
+            BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+            barrier.waitFor(bbAtom1, bbAtom2);
+            barrier.thenStart(bbReplaceAtom1FromAtom2);
+            barrier.activate();
+            bbAtom1.activate();
+            bbAtom2.activate();
+            bbReplaceAtom1FromAtom2.onDeactivateActivate(readModified);
+            logger.debug("Finished initializing test 'testQueryBasedMatch()'");
+        });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testModifyOnBehalf_addGraph() throws Exception {
+        final AtomicBoolean atom1Created = new AtomicBoolean(false);
+        final AtomicBoolean atom2Created = new AtomicBoolean(false);
+        final CountDownLatch latch = new CountDownLatch(2);
+        final AtomicReference<URI> createMessageUri1 = new AtomicReference();
+        final AtomicReference<URI> createMessageUri2 = new AtomicReference();
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri1 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            BotBehaviour bbAtom1 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri1.toString();
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Granting atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth = Authorization.builder()
+                                    .addGranteesAtomExpression(ae -> ae.addAtomsURI(atomUri2))
+                                    .addGrant(ase -> ase.addOperationsSimpleOperationExpression(OP_READ)
+                                                    .addGraph(g -> g
+                                                                    .addGraphType(GraphType.CONTENT_GRAPH)
+                                                                    .addOperationsMessageOperationExpression(moe -> moe
+                                                                                    .addMessageOnBehalfsMessageType(
+                                                                                                    MessageType.REPLACE_MESSAGE))))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri1)
+                                    .content().graph("#content", RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
+                    final String action = "Create granting atom";
+                    EventListener successCallback = event -> {
+                        logger.debug("Granting atom created");
+                        createMessageUri1.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    action);
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbAtom2 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri2.toString();
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Grantee atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri2)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getNobodyMayDoNothing()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
+                    final String action = "Create grantee atom";
+                    EventListener successCallback = event -> {
+                        logger.debug("Grantee atom created");
+                        createMessageUri2.set(((SuccessResponseEvent) event).getOriginalMessageURI());
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    action);
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbReplaceAtom1FromAtom2 = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage replaceMessage = WonMessageBuilder.replace()
+                                    .atom(atomUri1)
+                                    .content().graph("#content", RdfOutput.toGraph(AtomContent.builder(atomUri1)
+                                                    .addTitle("Replaced Title")
+                                                    .addTag("A-New-Tag")
+                                                    .addType(URI.create(WON.Atom.getURI()))
+                                                    .addType(URI.create(WON.Persona.getURI()))
+                                                    .addSocket(Socket.builder(atomUri1.toString() + "#buddySocket")
+                                                                    .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
+                                                                    .build())
+                                                    .addSocket(Socket.builder(atomUri1.toString() + "#holderSocket")
+                                                                    .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                                                    .build())
+                                                    .build()))
+                                    .content().graph("#content2", RdfOutput.toGraph(AtomContent.builder(atomUri1)
+                                                    .addTitle("New Title")
+                                                    .addType(URI.create(WON.Atom.getURI()))
+                                                    .addSocket(Socket.builder(atomUri1.toString() + "#chatSocket")
+                                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                                    .build())
+                                                    .build()))
+                                    .build();
+                    String action = "replace content of atom1 using webid of atom2, adding a graph";
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus, action);
+                    replaceMessage = ctx.getWonMessageSender().prepareMessageOnBehalf(replaceMessage, atomUri2);
+                    EventListener successCallback = makeLoggingCallback(bot, bus, action, () -> deactivate());
+                    EventBotActionUtils.makeAndSubscribeResponseListener(replaceMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(replaceMessage);
+                }
+            };
+            BotBehaviour readModified = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    Dataset atomData = ctx.getLinkedDataSource().getDataForResource(atomUri1, atomUri1);
+                    Set<String> expectedGraphNames = Set.of(atomUri1 + "#acl",
+                                    atomUri1 + "#acl-sig",
+                                    atomUri1 + "#content",
+                                    atomUri1 + "#content-sig",
+                                    atomUri1 + "#content2",
+                                    atomUri1 + "#content2-sig",
+                                    atomUri1 + "#key",
+                                    atomUri1 + "#key-sig",
+                                    atomUri1 + "#sysinfo");
+                    Iterator<String> it = atomData.listNames();
+                    Set<String> actualNames = new HashSet<>();
+                    while (it.hasNext()) {
+                        actualNames.add(it.next());
+                    }
+                    Assert.assertEquals(expectedGraphNames, actualNames);
+                    Shacl2JavaInstanceFactory instanceFactory = ContentUtils.newInstanceFactory();
+                    instanceFactory.load(atomData.getNamedModel(atomUri1 + "#content").getGraph());
+                    Optional<AtomContent> atomContent = instanceFactory
+                                    .getInstanceOfType(atomUri1.toString(), AtomContent.class);
+                    assertTrue(bus, "replacing content failed: replaced title not found",
+                                    atomContent.get().getTitles().contains("Replaced Title"));
+                    assertFalse(bus, "replacing content failed: old title still there",
+                                    atomContent.get().getTitles().contains("Granting atom"));
+                    instanceFactory.load(atomData.getNamedModel(atomUri1 + "#content2").getGraph());
+                    atomContent = instanceFactory
+                                    .getInstanceOfType(atomUri1.toString(), AtomContent.class);
+                    assertTrue(bus, "adding content failed: new title not found",
+                                    atomContent.get().getTitles().contains("New Title"));
+                    passTest(bus);
+                }
+            };
+            BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+            barrier.waitFor(bbAtom1, bbAtom2);
+            barrier.thenStart(bbReplaceAtom1FromAtom2);
+            barrier.activate();
+            bbAtom1.activate();
+            bbAtom2.activate();
+            bbReplaceAtom1FromAtom2.onDeactivateActivate(readModified);
             logger.debug("Finished initializing test 'testQueryBasedMatch()'");
         });
     }
@@ -967,6 +1402,14 @@ public class AclTests extends AbstractBotBasedTest {
         return Authorization.builder()
                         .setGranteeGranteeWildcard(GranteeWildcard.ANYONE)
                         .setProvideAuthInfo(ase -> ase.addOperationsSimpleOperationExpression(ANY_OPERATION))
+                        .build();
+    }
+
+    private Authorization getNobodyMayDoNothing() {
+        return Authorization.builder()
+                        .addGranteesAtomExpression(
+                                        ae -> ae.addAtomsURI(URI.create("http://example.com/nobody")))
+                        .addGrant(ase -> ase.addOperationsSimpleOperationExpression(OP_NOP))
                         .build();
     }
 }

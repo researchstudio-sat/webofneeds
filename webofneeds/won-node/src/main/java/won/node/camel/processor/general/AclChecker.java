@@ -120,10 +120,15 @@ public class AclChecker extends AbstractCamelProcessor {
                                             .build());
         }
         WonAclEvaluator evaluator = wonAclEvaluatorFactory.getWonAclEvaluator(aclGraph.get());
-        AclEvalResult result = evaluator.decide(operationRequest);
-        if (DecisionValue.ACCESS_DENIED.equals(result.getDecision())) {
-            throw new ForbiddenMessageException(
-                            String.format("Message not allowed"));
+        if (message.getMessageType().isReplace()) {
+            // decision for replace messages is deferred to where replacement actually
+            // happens
+        } else {
+            AclEvalResult result = evaluator.decide(operationRequest);
+            if (DecisionValue.ACCESS_DENIED.equals(result.getDecision())) {
+                throw new ForbiddenMessageException(
+                                String.format("Message not allowed"));
+            }
         }
         WonCamelHelper.putWonAclEvaluator(exchange, evaluator);
         WonCamelHelper.putWonAclOperationRequest(exchange, operationRequest);

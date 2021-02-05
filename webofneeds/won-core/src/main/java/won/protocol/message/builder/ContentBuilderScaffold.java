@@ -29,6 +29,19 @@ abstract class ContentBuilderScaffold<THIS extends ContentBuilderScaffold<THIS, 
     }
 
     /**
+     * Adds the specified model as a content graph to the message, using the
+     * specified uri fragment to generate the graph uri.
+     *
+     * @param content
+     * @param uriFragment a valid URI fragment, starting with a '#' char
+     * @return the parent builder
+     */
+    public PARENT model(String uriFragment, Model content) {
+        builder.content(uriFragment, content);
+        return parent.get();
+    }
+
+    /**
      * Adds the specified graph as a content graph to the message.
      *
      * @param content
@@ -36,6 +49,19 @@ abstract class ContentBuilderScaffold<THIS extends ContentBuilderScaffold<THIS, 
      */
     public PARENT graph(Graph content) {
         builder.content(content);
+        return parent.get();
+    }
+
+    /**
+     * Adds the specified model as a content graph to the message, using the
+     * specified uri fragment to generate the graph uri.
+     *
+     * @param content
+     * @param uriFragment a valid URI fragment, starting with a '#' char
+     * @return the parent builder
+     */
+    public PARENT graph(String uriFragment, Graph content) {
+        builder.content(uriFragment, content);
         return parent.get();
     }
 

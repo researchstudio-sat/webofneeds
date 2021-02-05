@@ -29,7 +29,6 @@ import java.util.function.Consumer;
  * @author Fabian Salcher
  */
 public class WonMessageBuilder {
-    public static final String CONTENT_URI_SUFFIX = "#content-";
     private static final CheapInsecureRandomString randomString = new CheapInsecureRandomString();
     private static final int RANDOM_SUFFIX_LENGTH = 5;
     private final URI messageURI;
@@ -364,10 +363,36 @@ public class WonMessageBuilder {
     }
 
     private URI addContentInternal(Model content) {
-        URI contentGraphUri = RdfUtils.createNewGraphURI(messageURI.toString(), CONTENT_URI_SUFFIX, 4,
+        URI contentGraphUri = RdfUtils.createNewGraphURI(messageURI.toString(), WonMessage.CONTENT_URI_SUFFIX_BASE, 4,
                         graphUri -> !contentMap.keySet().contains(URI.create(graphUri)));
         contentMap.put(contentGraphUri, content);
         return contentGraphUri;
+    }
+
+    WonMessageBuilder content(String graphNameFragment, Graph content) {
+        return content(graphNameFragment, ModelFactory.createModelForGraph(content));
+    }
+
+    WonMessageBuilder content(String graphNameFragment, Model content) {
+        if (!graphNameFragment.startsWith("#")) {
+            throw new IllegalArgumentException("graphNameFragment must start with the # sign - this is not acceptable:"
+                            + graphNameFragment);
+        }
+        if (graphNameFragment.equals(WonMessage.ENVELOPE_URI_SUFFIX)) {
+            throw new IllegalArgumentException(
+                            String.format("Cannot use reserved graph name %s!", WonMessage.ENVELOPE_URI_SUFFIX));
+        }
+        if (graphNameFragment.equals(WonMessage.KEY_URI_SUFFIX)) {
+            throw new IllegalArgumentException(
+                            String.format("Cannot use reserved graph name %s!", WonMessage.KEY_URI_SUFFIX));
+        }
+        if (graphNameFragment.equals(WonMessage.SIGNATURE_URI_SUFFIX)) {
+            throw new IllegalArgumentException(
+                            String.format("Cannot use reserved graph name %s!", WonMessage.SIGNATURE_URI_SUFFIX));
+        }
+        URI graphUri = URI.create(messageURI.toString() + graphNameFragment);
+        contentMap.put(graphUri, content);
+        return this;
     }
 
     private URI addAclGraphInternal(Graph acl) {
