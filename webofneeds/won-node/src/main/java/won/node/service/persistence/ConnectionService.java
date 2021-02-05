@@ -1,57 +1,39 @@
 package won.node.service.persistence;
 
+import org.apache.jena.graph.TripleBoundary;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import won.auth.AuthUtils;
+import won.auth.WonAclEvaluator;
+import won.auth.model.AclEvalResult;
+import won.auth.model.DecisionValue;
+import won.auth.model.OperationRequest;
+import won.protocol.exception.*;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonMessageDirection;
+import won.protocol.message.WonMessageType;
+import won.protocol.model.*;
+import won.protocol.repository.*;
+import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.DataAccessUtils;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WONCON;
+import won.protocol.vocabulary.WONMSG;
+
+import javax.persistence.EntityManager;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-
-import org.apache.jena.graph.TripleBoundary;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelExtract;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.StatementTripleBoundary;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import won.protocol.exception.ConnectionAlreadyExistsException;
-import won.protocol.exception.IllegalMessageForAtomStateException;
-import won.protocol.exception.IllegalMessageForConnectionStateException;
-import won.protocol.exception.IncompatibleSocketsException;
-import won.protocol.exception.MissingMessagePropertyException;
-import won.protocol.exception.NoSuchAtomException;
-import won.protocol.exception.NoSuchConnectionException;
-import won.protocol.exception.SocketCapacityException;
-import won.protocol.exception.WrongAddressingInformationException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageDirection;
-import won.protocol.message.WonMessageType;
-import won.protocol.model.Atom;
-import won.protocol.model.AtomState;
-import won.protocol.model.Connection;
-import won.protocol.model.ConnectionEventType;
-import won.protocol.model.ConnectionMessageContainer;
-import won.protocol.model.ConnectionState;
-import won.protocol.model.DatasetHolder;
-import won.protocol.model.Socket;
-import won.protocol.repository.AtomRepository;
-import won.protocol.repository.ConnectionContainerRepository;
-import won.protocol.repository.ConnectionMessageContainerRepository;
-import won.protocol.repository.ConnectionRepository;
-import won.protocol.repository.DatasetHolderRepository;
-import won.protocol.repository.MessageEventRepository;
-import won.protocol.repository.SocketRepository;
-import won.protocol.service.WonNodeInformationService;
-import won.protocol.util.DataAccessUtils;
-import won.protocol.util.RdfUtils;
-import won.protocol.vocabulary.WONCON;
-import won.protocol.vocabulary.WONMSG;
+import static won.auth.model.Individuals.OP_AUTO_CONNECT;
+import static won.auth.model.Individuals.POSITION_SOCKET;
 
 @Component
 public class ConnectionService {
@@ -331,26 +313,33 @@ public class ConnectionService {
                     final ConnectionState connectionState,
                     final ConnectionEventType connectionEventType)
                     throws NoSuchAtomException, IllegalMessageForAtomStateException, ConnectionAlreadyExistsException {
-        if (atomURI == null)
+        if (atomURI == null) {
             throw new IllegalArgumentException("atomURI is not set");
-        if (otherAtomURI == null)
+        }
+        if (otherAtomURI == null) {
             throw new IllegalArgumentException("otherAtomURI is not set");
-        if (atomURI.equals(otherAtomURI))
+        }
+        if (atomURI.equals(otherAtomURI)) {
             throw new IllegalArgumentException("atomURI and otherAtomURI are the same");
-        if (socketURI == null)
+        }
+        if (socketURI == null) {
             throw new IllegalArgumentException("socketURI is not set");
-        if (socketTypeURI == null)
+        }
+        if (socketTypeURI == null) {
             throw new IllegalArgumentException("socketTypeURI is not set");
+        }
         // Load atom (throws exception if not found)
         Optional<Atom> atom = atomRepository.findOneByAtomURIForUpdate(atomURI);
         if (atom.isPresent()) {
             entityManager.refresh(atom.get());
         }
-        if (atom.get().getState() != AtomState.ACTIVE)
+        if (atom.get().getState() != AtomState.ACTIVE) {
             throw new IllegalMessageForAtomStateException(atomURI, connectionEventType.name(), atom.get().getState());
+        }
         // TODO: create a proper exception if a socket is not supported by an atom
-        if (socketRepository.findByAtomURIAndTypeURI(atomURI, socketTypeURI).isEmpty())
+        if (socketRepository.findByAtomURIAndTypeURI(atomURI, socketTypeURI).isEmpty()) {
             throw new RuntimeException("Socket '" + socketTypeURI + "' is not supported by Atom: '" + atomURI + "'");
+        }
         /* Create connection */
         URI connectionUri = wonNodeInformationService.generateConnectionURI(atomURI);
         Connection con = new Connection();
@@ -383,9 +372,28 @@ public class ConnectionService {
         return con;
     }
 
-    public boolean shouldSendAutoOpenForConnect(WonMessage wonMessage) {
+    public boolean shouldSendAutoOpenForConnect(WonMessage wonMessage, WonAclEvaluator wonAclEvaluator,
+                    OperationRequest operationRequest) {
         URI recipientSocketURI = wonMessage.getRecipientSocketURIRequired();
-        return socketService.isAutoOpen(recipientSocketURI);
+        Connection con = getConnection(recipientSocketURI, wonMessage.getSenderSocketURI()).get();
+        if (con.getState() != ConnectionState.REQUEST_RECEIVED) {
+            return false;
+        }
+        if (socketService.isAutoOpen(recipientSocketURI)) {
+            return true;
+        }
+        if (wonAclEvaluator == null || operationRequest == null) {
+            return false;
+        }
+        OperationRequest or = AuthUtils.cloneShallow(operationRequest);
+        or.setOperationSimpleOperationExpression(OP_AUTO_CONNECT);
+        or.setReqPosition(POSITION_SOCKET);
+        or.setReqSocket(recipientSocketURI);
+        or.setReqSocketType(con.getTypeURI());
+        or.setReqConnectionState(AuthUtils.toAuthConnectionState(con.getState()));
+        or.setReqConnection(con.getConnectionURI());
+        AclEvalResult result = wonAclEvaluator.decide(or);
+        return DecisionValue.ACCESS_GRANTED.equals(result.getDecision());
     }
 
     public void grabRemoteConnectionURIFromRemoteResponse(WonMessage responseMessage) {
@@ -424,8 +432,9 @@ public class ConnectionService {
 
     private Connection nextConnectionState(URI connectionURI, ConnectionEventType connectionEventType)
                     throws NoSuchConnectionException, IllegalMessageForConnectionStateException {
-        if (connectionURI == null)
+        if (connectionURI == null) {
             throw new IllegalArgumentException("connectionURI is not set");
+        }
         // load connection, checking if it exists
         Connection con = DataAccessUtils.loadConnection(connectionRepository, connectionURI);
         // perform state transit

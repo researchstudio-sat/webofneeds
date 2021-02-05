@@ -8,11 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.auth.linkeddata.AuthEnabledLinkedDataSource;
 import won.auth.model.*;
+import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.behaviour.BehaviourBarrier;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
+import won.bot.framework.eventbot.event.Event;
+import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
+import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
@@ -1323,6 +1327,143 @@ public class AclTests extends AbstractBotBasedTest {
             bbCreateAtom1.activate();
             bbCreateAtom2.activate();
             bbCreateAtom3.activate();
+        });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testAutoConnectByAcl() throws Exception {
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri1 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final BotBehaviour bbCreateAtom1 = new BotBehaviour(ctx, "bbCreateAtom1") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri1.toString();
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Autoconnecting atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth = Authorization.builder()
+                                    .addGranteesAtomExpression(ae -> ae.addAtomsURI(atomUri2))
+                                    .addGrant(ase -> ase
+                                                    .addGraph(ge -> ge.addOperationsSimpleOperationExpression(OP_READ))
+                                                    .addSocket(s -> s.addSocketType(WXCHAT.ChatSocket.asURI()))
+                                                    .addOperationsSimpleOperationExpression(OP_AUTO_CONNECT))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri1)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content()
+                                    .aclGraph(won.auth.model.RdfOutput.toGraph(getConnectedMayCommunicateAuth()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection autoconnecting atom created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create autoconnecting atom");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            // create match source
+            final BotBehaviour bbCreateAtom2 = new BotBehaviour(ctx, "bbCreateAtom2") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri2.toString();
+                    final AtomContent atomContent = AtomContent.builder(atomUriString)
+                                    .addTitle("Connecting atom")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization auth = Authorization.builder()
+                                    .addGranteesAtomExpression(ae -> ae.addAtomsURI(atomUri1))
+                                    .addGrant(ase -> ase
+                                                    .addGraph(ge -> ge.addOperationsSimpleOperationExpression(OP_READ)))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri2)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(auth))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content()
+                                    .aclGraph(won.auth.model.RdfOutput.toGraph(getConnectedMayCommunicateAuth()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection initiating atom created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create connection initiating  atom");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbSendConnect = new BotBehaviour(ctx, "bbSendConnect") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri2.toString() + "#chatSocket"))
+                                    .recipient(URI.create(atomUri1.toString() + "#chatSocket"))
+                                    .direction().fromOwner()
+                                    .content().text("Hello there!")
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("Connection requested");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbWaitForConnectFromAtom1 = new BotBehaviour(ctx, "bbWaitForConnectFromAtom1") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    bus.subscribe(ConnectFromOtherAtomEvent.class,
+                                    new EventFilter() {
+                                        @Override public boolean accept(Event event) {
+                                            return event instanceof ConnectFromOtherAtomEvent
+                                                            && ((ConnectFromOtherAtomEvent) event)
+                                                            .getSenderSocket()
+                                                            .equals(URI.create(atomUri1.toString()
+                                                                            + "#chatSocket"));
+                                        }
+                                    },
+                                    new BaseEventBotAction(ctx) {
+                                        @Override protected void doRun(Event event, EventListener executingListener)
+                                                        throws Exception {
+                                            passTest(bus);
+                                        }
+                                    });
+                }
+            };
+            BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+            barrier.waitFor(bbCreateAtom1, bbCreateAtom2);
+            barrier.thenStart(bbSendConnect);
+            barrier.activate();
+            bbCreateAtom1.activate();
+            bbCreateAtom2.activate();
+            bbWaitForConnectFromAtom1.activate();
         });
     }
 
