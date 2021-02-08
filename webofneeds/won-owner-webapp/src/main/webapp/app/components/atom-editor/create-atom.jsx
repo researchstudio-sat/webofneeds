@@ -10,6 +10,7 @@ import { isTagViewSocket } from "../../won-utils.js";
 import vocab from "../../service/vocab";
 
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -40,6 +41,8 @@ export default function WonCreateAtom({
   );
   const processState = useSelector(generalSelectors.getProcessState);
   const accountState = useSelector(generalSelectors.getAccountState);
+
+  const activePersonaUri = useSelector(viewSelectors.getActivePersonaUri);
 
   const isHolderAtomValid = useSelector(
     state =>
@@ -187,19 +190,31 @@ export default function WonCreateAtom({
           )
         );
 
-        history.replace(
-          generateLink(
-            history.location,
-            {
-              postUri: fromAtomUri,
-              connectionUri: undefined,
-              tab: isTagViewSocket(targetSocketType)
-                ? "DETAIL"
-                : targetSocketType,
-            },
-            "/post"
-          )
-        );
+        //if fromAtomUri is the uri of the activePersona we simply go to the tab of the inventory instead of the fromAtomUri itself
+        if (activePersonaUri === fromAtomUri) {
+          dispatch(
+            actionCreators.view__setActivePersonaTab(
+              isTagViewSocket(targetSocketType) ? "DETAIL" : targetSocketType
+            )
+          );
+          history.replace(
+            generateLink(history.location, {}, "/inventory", false)
+          );
+        } else {
+          history.replace(
+            generateLink(
+              history.location,
+              {
+                postUri: fromAtomUri,
+                connectionUri: undefined,
+                tab: isTagViewSocket(targetSocketType)
+                  ? "DETAIL"
+                  : targetSocketType,
+              },
+              "/post"
+            )
+          );
+        }
       };
     } else {
       executeFunction = () => {
