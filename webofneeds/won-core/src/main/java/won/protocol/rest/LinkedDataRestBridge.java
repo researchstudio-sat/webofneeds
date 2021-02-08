@@ -56,12 +56,15 @@ public class LinkedDataRestBridge {
     }
 
     public RestTemplate getRestTemplate() {
+        PrivateKeyAliasContext.setPrivateKeyAlias(keyPairAliasDerivationStrategy.getAliasForAtomUri(null));
         return restTemplateWithDefaultWebId;
     }
 
     public RestTemplate getRestTemplate(String requesterWebID) {
         RestTemplate restTemplate;
         try {
+            PrivateKeyAliasContext
+                            .setPrivateKeyAlias(keyPairAliasDerivationStrategy.getAliasForAtomUri(requesterWebID));
             restTemplate = getRestTemplateForReadingLinkedData(requesterWebID);
         } catch (Exception e) {
             logger.error("Failed to create ssl tofu rest template", e);
