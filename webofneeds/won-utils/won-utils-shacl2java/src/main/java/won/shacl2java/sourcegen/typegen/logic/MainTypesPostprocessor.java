@@ -142,6 +142,12 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
     }
 
     private static void addDeepEquals(TypeSpec.Builder typeBuilder, ClassName typeClass) {
+        MethodSpec.Builder deepEqualsBuilderInitialDelegating = MethodSpec.methodBuilder("deepEquals")
+                        .addModifiers(PUBLIC)
+                        .addParameter(TypeName.OBJECT, "o")
+                        .returns(TypeName.BOOLEAN)
+                        .addStatement("return deepEquals(o, new $T())", ArrayDeque.class);
+        typeBuilder.addMethod(deepEqualsBuilderInitialDelegating.build());
         MethodSpec.Builder deepEqualsBuilder = MethodSpec.methodBuilder("deepEquals")
                         .addModifiers(PUBLIC)
                         .addParameter(TypeName.OBJECT, "o")

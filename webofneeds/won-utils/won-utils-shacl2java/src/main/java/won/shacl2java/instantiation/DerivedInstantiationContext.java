@@ -2,7 +2,6 @@ package won.shacl2java.instantiation;
 
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.compose.Union;
 import org.apache.jena.shacl.engine.ValidationContext;
 import org.apache.jena.shacl.parser.PropertyShape;
@@ -10,6 +9,8 @@ import org.apache.jena.shacl.parser.Shape;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DerivedInstantiationContext extends InstantiationContext {
     private InstantiationContext parentContext;
@@ -61,10 +62,10 @@ public class DerivedInstantiationContext extends InstantiationContext {
 
     @Override
     public Set<Object> getInstancesForFocusNode(Node focusNode) {
-        if (super.hasInstanceForFocusNode(focusNode)) {
-            return super.getInstancesForFocusNode(focusNode);
-        }
-        return parentContext.getInstancesForFocusNode(focusNode);
+        return Stream.concat(
+                        parentContext.getInstancesForFocusNode(focusNode).stream(),
+                        super.getInstancesForFocusNode(focusNode).stream())
+                        .collect(Collectors.toSet());
     }
 
     @Override
@@ -92,11 +93,8 @@ public class DerivedInstantiationContext extends InstantiationContext {
 
     @Override
     public Set<Object> getInstances(String uri) {
-        Node uriNode = NodeFactory.createURI(uri);
-        if (super.hasInstanceForFocusNode(uriNode)) {
-            return super.getInstances(uri);
-        }
-        return parentContext.getInstances(uri);
+        return Stream.concat(super.getInstances(uri).stream(),
+                        parentContext.getInstances(uri).stream()).collect(Collectors.toSet());
     }
 
     @Override

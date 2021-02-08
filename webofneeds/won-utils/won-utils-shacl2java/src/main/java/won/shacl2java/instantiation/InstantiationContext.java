@@ -48,7 +48,9 @@ public class InstantiationContext {
     }
 
     public Set<Object> getInstances(String uri) {
-        return focusNodeToInstance.get(NodeFactory.createURI(uri));
+        return Optional.ofNullable(focusNodeToInstance.get(NodeFactory.createURI(uri))).orElse(Collections.emptySet())
+                        .stream().collect(
+                                        Collectors.toSet());
     }
 
     public <T> Optional<T> getInstanceOfType(String uri, Class<T> type) {
@@ -82,7 +84,8 @@ public class InstantiationContext {
     }
 
     public Set<Class<?>> getClassesForShape(String shapeUri) {
-        return shapeClasses.get(shapeUri);
+        return Optional.ofNullable(shapeClasses.get(shapeUri)).orElse(Collections.emptySet()).stream()
+                        .collect(Collectors.toSet());
     }
 
     public boolean hasClassForShape(String shapeUri) {
@@ -147,7 +150,8 @@ public class InstantiationContext {
     }
 
     public Set<Object> getInstancesForFocusNode(Node focusNode) {
-        return focusNodeToInstance.get(focusNode);
+        return Optional.ofNullable(focusNodeToInstance.get(focusNode)).orElse(Collections.emptySet()).stream().collect(
+                        Collectors.toSet());
     }
 
     public boolean hasInstanceForFocusNode(Node focusNode) {
@@ -159,7 +163,8 @@ public class InstantiationContext {
     }
 
     public Set<Shape> getShapesForFocusNode(Node node) {
-        return focusNodeToShapes.get(node);
+        return Optional.ofNullable(focusNodeToShapes.get(node)).orElse(Collections.emptySet()).stream().collect(
+                        Collectors.toSet());
     }
 
     public boolean hasShapesForFocusNode(Node node) {

@@ -32,6 +32,7 @@ import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -73,13 +74,12 @@ public class GeneratedSourcesTests {
         factory.load(data.getGraph());
         Map<String, Set<Object>> entities = factory.getInstanceMap();
         Assert.assertEquals(4, entities.size());
-        Object o = entities.get("https://example.com/ns#Bob").stream().findFirst().get();
-        Assert.assertEquals(Person.class, o.getClass());
-        Person bob = (Person) o;
-        o = entities.get("https://example.com/ns#BobsAddress").stream().findFirst().get();
-        Assert.assertEquals(Address.class, o.getClass());
-        Assert.assertSame(o, bob.getAddresses().stream().findFirst().get());
-        Assert.assertEquals("1234", bob.getAddresses().stream().findFirst().get().getPostalCode());
+        Optional<Person> bob = factory.getInstanceOfType("https://example.com/ns#Bob", Person.class);
+        Assert.assertTrue(bob.isPresent());
+        Optional<Address> address = factory.getInstanceOfType("https://example.com/ns#BobsAddress", Address.class);
+        Assert.assertTrue(address.isPresent());
+        Assert.assertSame(address.get(), bob.get().getAddresses().stream().findFirst().get());
+        Assert.assertEquals("1234", bob.get().getAddresses().stream().findFirst().get().getPostalCode());
     }
 
     @Test

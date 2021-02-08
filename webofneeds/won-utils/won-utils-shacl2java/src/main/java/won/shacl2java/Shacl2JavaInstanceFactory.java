@@ -24,6 +24,7 @@ import won.shacl2java.annotation.ShapeNode;
 import won.shacl2java.instantiation.DataNodeAndShapes;
 import won.shacl2java.instantiation.DerivedInstantiationContext;
 import won.shacl2java.instantiation.InstantiationContext;
+import won.shacl2java.runtime.model.GraphEntity;
 import won.shacl2java.util.CollectionUtils;
 import won.shacl2java.util.NameUtils;
 import won.shacl2java.util.ShapeUtils;
@@ -295,15 +296,15 @@ public class Shacl2JavaInstanceFactory {
                 toInstantiate = deduplicate(toInstantiate);
             }
         }
-        ctx.getInstancesByNode().parallelStream().forEach(entry -> {
+        ctx.getInstancesByNode().stream().forEach(entry -> {
             Node node = entry.getKey();
             Set<Object> instances = entry.getValue();
-            instances.parallelStream().forEach(instance -> {
+            for (Object instance : instances) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("wiring dependencies of instance {} ", node);
                 }
                 wireDependencies(instance, ctx);
-            });
+            }
         });
     }
 
@@ -510,11 +511,7 @@ public class Shacl2JavaInstanceFactory {
 
     public void wireDependencies(Object instance, InstantiationContext ctx) {
         Map<Path, Set<Field>> fieldsByPath = new HashMap<>();
-        Class<?> type = ctx.getClassForInstance(instance);
-        if (type == null) {
-            throw new IllegalStateException(
-                            String.format("No class found for instance %s of class %s", instance, instance.getClass()));
-        }
+        Class<?> type = instance.getClass();
         Field[] instanceFields = type.getDeclaredFields();
         for (Field field : instanceFields) {
             extractPath(fieldsByPath, field);
@@ -547,33 +544,32 @@ public class Shacl2JavaInstanceFactory {
                     for (Node valueNode : valueNodes) {
                         Set<Object> dependencyCandidates = ctx.getInstancesForFocusNode(valueNode);
                         if (dependencyCandidates == null) {
-                            // dependency could be a blank node, literal or IRI that is not explicitly
-                            // covered by a shape
-                            if (valueNode.isLiteral()) {
-                                dependencyCandidates = Collections.singleton(valueNode.getLiteralDatatype()
-                                                .parse(valueNode.getLiteralLexicalForm()));
-                            } else if (valueNode.isURI()) {
-                                dependencyCandidates = Collections.singleton(URI.create(valueNode.getURI()));
-                            }
+                            dependencyCandidates = new HashSet<>();
+                        }
+                        // dependency could be a blank node, literal or IRI that is not explicitly
+                        // covered by a shape
+                        if (valueNode.isLiteral()) {
+                            dependencyCandidates.add(valueNode.getLiteralDatatype()
+                                            .parse(valueNode.getLiteralLexicalForm()));
+                        } else if (valueNode.isURI()) {
+                            dependencyCandidates.add(URI.create(valueNode.getURI()));
                         }
                         Field field = null;
                         try {
-                            Map<Field, Object> fieldsToDependencies = selectFieldByType(fieldsForPath, instance,
+                            SatisfiedFieldDependency fieldDependency = selectFieldByType(fieldsForPath, instance,
                                             dependencyCandidates);
-                            if (fieldsToDependencies == null || fieldsToDependencies.size() == 0) {
+                            if (fieldDependency == null) {
                                 throw new IllegalArgumentException(
                                                 makeWiringErrorMessage(instance, focusNode, dependencyCandidates, null,
                                                                 null)
                                                                 + ": unable to identify appropriate field to set");
                             }
-                            for (Map.Entry<Field, Object> fieldsToSet : fieldsToDependencies.entrySet()) {
-                                field = fieldsToSet.getKey();
-                                Object dependency = fieldsToSet.getValue();
-                                setDependency(instance, field.getName(), dependency);
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("wired {} ",
-                                                    makeWiringMessage(instance, focusNode, dependency, field));
-                                }
+                            field = fieldDependency.getField();
+                            Object dependency = fieldDependency.getDependency();
+                            setDependency(instance, field.getName(), dependency);
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("wired {} ",
+                                                makeWiringMessage(instance, focusNode, dependency, field));
                             }
                         } catch (Throwable e) {
                             throw new IllegalArgumentException(
@@ -633,42 +629,90 @@ public class Shacl2JavaInstanceFactory {
         return String.format("((%s) %s).%s = %s", instClassStr, focusNodeStr, fieldStr, dependencyStr);
     }
 
-    private Map<Field, Object> selectFieldByType(Set<Field> fields, Object instance, Set<Object> dependencyCandidates)
+    private static class SatisfiedFieldDependency {
+        private final Field field;
+        private final Object dependency;
+
+        public SatisfiedFieldDependency(Field field, Object dependency) {
+            this.field = field;
+            this.dependency = dependency;
+        }
+
+        public Object getDependency() {
+            return dependency;
+        }
+
+        public Field getField() {
+            return field;
+        }
+    }
+
+    /**
+     * Finds the best dependency from the object's fields for the set of
+     * dependencies. The priority order is:
+     * <ol>
+     * <li>instances of (subclasses of) GraphEntity,</li>
+     * <li>Sets of GraphEntity</li>
+     * <li>URIs</li>
+     * <li>other values</li>
+     * </ol>
+     * For any set of candidates, only one field and one candidate is selected.
+     *
+     * @param fields
+     * @param instance
+     * @param dependencyCandidates
+     * @return
+     * @throws NoSuchFieldException
+     */
+    private SatisfiedFieldDependency selectFieldByType(Set<Field> fields, Object instance,
+                    Set<Object> dependencyCandidates)
                     throws NoSuchFieldException {
-        Map<Field, Object> mapped = new HashMap<>();
-        for (Field field : fields) {
-            for (Object dependency : dependencyCandidates) {
-                if (field.getType().isAssignableFrom(dependency.getClass())) {
-                    mapped.put(field, dependency);
-                }
-            }
+        Optional<SatisfiedFieldDependency> result = dependencyCandidates
+                        .stream()
+                        .filter(dep -> GraphEntity.class.isAssignableFrom(dep.getClass()) || dep.getClass().isEnum())
+                        .map(dep -> fields
+                                        .stream()
+                                        .filter(f -> isAssignableTypeOrSetOf(f,
+                                                        dep.getClass()))
+                                        .findAny()
+                                        .map(f -> new SatisfiedFieldDependency(f, dep))
+                                        .orElse(null))
+                        .filter(Objects::nonNull)
+                        .findAny();
+        if (result.isPresent()) {
+            return result.get();
         }
-        if (mapped.size() == dependencyCandidates.size()) {
-            return mapped;
-        }
-        for (Field field : fields) {
-            if (mapped.containsKey(field)) {
-                continue;
-            }
-            if (Set.class.isAssignableFrom(field.getType())) {
-                try {
-                    Type typeArg = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-                    for (Object dependency : dependencyCandidates) {
-                        if (typeArg instanceof Class && ((Class<?>) typeArg).isAssignableFrom(dependency.getClass())) {
-                            mapped.put(field, dependency);
-                        }
-                    }
-                } catch (ClassCastException e) {
-                    throw e;
-                }
-            }
-        }
-        if (!mapped.isEmpty()) {
-            return mapped;
+        // no GraphEntity or Set<? extends GraphEntity> found, try any other type
+        result = dependencyCandidates
+                        .stream()
+                        .map(dep -> fields
+                                        .stream()
+                                        .filter(f -> isAssignableTypeOrSetOf(f,
+                                                        dep.getClass()))
+                                        .findAny()
+                                        .map(f -> new SatisfiedFieldDependency(f, dep))
+                                        .orElse(null))
+                        .filter(Objects::nonNull)
+                        .findAny();
+        if (result.isPresent()) {
+            return result.get();
         }
         throw new IllegalStateException(String.format(
                         "Could not find appropriate field for instance %s and dependency candidates %s",
                         instance, Arrays.toString(dependencyCandidates.toArray())));
+    }
+
+    private boolean isAssignableTypeOrSetOf(Field field, Class<?> dependencyType) {
+        if (field.getType().isAssignableFrom(dependencyType)) {
+            return true;
+        }
+        if (Set.class.isAssignableFrom(field.getType())) {
+            Type typeArg = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+            if (typeArg instanceof Class && ((Class<?>) typeArg).isAssignableFrom(dependencyType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void setDependency(Object instance, String fieldName, Object dependency) {
@@ -681,10 +725,14 @@ public class Shacl2JavaInstanceFactory {
             }
         } catch (Exception e) {
             throw new RuntimeException(
-                            String.format("Error using setter/adder method for %s on %s", fieldName, instance), e);
+                            String.format("Error using setter/adder method to set %s.%s = %s", instance,
+                                            fieldName, dependency),
+                            e);
         }
-        throw new RuntimeException(
-                        String.format("Could not find setter/adder method for %s on %s", fieldName, instance));
+        if (logger.isDebugEnabled()) {
+            logger.debug(String.format("Did not find setter/adder method to set %s.%s = %s", instance, fieldName,
+                            dependency));
+        }
     }
 
     private boolean setUsingSetter(Object instance, String fieldName, Object dependency)

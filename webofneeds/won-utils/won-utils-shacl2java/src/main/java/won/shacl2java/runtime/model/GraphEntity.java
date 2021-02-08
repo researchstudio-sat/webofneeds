@@ -6,13 +6,14 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 
 import java.net.URI;
+import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class GraphEntity {
+public abstract class GraphEntity {
     private Node node;
     private Graph graph;
     private Set<EntityTriple> entityTriples = new HashSet<>();
@@ -20,7 +21,7 @@ public class GraphEntity {
 
     /**
      * Create entity identified by the specified URI.
-     * 
+     *
      * @param uri
      */
     public GraphEntity(String uri) {
@@ -220,6 +221,10 @@ public class GraphEntity {
         return Objects.equals(node, that.node);
     }
 
+    public abstract boolean deepEquals(Object other);
+
+    public abstract boolean deepEquals(Object other, ArrayDeque visited);
+
     @Override
     public int hashCode() {
         return Objects.hash(node);
@@ -227,7 +232,7 @@ public class GraphEntity {
 
     @Override
     public String toString() {
-        return "GraphEntity{" +
+        return getClass().getSimpleName() + "{" +
                         "attached=" + (this.graph != null) +
                         ", node=" + node +
                         '}';
