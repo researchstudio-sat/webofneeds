@@ -43,9 +43,6 @@ won-atom-content {
 
     won-atom-content-single-connect-sockets,
     won-atom-content-reactions {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
-      grid-gap: 1rem;
       padding: 0.5rem 0;
 
       won-socket-add-button {
@@ -57,6 +54,10 @@ won-atom-content {
     }
 
     won-atom-content-single-connect-sockets {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+      grid-gap: 1rem;
+
       & > .scs__item {
         > .scs__item__label {
           padding-bottom: 0.25rem;
@@ -76,6 +77,9 @@ won-atom-content {
     }
 
     won-atom-content-reactions {
+      display: flex;
+      grid-gap: 0.5rem;
+      flex-wrap: wrap;
       border-top: $thinGrayBorder;
       padding-bottom: 0;
     }

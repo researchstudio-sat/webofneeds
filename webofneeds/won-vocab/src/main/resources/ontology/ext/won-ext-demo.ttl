@@ -97,13 +97,6 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
                  rdfs:comment "Intention to handle complaints. May be matched with complaints or related groups."@en ;
                  rdfs:label "HandleComplaint" .
 
-
-###  https://w3id.org/won/ext/demo#Interest
-:Interest rdf:type owl:Class ;
-          rdfs:comment "Announce an interest in something, such as a hobby."@en ;
-          rdfs:label "Interest" .
-
-
 ###  https://w3id.org/won/ext/demo#Meetup
 :Meetup rdf:type owl:Class ;
         rdfs:comment "Class for meetups."@en ;

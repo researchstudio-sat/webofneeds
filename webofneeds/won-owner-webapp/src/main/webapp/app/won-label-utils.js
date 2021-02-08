@@ -61,6 +61,10 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Partner Activities",
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Memberships",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
+    [vocab.WXPERSONA.InterestOfSocketCompacted]: "Interest Of",
+    [vocab.WXPERSONA.InterestSocketCompacted]: "Interests",
+    [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise Of",
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: "Expertises",
   },
   socketTabs: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Chat Members",
@@ -94,6 +98,10 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Organizers",
     [vocab.WXSCHEMA.EventSocketCompacted]: "Organized Events",
     [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: "Role Of",
+    [vocab.WXPERSONA.InterestOfSocketCompacted]: "Interest Of",
+    [vocab.WXPERSONA.InterestSocketCompacted]: "Interests",
+    [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise Of",
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: "Expertises",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -127,6 +135,10 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Organized Event",
     [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: "Attendee",
     [vocab.WXSCHEMA.AttendeeSocketCompacted]: "Event",
+    [vocab.WXPERSONA.InterestOfSocketCompacted]: "Interest",
+    [vocab.WXPERSONA.InterestSocketCompacted]: "Interest",
+    [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise",
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: "Expertise",
   },
   socketItems: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Chat Members",
@@ -158,6 +170,10 @@ const labels = deepFreeze({
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Organizers",
     [vocab.WXSCHEMA.AttendeeSocketCompacted]: "Attendees",
     [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: "Events",
+    [vocab.WXPERSONA.InterestOfSocketCompacted]: "Interest Of",
+    [vocab.WXPERSONA.InterestSocketCompacted]: "Interests",
+    [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise Of",
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: "Expertises",
   },
 });
 

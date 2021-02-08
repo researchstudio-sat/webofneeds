@@ -319,7 +319,8 @@ const actionHierarchy = {
       hide: INJ_DEFAULT,
       showEmailInput: INJ_DEFAULT,
     },
-
+    setActivePersonaUri: INJ_DEFAULT,
+    setActivePersonaTab: INJ_DEFAULT,
     toggleSlideIns: INJ_DEFAULT,
   },
 

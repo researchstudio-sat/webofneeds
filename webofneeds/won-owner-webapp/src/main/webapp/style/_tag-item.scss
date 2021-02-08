@@ -1,0 +1,79 @@
+@import "won-config";
+@import "sizing-utils";
+@import "animate";
+
+.ti {
+  border-radius: 0.5rem;
+  background: $won-secondary-color;
+  color: $won-secondary-text-color;
+  margin: 0.25rem 0.25rem 0.25rem 0;
+  padding: 0.25rem 0.5rem;
+
+  &.status--closed {
+    background: $won-light-gray;
+    color: $won-primary-text-color;
+
+    .headerElement {
+      text-decoration: line-through;
+      color: $won-primary-text-color;
+
+      a.won-atom-tag-header .ath__title,
+      won-atom-tag-header .ath__title {
+        color: $won-primary-text-color;
+      }
+    }
+
+    won-tag-socket-actions > .won-button--filled,
+    won-tag-socket-actions > .won-button--outlined {
+      > .won-button-icon {
+        --local-primary: #{$won-primary-text-color};
+      }
+      background: $won-light-gray;
+      color: $won-primary-text-color;
+    }
+
+    .cl__trigger {
+      --local-primary: #{$won-primary-text-color};
+    }
+  }
+
+  div.headerElement {
+    padding: 0;
+
+    &.status--sent {
+      opacity: 0.25;
+    }
+
+    &.status--closed {
+      //TODO: Filter grayscale or something
+    }
+
+    &.status--suggested,
+    &.status--received {
+      @include animateOpacityHeartBeat();
+    }
+  }
+
+  &.won-unread {
+    backgroud: $won-unread-attention;
+    /*box-shadow: 0px 0px 5px 5px var(--won-primary-color);*/
+  }
+
+  won-atom-context-layout > .cl__trigger {
+    --local-primary: #{$won-secondary-text-color};
+    padding: 0;
+  }
+
+  won-tag-socket-actions > .won-button--filled,
+  won-tag-socket-actions > .won-button--outlined {
+    border: 0;
+    background: $won-secondary-color;
+    --local-primary: #{$won-secondary-text-color};
+    border-radius: 0;
+
+    &:active:not(:disabled),
+    &:hover:not(:disabled) {
+      filter: brightness(100%);
+    }
+  }
+}
