@@ -7,14 +7,13 @@
 }
 
 @mixin desktopMenu() {
-  grid-auto-flow: row;
   justify-content: center;
   padding: 0.5rem 0;
   max-width: 20rem;
-}
 
-@mixin mobileMenu() {
-  grid-auto-flow: row;
+  .menu__user > .menu__user__persona > .menu__user__caption {
+    min-width: 10rem;
+  }
 }
 
 @mixin personaMenu() {
@@ -80,6 +79,7 @@
 @mixin genericMenu() {
   display: grid;
   box-sizing: border-box;
+  grid-auto-flow: row;
 
   .menu__user {
     display: grid;
@@ -219,7 +219,6 @@ won-menu.won-menu--show-mobile {
 
   > .menu {
     @include genericMenu();
-    @include mobileMenu();
 
     & > .menu__tab {
       @include genericMenuTab();
@@ -242,9 +241,6 @@ won-menu:not(.won-menu--show-mobile) {
 
     @media (min-width: $responsivenessBreakPoint) {
       @include desktopMenu();
-    }
-    @media (max-width: $responsivenessBreakPoint) {
-      @include mobileMenu();
     }
 
     & > .menu__tab {

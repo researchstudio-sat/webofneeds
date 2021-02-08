@@ -258,7 +258,13 @@ export default function WonMenu({ className }) {
           <WonAtomMenu
             className="persona__menu"
             atom={activePersona}
-            visibleTab={activePersonaTab}
+            visibleTab={
+              history.location.pathname === "/inventory" ||
+              history.location.pathname === "/"
+                ? activePersonaTab
+                : "FIXME:NOTEXISTS"
+            }
+            toggleAddPicker={() => {}}
             setVisibleTab={tabName => {
               hideMenuIfVisible();
               dispatch(actionCreators.view__setActivePersonaTab(tabName));
@@ -276,36 +282,38 @@ export default function WonMenu({ className }) {
             relevantConnectionsMap={relevantActivePersonaConnectionsMap}
           />
         ) : (
-          <NavLink
-            className={generateTabClasses(
-              false,
-              hasUnreadSuggestedConnections || hasUnreadBuddyConnections
-            )}
-            activeClassName="menu__tab--selected"
-            onClick={hideMenuIfVisible}
-            to="/inventory"
-          >
-            <span className="menu__tab__unread" />
-            <span className="menu__tab__label">Inventory</span>
-          </NavLink>
+          <React.Fragment>
+            <NavLink
+              className={generateTabClasses(
+                false,
+                hasUnreadSuggestedConnections || hasUnreadBuddyConnections
+              )}
+              activeClassName="menu__tab--selected"
+              onClick={hideMenuIfVisible}
+              to="/inventory"
+            >
+              <span className="menu__tab__unread" />
+              <span className="menu__tab__label">Inventory</span>
+            </NavLink>
+            <NavLink
+              className={generateTabClasses(false, hasUnreadChatConnections)}
+              activeClassName="menu__tab--selected"
+              onClick={hideMenuIfVisible}
+              to="/connections"
+            >
+              <span className="menu__tab__unread" />
+              <span className="menu__tab__label">Chats</span>
+            </NavLink>
+            <NavLink
+              className={generateTabClasses()}
+              activeClassName="menu__tab--selected"
+              onClick={hideMenuIfVisible}
+              to="/create"
+            >
+              <span className="menu__tab__label">Create</span>
+            </NavLink>
+          </React.Fragment>
         )}
-        <NavLink
-          className={generateTabClasses(false, hasUnreadChatConnections)}
-          activeClassName="menu__tab--selected"
-          onClick={hideMenuIfVisible}
-          to="/connections"
-        >
-          <span className="menu__tab__unread" />
-          <span className="menu__tab__label">Chats</span>
-        </NavLink>
-        <NavLink
-          className={generateTabClasses()}
-          activeClassName="menu__tab--selected"
-          onClick={hideMenuIfVisible}
-          to="/create"
-        >
-          <span className="menu__tab__label">Create</span>
-        </NavLink>
         <NavLink
           className={generateTabClasses()}
           activeClassName="menu__tab--selected"
