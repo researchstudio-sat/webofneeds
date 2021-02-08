@@ -44,16 +44,16 @@ import vocab from "./vocab.js";
      * ACL
      */
     const aclGraph = [];
-    const acls = args.acls ? args.acls : [];
-    const authBlankNodeIds = acls.map(function(a, i) {
+    const acl = args.acl ? args.acl : [];
+    const authBlankNodeIds = acl.map(function(a, i) {
       return "_:auth-" + i;
     });
 
-    acls.forEach(function(acl, i) {
+    acl.forEach(function(authorization, i) {
       aclGraph.push({
         "@id": authBlankNodeIds[i],
         "@type": [vocab.AUTH.AuthorizationCompacted],
-        ...acl,
+        ...authorization,
       });
     });
 

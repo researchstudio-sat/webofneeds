@@ -325,7 +325,7 @@ export function buildEditMessage(editedAtomData, oldAtom) {
       msgType: vocab.WONMSG.replaceMessage, //mandatory
       publishedContentUri: atomUriToEdit, //mandatory
       msgUri: vocab.WONMSG.uriPlaceholder.event,
-      acls: editedAtomData.acls,
+      acl: editedAtomData.acl,
     }
   );
   //add the @base definition to the @context so we can use #fragments in the atom structure
@@ -370,7 +370,7 @@ export function buildCreateMessage(atomData, wonNodeUri) {
       msgType: vocab.WONMSG.createMessage, //mandatory
       publishedContentUri: publishedContentUri, //mandatory
       msgUri: vocab.WONMSG.uriPlaceholder.event,
-      acls: atomData.acls,
+      acl: atomData.acl,
     }
   );
   //add the @base definition to the @context so we can use #fragments in the atom structure

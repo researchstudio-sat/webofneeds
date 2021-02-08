@@ -59,8 +59,13 @@ ex:expectedResult6
     auth:decision           auth:accessDenied ;
     auth:requestedOperation <#request6> .
 
+ex:expectedResult7
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request7> .
 
-# See only atom graph when buddies
+
+# See holderSocket connections of atoms buddies
 
 <#authorization>
     a            auth:Authorization ;
@@ -103,28 +108,28 @@ ex:expectedResult6
     auth:reqPosition auth:positionAtomGraph .
 
 <#request3>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom2:buddyConnection1 ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom2 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnections .
+    a                  auth:OperationRequest ;
+    auth:reqConnection atom2:buddyConnection1 ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqPosition   auth:positionConnections .
 
 <#request4>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom5:buddyConnection1 ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom5 ;
-    auth:reqAtom                 ex:atom1 ;
-    auth:reqPosition             auth:positionConnection .
+    a                  auth:OperationRequest ;
+    auth:reqConnection atom5:buddyConnection1 ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom5 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqPosition   auth:positionConnection .
 
 <#request5>
-    a                            auth:OperationRequest ;
-    auth:reqConnection           atom1:buddyConnection1 ;
-    auth:operation               auth:opRead ;
-    auth:requestor               ex:atom1 ;
-    auth:reqAtom                 ex:atom2 ;
-    auth:reqPosition             auth:positionConnection .
+    a                  auth:OperationRequest ;
+    auth:reqConnection atom1:buddyConnection1 ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom1 ;
+    auth:reqAtom       ex:atom2 ;
+    auth:reqPosition   auth:positionConnection .
 
 <#request6>
     a                  auth:OperationRequest ;
@@ -134,6 +139,14 @@ ex:expectedResult6
     auth:reqAtom       ex:atom1 ;
     auth:reqPosition   auth:positionConnection .
 
+
+<#request7>
+    a                  auth:OperationRequest ;
+    auth:reqConnection atom1:buddyConnection1 ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom1 ;
+    auth:reqAtom       ex:atom2 ;
+    auth:reqPosition   auth:positionConnections .
 #Persona 1
 
 ex:atom1

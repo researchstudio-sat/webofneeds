@@ -34,7 +34,7 @@ export const persona = {
         },
       },
       seeks: {},
-      acls: [
+      acl: [
         defaultPublicAtomAuthorization,
         seeHolderSocketConnectionsAuthorization,
         connectedConectionsAuthorization,

@@ -64,7 +64,7 @@ export const seeHolderSocketConnectionsAuthorization = {
     },
     [vocab.AUTH.socketCompacted]: {
       [vocab.AUTH.socketTypeCompacted]: {
-        "@id": vocab.WON.HolderSocketCompacted,
+        "@id": vocab.HOLD.HolderSocketCompacted,
       },
       [vocab.AUTH.connectionsCompacted]: {
         [vocab.AUTH.connectionStateCompacted]: {
@@ -72,8 +72,6 @@ export const seeHolderSocketConnectionsAuthorization = {
         },
         [vocab.AUTH.operationCompacted]: [
           { "@id": vocab.AUTH.opReadCompacted },
-          { "@id": vocab.AUTH.opConnectCloseCompacted },
-          { "@id": vocab.AUTH.opCommunicateCompacted },
         ],
         [vocab.AUTH.connectionMessagesCompacted]: {
           [vocab.AUTH.inheritCompacted]: false,
@@ -84,7 +82,7 @@ export const seeHolderSocketConnectionsAuthorization = {
 };
 
 // Atoms that are connected can see their connections to communicate
-const connectedConectionsAuthorization = {
+export const connectedConectionsAuthorization = {
   [vocab.AUTH.granteeCompacted]: {
     [vocab.AUTH.socketCompacted]: {
       [vocab.AUTH.connectionCompacted]: {
@@ -133,7 +131,7 @@ export const emptyDraftImm = Immutable.fromJS({
     },
   },
   seeks: {},
-  acls: [defaultPublicAtomAuthorization, connectedConectionsAuthorization],
+  acl: [defaultPublicAtomAuthorization, connectedConectionsAuthorization],
 });
 
 export const defaultReactions = {
@@ -182,18 +180,22 @@ export const defaultReactions = {
  * @param contentToMerge
  * @returns {any|*}
  */
-export function mergeInEmptyDraft(contentToMerge) {
-  if (!contentToMerge) return emptyDraftImm.toJS();
-  const contentToMergeImm = Immutable.fromJS(contentToMerge);
-  const mergeSockets = contentToMergeImm.getIn(["content", "sockets"]);
-
+export function mergeInEmptyDraft(draftToMerge) {
+  if (!draftToMerge) return emptyDraftImm.toJS();
+  const draftToMergeImm = Immutable.fromJS(draftToMerge);
+  const mergeSockets = draftToMergeImm.getIn(["content", "sockets"]);
   let mergedDraftImm = emptyDraftImm;
 
   if (mergeSockets && mergeSockets.size > 0) {
     mergedDraftImm = mergedDraftImm.removeIn(["content", "sockets"]);
   }
+  const mergeAcl = draftToMergeImm.getIn(["acl"]);
+  if (mergeAcl && mergeAcl.size > 0) {
+    mergedDraftImm = mergedDraftImm.removeIn(["acl"]);
+  }
 
-  mergedDraftImm = mergedDraftImm.mergeDeep(contentToMergeImm);
+  mergedDraftImm = mergedDraftImm.mergeDeep(draftToMergeImm);
+
   return mergedDraftImm.toJS();
 }
 
