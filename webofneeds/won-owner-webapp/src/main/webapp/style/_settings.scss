@@ -5,9 +5,6 @@
 
 aside.settings__left {
   border-right: $thinGrayBorder;
-  @media (max-width: $responsivenessBreakPoint) {
-    grid-column: 1 / -1;
-  }
 
   > .settings__left__item {
     padding: 1rem;

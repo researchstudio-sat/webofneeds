@@ -79,12 +79,13 @@ export const lunchPlan = {
         s: won.defaultContext["s"],
         match: won.defaultContext["match"],
         demo: won.defaultContext["demo"],
+        "wx-persona": won.defaultContext["wx-persona"],
       },
       distinct: true,
       variables: [resultName, "?score"],
       subQueries: subQueries,
       where: [
-        `${resultName} rdf:type demo:Interest.`,
+        `${resultName} rdf:type wx-persona:Interest.`,
         `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://www.wikidata.org/entity/Q12896105>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,
@@ -107,8 +108,12 @@ export const lunchInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["demo:Interest"],
+        type: ["wx-persona:Interest"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
+        sockets: {
+          "#chatSocket": vocab.CHAT.ChatSocketCompacted,
+          "#interestOfSocket": vocab.WXPERSONA.InterestOfSocketCompacted,
+        },
       },
       seeks: {},
     }),

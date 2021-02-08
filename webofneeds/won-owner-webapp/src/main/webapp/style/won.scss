@@ -34,15 +34,14 @@ body {
 
       @media (min-width: $responsivenessBreakPoint) {
         grid-template-areas:
-          "header header header header"
-          "menu menu menu menu"
-          "info info info info"
-          ". list content ."
-          ". . . ."
-          "footer footer footer footer";
-        grid-template-rows: min-content min-content min-content max-content 1fr min-content;
+          "header header header header header"
+          "menu info info info info"
+          "menu . list content ."
+          "menu . . . ."
+          "menu footer footer footer footer";
+        grid-template-rows: min-content min-content max-content 1fr min-content;
         grid-template-columns:
-          1fr minmax(min-content, $maxContentWidth/3) minmax(
+          min-content 1fr minmax(min-content, $maxContentWidth/3) minmax(
             min-content,
             (($maxContentWidth/3) * 2)
           )
@@ -98,8 +97,6 @@ body {
 
     > won-menu {
       box-sizing: border-box;
-      height: var(--menuHeight);
-      top: var(--headerHeight);
       z-index: 999;
 
       &.won-menu--show-mobile {
@@ -135,7 +132,8 @@ body {
 
     > main.overview__nochats {
       grid-area: content;
-      grid-column: 1 / -1;
+      grid-column: 2 / -1;
+
       > .overview__nochats__empty {
         box-sizing: border-box;
         position: sticky;
@@ -182,7 +180,7 @@ body {
 
     > main.overview__justconnection {
       @media (min-width: $responsivenessBreakPoint) {
-        grid-column: 2 / 4;
+        grid-column: 3 / 4;
 
         > * {
           border-left: $thinGrayBorder;
@@ -194,12 +192,56 @@ body {
     > main.about {
       grid-area: list;
       @media (min-width: $responsivenessBreakPoint) {
-        grid-column: 1 / -1;
+        grid-column: 2 / -1;
       }
     }
 
     > won-footer {
       grid-area: footer;
+    }
+  }
+}
+
+@media (max-width: $responsivenessBreakPoint) {
+  aside.overview__left,
+  main.ownercreate,
+  main.ownermap,
+  main.ownerinventory,
+  main.owneroverview,
+  main.ownerwelcome,
+  main.atomcontent,
+  aside.settings__left,
+  main.about {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: $responsivenessBreakPoint) {
+  section {
+    > aside.overview__left,
+    > main.ownercreate,
+    > main.ownermap,
+    > main.ownerinventory,
+    > main.owneroverview,
+    > main.ownerwelcome,
+    > main.atomcontent,
+    > aside.settings__left,
+    > main.about {
+      grid-column: 2 / -1;
+    }
+
+    &.won-signed-out {
+      > aside.overview__left,
+      > main.ownercreate,
+      > main.ownermap,
+      > main.ownerinventory,
+      > main.owneroverview,
+      > main.ownerwelcome,
+      > main.atomcontent,
+      > aside.settings__left,
+      > main.about {
+        grid-column: 1 / -1;
+      }
     }
   }
 }
@@ -252,6 +294,7 @@ a {
   //color: $won-primary-color;
   color: $won-secondary-color-lighter;
   text-decoration: none;
+
   &:visited {
     //color: darken($won-primary-color, 30%);
     color: $won-secondary-color-light;
@@ -269,13 +312,14 @@ svg {
 //QUICK FIX for broken elm back button
 main.settings won-svg-icon {
   @include fixed-square($postIconSize);
+
   > svg {
     @include fixed-square($postIconSize);
   }
 }
 
 main.ownerloading {
-  grid-column: 1 / -1;
+  grid-column: 2 / -1;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -4,19 +4,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 
 import "~/style/_menu.scss";
-import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
-import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
-import { NavLink, useHistory } from "react-router-dom";
+import { Link, NavLink, useHistory } from "react-router-dom";
+import ico36_person_anon from "~/images/won-icons/ico36_person_anon.svg";
+import ico36_person from "~/images/won-icons/ico36_person.svg";
+import { generateLink } from "~/app/utils";
+import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
 
 export default function WonMenu({ className }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const hasSlideIns = useSelector(viewSelectors.hasSlideIns(history));
   const isMenuVisible = useSelector(viewSelectors.isMenuVisible);
-  const isSlideInsVisible = useSelector(viewSelectors.isSlideInsVisible);
+  const accountState = useSelector(generalSelectors.getAccountState);
+
+  const email = accountUtils.getEmail(accountState);
+  const isAnonymous = accountUtils.isAnonymous(accountState);
   const isLocationAccessDenied = useSelector(
     generalSelectors.isLocationAccessDenied
   );
@@ -48,11 +54,6 @@ export default function WonMenu({ className }) {
     return classes.join(" ");
   }
 
-  function toggleSlideIns() {
-    hideMenuIfVisible();
-    dispatch(actionCreators.view__toggleSlideIns());
-  }
-
   function hideMenuIfVisible() {
     if (isMenuVisible) {
       dispatch(actionCreators.view__hideMenu());
@@ -63,6 +64,10 @@ export default function WonMenu({ className }) {
     viewWhatsX(() => {
       hideMenuIfVisible();
     });
+  }
+
+  function logout() {
+    dispatch(actionCreators.account__logout(history));
   }
 
   function viewWhatsNew() {
@@ -118,10 +123,9 @@ export default function WonMenu({ className }) {
         // TODO: Fix me.
         // Handler is closing menu before actual MenuAction is toggled
         // dispatch(actionCreators.view__hideMenu());
-
-        return;
       }
     }
+
     document.addEventListener("mousedown", handleClick, false);
 
     return function cleanup() {
@@ -131,7 +135,46 @@ export default function WonMenu({ className }) {
 
   return (
     <won-menu class={generateRootClasses()} ref={node => (thisNode = node)}>
+      <div className="personas">
+        <Link
+          className="personas__create"
+          to={location =>
+            generateLink(
+              location,
+              {
+                useCase: "persona",
+              },
+              "/create",
+              false
+            )
+          }
+        >
+          <svg className="personas__create__icon" title="Create a new Persona">
+            <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
+          </svg>
+        </Link>
+      </div>
       <div className="menu">
+        <div className="menu__user">
+          {isAnonymous ? (
+            <React.Fragment>
+              <svg className="menu__user__icon">
+                <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
+              </svg>
+              <span className="menu__user__caption">Anonymous</span>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <svg className="menu__user__icon">
+                <use xlinkHref={ico36_person} href={ico36_person} />
+              </svg>
+              <span className="menu__user__caption">{email}</span>
+            </React.Fragment>
+          )}
+          <a className="menu__user__signout" onClick={logout}>
+            Sign out
+          </a>
+        </div>
         <NavLink
           className={generateTabClasses(
             false,
@@ -177,37 +220,23 @@ export default function WonMenu({ className }) {
         >
           <span className="menu__tab__label">{"What's Around"}</span>
         </NavLink>
-        {hasSlideIns ? (
-          <div
-            className="menu__slideintoggle hide-in-responsive"
-            onClick={toggleSlideIns}
+        <NavLink
+          className={generateTabClasses()}
+          activeClassName="menu__tab--selected"
+          onClick={hideMenuIfVisible}
+          to="/settings"
+        >
+          <span className="menu__tab__label">Account Settings</span>
+        </NavLink>
+        {isAnonymous && (
+          <NavLink
+            className={generateTabClasses()}
+            activeClassName="menu__tab--selected"
+            onClick={hideMenuIfVisible}
+            to="/signup"
           >
-            <svg className="menu__slideintoggle__icon">
-              <use
-                xlinkHref={ico16_indicator_warning}
-                href={ico16_indicator_warning}
-              />
-            </svg>
-            <svg
-              className={
-                "menu__slideintoggle__carret " +
-                (isSlideInsVisible
-                  ? " menu__slideintoggle__carret--expanded "
-                  : "")
-              }
-            >
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-            <span className="menu__slideintoggle__label">
-              {isSlideInsVisible ? (
-                <span>Hide Info Slide-Ins</span>
-              ) : (
-                <span>Show Info Slide-Ins</span>
-              )}
-            </span>
-          </div>
-        ) : (
-          undefined
+            <span>Sign up</span>
+          </NavLink>
         )}
       </div>
     </won-menu>
