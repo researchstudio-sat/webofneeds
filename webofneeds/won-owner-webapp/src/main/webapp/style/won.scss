@@ -182,7 +182,7 @@ body {
 
     > main.overview__justconnection {
       @media (min-width: $responsivenessBreakPoint) {
-        grid-column: 3 / 4;
+        grid-column: 3 / 5;
 
         > * {
           border-left: $thinGrayBorder;
