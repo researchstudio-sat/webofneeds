@@ -1,25 +1,22 @@
 package won.node.service.persistence;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.node.service.linkeddata.lookup.SocketLookup;
 import won.protocol.exception.NoAtomForSocketFoundException;
-import won.protocol.exception.NoDefaultSocketException;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchSocketException;
 import won.protocol.model.Socket;
 import won.protocol.model.SocketDefinition;
 import won.protocol.repository.AtomRepository;
 import won.protocol.repository.SocketRepository;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service that is informed of a state change of a connection and performs data
@@ -39,22 +36,12 @@ public class SocketService {
     public SocketService() {
     }
 
-    public Optional<Socket> getDefaultSocket(URI atomUri) throws NoSuchAtomException {
-        List<Socket> sockets = socketRepository.findByAtomURI(atomUri);
-        for (Socket socket : sockets) {
-            if (socket.isDefaultSocket())
-                return Optional.of(socket);
-        }
-        return sockets.stream().findFirst();
-    }
-
     public Socket getSocket(URI atomUri, Optional<URI> socketUri) throws IllegalArgumentException, NoSuchAtomException {
         if (socketUri.isPresent()) {
             return socketRepository.findOneBySocketURI(socketUri.get())
                             .orElseThrow(() -> new NoSuchSocketException(socketUri.get()));
         }
-        return getDefaultSocket(atomUri)
-                        .orElseThrow(() -> new NoDefaultSocketException(atomUri));
+        return null;
     }
 
     public Optional<URI> getAtomOfSocket(URI socketURI) {
