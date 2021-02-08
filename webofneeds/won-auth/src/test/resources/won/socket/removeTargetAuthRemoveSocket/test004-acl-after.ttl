@@ -1,0 +1,15 @@
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-group: <https://w3id.org/won/ext/group#> .
+
+[ a                auth:Authorization ;
+  auth:requestedBy <https://example.com/won/resource/atom/own-atom#not-our-socket> ;
+  auth:grantee     [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                   auth:connection [ auth:connectionState won:Connected, won:RequestSent ] ;
+                                   auth:targetAtom [ ] ; ] ] ;
+  auth:grant       [ auth:graph  [ auth:graphType auth:sysinfoGraph, auth:contentGraph ;
+                                   auth:operation auth:opRead ; ] ;
+                     auth:socket [ auth:socketType         wx-buddy:BuddySocket ;
+                                   auth:operation          auth:opRead ;
+                                   auth:connectionMessages [ auth:inherit false ; ] ] ] ] .

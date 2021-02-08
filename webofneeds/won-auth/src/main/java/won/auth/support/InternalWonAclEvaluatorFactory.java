@@ -4,6 +4,7 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.shacl.Shapes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.auth.AuthUtils;
 import won.auth.WonAclEvaluator;
 import won.auth.check.AtomNodeChecker;
 import won.auth.check.TargetAtomCheckEvaluator;
@@ -30,7 +31,7 @@ public class InternalWonAclEvaluatorFactory {
                     WebIdKeyLoader webIdKeyLoader) {
         this.targetAtomCheckEvaluator = targetAtomCheckEvaluator;
         this.shapes = shapes;
-        this.instanceFactory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
+        this.instanceFactory = AuthUtils.newInstanceFactory();
         this.webIdKeyLoader = webIdKeyLoader;
         this.atomNodeChecker = atomNodeChecker;
     }

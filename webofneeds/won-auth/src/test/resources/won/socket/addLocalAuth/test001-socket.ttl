@@ -1,0 +1,66 @@
+@prefix :        <https://w3id.org/won/ext/buddy#> .
+@prefix s:       <http://schema.org/> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:     <https://w3id.org/won/core#> .
+@prefix xml:     <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann:    <http://purl.org/vocab/vann/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix auth:    <https://w3id.org/won/auth#> .
+@base            <https://w3id.org/won/ext/buddy> .
+
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://schema.org/knows
+
+s:knows
+    rdf:type owl:ObjectProperty .
+
+
+###  https://w3id.org/won/ext/buddy#buddy
+
+:buddy
+    rdf:type           owl:ObjectProperty ;
+    rdfs:subPropertyOf s:knows ;
+    rdfs:domain        won:Atom ;
+    rdfs:range         won:Atom ;
+    rdfs:comment
+                       "Links a buddy Atom to one of its buddies. This should generally imply natural persons on both ends. We interpret buddies are people who like to do things together; such as engaging in sports or other social activities."@en ;
+    rdfs:label         "buddy" .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/won/ext/buddy#BuddySocket
+
+:BuddySocket
+    rdf:type                       owl:NamedIndividual, won:SocketDefinition ;
+    won:compatibleSocketDefinition :BuddySocket ;
+    won:derivesAtomProperty        :buddy ;
+    rdfs:comment                   "Compatible with other BuddySockets, derives the buddy relationship."@en ;
+    rdfs:label                     "BuddySocket" .
+
+:BuddySocket
+    a              won:SocketDefinition ;
+    auth:localAuth [ a            auth:Authorization ;
+                     auth:grantee [ auth:socket [ auth:socketType :BuddySocket ;
+                                                  auth:connection
+                                                                  [ auth:connectionState
+                                                                          won:Connected, won:RequestSent ] ;
+                                                  auth:targetAtom [ ] ; ] ] ;
+                     auth:grant   [ auth:graph  [ auth:graphType auth:sysinfoGraph, auth:contentGraph ;
+                                                  auth:operation auth:opRead ; ] ;
+                                    auth:socket [ auth:socketType         :BuddySocket ;
+                                                  auth:operation          auth:opRead ;
+                                                  auth:connectionMessages [ auth:inherit false ; ] ] ] ] .
+

@@ -5,11 +5,14 @@ import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.shacl.Shapes;
+import org.apache.jena.sparql.graph.GraphFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.protocol.message.WonMessageType;
+import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
@@ -26,6 +29,23 @@ public class AuthUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String JWT_FIELD_SIG = "sig";
     private static final String JWT_FIELD_SCOPE = "scope";
+    private static final Shapes shapes = Shapes.parse(readShapesData());
+
+    private static Graph readShapesData() {
+        Graph graph = GraphFactory.createGraphMem();
+        RDFDataMgr.read(graph,
+                        AuthUtils.class.getClassLoader().getResourceAsStream("shacl/won-auth-shapes.ttl"),
+                        Lang.TTL);
+        return graph;
+    }
+
+    public static Shapes shapes() {
+        return shapes;
+    }
+
+    public static Shacl2JavaInstanceFactory newInstanceFactory() {
+        return new Shacl2JavaInstanceFactory(shapes(), "won.auth.model");
+    }
 
     public static Optional<Long> getExpiresAfterSecondsLong(TokenSpecification spec) {
         if (spec.getExpiresAfterInteger() != null) {

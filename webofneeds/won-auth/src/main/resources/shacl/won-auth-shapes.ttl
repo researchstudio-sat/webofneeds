@@ -517,52 +517,23 @@ auth:granteeWildcardShape
     sh:nodeKind          sh:IRI ;
     sh:in                ( auth:anyone ) .
 
-# Definition 24 (authorization request)
-
-auth:authorizationRequestShape
-    a                    sh:NodeShape ;
-    sh:targetClass       auth:AuthorizationRequest ;
-    sh:class             auth:AuthorizationRequest ;
-    sh:closed            true ;
-    sh:ignoredProperties ( rdf:type auth:grantee auth:grant auth:grantToken auth:provideAuthInfo
-                           auth:bearer ) ;
-    sh:or                ( [ sh:property [ sh:path     auth:grantee ;
-                                           sh:minCount 1 ;
-                                           sh:node     auth:atomExpressionShape ] ]
-                           [ sh:property [ sh:path     auth:grantee ;
-                                           sh:minCount 1 ;
-                                           sh:node     auth:aseRootShape ] ]
-                           [ sh:property [ sh:path     auth:grantee ;
-                                           sh:minCount 1 ;
-                                           sh:maxCount 1 ;
-                                           sh:node     auth:granteeWildcardShape ] ]
-                           [ sh:property [ sh:path     auth:bearer ;
-                                           sh:minCount 1 ;
-                                           sh:node     auth:tokenShapeShape ; ] ] ) ;
-    sh:or                ( [ sh:property [ sh:path     auth:grant ;
-                                           sh:minCount 1 ;
-                                           sh:node     auth:aseRootShape ] ]
-                           [ sh:property [ sh:path     auth:provideAuthInfo ;
-                                           sh:minCount 1 ;
-                                           sh:maxCount 1 ;
-                                           sh:node     auth:aseRootShape ] ] ) .
-
 # Requesting authorization
 
-auth:requestsOwnAuthorizationPropertyShape
+auth:localAuthPropertyShape
     a       sh:PropertyShape ;
-    sh:path auth:requestsOwnAuthorization ;
-    sh:node auth:authorizationRequestShape .
+    sh:path auth:localAuth ;
+    sh:node auth:authorizationShape .
 
-auth:requestsPartnerAuthorizationShape
+auth:targetAuthPropertyShape
     a       sh:PropertyShape ;
-    sh:path auth:requestsPartnerAuthorization ;
-    sh:node auth:authorizationRequestShape .
+    sh:path auth:targetAuth ;
+    sh:node auth:authorizationShape .
 
-auth:requestsReciprocalAuthorizationShape
-    a       sh:PropertyShape ;
-    sh:path auth:requestsReciprocalAuthorization ;
-    sh:node auth:authorizationRequestShape .
+auth:SocketDefinitionShape
+    a              sh:NodeShape ;
+    sh:targetClass won:SocketDefinition ;
+    sh:property    auth:localAuthPropertyShape ;
+    sh:property    auth:targetAuthPropertyShape .
 
 # Requesting an operation (might not be necessary to express this in RDF)
 
@@ -750,9 +721,6 @@ auth:OperationAttempt
     a owl:Class .
 
 auth:ImplicitAuthorization
-    a owl:Class .
-
-auth:AuthorizationRequest
     a owl:Class .
 
 auth:Operation
