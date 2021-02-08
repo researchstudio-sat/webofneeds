@@ -1441,16 +1441,18 @@ public class AclTests extends AbstractBotBasedTest {
                 protected void onActivate(Optional<Object> message) {
                     bus.subscribe(ConnectFromOtherAtomEvent.class,
                                     new EventFilter() {
-                                        @Override public boolean accept(Event event) {
+                                        @Override
+                                        public boolean accept(Event event) {
                                             return event instanceof ConnectFromOtherAtomEvent
                                                             && ((ConnectFromOtherAtomEvent) event)
-                                                            .getSenderSocket()
-                                                            .equals(URI.create(atomUri1.toString()
-                                                                            + "#chatSocket"));
+                                                                            .getSenderSocket()
+                                                                            .equals(URI.create(atomUri1.toString()
+                                                                                            + "#chatSocket"));
                                         }
                                     },
                                     new BaseEventBotAction(ctx) {
-                                        @Override protected void doRun(Event event, EventListener executingListener)
+                                        @Override
+                                        protected void doRun(Event event, EventListener executingListener)
                                                         throws Exception {
                                             passTest(bus);
                                         }
