@@ -130,8 +130,8 @@
         <jjwt.version>0.11.2</jjwt.version>
         <org.apache.commons.email.version>1.3.1</org.apache.commons.email.version>
         <net.sf.ehcache.version>2.6.8</net.sf.ehcache.version>
-        <org.apache.jena.version>3.18.0-SNAPSHOT</org.apache.jena.version>
-        <org.apache.jena-tdb.version>3.18.0-SNAPSHOT</org.apache.jena-tdb.version>
+        <org.apache.jena.version>4.0.0-SNAPSHOT</org.apache.jena.version>
+        <org.apache.jena-tdb.version>4.0.0-SNAPSHOT</org.apache.jena-tdb.version>
         <org.apache.httpcomponents.version>4.5.13</org.apache.httpcomponents.version>
         <org.hibernate.version>5.4.27.Final</org.hibernate.version>
         <org.hibernate.hibernate-validator.version>6.1.6.Final</org.hibernate.hibernate-validator.version>
@@ -331,7 +331,7 @@
             <dependency>
                 <groupId>org.apache.jena</groupId>
                 <artifactId>jena-arq</artifactId>
-                <version>3.18.0-20210205.073020-31</version>
+                <version>${org.apache.jena.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
