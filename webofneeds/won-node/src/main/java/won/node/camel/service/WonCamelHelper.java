@@ -1,12 +1,8 @@
 package won.node.camel.service;
 
-import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import org.apache.camel.Exchange;
-
+import won.auth.WonAclEvaluator;
+import won.auth.model.OperationRequest;
 import won.node.service.persistence.ConnectionService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
@@ -15,6 +11,11 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Connection;
 import won.protocol.util.RdfUtils;
+
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class WonCamelHelper {
     //// message
@@ -82,8 +83,9 @@ public class WonCamelHelper {
     public static Optional<WonMessageDirection> getDirection(Exchange exchange) {
         Objects.requireNonNull(exchange);
         URI uri = (URI) exchange.getIn().getHeader(WonCamelConstants.DIRECTION_HEADER);
-        if (uri == null)
+        if (uri == null) {
             return Optional.empty();
+        }
         WonMessageDirection direction = WonMessageDirection.getWonMessageDirection(uri);
         return Optional.ofNullable(direction);
     }
@@ -103,8 +105,9 @@ public class WonCamelHelper {
     public static Optional<WonMessageType> getMessageType(Exchange exchange) {
         Objects.requireNonNull(exchange);
         URI uri = (URI) exchange.getIn().getHeader(WonCamelConstants.MESSAGE_TYPE_HEADER);
-        if (uri == null)
+        if (uri == null) {
             return Optional.empty();
+        }
         WonMessageType type = WonMessageType.getWonMessageType(uri);
         return Optional.ofNullable(type);
     }
@@ -303,6 +306,37 @@ public class WonCamelHelper {
         }
         return connectionService.getConnectionForMessageRequired(getMessageRequired(exchange),
                         getDirectionRequired(exchange));
+    }
+
+    public static void putWonAclEvaluator(Exchange exchange, WonAclEvaluator evaluator) {
+        Objects.requireNonNull(exchange);
+        Objects.requireNonNull(evaluator);
+        exchange.getIn().setHeader(WonCamelConstants.WON_ACL_EVALUATOR_HEADER, evaluator);
+    }
+
+    public static Optional<WonAclEvaluator> getWonAclEvaluator(Exchange exchange) {
+        return Optional.ofNullable(
+                        (WonAclEvaluator) exchange.getIn().getHeader(WonCamelConstants.WON_ACL_EVALUATOR_HEADER));
+    }
+
+    public static WonAclEvaluator getWonAclEvaluatorRequired(Exchange exchange) {
+        return getWonAclEvaluator(exchange).orElseThrow(expectedHeader(WonCamelConstants.WON_ACL_EVALUATOR_HEADER));
+    }
+
+    public static void putWonAclOperationRequest(Exchange exchange, OperationRequest operationRequest) {
+        Objects.requireNonNull(exchange);
+        Objects.requireNonNull(operationRequest);
+        exchange.getIn().setHeader(WonCamelConstants.WON_ACL_OPERATION_REQUEST_HEADER, operationRequest);
+    }
+
+    public static Optional<OperationRequest> getWonAclOperationRequest(Exchange exchange) {
+        return Optional.ofNullable((OperationRequest) exchange.getIn()
+                        .getHeader(WonCamelConstants.WON_ACL_OPERATION_REQUEST_HEADER));
+    }
+
+    public static OperationRequest getWonAclOperationRequestRequired(Exchange exchange) {
+        return getWonAclOperationRequest(exchange).orElseThrow(expectedHeader(
+                        WonCamelConstants.WON_ACL_OPERATION_REQUEST_HEADER));
     }
 
     /**

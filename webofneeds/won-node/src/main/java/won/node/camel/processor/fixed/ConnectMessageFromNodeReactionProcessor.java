@@ -1,19 +1,19 @@
 package won.node.camel.processor.fixed;
 
-import java.net.URI;
-
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
+import won.node.camel.service.WonCamelHelper;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.vocabulary.WONMSG;
+
+import java.net.URI;
 
 @Component
 @FixedMessageReactionProcessor(direction = WONMSG.FromExternalString, messageType = WONMSG.ConnectMessageString)
@@ -25,7 +25,10 @@ public class ConnectMessageFromNodeReactionProcessor extends AbstractCamelProces
         // if the connection's socket isAutoOpen, send an open automatically.
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
-        if (connectionService.shouldSendAutoOpenForConnect(wonMessage)) {
+        if (connectionService.shouldSendAutoOpenForConnect(
+                        wonMessage,
+                        WonCamelHelper.getWonAclEvaluator(exchange).orElse(null),
+                        WonCamelHelper.getWonAclOperationRequest(exchange).orElse(null))) {
             sendAutoOpenForConnect(wonMessage);
         }
     }

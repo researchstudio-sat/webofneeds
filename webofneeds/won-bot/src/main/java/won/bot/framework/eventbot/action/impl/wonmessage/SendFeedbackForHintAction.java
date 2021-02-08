@@ -10,13 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Random;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -26,6 +21,10 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Random;
 
 /**
  * User: fkleedorfer Date: 30.01.14

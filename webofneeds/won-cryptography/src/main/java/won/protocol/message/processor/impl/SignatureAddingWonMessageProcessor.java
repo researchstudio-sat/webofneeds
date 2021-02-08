@@ -1,5 +1,17 @@
 package won.protocol.message.processor.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
+import won.cryptography.service.CryptographyService;
+import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.message.WonMessage;
+import won.protocol.message.processor.WonMessageProcessor;
+import won.protocol.util.Prefixer;
+import won.protocol.util.RdfUtils;
+import won.protocol.vocabulary.WONMSG;
+
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.security.PrivateKey;
@@ -9,20 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
-import won.cryptography.service.CryptographyService;
-import won.protocol.exception.WonMessageProcessingException;
-import won.protocol.message.WonMessage;
-import won.protocol.message.processor.WonMessageProcessor;
-import won.protocol.util.Prefixer;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.WonMessageUriHelper;
-import won.protocol.vocabulary.WONMSG;
-
 /**
  * User: ypanchenko Date: 03.04.2015
  */
@@ -31,7 +29,7 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
     @Autowired
     private CryptographyService cryptographyService;
     @Autowired(required = false) // in production, there is a factory setting this value, for testing, we use
-                                 // Autowired
+    // Autowired
     private KeyPairAliasDerivationStrategy keyPairAliasDerivationStrategy;
 
     public SignatureAddingWonMessageProcessor() {
@@ -82,10 +80,33 @@ public class SignatureAddingWonMessageProcessor implements WonMessageProcessor {
             String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(senderAtomURI.get().toString());
             PrivateKey privateKey = cryptographyService.getPrivateKey(alias);
             PublicKey publicKey = cryptographyService.getPublicKey(alias);
+            if (privateKey == null || publicKey == null) {
+                throw new WonMessageProcessingException(
+                                String.format("Cannot sign message with key for atom %s: key not found",
+                                                senderAtomURI));
+            }
+            try {
+                ret.add(processWithKey(message, senderAtomURI.get().toString(), privateKey, publicKey));
+            } catch (Exception e) {
+                logger.error("Failed to sign", e);
+                throw new WonMessageProcessingException("Failed to sign message "
+                                + message.getMessageURI().toString(), e);
+            }
+        }
+        return WonMessage.of(ret);
+    }
+
+    public WonMessage signWithOtherKey(final WonMessage wonMessage, URI webId) throws WonMessageProcessingException {
+        List<WonMessage> ret = new ArrayList<>();
+        for (WonMessage message : wonMessage.getAllMessages()) {
+            // use senderAtom key for signing
+            String alias = keyPairAliasDerivationStrategy.getAliasForAtomUri(webId.toString());
+            PrivateKey privateKey = cryptographyService.getPrivateKey(alias);
+            PublicKey publicKey = cryptographyService.getPublicKey(alias);
             Objects.requireNonNull(publicKey);
             Objects.requireNonNull(publicKey);
             try {
-                ret.add(processWithKey(message, senderAtomURI.get().toString(), privateKey, publicKey));
+                ret.add(processWithKey(message, webId.toString(), privateKey, publicKey));
             } catch (Exception e) {
                 logger.error("Failed to sign", e);
                 throw new WonMessageProcessingException("Failed to sign message "

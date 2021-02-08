@@ -1,55 +1,29 @@
 package won.protocol.util;
 
-import java.net.URI;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.graph.compose.Union;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.sparql.path.Path;
 import org.apache.jena.sparql.path.PathParser;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
-
 import won.protocol.exception.IllegalAtomContentException;
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.model.AtomGraphType;
 import won.protocol.model.AtomState;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMATCH;
+
+import java.net.URI;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class wraps the atom models (atom and sysinfo graphs in an atom
@@ -62,9 +36,9 @@ import won.protocol.vocabulary.WONMATCH;
  */
 public class AtomModelWrapper {
     // holds all the atom data with its different (default and named) models
-    protected Dataset atomDataset;
-    private String sysInfoGraphName;
-    private String atomModelGraphName;
+    protected Dataset atomDataset = null;
+    private String sysInfoGraphName = null;
+    private Set<String> contentGraphNames = null;
 
     /**
      * Create a new atom model (incluing sysinfo)
@@ -88,8 +62,9 @@ public class AtomModelWrapper {
         Model sysInfoModel = ModelFactory.createDefaultModel();
         DefaultPrefixUtils.setDefaultPrefixes(sysInfoModel);
         sysInfoModel.createResource(atomUri, WON.Atom);
-        this.atomModelGraphName = atomUri + "#atom";
-        atomDataset.addNamedModel(this.atomModelGraphName, atomModel);
+        String contentGraphName = atomUri + "#atom";
+        this.contentGraphNames = Set.of(contentGraphName);
+        atomDataset.addNamedModel(contentGraphName, atomModel);
     }
 
     /**
@@ -118,8 +93,9 @@ public class AtomModelWrapper {
                 Model atomModel = ModelFactory.createDefaultModel();
                 atomModel.createResource(atomUri, WON.Atom);
                 DefaultPrefixUtils.setDefaultPrefixes(atomModel);
-                this.atomModelGraphName = "dummy#atom";
-                atomDataset.addNamedModel(this.atomModelGraphName, atomModel);
+                String contentGraphName = "dummy#atom";
+                this.contentGraphNames = Set.of(contentGraphName);
+                atomDataset.addNamedModel(contentGraphName, atomModel);
             }
             if (getSysInfoModel() == null) {
                 Model sysInfoModel = ModelFactory.createDefaultModel();
@@ -147,8 +123,9 @@ public class AtomModelWrapper {
             atomUri = getAtomNode(AtomGraphType.SYSINFO).getURI();
         }
         if (atomModel != null) {
-            this.atomModelGraphName = "dummy#atom";
-            atomDataset.addNamedModel(this.atomModelGraphName, atomModel);
+            String contentGraphName = "dummy#atom";
+            atomDataset.addNamedModel(contentGraphName, atomModel);
+            this.contentGraphNames = Set.of(contentGraphName);
             atomUri = getAtomContentNode().getURI();
         }
         if (atomUri != null) {
@@ -163,32 +140,45 @@ public class AtomModelWrapper {
                 atomModel = ModelFactory.createDefaultModel();
                 DefaultPrefixUtils.setDefaultPrefixes(atomModel);
                 atomModel.createResource(atomUri, WON.Atom);
-                this.atomModelGraphName = "dummy#atom";
-                atomDataset.addNamedModel(this.atomModelGraphName, atomModel);
+                String contentGraphName = "dummy#atom";
+                this.contentGraphNames = Set.of(contentGraphName);
+                atomDataset.addNamedModel(contentGraphName, atomModel);
             }
         }
+    }
+
+    /**
+     * Indicates if the wrapped data looks like atom data.
+     *
+     * @return
+     */
+    public static boolean isAAtom(Dataset ds) {
+        if (ds == null || ds.isEmpty()) {
+            return false;
+        }
+        AtomModelWrapper wrapper = new AtomModelWrapper(ds, false);
+        return wrapper.getAtomContentNode() != null && wrapper.getAtomNode(AtomGraphType.SYSINFO) != null;
     }
 
     public Dataset getDataset() {
         return atomDataset;
     }
 
-    /**
-     * Indicates if the wrapped data looks like atom data.
-     * 
-     * @return
-     */
-    public static boolean isAAtom(Dataset ds) {
-        if (ds == null || ds.isEmpty())
-            return false;
-        AtomModelWrapper wrapper = new AtomModelWrapper(ds, false);
-        return wrapper.getAtomContentNode() != null && wrapper.getAtomNode(AtomGraphType.SYSINFO) != null;
-    }
-
     public Model getAtomModel() {
         Iterator<String> modelNameIter = atomDataset.listNames();
-        if (this.atomModelGraphName != null && atomDataset.getNamedModel(this.atomModelGraphName) != null) {
-            return atomDataset.getNamedModel(this.atomModelGraphName);
+        if (this.contentGraphNames != null) {
+            return this.contentGraphNames.stream()
+                            .map(n -> atomDataset.getNamedModel(n))
+                            .map(m -> m.getGraph())
+                            .reduce((l, r) -> {
+                                if (l == null) {
+                                    return r;
+                                }
+                                if (r == null) {
+                                    return l;
+                                }
+                                return new Union(l, r);
+                            }).map(g -> ModelFactory.createModelForGraph(g)).get();
         }
         Model defaultModel = atomDataset.getDefaultModel();
         if (defaultModel.listSubjectsWithProperty(RDF.type, WON.Atom).hasNext()
@@ -203,7 +193,7 @@ public class AtomModelWrapper {
             }
             if (model.listSubjectsWithProperty(RDF.type, WON.Atom).hasNext()
                             && !model.listSubjectsWithProperty(WON.atomState).hasNext()) {
-                this.atomModelGraphName = tempModelName;
+                this.contentGraphNames = Set.of(tempModelName);
                 return model;
             }
         }
@@ -260,11 +250,11 @@ public class AtomModelWrapper {
     /**
      * get the atom or sysinfo model
      *
-     * @param graph type specifies the atom or sysinfo model to return
+     * @param graphType type specifies the atom or sysinfo model to return
      * @return atom or sysinfo model
      */
-    public Model copyAtomModel(AtomGraphType graph) {
-        if (graph.equals(AtomGraphType.ATOM)) {
+    public Model copyAtomModel(AtomGraphType graphType) {
+        if (graphType.equals(AtomGraphType.ATOM)) {
             return RdfUtils.cloneModel(getAtomModel());
         } else {
             return RdfUtils.cloneModel(getSysInfoModel());
@@ -296,16 +286,19 @@ public class AtomModelWrapper {
      * @return atom or sysinfo atom node
      */
     protected Resource getAtomNode(AtomGraphType graph) {
-        if (graph.equals(AtomGraphType.ATOM) && getAtomModel() != null) {
-            ResIterator iter = getAtomModel().listSubjectsWithProperty(RDF.type, WON.Atom);
-            Resource ret = null;
-            if (iter.hasNext()) {
-                ret = iter.next();
+        if (graph.equals(AtomGraphType.ATOM)) {
+            Model atomModel = getAtomModel();
+            if (atomModel != null) {
+                ResIterator iter = getAtomModel().listSubjectsWithProperty(RDF.type, WON.Atom);
+                Resource ret = null;
+                if (iter.hasNext()) {
+                    ret = iter.next();
+                }
+                if (iter.hasNext()) {
+                    throw new IllegalAtomContentException("More than one atom resource found");
+                }
+                return ret;
             }
-            if (iter.hasNext()) {
-                throw new IllegalAtomContentException("More than one atom resource found");
-            }
-            return ret;
         } else if (graph.equals(AtomGraphType.SYSINFO) && getSysInfoModel() != null) {
             ResIterator iter = getSysInfoModel().listSubjectsWithProperty(RDF.type, WON.Atom);
             Resource ret = null;
@@ -387,17 +380,18 @@ public class AtomModelWrapper {
      * Rename resources in all models, replacing the prefix string by the
      * replacement string.
      * 
-     * @param dataset
      * @param prefix
      * @param replacement
      */
     public void renameResourceWithPrefix(String prefix, String replacement) {
         RdfUtils.renameResourceWithPrefix(this.atomDataset, prefix, replacement);
-        this.atomModelGraphName = preplacePrefix(this.atomModelGraphName, prefix, replacement);
-        this.sysInfoGraphName = preplacePrefix(this.sysInfoGraphName, prefix, replacement);
+        this.contentGraphNames = this.contentGraphNames.stream()
+                        .map(s -> replacePrefix(s, prefix, replacement))
+                        .collect(Collectors.toSet());
+        this.sysInfoGraphName = replacePrefix(this.sysInfoGraphName, prefix, replacement);
     }
 
-    private String preplacePrefix(String toChange, String prefix, String replacement) {
+    private String replacePrefix(String toChange, String prefix, String replacement) {
         if (toChange == null) {
             return null;
         }
@@ -437,20 +431,21 @@ public class AtomModelWrapper {
         getAtomContentNode().addProperty(WONMATCH.sparqlQuery, query);
     }
 
-    public void setQuery(String query) {
-        removeQuery();
-        getAtomContentNode().addProperty(WONMATCH.sparqlQuery, query);
-    }
-
     public void removeQuery() {
         getAtomContentNode().removeAll(WONMATCH.sparqlQuery);
     }
 
     public Optional<String> getQuery() {
         Statement stmt = getAtomContentNode().getProperty(WONMATCH.sparqlQuery);
-        if (stmt == null)
+        if (stmt == null) {
             return Optional.empty();
+        }
         return Optional.of(stmt.getString());
+    }
+
+    public void setQuery(String query) {
+        removeQuery();
+        getAtomContentNode().addProperty(WONMATCH.sparqlQuery, query);
     }
 
     public boolean sparqlQuery() {
@@ -492,6 +487,18 @@ public class AtomModelWrapper {
      * @deprecated Default Socket is not used anymore, will be removed soon
      */
     @Deprecated
+    public Optional<String> getDefaultSocket() {
+        Statement stmt = getAtomContentNode().getProperty(WON.defaultSocket);
+        if (stmt == null) {
+            return Optional.empty();
+        }
+        return Optional.of(stmt.getObject().toString());
+    }
+
+    /**
+     * @deprecated Default Socket is not used anymore, will be removed soon
+     */
+    @Deprecated
     public void setDefaultSocket(String socketUri) {
         if (socketUri.startsWith("#")) {
             socketUri = getAtomUri() + socketUri;
@@ -501,17 +508,6 @@ public class AtomModelWrapper {
         }
         Resource socket = getAtomModel().getResource(socketUri);
         getAtomContentNode().addProperty(WON.defaultSocket, socket);
-    }
-
-    /**
-     * @deprecated Default Socket is not used anymore, will be removed soon
-     */
-    @Deprecated
-    public Optional<String> getDefaultSocket() {
-        Statement stmt = getAtomContentNode().getProperty(WON.defaultSocket);
-        if (stmt == null)
-            return Optional.empty();
-        return Optional.of(stmt.getObject().toString());
     }
 
     public Collection<String> getSocketUris() {
@@ -539,8 +535,9 @@ public class AtomModelWrapper {
             return Optional.empty();
         }
         Statement stmt = socket.getProperty(WON.socketDefinition);
-        if (stmt == null)
+        if (stmt == null) {
             return Optional.empty();
+        }
         return Optional.of(stmt.getObject().toString());
     }
 
@@ -550,8 +547,9 @@ public class AtomModelWrapper {
             return Optional.empty();
         }
         Statement stmt = socket.getProperty(WON.socketDefinition);
-        if (stmt == null)
+        if (stmt == null) {
             return Optional.empty();
+        }
         return Optional.of(URI.create(stmt.getObject().toString()));
     }
 
@@ -610,13 +608,6 @@ public class AtomModelWrapper {
         return null;
     }
 
-    public void setAtomState(AtomState state) {
-        Resource stateRes = AtomState.ACTIVE.equals(state) ? WON.ATOM_STATE_ACTIVE : WON.ATOM_STATE_INACTIVE;
-        Resource atom = getAtomNode(AtomGraphType.SYSINFO);
-        atom.removeAll(WON.atomState);
-        atom.addProperty(WON.atomState, stateRes);
-    }
-
     public AtomState getAtomState() {
         Model sysInfoModel = getSysInfoModel();
         sysInfoModel.enterCriticalSection(true);
@@ -633,6 +624,13 @@ public class AtomModelWrapper {
         throw new IllegalStateException("Unrecognized atom state: " + state);
     }
 
+    public void setAtomState(AtomState state) {
+        Resource stateRes = AtomState.ACTIVE.equals(state) ? WON.ATOM_STATE_ACTIVE : WON.ATOM_STATE_INACTIVE;
+        Resource atom = getAtomNode(AtomGraphType.SYSINFO);
+        atom.removeAll(WON.atomState);
+        atom.addProperty(WON.atomState, stateRes);
+    }
+
     public ZonedDateTime getCreationDate() {
         String dateString = RdfUtils.findOnePropertyFromResource(getSysInfoModel(), getAtomNode(AtomGraphType.SYSINFO),
                         DCTerms.created).asLiteral().getString();
@@ -645,6 +643,11 @@ public class AtomModelWrapper {
         return ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
     }
 
+    public String getConnectionContainerUri() {
+        return RdfUtils.findOnePropertyFromResource(getSysInfoModel(), getAtomNode(AtomGraphType.SYSINFO),
+                        WON.connections).asResource().getURI();
+    }
+
     public void setConnectionContainerUri(String containerUri) {
         Resource container = getSysInfoModel().createResource(containerUri);
         Resource atom = getAtomNode(AtomGraphType.SYSINFO);
@@ -652,9 +655,9 @@ public class AtomModelWrapper {
         atom.addProperty(WON.connections, container);
     }
 
-    public String getConnectionContainerUri() {
-        return RdfUtils.findOnePropertyFromResource(getSysInfoModel(), getAtomNode(AtomGraphType.SYSINFO),
-                        WON.connections).asResource().getURI();
+    public String getWonNodeUri() {
+        return RdfUtils.findOnePropertyFromResource(getSysInfoModel(), getAtomNode(AtomGraphType.SYSINFO), WON.wonNode)
+                        .asResource().getURI();
     }
 
     public void setWonNodeUri(String nodeUri) {
@@ -662,11 +665,6 @@ public class AtomModelWrapper {
         Resource atom = getAtomNode(AtomGraphType.SYSINFO);
         atom.removeAll(WON.wonNode);
         atom.addProperty(WON.wonNode, node);
-    }
-
-    public String getWonNodeUri() {
-        return RdfUtils.findOnePropertyFromResource(getSysInfoModel(), getAtomNode(AtomGraphType.SYSINFO), WON.wonNode)
-                        .asResource().getURI();
     }
 
     /**
@@ -945,13 +943,15 @@ public class AtomModelWrapper {
         if (preferredLanguages != null) {
             for (String preferredLanguage : preferredLanguages) {
                 values = getContentPropertyStringValues(contentNode, p, preferredLanguage);
-                if (values != null && values.size() > 0)
+                if (values != null && values.size() > 0) {
                     return values.iterator().next();
+                }
             }
         }
         values = getContentPropertyStringValues(contentNode, p, null);
-        if (values != null && values.size() > 0)
+        if (values != null && values.size() > 0) {
             return values.iterator().next();
+        }
         return null;
     }
 
@@ -969,27 +969,31 @@ public class AtomModelWrapper {
         if (preferredLanguages != null) {
             for (String preferredLanguage : preferredLanguages) {
                 String valueOfContentNode = getSomeContentPropertyStringValue(contentNode, p, preferredLanguage);
-                if (valueOfContentNode != null)
+                if (valueOfContentNode != null) {
                     return valueOfContentNode;
+                }
             }
         }
         String valueOfAtomContentNode = getSomeContentPropertyStringValue(contentNode, p);
-        if (valueOfAtomContentNode != null)
+        if (valueOfAtomContentNode != null) {
             return valueOfAtomContentNode;
+        }
         Collection<Resource> nodes = getSeeksNodes();
         if (preferredLanguages != null) {
             for (String preferredLanguage : preferredLanguages) {
                 for (Resource node : nodes) {
                     String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguage);
-                    if (valueOfContentNode != null)
+                    if (valueOfContentNode != null) {
                         return valueOfContentNode;
+                    }
                 }
             }
         }
         for (Resource node : nodes) {
             String valueOfContentNode = getSomeContentPropertyStringValue(node, p);
-            if (valueOfContentNode != null)
+            if (valueOfContentNode != null) {
                 return valueOfContentNode;
+            }
         }
         return null;
     }
@@ -1008,8 +1012,9 @@ public class AtomModelWrapper {
         if (preferredLanguages != null) {
             for (String preferredLanguage : preferredLanguages) {
                 String valueOfContentNode = getSomeContentPropertyStringValue(node, p, preferredLanguage);
-                if (valueOfContentNode != null)
+                if (valueOfContentNode != null) {
                     return valueOfContentNode;
+                }
             }
         }
         return getSomeContentPropertyStringValue(node, p);
@@ -1052,8 +1057,9 @@ public class AtomModelWrapper {
     }
 
     private Resource copyNode(Resource node) {
-        if (node.isAnon())
+        if (node.isAnon()) {
             return node.getModel().createResource();
+        }
         int i = 0;
         String uri = node.getURI() + RandomStringUtils.randomAlphanumeric(4);
         String newUri = uri + "_" + i;
@@ -1111,10 +1117,12 @@ public class AtomModelWrapper {
     private void recursiveCopyWhereMultipleInEdges(RDFNode node, ModelModification modelModification,
                     Collection<RDFNode> visited) {
         // a non-resource is trivially ok
-        if (!node.isResource())
+        if (!node.isResource()) {
             return;
-        if (visited.contains(node))
+        }
+        if (visited.contains(node)) {
             return;
+        }
         visited.add(node);
         List<Statement> outgoingEdges = node.getModel().listStatements(node.asResource(), null, (RDFNode) null)
                         .toList();
@@ -1145,12 +1153,15 @@ public class AtomModelWrapper {
     }
 
     private boolean isReachableFrom(RDFNode src, RDFNode target, Collection<RDFNode> visited) {
-        if (src.equals(target))
+        if (src.equals(target)) {
             return true;
-        if (!src.isResource())
+        }
+        if (!src.isResource()) {
             return false;
-        if (visited.contains(src))
+        }
+        if (visited.contains(src)) {
             return false;
+        }
         visited.add(src);
         StmtIterator it = src.getModel().listStatements(src.asResource(), null, (RDFNode) null);
         while (it.hasNext()) {
@@ -1169,10 +1180,12 @@ public class AtomModelWrapper {
     }
 
     private void findReachableResources(RDFNode src, Set<Resource> found) {
-        if (!src.isResource())
+        if (!src.isResource()) {
             return;
-        if (found.contains(src))
+        }
+        if (found.contains(src)) {
             return;
+        }
         found.add(src.asResource());
         StmtIterator it = src.getModel().listStatements(src.asResource(), null, (RDFNode) null);
         while (it.hasNext()) {
@@ -1187,12 +1200,15 @@ public class AtomModelWrapper {
 
     private RDFNode recursiveCopy(RDFNode node, ModelModification modelModification, RDFNode toReplace,
                     RDFNode replacement, Collection<RDFNode> visited) {
-        if (node.equals(toReplace))
+        if (node.equals(toReplace)) {
             return replacement;
-        if (!node.isResource())
+        }
+        if (!node.isResource()) {
             return node;
-        if (visited.contains(node))
+        }
+        if (visited.contains(node)) {
             return copyNode(node.asResource());
+        }
         visited.add(node);
         RDFNode nodeInCopy;
         if (isSplittableNode(node)) {

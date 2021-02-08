@@ -140,7 +140,6 @@ export default function PageInventory() {
               showIndicators={true}
               showHolder={true}
               showCreate={true}
-              showCreatePersona={true}
             />
           </div>
           {hasOwnedInactiveAtomUris && (

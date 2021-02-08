@@ -2,6 +2,7 @@ package won.node.service.persistence;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -9,6 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.auth.AuthUtils;
+import won.auth.WonAclEvaluator;
+import won.auth.model.AclEvalResult;
+import won.auth.model.DecisionValue;
+import won.auth.model.GraphType;
+import won.auth.model.OperationRequest;
+import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
@@ -19,14 +27,18 @@ import won.protocol.model.*;
 import won.protocol.repository.*;
 import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.WONMSG;
 
 import javax.persistence.EntityManager;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.PublicKey;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static won.auth.model.Individuals.POSITION_ATOM_GRAPH;
 
 @Component
 public class AtomService {
@@ -186,24 +198,75 @@ public class AtomService {
         return atom;
     }
 
-    public Atom replaceAtom(final WonMessage wonMessage) throws NoSuchAtomException {
-        Dataset atomContent = wonMessage.getMessageContent();
+    public Atom replaceAtom(final WonMessage wonMessage, WonAclEvaluator evaluator, OperationRequest request)
+                    throws NoSuchAtomException {
+        Dataset newAtomContent = wonMessage.getMessageContent();
         List<WonMessage.AttachmentHolder> attachmentHolders = wonMessage.getAttachments();
         // remove attachment and its signature from the atomContent
-        removeAttachmentsFromAtomContent(atomContent, attachmentHolders);
-        final AtomModelWrapper atomModelWrapper = new AtomModelWrapper(atomContent);
+        removeAttachmentsFromAtomContent(newAtomContent, attachmentHolders);
+        final AtomModelWrapper atomModelWrapper = new AtomModelWrapper(newAtomContent);
         URI atomURI = getAtomURIAndCheck(atomModelWrapper);
+        checkReplaceAllowed(newAtomContent, atomURI, evaluator, request);
         checkCanThisMessageCreateOrModifyThisAtom(wonMessage, atomURI);
         checkResourcesInAtomContent(atomModelWrapper);
-        Collection<String> sockets = getSocketsAndCheck(atomModelWrapper, atomURI);
-        final Atom atom = getAtomRequired(atomURI);
         URI messageURI = wonMessage.getMessageURI();
-        // store the atom content
+        atomModelWrapper.renameResourceWithPrefix(messageURI.toString(), atomURI.toString());
+        final Atom atom = getAtomRequired(atomURI);
         DatasetHolder datasetHolder = atom.getDatatsetHolder();
-        // get the derived data, we don't change that here
-        Dataset atomDataset = atom.getDatatsetHolder().getDataset();
-        Optional<Model> derivationModel = Optional
-                        .ofNullable(atomDataset.getNamedModel(atom.getAtomURI() + "#derivedData"));
+        Dataset oldAtomDataset = atom.getDatatsetHolder().getDataset();
+        URI keyGraphUri = WonRelativeUriHelper.createKeyGraphURIForAtomURI(atom.getAtomURI());
+        // store the atom content
+        boolean handleLegacyKey = false;
+        if (!oldAtomDataset.containsNamedModel(keyGraphUri.toString())) {
+            // there is no separate key graph in the atom, yet so there
+            // must be the public key in a content graph. We have to remove it from
+            // there. If the message does not contain a new one, we copy the old one to the
+            // key graph
+            // Note: we cannot delete the key from the content graph because that would
+            // invalidate its signature.
+            handleLegacyKey = true;
+        }
+        Iterator<String> oldGraphNames = oldAtomDataset.listNames();
+        String derivedDataName = atom.getAtomURI().toString() + "#derivedData";
+        boolean legacyKeyHandled = false;
+        while (oldGraphNames.hasNext()) {
+            String oldGraphName = oldGraphNames.next();
+            if (oldGraphName.equals(derivedDataName)) {
+                newAtomContent.addNamedModel(oldGraphName, oldAtomDataset.getNamedModel(oldGraphName));
+                continue;
+            }
+            if (handleLegacyKey) {
+                Model model = oldAtomDataset.getNamedModel(oldGraphName);
+                PublicKey key = null;
+                try {
+                    key = WonKeysReaderWriter.readFromModel(model, atomURI.toString());
+                    if (key != null) {
+                        if (legacyKeyHandled) {
+                            throw new IllegalStateException("More than one legacy key found in atom " + atomURI);
+                        }
+                        legacyKeyHandled = true;
+                        if (!newAtomContent.containsNamedModel(keyGraphUri.toString())) {
+                            // only copy the legacy key to the key graph if the message
+                            // does not contain a key
+                            Model m = ModelFactory.createDefaultModel();
+                            WonKeysReaderWriter.writeToModel(m, m.getResource(atomURI.toString()), key);
+                            newAtomContent.addNamedModel(keyGraphUri.toString(), m);
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new WonMessageProcessingException("Cannot process replace message", e);
+                }
+            }
+            if (!newAtomContent.containsNamedModel(oldGraphName)) {
+                // copy graphs not contained in the message from old to new state
+                // ie, graphs with same name are overwritten
+                newAtomContent.addNamedModel(oldGraphName, oldAtomDataset.getNamedModel(oldGraphName));
+            }
+        }
+        if (!newAtomContent.containsNamedModel(keyGraphUri.toString())) {
+            throw new WonProtocolException(
+                            String.format("Cannot replace %s, operation results in atom without key graph", atomURI));
+        }
         // replace attachments
         List<DatasetHolder> attachments = new ArrayList<>(attachmentHolders.size());
         for (WonMessage.AttachmentHolder attachmentHolder : attachmentHolders) {
@@ -214,7 +277,7 @@ public class AtomService {
         // rename the content graphs and signature graphs so they start with the atom
         // uri
         // analyzed change in socket data
-        atomModelWrapper.renameResourceWithPrefix(messageURI.toString(), atomURI.toString());
+        Collection<String> sockets = getSocketsAndCheck(atomModelWrapper, atomURI);
         List<Socket> existingSockets = socketRepository.findByAtomURI(atomURI);
         Set<Socket> newSocketEntities = determineNewSockets(atomURI, existingSockets, atomModelWrapper);
         Set<Socket> removedSockets = determineRemovedSockets(atomURI, existingSockets, atomModelWrapper);
@@ -238,14 +301,40 @@ public class AtomService {
         socketRepository.saveAll(newSocketEntities);
         socketRepository.saveAll(changedSockets);
         socketRepository.deleteAll(removedSockets);
-        if (derivationModel.isPresent()) {
-            atomContent.addNamedModel(atom.getAtomURI().toString() + "#derivedData", derivationModel.get());
-        }
-        datasetHolder.setDataset(atomContent);
+        datasetHolder.setDataset(newAtomContent);
         atom.setDatatsetHolder(datasetHolder);
         atom.setAttachmentDatasetHolders(attachments);
         dataDerivationService.deriveDataIfNecessary(atom);
         return atomRepository.save(atom);
+    }
+
+    private void checkReplaceAllowed(Dataset atomContent, URI atomUri, WonAclEvaluator evaluator,
+                    OperationRequest request) {
+        Iterator<String> graphNames = atomContent.listNames();
+        URI aclGraphUri = WonRelativeUriHelper.createAclGraphURIForAtomURI(atomUri);
+        URI keyGraphUri = WonRelativeUriHelper.createKeyGraphURIForAtomURI(atomUri);
+        OperationRequest or = AuthUtils.cloneShallow(request);
+        or.setReqPosition(POSITION_ATOM_GRAPH);
+        while (graphNames.hasNext()) {
+            String graphName = graphNames.next();
+            if (graphName.endsWith(WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX)) {
+                // don't check permissions for signatures
+                continue;
+            }
+            URI graphUri = URI.create(graphName);
+            if (aclGraphUri.equals(graphUri)) {
+                or.addReqGraphType(GraphType.ACL_GRAPH);
+            } else if (keyGraphUri.equals(graphUri)) {
+                or.addReqGraphType(GraphType.KEY_GRAPH);
+            } else {
+                or.addReqGraphType(GraphType.CONTENT_GRAPH);
+            }
+            or.addReqGraph(graphUri);
+        }
+        AclEvalResult result = evaluator.decide(or);
+        if (DecisionValue.ACCESS_DENIED.equals(result.getDecision())) {
+            throw new ForbiddenMessageException("Replace operation is not allowed");
+        }
     }
 
     private Set<Socket> determineNewSockets(URI atomURI, List<Socket> existingSockets,

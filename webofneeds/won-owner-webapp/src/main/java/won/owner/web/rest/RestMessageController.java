@@ -1,14 +1,5 @@
 package won.owner.web.rest;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import javax.transaction.Transactional;
-
 import org.apache.jena.riot.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import won.owner.model.User;
 import won.owner.pojo.MessageUriPojo;
 import won.owner.pojo.RestStatusResponse;
@@ -39,14 +29,18 @@ import won.protocol.message.WonMessageType;
 import won.protocol.message.sender.exception.WonMessageSenderException;
 import won.protocol.util.AuthenticationThreadLocal;
 
+import javax.transaction.Transactional;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @Controller
 @RequestMapping("/rest/messages")
 public class RestMessageController {
     Logger logger = LoggerFactory.getLogger(getClass());
-
-    public RestMessageController() {
-    }
-
     @Autowired
     OwnerApplicationService ownerApplicationService;
     @Autowired
@@ -57,11 +51,23 @@ public class RestMessageController {
     WebSocketSessionService webSocketSessionService;
     ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    public RestMessageController() {
+    }
+
+    private static ResponseEntity<Map<String, Object>> generateStatusResponse(RestStatusResponse restStatusResponse,
+                    Optional<String> detail) {
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put("code", restStatusResponse.getCode());
+        values.put("message", restStatusResponse.getMessage());
+        detail.ifPresent(d -> values.put("detail", d));
+        return new ResponseEntity<Map<String, Object>>(values, restStatusResponse.getHttpStatus());
+    }
+
     /**
      * Prepares and sends the WonMessage received in the body of this post request.
      * The message has to be encoded in JSON-LD and use the reserved self message
      * URI.
-     * 
+     *
      * @param message
      * @return
      */
@@ -147,14 +153,5 @@ public class RestMessageController {
             }
         }
         return e.getMessage();
-    }
-
-    private static ResponseEntity<Map<String, Object>> generateStatusResponse(RestStatusResponse restStatusResponse,
-                    Optional<String> detail) {
-        Map<String, Object> values = new HashMap<String, Object>();
-        values.put("code", restStatusResponse.getCode());
-        values.put("message", restStatusResponse.getMessage());
-        detail.ifPresent(d -> values.put("detail", d));
-        return new ResponseEntity<Map<String, Object>>(values, restStatusResponse.getHttpStatus());
     }
 }

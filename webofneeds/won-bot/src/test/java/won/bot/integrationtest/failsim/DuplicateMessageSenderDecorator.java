@@ -15,6 +15,8 @@ import won.protocol.message.WonMessage;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
 
+import java.net.URI;
+
 /**
  * Decorates the EventListenerContext such that the bot sends each message
  * twice.
@@ -37,6 +39,18 @@ public class DuplicateMessageSenderDecorator extends BaseEventListenerContextDec
             @Override
             public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
                 return delegate.prepareMessage(message);
+            }
+
+            @Override
+            public WonMessage prepareMessageOnBehalf(WonMessage message, URI webId)
+                            throws WonMessageSenderException {
+                return delegate.prepareMessageOnBehalf(message, webId);
+            }
+
+            @Override
+            public void prepareAndSendMessageOnBehalf(WonMessage message, URI webId)
+                            throws WonMessageSenderException {
+                sendMessage(delegate.prepareMessageOnBehalf(message, webId));
             }
 
             @Override

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
+import won.protocol.message.WonMessageType;
 
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
@@ -16,7 +17,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Key;
 import java.security.PrivateKey;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 public class AuthUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -129,12 +133,12 @@ public class AuthUtils {
         clone.setReqConnectionMessage(toClone.getReqConnectionMessage());
         clone.setReqConnectionState(toClone.getReqConnectionState());
         clone.setReqConnectionTargetAtom(toClone.getReqConnectionTargetAtom());
-        clone.setReqGraphs(Collections.unmodifiableSet(toClone.getReqGraphs()));
-        clone.setReqGraphTypes(Collections.unmodifiableSet(toClone.getReqGraphTypes()));
         clone.setReqPosition(toClone.getReqPosition());
         clone.setReqSocket(toClone.getReqSocket());
         clone.setReqSocketType(toClone.getReqSocketType());
-        clone.setBearsTokens(Collections.unmodifiableSet(toClone.getBearsTokens()));
+        toClone.getReqGraphs().forEach(clone::addReqGraph);
+        toClone.getReqGraphTypes().forEach(clone::addReqGraphType);
+        toClone.getBearsTokens().forEach(clone::addBearsToken);
         return clone;
     }
 
@@ -221,6 +225,14 @@ public class AuthUtils {
         StringWriter writer = new StringWriter();
         RDFDataMgr.write(writer, g, Lang.TTL);
         return writer.toString();
+    }
+
+    public static MessageType toAuthMessageType(WonMessageType messageType) {
+        return MessageType.forValue(messageType.getURI());
+    }
+
+    public static WonMessageType fromAuthMessageType(MessageType messageType) {
+        return WonMessageType.getWonMessageType(messageType.getValue());
     }
 
     private static class WebIdKeyLoadingSigningKeyResolver extends SigningKeyResolverAdapter {

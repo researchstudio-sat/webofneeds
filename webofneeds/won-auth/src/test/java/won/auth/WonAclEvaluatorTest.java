@@ -103,8 +103,8 @@ public class WonAclEvaluatorTest {
                                         "won.auth.test.model"));
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
                         "won.auth.test.model");
-        WonAclEvaluatorTestFactory evaluator = withDurationLog("initializing WonAclEvaluator",
-                        () -> new WonAclEvaluatorTestFactory(shapes, targetAtomChecker, atomNodeChecker, null));
+        InternalWonAclEvaluatorTestFactory evaluator = withDurationLog("initializing WonAclEvaluator",
+                        () -> new InternalWonAclEvaluatorTestFactory(shapes, targetAtomChecker, atomNodeChecker, null));
         getFailOperationRequests().forEach(
                         testCaseResource -> {
                             Graph graph = null;
@@ -125,8 +125,8 @@ public class WonAclEvaluatorTest {
                         "won.auth.test.model");
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
                         "won.auth.test.model");
-        WonAclEvaluatorTestFactory evaluator = withDurationLog("initializing WonAclEvaluator",
-                        () -> new WonAclEvaluatorTestFactory(shapes, targetAtomChecker, atomNodeChecker, null));
+        InternalWonAclEvaluatorTestFactory evaluator = withDurationLog("initializing WonAclEvaluator",
+                        () -> new InternalWonAclEvaluatorTestFactory(shapes, targetAtomChecker, atomNodeChecker, null));
         getOkOperationRequests().forEach(
                         testCaseResource -> {
                             Graph graph = null;
@@ -147,8 +147,8 @@ public class WonAclEvaluatorTest {
                         "won.auth.test.model");
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
                         "won.auth.test.model");
-        WonAclEvaluatorTestFactory evaluator = withDurationLog("initializing WonAclEvaluator",
-                        () -> new WonAclEvaluatorTestFactory(shapes, targetAtomChecker, atomNodeChecker, null));
+        InternalWonAclEvaluatorTestFactory evaluator = withDurationLog("initializing WonAclEvaluator",
+                        () -> new InternalWonAclEvaluatorTestFactory(shapes, targetAtomChecker, atomNodeChecker, null));
         getSpecOperationRequests().forEach(
                         testCaseResource -> {
                             Graph graph = loadGraph(testCaseResource);
@@ -170,8 +170,8 @@ public class WonAclEvaluatorTest {
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
                         "won.auth.test.model");
         Graph domainBase = loadGraph(loader.getResource("classpath:/won/opreq/domain1/domain.ttl"));
-        WonAclEvaluatorTestFactory evaluator = withDurationLog("initializing WonAclEvaluator",
-                        () -> new WonAclEvaluatorTestFactory(shapes, targetAtomChecker, atomNodeChecker, null));
+        InternalWonAclEvaluatorTestFactory evaluator = withDurationLog("initializing WonAclEvaluator",
+                        () -> new InternalWonAclEvaluatorTestFactory(shapes, targetAtomChecker, atomNodeChecker, null));
         getDomainSpecOperationRequests().forEach(
                         testCaseResource -> {
                             try {
@@ -186,7 +186,8 @@ public class WonAclEvaluatorTest {
     }
 
     private void evaluateTest(Shapes shapes, Shapes atomDataShapes,
-                    WonAclEvaluatorTestFactory evaluatorFactory, ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
+                    InternalWonAclEvaluatorTestFactory evaluatorFactory,
+                    ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
                     Resource resource,
                     DecisionValue accessDenied)
                     throws IOException {
@@ -208,7 +209,8 @@ public class WonAclEvaluatorTest {
     }
 
     private void evaluateTestWithSpec(Shapes shapes, Shapes atomDataShapes,
-                    WonAclEvaluatorTestFactory evaluatorFactory, ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
+                    InternalWonAclEvaluatorTestFactory evaluatorFactory,
+                    ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
                     ModelBasedAtomNodeChecker atomNodeChecker, Graph graph,
                     Resource resource)
                     throws IOException {
@@ -252,7 +254,7 @@ public class WonAclEvaluatorTest {
         }
     }
 
-    private void checkExpectedAuthDecision(WonAclEvaluatorTestFactory loadedEvaluator, DecisionValue expected,
+    private void checkExpectedAuthDecision(InternalWonAclEvaluatorTestFactory loadedEvaluator, DecisionValue expected,
                     String testIdentifier) {
         for (Authorization auth : loadedEvaluator.getAuthorizations()) {
             for (OperationRequest opReq : loadedEvaluator.getOperationRequests()) {
@@ -267,7 +269,7 @@ public class WonAclEvaluatorTest {
         }
     }
 
-    private void checkSpecifiedAuthDecision(WonAclEvaluatorTestFactory loadedEvaluator,
+    private void checkSpecifiedAuthDecision(InternalWonAclEvaluatorTestFactory loadedEvaluator,
                     Shacl2JavaInstanceFactory atomTestData, String testIdentifier) {
         Set<ExpectedAclEvalResult> expectedResuls = loadedEvaluator.getInstanceFactory()
                         .getInstancesOfType(ExpectedAclEvalResult.class, true);

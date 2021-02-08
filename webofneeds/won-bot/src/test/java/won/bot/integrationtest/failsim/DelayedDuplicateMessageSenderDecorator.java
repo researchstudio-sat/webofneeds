@@ -10,15 +10,15 @@
  */
 package won.bot.integrationtest.failsim;
 
-import java.lang.invoke.MethodHandles;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.protocol.message.WonMessage;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
 
 /**
  * Decorates the EventListenerContext such that the bot sends each message
@@ -53,6 +53,18 @@ public class DelayedDuplicateMessageSenderDecorator extends BaseEventListenerCon
             @Override
             public WonMessage prepareMessage(WonMessage message) throws WonMessageSenderException {
                 return delegate.prepareMessage(message);
+            }
+
+            @Override
+            public WonMessage prepareMessageOnBehalf(WonMessage message, URI webId)
+                            throws WonMessageSenderException {
+                return delegate.prepareMessageOnBehalf(message, webId);
+            }
+
+            @Override
+            public void prepareAndSendMessageOnBehalf(WonMessage message, URI webId)
+                            throws WonMessageSenderException {
+                sendMessage(delegate.prepareMessageOnBehalf(message, webId));
             }
 
             @Override

@@ -1,43 +1,28 @@
 package won.cryptography.rdfsign;
 
-import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.transaction.NotSupportedException;
-
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.vocabulary.RDF;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
-
 import won.cryptography.exception.KeyNotSupportedException;
 import won.cryptography.key.KeyInformationExtractor;
 import won.cryptography.key.KeyInformationExtractorBouncyCastle;
+import won.protocol.message.WonMessage;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.CERT;
 import won.protocol.vocabulary.WON;
 import won.protocol.vocabulary.WONMSG;
+
+import javax.transaction.NotSupportedException;
+import java.math.BigInteger;
+import java.net.URI;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.util.*;
 
 /**
  * A helper class to read from/write to RDF EC public key won representation, as
@@ -47,43 +32,54 @@ import won.protocol.vocabulary.WONMSG;
 public class WonKeysReaderWriter {
     private static final Provider securityProvider = new BouncyCastleProvider();
 
-    public WonKeysReaderWriter() {
-    }
-
-    public Map<String, PublicKey> readFromDataset(Dataset dataset)
+    public static Map<String, PublicKey> readKeyFromMessage(WonMessage wonMessage)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         Map<String, PublicKey> keys = new HashMap<>();
-        readFromModel(dataset.getDefaultModel(), keys);
-        for (String name : RdfUtils.getModelNames(dataset)) {
-            readFromModel(dataset.getNamedModel(name), keys);
+        Optional<Model> keyGraph = wonMessage.getKeyGraph();
+        if (keyGraph.isEmpty()) {
+            return keys;
         }
+        readFromModel(keyGraph.get(), keys);
         return keys;
     }
 
-    public Set<PublicKey> readFromDataset(Dataset dataset, String keyUri)
+    public static Set<PublicKey> readKeyFromAtom(URI atomUri, Dataset dataset, String keyUri)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        PublicKey key = readFromModel(dataset.getDefaultModel(), keyUri);
+        URI keyGraphUri = WonRelativeUriHelper.createKeyGraphURIForAtomURI(atomUri);
+        PublicKey key = readFromModel(dataset.getNamedModel(keyGraphUri.toString()), keyUri);
         Set<PublicKey> keys = new HashSet<>();
         if (key != null) {
             keys.add(key);
-        }
-        for (String name : RdfUtils.getModelNames(dataset)) {
-            key = readFromModel(dataset.getNamedModel(name), keyUri);
-            if (key != null) {
-                keys.add(key);
+        } else {
+            String aclGraphUri = WonRelativeUriHelper.createAclGraphURIForAtomURI(atomUri).toString();
+            String sysinfoGraphUri = WonRelativeUriHelper.createSysInfoGraphURIForAtomURI(atomUri).toString();
+            // allow legacy atoms (keys in content graph)
+            Iterator<String> names = dataset.listNames();
+            while (names.hasNext()) {
+                String graphUri = names.next();
+                if (graphUri.endsWith(WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX)
+                                || graphUri.equals(aclGraphUri)
+                                || graphUri.equals(sysinfoGraphUri)) {
+                    continue;
+                }
+                key = readFromModel(dataset.getNamedModel(graphUri), keyUri);
+                if (key != null) {
+                    keys.add(key);
+                    return keys;
+                }
             }
         }
         return keys;
     }
 
-    public Map<String, PublicKey> readFromModel(Model model)
+    public static Map<String, PublicKey> readFromModel(Model model)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         Map<String, PublicKey> keys = new HashMap<>();
         readFromModel(model, keys);
         return keys;
     }
 
-    private PublicKey readFromModel(Model model, String keyUri)
+    public static PublicKey readFromModel(Model model, String keyUri)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         Map<String, PublicKey> keys = new HashMap<>();
         Resource keyRes = model.createResource(keyUri);
@@ -91,12 +87,12 @@ public class WonKeysReaderWriter {
         return keys.get(keyUri);
     }
 
-    private void readFromModel(final Model model, final Map<String, PublicKey> keys)
+    private static void readFromModel(final Model model, final Map<String, PublicKey> keys)
                     throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
         readFromModel(model, keys, null);
     }
 
-    private void readFromModel(final Model model, final Map<String, PublicKey> keys, Resource keyAgent)
+    private static void readFromModel(final Model model, final Map<String, PublicKey> keys, Resource keyAgent)
                     throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
         StmtIterator keyStmts = model.listStatements(keyAgent, CERT.KEY, RdfUtils.EMPTY_RDF_NODE);
         // TODO replace if with while if we allow multiple keys
@@ -152,7 +148,19 @@ public class WonKeysReaderWriter {
         }
     }
 
-    public Set<String> readKeyReferences(Dataset dataset) {
+    public static void deleteFromModel(final Model model, URI key) {
+        List<Resource> toRemove = new ArrayList<>();
+        StmtIterator keyStmts = model.listStatements(model.getResource(key.toString()),
+                        CERT.KEY,
+                        RdfUtils.EMPTY_RDF_NODE);
+        if (keyStmts.hasNext()) {
+            Statement statement = keyStmts.next();
+            toRemove.add(statement.getObject().asResource());
+        }
+        toRemove.forEach(r -> RdfUtils.removeResource(model, r));
+    }
+
+    public static Set<String> readKeyReferences(Dataset dataset) {
         List<String> keyRefs = RdfUtils.visitFlattenedToList(dataset, model -> {
             StmtIterator it = model.listStatements((Resource) null, WONMSG.signer, (RDFNode) null);
             List<String> ret = new ArrayList<>();
@@ -164,7 +172,7 @@ public class WonKeysReaderWriter {
         return new HashSet<>(keyRefs);
     }
 
-    private void writeToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
+    private static void writeToModel(Model model, Resource keySubject, WonEccPublicKey pubKey) {
         // EC public key triples
         Resource bn = model.createResource();
         Statement stmt = model.createStatement(bn, RDF.type, WON.ECCPublicKey);
@@ -186,7 +194,7 @@ public class WonKeysReaderWriter {
         model.add(stmt);
     }
 
-    public Model writeToModel(Resource keySubject, WonEccPublicKey pubKey) {
+    public static Model writeToModel(Resource keySubject, WonEccPublicKey pubKey) {
         Objects.requireNonNull(keySubject);
         Objects.requireNonNull(pubKey);
         Model model = ModelFactory.createDefaultModel();
@@ -194,7 +202,7 @@ public class WonKeysReaderWriter {
         return model;
     }
 
-    public void writeToModel(Model model, Resource keySubject, PublicKey publicKey)
+    public static void writeToModel(Model model, Resource keySubject, PublicKey publicKey)
                     throws NotSupportedException, KeyNotSupportedException {
         Objects.requireNonNull(keySubject);
         Objects.requireNonNull(publicKey);

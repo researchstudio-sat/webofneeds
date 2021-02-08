@@ -18,11 +18,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
 
 @Component
 @Primary
@@ -54,9 +51,9 @@ public class DbBackedWebIdKeyLoader implements WebIdKeyLoader {
             if (atomOpt.isEmpty()) {
                 return null;
             }
-            Map<String, PublicKey> keys = wonKeysReaderWriter
-                            .readFromDataset(atomOpt.get().getDatatsetHolder().getDataset());
-            return keys.values().stream().collect(toSet());
+            return wonKeysReaderWriter
+                            .readKeyFromAtom(atomOpt.get().getAtomURI(), atomOpt.get().getDatatsetHolder().getDataset(),
+                                            keyURI);
         } catch (Exception e) {
             logger.debug("could not load key locally: {}", keyURI);
         }

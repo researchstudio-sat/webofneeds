@@ -16,20 +16,43 @@
   grid-auto-flow: row;
 }
 
+@mixin personaMenu() {
+  background: $won-dark-gray;
+  align-self: stretch;
+  padding: 0.5rem;
+
+  .personas__create {
+    display: block;
+    padding: 0.3rem 0.5rem;
+    border-radius: 100%;
+    border-style: solid;
+    border-color: $won-line-gray;
+    border-width: $boldBorderWidth;
+    --local-primary: #{$won-line-gray};
+
+    &__icon {
+      @include fixed-square($toastIconSize);
+    }
+
+    &:hover {
+      border-color: $won-secondary-text-color;
+
+      .personas__create__icon {
+        --local-primary: #{$won-secondary-text-color};
+      }
+    }
+  }
+}
+
 @mixin genericMenu() {
   display: grid;
   box-sizing: border-box;
 
-  .menu__signout {
-    margin: 0.5rem 1rem;
-  }
   .menu__user {
+    display: grid;
+    grid-template-columns: min-content 1fr;
     padding: 0 1rem 0.5rem 1rem;
     border-bottom: $thinGrayBorder;
-  }
-
-  .menu__user {
-    display: flex;
     box-sizing: border-box;
     align-items: center;
     white-space: nowrap;
@@ -41,6 +64,19 @@
     > .menu__user__caption {
       margin-left: 0.5rem;
       color: #{$won-primary-color};
+    }
+
+    > .menu__user__signout {
+      color: $won-secondary-color;
+      font-size: $smallFontSize;
+      cursor: pointer;
+      grid-column: 1 / -1;
+      justify-self: end;
+      padding: 0.5rem;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 }
@@ -111,6 +147,13 @@
 
 won-menu.won-menu--show-mobile {
   background: $won-light-gray;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: self-start;
+
+  > .personas {
+    @include personaMenu();
+  }
 
   > .menu {
     @include genericMenu();
@@ -124,7 +167,13 @@ won-menu.won-menu--show-mobile {
 
 won-menu:not(.won-menu--show-mobile) {
   background: $won-light-gray;
-  border-bottom: $thinGrayBorder;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: self-start;
+
+  > .personas {
+    @include personaMenu();
+  }
 
   > .menu {
     @include genericMenu();

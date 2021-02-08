@@ -6,13 +6,14 @@ import won.auth.check.AtomNodeChecker;
 import won.auth.check.TargetAtomCheckEvaluator;
 import won.auth.model.Authorization;
 import won.auth.model.OperationRequest;
+import won.auth.support.InternalWonAclEvaluatorFactory;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.util.Set;
 
-public class WonAclEvaluatorTestFactory extends WonAclEvaluatorFactory {
-    public WonAclEvaluatorTestFactory(Shapes shapes,
+public class InternalWonAclEvaluatorTestFactory extends InternalWonAclEvaluatorFactory {
+    public InternalWonAclEvaluatorTestFactory(Shapes shapes,
                     TargetAtomCheckEvaluator targetAtomCheckEvaluator,
                     AtomNodeChecker atomNodeChecker,
                     WebIdKeyLoader webIdKeyLoader) {

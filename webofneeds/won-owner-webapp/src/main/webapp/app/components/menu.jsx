@@ -8,9 +8,11 @@ import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
-import { NavLink, useHistory } from "react-router-dom";
+import { Link, NavLink, useHistory } from "react-router-dom";
 import ico36_person_anon from "~/images/won-icons/ico36_person_anon.svg";
 import ico36_person from "~/images/won-icons/ico36_person.svg";
+import { generateLink } from "~/app/utils";
+import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
 
 export default function WonMenu({ className }) {
   const dispatch = useDispatch();
@@ -121,10 +123,9 @@ export default function WonMenu({ className }) {
         // TODO: Fix me.
         // Handler is closing menu before actual MenuAction is toggled
         // dispatch(actionCreators.view__hideMenu());
-
-        return;
       }
     }
+
     document.addEventListener("mousedown", handleClick, false);
 
     return function cleanup() {
@@ -134,6 +135,25 @@ export default function WonMenu({ className }) {
 
   return (
     <won-menu class={generateRootClasses()} ref={node => (thisNode = node)}>
+      <div className="personas">
+        <Link
+          className="personas__create"
+          to={location =>
+            generateLink(
+              location,
+              {
+                useCase: "persona",
+              },
+              "/create",
+              false
+            )
+          }
+        >
+          <svg className="personas__create__icon" title="Create a new Persona">
+            <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
+          </svg>
+        </Link>
+      </div>
       <div className="menu">
         <div className="menu__user">
           {isAnonymous ? (
@@ -151,6 +171,9 @@ export default function WonMenu({ className }) {
               <span className="menu__user__caption">{email}</span>
             </React.Fragment>
           )}
+          <a className="menu__user__signout" onClick={logout}>
+            Sign out
+          </a>
         </div>
         <NavLink
           className={generateTabClasses(
@@ -215,12 +238,6 @@ export default function WonMenu({ className }) {
             <span>Sign up</span>
           </NavLink>
         )}
-        <button
-          className="menu__signout won-button--filled secondary"
-          onClick={logout}
-        >
-          <span>Sign out</span>
-        </button>
       </div>
     </won-menu>
   );

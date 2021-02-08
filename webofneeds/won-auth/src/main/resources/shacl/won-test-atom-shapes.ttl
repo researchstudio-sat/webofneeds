@@ -64,6 +64,7 @@ won:connectionShape
     sh:property    [ sh:path     won:connectionState ;
                      sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
+                     sh:minCount 1 ;
                      sh:in       ( won:Suggested won:RequestSent won:RequestReceived won:Connected
                                    won:Closed ) ] ;
     sh:property    [ sh:path     won:targetAtom ;
@@ -85,6 +86,7 @@ won:connectionShape
     sh:property    [ sh:path     won:socket ;
                      sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
+                     sh:minCount 1 ;
                      sh:node     won:socketShape ] ;
     sh:property    [ sh:path     won:messageContainer ;
                      sh:nodeKind sh:IRI ;

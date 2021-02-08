@@ -33,6 +33,7 @@ import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.test.TestFailedEvent;
 import won.bot.framework.eventbot.event.impl.test.TestPassedEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.DeliveryResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.FailureResponseEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.listener.EventListener;
@@ -154,6 +155,18 @@ public abstract class AbstractBotBasedTest
         logger.debug("test passed");
     }
 
+    protected void assertTrue(EventBus bus, String message, boolean condition) {
+        if (!condition) {
+            failTest(bus, message);
+        }
+    }
+
+    protected void assertFalse(EventBus bus, String message, boolean condition) {
+        if (condition) {
+            failTest(bus, message);
+        }
+    }
+
     protected void passTest(EventBus bus) {
         bus.publish(new TestPassedEvent(bot));
     }
@@ -184,12 +197,52 @@ public abstract class AbstractBotBasedTest
         return failureCallback;
     }
 
+    protected EventListener makeSuccessCallbackToFailTest(Bot bot,
+                    EventListenerContext ctx, EventBus bus, String action) {
+        EventListener successCallback = event -> {
+            URI atomUri = ((SuccessResponseEvent) event).getAtomURI();
+            logger.error("{} succeeded unexpectedly for atom URI {}, original message URI: {}", action,
+                            atomUri);
+            ctx.getBotContextWrapper().removeAtomUri(atomUri);
+            bus.publish(new TestFailedEvent(bot,
+                            String.format("%s succeeded unexpectedly for atom URI %s",
+                                            action, atomUri)));
+        };
+        return successCallback;
+    }
+
     protected EventListener makeSuccessCallbackToPassTest(Bot bot, EventBus bus, String action) {
         EventListener successCallback = event -> {
-            logger.debug("{}} successful, new atom URI is {}", action, ((SuccessResponseEvent) event).getAtomURI());
+            logger.debug("{} successful, new atom URI is {}", action, ((SuccessResponseEvent) event).getAtomURI());
             bus.publish(new TestPassedEvent(bot));
         };
         return successCallback;
+    }
+
+    /**
+     * Can be used as success or failure callback to
+     * <code>EventBotActionUtils.makeAndSubscribeResponseListener</code> The
+     * optional task parameter can be used to execute code after logging.
+     *
+     * @param bot
+     * @param bus
+     * @param action
+     * @param task optional task to run after logging
+     * @return
+     */
+    protected EventListener makeLoggingCallback(Bot bot, EventBus bus, String action, Runnable task) {
+        EventListener callback = event -> {
+            DeliveryResponseEvent dre = ((DeliveryResponseEvent) event);
+            boolean success = event instanceof SuccessResponseEvent;
+            String resultStr = success ? "successful" : "failed";
+            logger.debug("{} {} (got {} for message {}, atom {})",
+                            new Object[] { action, resultStr, event.getClass().getSimpleName(),
+                                            dre.getOriginalMessageURI(), dre.getAtomURI() });
+            if (task != null) {
+                task.run();
+            }
+        };
+        return callback;
     }
 
     protected boolean testLinkedDataRequestOkNoWebId(EventListenerContext ctx, EventBus bus, String testCaseIdPrefix,

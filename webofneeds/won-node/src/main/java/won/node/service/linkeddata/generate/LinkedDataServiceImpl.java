@@ -44,6 +44,7 @@ import won.node.service.persistence.AtomInformationService;
 import won.node.springsecurity.acl.WonAclEvalContext;
 import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
+import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.model.*;
@@ -57,6 +58,7 @@ import won.protocol.service.impl.UnreadInformationService;
 import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.DefaultPrefixUtils;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.RDFG;
 import won.protocol.vocabulary.WON;
 
@@ -272,20 +274,31 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     private Dataset filterByAcl(URI atomUri, Dataset dataset, WonAclEvalContext wonAclEvalContext) {
         Dataset filtered = DatasetFactory.createGeneral();
         String aclGraphUri = uriService.createAclGraphURIForAtomURI(atomUri).toString();
+        String keyGraphUri = WonRelativeUriHelper.createKeyGraphURIForAtomURI(atomUri).toString();
         Iterator<String> graphUriIt = dataset.listNames();
         while (graphUriIt.hasNext()) {
             String graphUri = graphUriIt.next();
             OperationRequest operationRequest = wonAclEvalContext.getOperationRequest();
             operationRequest.setReqPosition(POSITION_ATOM_GRAPH);
             operationRequest.setReqGraphs(Collections.singleton(URI.create(graphUri)));
+            if (graphUri.endsWith(WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX)) {
+                // decide later: signature graphs are added for filtered graphs
+                continue;
+            }
             if (graphUri.equals(aclGraphUri)) {
                 operationRequest.setReqGraphTypes(Collections.singleton(GraphType.ACL_GRAPH));
+            } else if (graphUri.equals(keyGraphUri)) {
+                operationRequest.setReqGraphTypes(Collections.singleton(GraphType.KEY_GRAPH));
             } else {
                 operationRequest.setReqGraphTypes(Collections.singleton(GraphType.CONTENT_GRAPH));
             }
             AclEvalResult result = wonAclEvalContext.decideAndRemember(operationRequest);
             if (DecisionValue.ACCESS_GRANTED.equals(result.getDecision())) {
                 filtered.addNamedModel(graphUri, dataset.getNamedModel(graphUri));
+                String signatureGraphUri = graphUri + WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX;
+                if (dataset.containsNamedModel(signatureGraphUri)) {
+                    filtered.addNamedModel(signatureGraphUri, dataset.getNamedModel(signatureGraphUri));
+                }
             }
         }
         return filtered;

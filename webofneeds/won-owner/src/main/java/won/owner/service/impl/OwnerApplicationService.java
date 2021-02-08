@@ -1,18 +1,18 @@
 package won.owner.service.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.WonMessageProcessor;
 import won.protocol.message.sender.WonMessageSender;
 import won.protocol.message.sender.exception.WonMessageSenderException;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Service that connects client-side logic (e.g. the WonWebSocketHandler in
@@ -35,9 +35,20 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
         return wonMessageSenderDelegate.prepareMessage(message);
     }
 
+    @Override
+    public void prepareAndSendMessageOnBehalf(WonMessage message, URI webId)
+                    throws WonMessageSenderException {
+        sendMessage(wonMessageSenderDelegate.prepareMessageOnBehalf(message, webId));
+    }
+
+    @Override
+    public WonMessage prepareMessageOnBehalf(WonMessage message, URI webId) throws WonMessageSenderException {
+        return wonMessageSenderDelegate.prepareMessageOnBehalf(message, webId);
+    }
+
     /**
      * Sends a message to the won node.
-     * 
+     *
      * @param wonMessage
      */
     public void sendMessage(WonMessage wonMessage) {
@@ -59,7 +70,7 @@ public class OwnerApplicationService implements WonMessageProcessor, WonMessageS
 
     /**
      * Sends a message to the owner.
-     * 
+     *
      * @param wonMessage
      * @return null - this is not a normal WonMessageProcessor, it does not return
      * an altered message.

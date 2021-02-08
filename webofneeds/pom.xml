@@ -331,7 +331,7 @@
             <dependency>
                 <groupId>org.apache.jena</groupId>
                 <artifactId>jena-arq</artifactId>
-                <version>${org.apache.jena.version}</version>
+                <version>3.18.0-20210205.073020-31</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>

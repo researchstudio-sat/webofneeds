@@ -1,16 +1,11 @@
 package won.protocol.message.processor.impl;
 
-import java.net.URI;
-import java.util.Objects;
-import java.util.Optional;
-
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StopWatch;
-
 import won.protocol.exception.UriNodePathException;
 import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.exception.WonMessageProcessingException;
@@ -26,6 +21,10 @@ import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.LogMarkers;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.WonUriCheckHelper;
+
+import java.net.URI;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Checks if the event, graph or atom uri is well-formed according the node's
@@ -114,13 +113,6 @@ public class UriConsistencyCheckingWonMessageProcessor implements WonMessageProc
         sw.stop();
         sw.start("signerCheck");
         WonMessageDirection statedDirection = message.getEnvelopeType();
-        if (statedDirection.isFromOwner()) {
-            if (!Objects.equals(message.getSenderAtomURIRequired(), message.getSignerURIRequired())) {
-                RDFDataMgr.write(System.out, message.getCompleteDataset(), Lang.TRIG);
-                throw new WonMessageNotWellFormedException("WonMessage " + message.toShortStringForDebug()
-                                + " is FROM_OWNER but not signed by its atom");
-            }
-        }
         if (statedDirection.isFromSystem()) {
             if (!Objects.equals(message.getSenderNodeURIRequired(), message.getSignerURIRequired())) {
                 RDFDataMgr.write(System.out, message.getCompleteDataset(), Lang.TRIG);

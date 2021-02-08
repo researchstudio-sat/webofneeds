@@ -1,7 +1,9 @@
 package won.auth.check.impl;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import won.cryptography.service.CryptographyService;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
@@ -10,14 +12,12 @@ import java.net.URI;
 import java.util.Optional;
 
 @Component
-public class LDFetchingAtomNodeChecker implements won.auth.check.AtomNodeChecker {
+public class LDFetchingAtomNodeChecker implements won.auth.check.AtomNodeChecker, InitializingBean {
     @Autowired
-    LinkedDataSource linkedDataSource;
-    URI webIdForRequests;
-
-    public void setWebIdForRequests(URI webIdForRequests) {
-        this.webIdForRequests = webIdForRequests;
-    }
+    private LinkedDataSource linkedDataSource;
+    @Autowired
+    private CryptographyService cryptographyService;
+    private URI webIdForRequests;
 
     public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
         this.linkedDataSource = linkedDataSource;
@@ -46,5 +46,10 @@ public class LDFetchingAtomNodeChecker implements won.auth.check.AtomNodeChecker
         }
         String wonNodeURI = wni.get().getWonNodeURI();
         return Optional.of(URI.create(wonNodeURI));
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.webIdForRequests = URI.create(cryptographyService.getDefaultPrivateKeyAlias());
     }
 }
