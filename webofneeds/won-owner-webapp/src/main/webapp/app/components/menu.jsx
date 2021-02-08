@@ -16,6 +16,9 @@ import * as atomUtils from "~/app/redux/utils/atom-utils";
 import WonAtomIcon from "~/app/components/atom-icon";
 import WonShareDropdown from "~/app/components/share-dropdown";
 import WonAtomContextDropdown from "~/app/components/atom-context-dropdown";
+import WonAtomMenu from "~/app/components/atom-menu";
+import VisibilitySensor from "react-visibility-sensor";
+import * as processUtils from "~/app/redux/utils/process-utils";
 
 export default function WonMenu({ className }) {
   const dispatch = useDispatch();
@@ -39,7 +42,10 @@ export default function WonMenu({ className }) {
     generalSelectors.hasUnreadChatConnections
   );
 
+  const processState = useSelector(generalSelectors.getProcessState);
+
   const activePersonaUri = useSelector(viewSelectors.getActivePersonaUri);
+  const activePersonaTab = useSelector(viewSelectors.getActivePersonaTab);
 
   const ownedPersonas = useSelector(state =>
     generalSelectors
@@ -49,6 +55,12 @@ export default function WonMenu({ className }) {
   );
 
   const activePersona = get(ownedPersonas, activePersonaUri);
+
+  const relevantActivePersonaConnectionsMap = useSelector(
+    generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(
+      activePersonaUri
+    )
+  );
 
   const personaElements = [];
   ownedPersonas &&
@@ -65,9 +77,29 @@ export default function WonMenu({ className }) {
             activePersonaUri !== personaUri &&
             dispatch(actionCreators.view__setActivePersonaUri(personaUri))
           }
+          title={atomUtils.getTitle(persona)}
           key={personaUri}
         >
-          <WonAtomIcon className="personas__persona__icon" atom={persona} />
+          <VisibilitySensor
+            onChange={isVisible => {
+              if (isVisible) {
+                const isAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+                  processState,
+                  personaUri,
+                  persona
+                );
+                if (isAtomFetchNecessary) {
+                  console.debug("fetch personaUri, ", personaUri);
+                  dispatch(actionCreators.atoms__fetchUnloadedAtom(personaUri));
+                }
+              }
+            }}
+            intervalDelay={200}
+            partialVisibility={true}
+            offset={{ top: -300, bottom: -300 }}
+          >
+            <WonAtomIcon className="personas__persona__icon" atom={persona} />
+          </VisibilitySensor>
         </div>
       );
     });
@@ -222,18 +254,41 @@ export default function WonMenu({ className }) {
             Sign out
           </a>
         </div>
-        <NavLink
-          className={generateTabClasses(
-            false,
-            hasUnreadSuggestedConnections || hasUnreadBuddyConnections
-          )}
-          activeClassName="menu__tab--selected"
-          onClick={hideMenuIfVisible}
-          to="/inventory"
-        >
-          <span className="menu__tab__unread" />
-          <span className="menu__tab__label">Inventory</span>
-        </NavLink>
+        {activePersona ? (
+          <WonAtomMenu
+            className="persona__menu"
+            atom={activePersona}
+            visibleTab={activePersonaTab}
+            setVisibleTab={tabName => {
+              hideMenuIfVisible();
+              dispatch(actionCreators.view__setActivePersonaTab(tabName));
+              if (
+                !(
+                  history.location.pathname === "/inventory" ||
+                  history.location.pathname === "/"
+                )
+              ) {
+                history.replace(
+                  generateLink(history.location, {}, "/inventory")
+                );
+              }
+            }}
+            relevantConnectionsMap={relevantActivePersonaConnectionsMap}
+          />
+        ) : (
+          <NavLink
+            className={generateTabClasses(
+              false,
+              hasUnreadSuggestedConnections || hasUnreadBuddyConnections
+            )}
+            activeClassName="menu__tab--selected"
+            onClick={hideMenuIfVisible}
+            to="/inventory"
+          >
+            <span className="menu__tab__unread" />
+            <span className="menu__tab__label">Inventory</span>
+          </NavLink>
+        )}
         <NavLink
           className={generateTabClasses(false, hasUnreadChatConnections)}
           activeClassName="menu__tab--selected"

@@ -119,6 +119,28 @@
       }
     }
   }
+
+  won-atom-menu.persona__menu {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+
+    > .atom-menu__item {
+      padding: 0.5rem;
+      border-bottom: 0;
+
+      &.atom-menu__item--selected {
+        border-right: 0.2rem solid $won-primary-color;
+        border-bottom: 0;
+      }
+
+      &:hover {
+        color: $won-primary-color-light;
+        border-right: 0.2rem solid $won-primary-color-light;
+        border-bottom: 0;
+      }
+    }
+  }
 }
 
 @mixin genericMenuTab() {

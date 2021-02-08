@@ -24,7 +24,10 @@ const initialState = Immutable.fromJS({
   showSlideIns: true,
   locationAccessDenied: false,
   currentLocation: undefined,
-  activePersonaUri: undefined,
+  activePersona: {
+    uri: undefined,
+    tab: "DETAIL",
+  },
 });
 
 export default function(viewState = initialState, action = {}) {
@@ -136,7 +139,14 @@ export default function(viewState = initialState, action = {}) {
 
     case actionTypes.view.setActivePersonaUri: {
       const personaUri = action.payload;
-      return viewState.set("activePersonaUri", personaUri);
+      return viewState
+        .setIn(["activePersona", "uri"], personaUri)
+        .setIn(["activePersona", "tab"], "DETAIL");
+    }
+
+    case actionTypes.view.setActivePersonaTab: {
+      const tab = action.payload;
+      return viewState.setIn(["activePersona", "tab"], tab);
     }
 
     case actionTypes.view.showModalDialog: {

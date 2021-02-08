@@ -17,6 +17,7 @@ import "~/style/_atom-menu.scss";
 
 export default function WonAtomMenu({
   atom,
+  className,
   visibleTab,
   setVisibleTab,
   toggleAddPicker,
@@ -34,7 +35,7 @@ export default function WonAtomMenu({
   const shouldShowRdf = viewUtils.showRdf(viewState);
 
   function generateParentCssClasses() {
-    const cssClassNames = [];
+    const cssClassNames = [className];
     atomLoading && cssClassNames.push("won-is-loading");
     atomFailedToLoad && cssClassNames.push("won-failed-to-load");
 
@@ -194,6 +195,7 @@ export default function WonAtomMenu({
 
 WonAtomMenu.propTypes = {
   atom: PropTypes.object.isRequired,
+  className: PropTypes.string,
   relevantConnectionsMap: PropTypes.object.isRequired,
   visibleTab: PropTypes.string.isRequired,
   setVisibleTab: PropTypes.func.isRequired,

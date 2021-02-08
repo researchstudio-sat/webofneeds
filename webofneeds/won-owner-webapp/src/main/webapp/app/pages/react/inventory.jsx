@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "../../actions/actions.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
@@ -8,7 +8,6 @@ import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as viewUtils from "../../redux/utils/view-utils.js";
 import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonAtomInfo from "../../components/atom-info.jsx";
 import WonTopnav from "../../components/topnav.jsx";
 import WonMenu from "../../components/menu.jsx";
 import WonToasts from "../../components/toasts.jsx";
@@ -21,7 +20,7 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 import "~/style/_inventory.scss";
 import { useHistory } from "react-router-dom";
-import vocab from "../../service/vocab.js";
+import WonAtomContent from "~/app/components/atom-content";
 
 export default function PageInventory() {
   const history = useHistory();
@@ -30,10 +29,11 @@ export default function PageInventory() {
   const theme = useSelector(generalSelectors.getTheme);
   const accountState = useSelector(generalSelectors.getAccountState);
 
+  const storedAtoms = useSelector(generalSelectors.getAtoms);
+
   const ownedActivePersonas = useSelector(state =>
     generalSelectors
       .getOwnedPersonas(state)
-      .filter(atomUtils.isActive)
       .toOrderedMap()
       .sortBy(persona => atomUtils.getTitle(persona))
   );
@@ -95,20 +95,17 @@ export default function PageInventory() {
     ));
   }
 
-  const personaElements = [];
+  const activePersonaUri = useSelector(viewSelectors.getActivePersonaUri);
+  const activePersonaTab = useSelector(viewSelectors.getActivePersonaTab);
+  const activePersona = get(ownedActivePersonas, activePersonaUri);
 
-  ownedActivePersonas &&
-    ownedActivePersonas.map((persona, personaUri) => {
-      personaElements.push(
-        <WonAtomInfo
-          key={personaUri}
-          className="ownerinventory__personas__persona"
-          atomUri={personaUri}
-          atom={persona}
-          initialTab={vocab.HOLD.HolderSocketCompacted}
-        />
-      );
-    });
+  const relevantActivePersonaConnectionsMap = useSelector(
+    generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(
+      activePersonaUri
+    )
+  );
+
+  const [showAddPicker, toggleAddPicker] = useState(false);
 
   return (
     <section className={!isLoggedIn ? "won-signed-out" : ""}>
@@ -120,63 +117,80 @@ export default function PageInventory() {
 
       {isLoggedIn ? (
         <main className="ownerinventory">
-          {personaElements.length > 0 && (
-            <div className="ownerinventory__personas">{personaElements}</div>
-          )}
-          <div className="ownerinventory__header">
-            <div className="ownerinventory__header__title">
-              Unassigned
-              {hasOwnedUnassignedAtomUris && (
-                <span className="ownerinventory__header__title__count">
-                  {"(" + unassignedAtomSize + ")"}
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="ownerinventory__content">
-            <WonAtomCardGrid
-              atoms={ownedUnassignedActivePosts}
-              currentLocation={currentLocation}
-              showIndicators={true}
-              showHolder={true}
-              showCreate={true}
-            />
-          </div>
-          {hasOwnedInactiveAtomUris && (
-            <div
-              className="ownerinventory__header clickable"
-              onClick={() => dispatch(actionCreators.view__toggleClosedAtoms())}
-            >
-              <div className="ownerinventory__header__title">
-                Archived
-                <span className="ownerinventory__header__title__count">
-                  {"(" + inactiveAtomUriSize + ")"}
-                </span>
-              </div>
-              <svg
-                className={
-                  "ownerinventory__header__carret " +
-                  (showClosedAtoms
-                    ? "ownerinventory__header__carret--expanded"
-                    : "ownerinventory__header__carret--collapsed")
+          {activePersona ? (
+            <div className="ownerinventory__activepersona">
+              <WonAtomContent
+                atom={activePersona}
+                visibleTab={activePersonaTab}
+                relevantConnectionsMap={relevantActivePersonaConnectionsMap}
+                toggleAddPicker={toggleAddPicker}
+                showAddPicker={showAddPicker}
+                setVisibleTab={tabName =>
+                  dispatch(actionCreators.view__setActivePersonaTab(tabName))
                 }
-              >
-                <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-              </svg>
+                storedAtoms={storedAtoms}
+              />
             </div>
-          )}
-          {showClosedAtoms &&
-            hasOwnedInactiveAtomUris && (
+          ) : (
+            <React.Fragment>
+              <div className="ownerinventory__header">
+                <div className="ownerinventory__header__title">
+                  Anonymous Postings
+                  {hasOwnedUnassignedAtomUris && (
+                    <span className="ownerinventory__header__title__count">
+                      {"(" + unassignedAtomSize + ")"}
+                    </span>
+                  )}
+                </div>
+              </div>
               <div className="ownerinventory__content">
                 <WonAtomCardGrid
-                  atoms={ownedInactiveAtoms}
+                  atoms={ownedUnassignedActivePosts}
                   currentLocation={currentLocation}
-                  showIndicators={false}
-                  showHolder={false}
-                  showCreate={false}
+                  showIndicators={true}
+                  showHolder={true}
+                  showCreate={true}
                 />
               </div>
-            )}
+              {hasOwnedInactiveAtomUris && (
+                <div
+                  className="ownerinventory__header clickable"
+                  onClick={() =>
+                    dispatch(actionCreators.view__toggleClosedAtoms())
+                  }
+                >
+                  <div className="ownerinventory__header__title">
+                    Archived
+                    <span className="ownerinventory__header__title__count">
+                      {"(" + inactiveAtomUriSize + ")"}
+                    </span>
+                  </div>
+                  <svg
+                    className={
+                      "ownerinventory__header__carret " +
+                      (showClosedAtoms
+                        ? "ownerinventory__header__carret--expanded"
+                        : "ownerinventory__header__carret--collapsed")
+                    }
+                  >
+                    <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+                  </svg>
+                </div>
+              )}
+              {showClosedAtoms &&
+                hasOwnedInactiveAtomUris && (
+                  <div className="ownerinventory__content">
+                    <WonAtomCardGrid
+                      atoms={ownedInactiveAtoms}
+                      currentLocation={currentLocation}
+                      showIndicators={false}
+                      showHolder={false}
+                      showCreate={false}
+                    />
+                  </div>
+                )}
+            </React.Fragment>
+          )}
         </main>
       ) : (
         <main className="ownerwelcome">

@@ -34,7 +34,11 @@ export function isMenuVisible(viewState) {
 }
 
 export function getActivePersonaUri(viewState) {
-  return get(viewState, "activePersonaUri");
+  return getIn(viewState, ["activePersona", "uri"]);
+}
+
+export function getActivePersonaTab(viewState) {
+  return getIn(viewState, ["activePersona", "tab"]);
 }
 
 export function showClosedAtoms(viewState) {
