@@ -72,6 +72,7 @@ public class LinkedDataRestBridge {
 
     private RestTemplate getRestTemplateForReadingLinkedData(String webID) throws Exception {
         if (webID == null) {
+            PrivateKeyAliasContext.setPrivateKeyAlias(keyPairAliasDerivationStrategy.getAliasForAtomUri(null));
             return restTemplateWithDefaultWebId;
         }
         return createRestTemplateForReadingLinkedData(webID);
