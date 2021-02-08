@@ -1,59 +1,11 @@
 package won.protocol.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collector.Characteristics;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
+import com.google.common.collect.Iterators;
+import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -70,12 +22,24 @@ import org.apache.jena.util.FileUtils;
 import org.apache.jena.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterators;
-
 import won.protocol.exception.IncorrectPropertyCountException;
 import won.protocol.util.pretty.ConversationDatasetWriterFactory;
 import won.protocol.util.pretty.Lang_WON;
+
+import java.io.*;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collector.Characteristics;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Utilities for RDF manipulation with Jena.
@@ -145,8 +109,9 @@ public class RdfUtils {
     public static Dataset toDataset(String content, RDFFormat rdfFormat) {
         if (content != null) {
             return toDataset(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), rdfFormat);
-        } else
+        } else {
             return DatasetFactory.createGeneral();
+        }
     }
 
     public static Dataset toDataset(InputStream stream, RDFFormat rdfFormat) {
@@ -183,8 +148,9 @@ public class RdfUtils {
     }
 
     public static Dataset cloneDataset(Dataset dataset) {
-        if (dataset == null)
+        if (dataset == null) {
             return null;
+        }
         boolean existingTransaction = dataset.isInTransaction();
         if (!existingTransaction) {
             dataset.begin(ReadWrite.READ);
@@ -215,10 +181,12 @@ public class RdfUtils {
      * @return
      */
     public static boolean isIsomorphicWith(Dataset dataset, Dataset otherDataset) {
-        if (dataset == null)
+        if (dataset == null) {
             throw new IllegalArgumentException("dataset must not be null");
-        if (otherDataset == null)
+        }
+        if (otherDataset == null) {
             throw new IllegalArgumentException("otherDataset must not be null");
+        }
         // first, check the default graph:
         Model defaultModel = dataset.getDefaultModel();
         Model otherDefaultModel = otherDataset.getDefaultModel();
@@ -270,9 +238,15 @@ public class RdfUtils {
         throw new IllegalArgumentException("both models are null");
     }
 
+    public static Pair<Graph> diff(Graph first, Graph second) {
+        Pair<Model> diff = diff(ModelFactory.createModelForGraph(first), ModelFactory.createModelForGraph(second));
+        return new Pair<Graph>(diff.first.getGraph(), diff.second.getGraph());
+    }
+
     public static Pair<Model> diff(Model firstModel, Model secondModel) {
-        if (firstModel == null && secondModel == null)
+        if (firstModel == null && secondModel == null) {
             return null;
+        }
         Model cloneFirst = null;
         Model cloneSecond = null;
         if (firstModel != null) {
@@ -294,17 +268,21 @@ public class RdfUtils {
                 Resource s = stmt.getSubject();
                 Property p = stmt.getPredicate();
                 RDFNode o = stmt.getObject();
-                if (s.isAnon())
+                if (s.isAnon()) {
                     s = null;
-                if (o.isAnon())
+                }
+                if (o.isAnon()) {
                     o = null;
+                }
                 StmtIterator it2 = cloneSecond.listStatements(s, p, o);
                 while (it2.hasNext()) {
                     Statement toRemove = it2.nextStatement();
-                    if (stmt.getSubject().isAnon() && !toRemove.getSubject().isAnon())
+                    if (stmt.getSubject().isAnon() && !toRemove.getSubject().isAnon()) {
                         continue;
-                    if (stmt.getObject().isAnon() && !toRemove.getObject().isAnon())
+                    }
+                    if (stmt.getObject().isAnon() && !toRemove.getObject().isAnon()) {
                         continue;
+                    }
                     it2.remove();
                 }
             } else {
@@ -318,17 +296,21 @@ public class RdfUtils {
                 Resource s = stmt.getSubject();
                 Property p = stmt.getPredicate();
                 RDFNode o = stmt.getObject();
-                if (s.isAnon())
+                if (s.isAnon()) {
                     s = null;
-                if (o.isAnon())
+                }
+                if (o.isAnon()) {
                     o = null;
+                }
                 StmtIterator it2 = cloneFirst.listStatements(s, p, o);
                 while (it2.hasNext()) {
                     Statement toRemove = it2.nextStatement();
-                    if (stmt.getSubject().isAnon() && !toRemove.getSubject().isAnon())
+                    if (stmt.getSubject().isAnon() && !toRemove.getSubject().isAnon()) {
                         continue;
-                    if (stmt.getObject().isAnon() && !toRemove.getObject().isAnon())
+                    }
+                    if (stmt.getObject().isAnon() && !toRemove.getObject().isAnon()) {
                         continue;
+                    }
                     it2.remove();
                 }
             } else {
@@ -399,23 +381,30 @@ public class RdfUtils {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             Pair other = (Pair) obj;
             if (first == null) {
-                if (other.first != null)
+                if (other.first != null) {
                     return false;
-            } else if (!first.equals(other.first))
+                }
+            } else if (!first.equals(other.first)) {
                 return false;
+            }
             if (second == null) {
-                if (other.second != null)
+                if (other.second != null) {
                     return false;
-            } else if (!second.equals(other.second))
+                }
+            } else if (!second.equals(other.second)) {
                 return false;
+            }
             return true;
         }
     }
@@ -568,8 +557,9 @@ public class RdfUtils {
 
     public static void replaceBaseResource(final Model model, final Resource replacement, boolean renamePrefixedURIs) {
         String baseURI = model.getNsPrefixURI("");
-        if (baseURI == null)
+        if (baseURI == null) {
             return;
+        }
         Resource baseUriResource = model.getResource(baseURI);
         if (renamePrefixedURIs) {
             renameResourceWithPrefix(model, baseUriResource.getURI(), replacement.getURI());
@@ -598,8 +588,9 @@ public class RdfUtils {
      */
     public static void replaceResourceInModel(final Resource resource, final Resource replacement) {
         logger.debug("replacing resource '{}' with resource '{}'", resource, replacement);
-        if (!resource.getModel().equals(replacement.getModel()))
+        if (!resource.getModel().equals(replacement.getModel())) {
             throw new IllegalArgumentException("resource and replacement must be from the same model");
+        }
         Model model = resource.getModel();
         Model modelForNewStatements = ModelFactory.createDefaultModel();
         StmtIterator iterator = model.listStatements(resource, null, (RDFNode) null);
@@ -709,8 +700,9 @@ public class RdfUtils {
      * @return
      */
     public static Model replaceResource(Resource resource, Resource replacement) {
-        if (!resource.getModel().equals(replacement.getModel()))
+        if (!resource.getModel().equals(replacement.getModel())) {
             throw new IllegalArgumentException("resource and replacement must be from the same model");
+        }
         Model result = ModelFactory.createDefaultModel();
         result.setNsPrefixes(resource.getModel().getNsPrefixMap());
         StmtIterator it = resource.getModel().listStatements();
@@ -836,8 +828,9 @@ public class RdfUtils {
      */
     public static Model readRdfSnippet(final InputStream in, final String rdfLanguage) {
         org.apache.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
-        if (in == null)
+        if (in == null) {
             return model;
+        }
         String baseURI = "no:uri";
         model.setNsPrefix("", baseURI);
         model.read(in, baseURI, rdfLanguage);
@@ -865,8 +858,9 @@ public class RdfUtils {
      */
     public static Model readRdfSnippet(final Reader in, final String rdfLanguage) {
         org.apache.jena.rdf.model.Model model = ModelFactory.createDefaultModel();
-        if (in == null)
+        if (in == null) {
             return model;
+        }
         String baseURI = "no:uri";
         model.setNsPrefix("", baseURI);
         model.read(in, baseURI, rdfLanguage);
@@ -1099,8 +1093,9 @@ public class RdfUtils {
      * @return
      */
     public static String toString(Node node) {
-        if (node == null)
+        if (node == null) {
             return null;
+        }
         return node.getLiteralLexicalForm();
     }
 
@@ -1113,8 +1108,9 @@ public class RdfUtils {
      * @return
      */
     public static URI toURI(Node node) {
-        if (node == null)
+        if (node == null) {
             return null;
+        }
         return URI.create(node.getURI());
     }
 
@@ -1126,8 +1122,9 @@ public class RdfUtils {
      * @return
      */
     public static URI toURI(RDFNode node) {
-        if (node == null)
+        if (node == null) {
             return null;
+        }
         return URI.create(node.asResource().getURI());
     }
 
@@ -1146,8 +1143,9 @@ public class RdfUtils {
         // propertyPath);
         Iterator<Node> result = PathEval.eval(model.getGraph(), model.getResource(resourceURI.toString()).asNode(),
                         propertyPath, Context.emptyContext);
-        if (!result.hasNext())
+        if (!result.hasNext()) {
             return null;
+        }
         return result.next();
     }
 
@@ -1156,8 +1154,9 @@ public class RdfUtils {
         // model.getResource(resourceURI.toString()).asNode(),
         // propertyPath);
         Iterator<Node> result = PathEval.eval(model.getGraph(), node, propertyPath, Context.emptyContext);
-        if (!result.hasNext())
+        if (!result.hasNext()) {
             return null;
+        }
         return result.next();
     }
 
@@ -1326,8 +1325,9 @@ public class RdfUtils {
     }
 
     public static URI toUriOrNull(final Object uriStringOrNull) {
-        if (uriStringOrNull == null)
+        if (uriStringOrNull == null) {
             return null;
+        }
         return URI.create(uriStringOrNull.toString());
     }
 
@@ -1526,7 +1526,7 @@ public class RdfUtils {
      */
     public static ModelSelector getDefaultModelSelector() {
         return DEFAULT_MODEL_SELECTOR;
-    };
+    }
 
     /**
      * Calls the specified ModelVisitor's visit method on each model of the dataset
@@ -1615,8 +1615,9 @@ public class RdfUtils {
     public static <T> T findFirst(Dataset dataset, ModelVisitor<T> visitor, ModelSelector modelSelector) {
         for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
             T result = visitor.visit(modelIterator.next());
-            if (result != null)
+            if (result != null) {
                 return result;
+            }
         }
         return null;
     }
@@ -1654,8 +1655,9 @@ public class RdfUtils {
                 result = newResult;
             }
         }
-        if (result == null)
+        if (result == null) {
             throw new IncorrectPropertyCountException("No result found", 1, 0);
+        }
         return result;
     }
 
@@ -1679,10 +1681,11 @@ public class RdfUtils {
         T result = null;
         for (Iterator<Model> modelIterator = modelSelector.select(dataset); modelIterator.hasNext();) {
             T newResult = visitor.visit(modelIterator.next());
-            if (result != null)
+            if (result != null) {
                 result = resultCombiner.combine(result, newResult);
-            else
+            } else {
                 result = newResult;
+            }
         }
         return result;
     }
@@ -1773,8 +1776,9 @@ public class RdfUtils {
         Objects.nonNull(resource);
         Objects.nonNull(property);
         NodeIterator iterator = model.listObjectsOfProperty(resource, property);
-        if (iterator.hasNext())
+        if (iterator.hasNext()) {
             return iterator.next();
+        }
         return null;
     }
 
@@ -1785,16 +1789,17 @@ public class RdfUtils {
         while (iterator.hasNext()) {
             foundNodes.add(iterator.next());
         }
-        if (foundNodes.size() == 0)
+        if (foundNodes.size() == 0) {
             return null;
-        else if (foundNodes.size() == 1)
+        } else if (foundNodes.size() == 1) {
             return foundNodes.get(0);
-        else {
+        } else {
             foundNodes.size();
             RDFNode n = foundNodes.get(0);
             for (RDFNode node : foundNodes) {
-                if (!node.equals(n))
+                if (!node.equals(n)) {
                     throw new IncorrectPropertyCountException(1, 2);
+                }
             }
             return n;
         }
@@ -1862,13 +1867,15 @@ public class RdfUtils {
                     boolean allowNone) {
         URI retVal = null;
         StmtIterator it = model.listStatements(null, property, object);
-        if (!it.hasNext() && !allowNone)
+        if (!it.hasNext() && !allowNone) {
             throw new IllegalArgumentException("expecting at least one triple");
+        }
         if (it.hasNext()) {
             retVal = URI.create(it.nextStatement().getSubject().asResource().toString());
         }
-        if (!allowMultiple && it.hasNext())
+        if (!allowMultiple && it.hasNext()) {
             throw new IllegalArgumentException("not expecting more than one triple");
+        }
         return retVal;
     }
 
@@ -1876,13 +1883,15 @@ public class RdfUtils {
                     boolean allowNone) {
         URI retVal = null;
         StmtIterator it = model.listStatements(null, property, object);
-        if (!it.hasNext() && !allowNone)
+        if (!it.hasNext() && !allowNone) {
             throw new IllegalArgumentException("expecting at least one triple");
+        }
         if (it.hasNext()) {
             retVal = URI.create(it.nextStatement().getObject().asResource().toString());
         }
-        if (!allowMultiple && it.hasNext())
+        if (!allowMultiple && it.hasNext()) {
             throw new IllegalArgumentException("not expecting more than one triple");
+        }
         return retVal;
     }
 
@@ -2028,10 +2037,12 @@ public class RdfUtils {
      */
     public static Dataset addDatasetToDataset(final Dataset baseDataset, final Dataset toBeAddedtoBase,
                     boolean replaceNamedModel) {
-        if (baseDataset == null)
+        if (baseDataset == null) {
             throw new IllegalArgumentException("baseDataset must not be null");
-        if (toBeAddedtoBase == null)
+        }
+        if (toBeAddedtoBase == null) {
             throw new IllegalArgumentException("toBeAddedToBase must not be null");
+        }
         baseDataset.getDefaultModel().add(toBeAddedtoBase.getDefaultModel());
         for (Iterator<String> nameIt = toBeAddedtoBase.listNames(); nameIt.hasNext();) {
             String modelName = nameIt.next();
