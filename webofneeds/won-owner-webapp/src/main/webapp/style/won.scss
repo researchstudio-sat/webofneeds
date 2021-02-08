@@ -97,16 +97,18 @@ body {
 
     > won-menu {
       box-sizing: border-box;
+      border-right: $thinGrayBorder;
+      box-shadow: 0 0 5px 5px var(--won-line-gray);
       z-index: 999;
 
       &.won-menu--show-mobile {
         position: fixed;
         height: calc(100vh - var(--headerHeight));
+        top: var(--headerHeight);
         width: 80vw;
         max-width: 80vw;
         transition: max-width linear 0.25s;
         overflow-y: hidden;
-        border-right: $thinGrayBorder;
       }
 
       &:not(.won-menu--show-mobile) {

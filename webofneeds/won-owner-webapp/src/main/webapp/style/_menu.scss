@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "square-image";
 
 @mixin desktopMenuTab() {
   padding: 0.5rem 2rem;
@@ -17,9 +18,41 @@
 }
 
 @mixin personaMenu() {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 1rem;
+  align-items: center;
   background: $won-dark-gray;
   align-self: stretch;
-  padding: 0.5rem;
+  padding: 1rem 0.5rem;
+
+  .personas__persona {
+    &--anon {
+      --local-primary: #{$won-line-gray};
+
+      .personas__persona__anonicon {
+        border-radius: 100%;
+        @include fixed-square($feedIconSize);
+      }
+
+      &:hover {
+        --local-primary: #{$won-secondary-text-color};
+      }
+    }
+
+    @include square-image($feedIconSize);
+
+    &--active {
+      .personas__persona__anonicon,
+      .image {
+        box-shadow: 0 0 5px 5px var(--won-secondary-text-color);
+      }
+
+      .personas__persona__anonicon {
+        --local-primary: #{$won-secondary-text-color};
+      }
+    }
+  }
 
   .personas__create {
     display: block;
@@ -50,27 +83,34 @@
 
   .menu__user {
     display: grid;
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: 1fr;
     padding: 0 1rem 0.5rem 1rem;
     border-bottom: $thinGrayBorder;
     box-sizing: border-box;
     align-items: center;
     white-space: nowrap;
 
-    > .menu__user__icon {
-      @include fixed-square($bigiconSize);
-      --local-primary: #{$won-primary-color};
+    .menu__user__persona {
+      display: grid;
+      grid-template-columns: 1fr min-content min-content;
+      align-items: end;
+
+      > .menu__user__caption {
+        margin-right: 1rem;
+      }
     }
-    > .menu__user__caption {
-      margin-left: 0.5rem;
-      color: #{$won-primary-color};
+
+    .menu__user__caption {
+      font-weight: lighter;
+      font-size: $mediumFontSize;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
 
     > .menu__user__signout {
       color: $won-secondary-color;
       font-size: $smallFontSize;
       cursor: pointer;
-      grid-column: 1 / -1;
       justify-self: end;
       padding: 0.5rem;
 

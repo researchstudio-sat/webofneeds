@@ -47,6 +47,10 @@ export const showAnonymousSlideInEmailInput = createSelector(
   viewState => viewUtils.showAnonymousSlideInEmailInput(viewState)
 );
 
+export const getActivePersonaUri = createSelector(getViewState, viewState =>
+  viewUtils.getActivePersonaUri(viewState)
+);
+
 export const showSlideInConnectionLost = createSelector(
   state => getIn(state, ["messages", "lostConnection"]),
   lostConnection => lostConnection

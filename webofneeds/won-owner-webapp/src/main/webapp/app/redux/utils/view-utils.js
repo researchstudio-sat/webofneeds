@@ -33,6 +33,10 @@ export function isMenuVisible(viewState) {
   return get(viewState, "showMenu");
 }
 
+export function getActivePersonaUri(viewState) {
+  return get(viewState, "activePersonaUri");
+}
+
 export function showClosedAtoms(viewState) {
   return get(viewState, "showClosedAtoms");
 }

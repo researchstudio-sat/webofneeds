@@ -10,9 +10,12 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
 import { Link, NavLink, useHistory } from "react-router-dom";
 import ico36_person_anon from "~/images/won-icons/ico36_person_anon.svg";
-import ico36_person from "~/images/won-icons/ico36_person.svg";
-import { generateLink } from "~/app/utils";
+import { get, generateLink } from "~/app/utils";
 import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
+import * as atomUtils from "~/app/redux/utils/atom-utils";
+import WonAtomIcon from "~/app/components/atom-icon";
+import WonShareDropdown from "~/app/components/share-dropdown";
+import WonAtomContextDropdown from "~/app/components/atom-context-dropdown";
 
 export default function WonMenu({ className }) {
   const dispatch = useDispatch();
@@ -21,7 +24,7 @@ export default function WonMenu({ className }) {
   const isMenuVisible = useSelector(viewSelectors.isMenuVisible);
   const accountState = useSelector(generalSelectors.getAccountState);
 
-  const email = accountUtils.getEmail(accountState);
+  // const email = accountUtils.getEmail(accountState); //TODO: E-Mail is not displayed for now, figure out what to do with it in the future
   const isAnonymous = accountUtils.isAnonymous(accountState);
   const isLocationAccessDenied = useSelector(
     generalSelectors.isLocationAccessDenied
@@ -35,6 +38,39 @@ export default function WonMenu({ className }) {
   const hasUnreadChatConnections = useSelector(
     generalSelectors.hasUnreadChatConnections
   );
+
+  const activePersonaUri = useSelector(viewSelectors.getActivePersonaUri);
+
+  const ownedPersonas = useSelector(state =>
+    generalSelectors
+      .getOwnedPersonas(state)
+      .toOrderedMap()
+      .sortBy(persona => atomUtils.getTitle(persona))
+  );
+
+  const activePersona = get(ownedPersonas, activePersonaUri);
+
+  const personaElements = [];
+  ownedPersonas &&
+    ownedPersonas.map((persona, personaUri) => {
+      personaElements.push(
+        <div
+          className={
+            "personas__persona " +
+            (activePersonaUri === personaUri
+              ? "personas__persona--active"
+              : "clickable")
+          }
+          onClick={() =>
+            activePersonaUri !== personaUri &&
+            dispatch(actionCreators.view__setActivePersonaUri(personaUri))
+          }
+          key={personaUri}
+        >
+          <WonAtomIcon className="personas__persona__icon" atom={persona} />
+        </div>
+      );
+    });
 
   function generateTabClasses(inactive = false, unread = false) {
     const classes = ["menu__tab"];
@@ -136,6 +172,21 @@ export default function WonMenu({ className }) {
   return (
     <won-menu class={generateRootClasses()} ref={node => (thisNode = node)}>
       <div className="personas">
+        {personaElements}
+        <div
+          className={
+            "personas__persona personas__persona--anon " +
+            (!activePersonaUri ? "personas__persona--active" : "clickable")
+          }
+          onClick={() =>
+            !!activePersonaUri &&
+            dispatch(actionCreators.view__setActivePersonaUri())
+          }
+        >
+          <svg className="personas__persona__anonicon">
+            <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
+          </svg>
+        </div>
         <Link
           className="personas__create"
           to={location =>
@@ -156,20 +207,16 @@ export default function WonMenu({ className }) {
       </div>
       <div className="menu">
         <div className="menu__user">
-          {isAnonymous ? (
-            <React.Fragment>
-              <svg className="menu__user__icon">
-                <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
-              </svg>
-              <span className="menu__user__caption">Anonymous</span>
-            </React.Fragment>
+          {activePersona ? (
+            <div className="menu__user__persona">
+              <span className="menu__user__caption">
+                {atomUtils.getTitle(activePersona)}
+              </span>
+              <WonShareDropdown atom={activePersona} />
+              <WonAtomContextDropdown atom={activePersona} />
+            </div>
           ) : (
-            <React.Fragment>
-              <svg className="menu__user__icon">
-                <use xlinkHref={ico36_person} href={ico36_person} />
-              </svg>
-              <span className="menu__user__caption">{email}</span>
-            </React.Fragment>
+            <span className="menu__user__caption">Anonymous</span>
           )}
           <a className="menu__user__signout" onClick={logout}>
             Sign out
