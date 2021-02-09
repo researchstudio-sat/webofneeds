@@ -23,6 +23,7 @@ import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import "~/style/_atom-header-big.scss";
 
 import VisibilitySensor from "react-visibility-sensor";
+import ico36_detail_datetime from "~/images/won-icons/ico36_detail_datetime.svg";
 
 export default function WonAtomHeaderBig({
   atomUri,
@@ -280,6 +281,8 @@ export default function WonAtomHeaderBig({
       </span>
     );
 
+    const atomDuration = atomUtils.getDuration(atom);
+
     contentElement = (
       <React.Fragment>
         <WonAtomIcon atom={atom} />
@@ -292,6 +295,23 @@ export default function WonAtomHeaderBig({
         )}
         {buddyActionElement}
         {generateAtomActionButton()}
+        {atomDuration && (
+          <a
+            href={atomUtils.generateIcalDownloadLink(atom)}
+            download="calendarentry.ics"
+            className="calendar__link"
+          >
+            <svg
+              className="calendar__link__icon"
+              title="Download Calendarentry"
+            >
+              <use
+                xlinkHref={ico36_detail_datetime}
+                href={ico36_detail_datetime}
+              />
+            </svg>
+          </a>
+        )}
         <WonShareDropdown atom={atom} />
         <WonAtomContextDropdown atom={atom} />
       </React.Fragment>

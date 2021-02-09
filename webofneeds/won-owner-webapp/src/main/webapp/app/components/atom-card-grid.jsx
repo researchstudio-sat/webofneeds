@@ -7,7 +7,6 @@ import WonAtomCard from "./atom-card.jsx";
 import { generateLink } from "../utils.js";
 import PropTypes from "prop-types";
 
-import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
 import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 import { Link } from "react-router-dom";
 
@@ -16,7 +15,6 @@ export default function WonAtomCardGrid({
   showHolder,
   showIndicators,
   showCreate,
-  showCreatePersona,
   currentLocation,
 }) {
   const atomCardElements = [];
@@ -49,33 +47,9 @@ export default function WonAtomCardGrid({
     undefined
   );
 
-  const createPersonaAtom = showCreatePersona ? (
-    <Link
-      className="won-create-card"
-      to={location =>
-        generateLink(
-          location,
-          {
-            useCase: "persona",
-          },
-          "/create",
-          false
-        )
-      }
-    >
-      <svg className="createcard__icon" title="Create a new post">
-        <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
-      </svg>
-      <span className="createcard__label">New Persona</span>
-    </Link>
-  ) : (
-    undefined
-  );
-
   return (
     <React.Fragment>
       {createAtom}
-      {createPersonaAtom}
       {atomCardElements}
     </React.Fragment>
   );
@@ -85,6 +59,5 @@ WonAtomCardGrid.propTypes = {
   showHolder: PropTypes.bool,
   showIndicators: PropTypes.bool,
   showCreate: PropTypes.bool,
-  showCreatePersona: PropTypes.bool,
   currentLocation: PropTypes.object,
 };

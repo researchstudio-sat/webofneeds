@@ -5,6 +5,7 @@ import { lunchInterest, lunchPlan } from "./uc-lunch.js";
 import { genericInterest, genericPlan } from "./uc-interest.js";
 import { pokemonInterest, pokemonGoRaid } from "./uc-pokemon.js";
 import { sightseeingInterest, sightseeingPlan } from "./uc-sightseeing.js";
+import { event } from "./uc-event.js";
 
 import ico36_detail_interests from "../../images/won-icons/ico36_detail_interests.svg";
 import ico36_detail_datetime from "~/images/won-icons/ico36_detail_datetime.svg";
@@ -36,5 +37,6 @@ export const plansGroup = {
     cyclingPlan: cyclingPlan,
     pokemonGoRaid: pokemonGoRaid,
     genericPlan: genericPlan,
+    event: event,
   },
 };

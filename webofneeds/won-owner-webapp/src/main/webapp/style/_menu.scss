@@ -1,82 +1,77 @@
 @import "won-config";
 @import "sizing-utils";
+@import "square-image";
 
 @mixin desktopMenuTab() {
-  border-bottom: $won-light-gray 0.25rem solid;
-  grid-template-areas: "menu_indicator menu_label";
-
-  &.menu__tab--selected {
-    border-bottom-color: $won-primary-color;
-  }
-
-  &:hover {
-    border-bottom-color: $won-primary-color-light;
-    color: $won-primary-color-light;
-  }
-}
-
-@mixin mobileMenuTab() {
-  border-left: $won-light-gray 0.25rem solid;
-  border-bottom: $thinGrayBorder;
-
-  grid-template-areas: "menu_label menu_indicator";
-  justify-content: left;
-
-  &.menu__tab--selected {
-    border-left-color: $won-primary-color;
-  }
-
-  &:hover {
-    border-left-color: $won-primary-color-light;
-    color: $won-primary-color-light;
-  }
+  padding: 0.5rem 2rem;
 }
 
 @mixin desktopMenu() {
-  grid-auto-flow: column;
-  grid-gap: 0.5rem;
   justify-content: center;
-  margin: 0 auto;
-  padding: 0 0.5rem;
-  max-width: $maxContentWidth;
+  padding: 0.5rem 0;
+  max-width: 20rem;
 
-  > .menu__slideintoggle {
-    align-self: center;
-    border-bottom: $won-light-gray 0.25rem solid;
-
-    > .menu__slideintoggle__label {
-      display: none;
-    }
-    > .menu__slideintoggle__carret {
-      @include fixed-square(1.5rem);
-      --local-primary: #{$won-secondary-color};
-
-      &.menu__slideintoggle__carret--expanded {
-        transform: rotate(-180deg);
-        transition: transform linear 0.2s;
-      }
-      &:not(.menu__slideintoggle__carret--expanded) {
-        transform: rotate(0deg);
-        transition: transform linear 0.2s;
-      }
-    }
+  .menu__user > .menu__user__persona > .menu__user__caption {
+    min-width: 10rem;
   }
 }
 
-@mixin mobileMenu() {
-  grid-auto-flow: row;
+@mixin personaMenu() {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 1rem;
+  align-items: center;
+  background: $won-dark-gray;
+  align-self: stretch;
+  padding: 1rem 0.5rem;
 
-  > .menu__slideintoggle {
-    border-bottom: $thinGrayBorder;
-    padding: 0.5rem;
-    grid-gap: 0.25rem;
-    grid-template-columns: min-content 1fr;
+  .personas__persona {
+    &--anon {
+      --local-primary: #{$won-line-gray};
 
-    > .menu__slideintoggle__label {
-      color: $won-secondary-color;
+      .personas__persona__anonicon {
+        border-radius: 100%;
+        @include fixed-square($feedIconSize);
+      }
+
+      &:hover {
+        --local-primary: #{$won-secondary-text-color};
+      }
     }
-    > .menu__slideintoggle__carret {
-      display: none;
+
+    @include square-image($feedIconSize);
+
+    &--active {
+      .personas__persona__anonicon,
+      .image {
+        box-shadow: 0 0 5px 5px var(--won-secondary-text-color);
+      }
+
+      .personas__persona__anonicon {
+        --local-primary: #{$won-secondary-text-color};
+      }
+    }
+  }
+
+  .personas__create {
+    display: block;
+    padding: 0.3rem 0.5rem;
+    border-radius: 100%;
+    border-style: solid;
+    border-color: $won-line-gray;
+    border-width: $boldBorderWidth;
+    --local-primary: #{$won-line-gray};
+
+    &__icon {
+      @include fixed-square($toastIconSize);
+    }
+
+    &:hover {
+      border-color: $won-secondary-text-color;
+
+      .personas__create__icon {
+        --local-primary: #{$won-secondary-text-color};
+      }
     }
   }
 }
@@ -84,15 +79,66 @@
 @mixin genericMenu() {
   display: grid;
   box-sizing: border-box;
+  grid-auto-flow: row;
 
-  > .menu__slideintoggle {
+  .menu__user {
     display: grid;
-    cursor: pointer;
-    grid-auto-flow: column;
+    grid-template-columns: 1fr;
+    padding: 0 1rem 0.5rem 1rem;
+    border-bottom: $thinGrayBorder;
+    box-sizing: border-box;
+    align-items: center;
+    white-space: nowrap;
 
-    > .menu__slideintoggle__icon {
-      @include fixed-square(1.5rem);
-      --local-primary: #{$won-secondary-color};
+    .menu__user__persona {
+      display: grid;
+      grid-template-columns: 1fr min-content min-content;
+      align-items: end;
+
+      > .menu__user__caption {
+        margin-right: 1rem;
+      }
+    }
+
+    .menu__user__caption {
+      font-weight: lighter;
+      font-size: $mediumFontSize;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    > .menu__user__signout {
+      color: $won-secondary-color;
+      font-size: $smallFontSize;
+      cursor: pointer;
+      justify-self: end;
+      padding: 0.5rem;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  won-atom-menu.persona__menu {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+
+    > .atom-menu__item {
+      padding: 0.5rem;
+      border-bottom: 0;
+
+      &.atom-menu__item--selected {
+        border-right: 0.2rem solid $won-primary-color;
+        border-bottom: 0;
+      }
+
+      &:hover {
+        color: $won-primary-color-light;
+        border-right: 0.2rem solid $won-primary-color-light;
+        border-bottom: 0;
+      }
     }
   }
 }
@@ -101,11 +147,26 @@
   display: grid;
   grid-column-gap: 0.25rem;
   align-items: center;
+  grid-template-areas: "menu_label menu_indicator";
   grid-template-columns: min-content min-content;
   cursor: pointer;
   padding: 0.5rem;
   color: $won-primary-text-color;
   box-sizing: border-box;
+  white-space: nowrap;
+  justify-content: left;
+
+  border-right: $won-light-gray 0.25rem solid;
+  border-bottom: $thinGrayBorder;
+
+  &.menu__tab--selected {
+    border-right-color: $won-primary-color;
+  }
+
+  &:hover {
+    border-right-color: $won-primary-color-light;
+    color: $won-primary-color-light;
+  }
 
   &.menu__tab--inactive {
     color: $won-line-gray;
@@ -145,23 +206,35 @@
     }
   }
 }
+
 won-menu.won-menu--show-mobile {
   background: $won-light-gray;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: self-start;
+
+  > .personas {
+    @include personaMenu();
+  }
 
   > .menu {
     @include genericMenu();
-    @include mobileMenu();
 
     & > .menu__tab {
       @include genericMenuTab();
-      @include mobileMenuTab();
     }
   }
 }
 
 won-menu:not(.won-menu--show-mobile) {
   background: $won-light-gray;
-  border-bottom: $thinGrayBorder;
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: self-start;
+
+  > .personas {
+    @include personaMenu();
+  }
 
   > .menu {
     @include genericMenu();
@@ -169,18 +242,12 @@ won-menu:not(.won-menu--show-mobile) {
     @media (min-width: $responsivenessBreakPoint) {
       @include desktopMenu();
     }
-    @media (max-width: $responsivenessBreakPoint) {
-      @include mobileMenu();
-    }
 
     & > .menu__tab {
       @include genericMenuTab();
 
       @media (min-width: $responsivenessBreakPoint) {
         @include desktopMenuTab();
-      }
-      @media (max-width: $responsivenessBreakPoint) {
-        @include mobileMenuTab();
       }
     }
   }

@@ -4,19 +4,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { actionCreators } from "../actions/actions.js";
 
 import "~/style/_menu.scss";
-import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
-import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
-import { NavLink, useHistory } from "react-router-dom";
+import { Link, NavLink, useHistory } from "react-router-dom";
+import ico36_person_anon from "~/images/won-icons/ico36_person_anon.svg";
+import { get, generateLink } from "~/app/utils";
+import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
+import * as atomUtils from "~/app/redux/utils/atom-utils";
+import WonAtomIcon from "~/app/components/atom-icon";
+import WonShareDropdown from "~/app/components/share-dropdown";
+import WonAtomContextDropdown from "~/app/components/atom-context-dropdown";
+import WonAtomMenu from "~/app/components/atom-menu";
+import VisibilitySensor from "react-visibility-sensor";
+import * as processUtils from "~/app/redux/utils/process-utils";
 
 export default function WonMenu({ className }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const hasSlideIns = useSelector(viewSelectors.hasSlideIns(history));
   const isMenuVisible = useSelector(viewSelectors.isMenuVisible);
-  const isSlideInsVisible = useSelector(viewSelectors.isSlideInsVisible);
+  const accountState = useSelector(generalSelectors.getAccountState);
+
+  // const email = accountUtils.getEmail(accountState); //TODO: E-Mail is not displayed for now, figure out what to do with it in the future
+  const isAnonymous = accountUtils.isAnonymous(accountState);
   const isLocationAccessDenied = useSelector(
     generalSelectors.isLocationAccessDenied
   );
@@ -29,6 +41,68 @@ export default function WonMenu({ className }) {
   const hasUnreadChatConnections = useSelector(
     generalSelectors.hasUnreadChatConnections
   );
+
+  const processState = useSelector(generalSelectors.getProcessState);
+
+  const activePersonaUri = useSelector(viewSelectors.getActivePersonaUri);
+  const activePersonaTab = useSelector(viewSelectors.getActivePersonaTab);
+
+  const ownedPersonas = useSelector(state =>
+    generalSelectors
+      .getOwnedPersonas(state)
+      .toOrderedMap()
+      .sortBy(persona => atomUtils.getTitle(persona))
+  );
+
+  const activePersona = get(ownedPersonas, activePersonaUri);
+
+  const relevantActivePersonaConnectionsMap = useSelector(
+    generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(
+      activePersonaUri
+    )
+  );
+
+  const personaElements = [];
+  ownedPersonas &&
+    ownedPersonas.map((persona, personaUri) => {
+      personaElements.push(
+        <div
+          className={
+            "personas__persona " +
+            (activePersonaUri === personaUri
+              ? "personas__persona--active"
+              : "clickable")
+          }
+          onClick={() =>
+            activePersonaUri !== personaUri &&
+            dispatch(actionCreators.view__setActivePersonaUri(personaUri))
+          }
+          title={atomUtils.getTitle(persona)}
+          key={personaUri}
+        >
+          <VisibilitySensor
+            onChange={isVisible => {
+              if (isVisible) {
+                const isAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+                  processState,
+                  personaUri,
+                  persona
+                );
+                if (isAtomFetchNecessary) {
+                  console.debug("fetch personaUri, ", personaUri);
+                  dispatch(actionCreators.atoms__fetchUnloadedAtom(personaUri));
+                }
+              }
+            }}
+            intervalDelay={200}
+            partialVisibility={true}
+            offset={{ top: -300, bottom: -300 }}
+          >
+            <WonAtomIcon className="personas__persona__icon" atom={persona} />
+          </VisibilitySensor>
+        </div>
+      );
+    });
 
   function generateTabClasses(inactive = false, unread = false) {
     const classes = ["menu__tab"];
@@ -48,11 +122,6 @@ export default function WonMenu({ className }) {
     return classes.join(" ");
   }
 
-  function toggleSlideIns() {
-    hideMenuIfVisible();
-    dispatch(actionCreators.view__toggleSlideIns());
-  }
-
   function hideMenuIfVisible() {
     if (isMenuVisible) {
       dispatch(actionCreators.view__hideMenu());
@@ -63,6 +132,10 @@ export default function WonMenu({ className }) {
     viewWhatsX(() => {
       hideMenuIfVisible();
     });
+  }
+
+  function logout() {
+    dispatch(actionCreators.account__logout(history));
   }
 
   function viewWhatsNew() {
@@ -118,10 +191,9 @@ export default function WonMenu({ className }) {
         // TODO: Fix me.
         // Handler is closing menu before actual MenuAction is toggled
         // dispatch(actionCreators.view__hideMenu());
-
-        return;
       }
     }
+
     document.addEventListener("mousedown", handleClick, false);
 
     return function cleanup() {
@@ -131,36 +203,117 @@ export default function WonMenu({ className }) {
 
   return (
     <won-menu class={generateRootClasses()} ref={node => (thisNode = node)}>
+      <div className="personas">
+        {personaElements}
+        <div
+          className={
+            "personas__persona personas__persona--anon " +
+            (!activePersonaUri ? "personas__persona--active" : "clickable")
+          }
+          onClick={() =>
+            !!activePersonaUri &&
+            dispatch(actionCreators.view__setActivePersonaUri())
+          }
+        >
+          <svg className="personas__persona__anonicon">
+            <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
+          </svg>
+        </div>
+        <Link
+          className="personas__create"
+          to={location =>
+            generateLink(
+              location,
+              {
+                useCase: "persona",
+              },
+              "/create",
+              false
+            )
+          }
+        >
+          <svg className="personas__create__icon" title="Create a new Persona">
+            <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
+          </svg>
+        </Link>
+      </div>
       <div className="menu">
-        <NavLink
-          className={generateTabClasses(
-            false,
-            hasUnreadSuggestedConnections || hasUnreadBuddyConnections
+        <div className="menu__user">
+          {activePersona ? (
+            <div className="menu__user__persona">
+              <span className="menu__user__caption">
+                {atomUtils.getTitle(activePersona)}
+              </span>
+              <WonShareDropdown atom={activePersona} />
+              <WonAtomContextDropdown atom={activePersona} />
+            </div>
+          ) : (
+            <span className="menu__user__caption">Anonymous</span>
           )}
-          activeClassName="menu__tab--selected"
-          onClick={hideMenuIfVisible}
-          to="/inventory"
-        >
-          <span className="menu__tab__unread" />
-          <span className="menu__tab__label">Inventory</span>
-        </NavLink>
-        <NavLink
-          className={generateTabClasses(false, hasUnreadChatConnections)}
-          activeClassName="menu__tab--selected"
-          onClick={hideMenuIfVisible}
-          to="/connections"
-        >
-          <span className="menu__tab__unread" />
-          <span className="menu__tab__label">Chats</span>
-        </NavLink>
-        <NavLink
-          className={generateTabClasses()}
-          activeClassName="menu__tab--selected"
-          onClick={hideMenuIfVisible}
-          to="/create"
-        >
-          <span className="menu__tab__label">Create</span>
-        </NavLink>
+          <a className="menu__user__signout" onClick={logout}>
+            Sign out
+          </a>
+        </div>
+        {activePersona ? (
+          <WonAtomMenu
+            className="persona__menu"
+            atom={activePersona}
+            visibleTab={
+              history.location.pathname === "/inventory" ||
+              history.location.pathname === "/"
+                ? activePersonaTab
+                : "FIXME:NOTEXISTS"
+            }
+            toggleAddPicker={() => {}}
+            setVisibleTab={tabName => {
+              hideMenuIfVisible();
+              dispatch(actionCreators.view__setActivePersonaTab(tabName));
+              if (
+                !(
+                  history.location.pathname === "/inventory" ||
+                  history.location.pathname === "/"
+                )
+              ) {
+                history.replace(
+                  generateLink(history.location, {}, "/inventory")
+                );
+              }
+            }}
+            relevantConnectionsMap={relevantActivePersonaConnectionsMap}
+          />
+        ) : (
+          <React.Fragment>
+            <NavLink
+              className={generateTabClasses(
+                false,
+                hasUnreadSuggestedConnections || hasUnreadBuddyConnections
+              )}
+              activeClassName="menu__tab--selected"
+              onClick={hideMenuIfVisible}
+              to="/inventory"
+            >
+              <span className="menu__tab__unread" />
+              <span className="menu__tab__label">Inventory</span>
+            </NavLink>
+            <NavLink
+              className={generateTabClasses(false, hasUnreadChatConnections)}
+              activeClassName="menu__tab--selected"
+              onClick={hideMenuIfVisible}
+              to="/connections"
+            >
+              <span className="menu__tab__unread" />
+              <span className="menu__tab__label">Chats</span>
+            </NavLink>
+            <NavLink
+              className={generateTabClasses()}
+              activeClassName="menu__tab--selected"
+              onClick={hideMenuIfVisible}
+              to="/create"
+            >
+              <span className="menu__tab__label">Create</span>
+            </NavLink>
+          </React.Fragment>
+        )}
         <NavLink
           className={generateTabClasses()}
           activeClassName="menu__tab--selected"
@@ -177,37 +330,23 @@ export default function WonMenu({ className }) {
         >
           <span className="menu__tab__label">{"What's Around"}</span>
         </NavLink>
-        {hasSlideIns ? (
-          <div
-            className="menu__slideintoggle hide-in-responsive"
-            onClick={toggleSlideIns}
+        <NavLink
+          className={generateTabClasses()}
+          activeClassName="menu__tab--selected"
+          onClick={hideMenuIfVisible}
+          to="/settings"
+        >
+          <span className="menu__tab__label">Account Settings</span>
+        </NavLink>
+        {isAnonymous && (
+          <NavLink
+            className={generateTabClasses()}
+            activeClassName="menu__tab--selected"
+            onClick={hideMenuIfVisible}
+            to="/signup"
           >
-            <svg className="menu__slideintoggle__icon">
-              <use
-                xlinkHref={ico16_indicator_warning}
-                href={ico16_indicator_warning}
-              />
-            </svg>
-            <svg
-              className={
-                "menu__slideintoggle__carret " +
-                (isSlideInsVisible
-                  ? " menu__slideintoggle__carret--expanded "
-                  : "")
-              }
-            >
-              <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
-            </svg>
-            <span className="menu__slideintoggle__label">
-              {isSlideInsVisible ? (
-                <span>Hide Info Slide-Ins</span>
-              ) : (
-                <span>Show Info Slide-Ins</span>
-              )}
-            </span>
-          </div>
-        ) : (
-          undefined
+            <span>Sign up</span>
+          </NavLink>
         )}
       </div>
     </won-menu>

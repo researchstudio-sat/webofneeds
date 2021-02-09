@@ -1,0 +1,127 @@
+@base             <https://example.com/test/atom1> .
+@prefix ex:       <https://example.com/test/> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix atom1:    <http://example.org/test/atom1#> .
+@prefix atom2:    <http://example.org/test/atom2#> .
+@prefix atom3:    <http://example.org/test/atom3#> .
+@prefix msg:      <https://w3id.org/won/message#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg:     <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+ex:expectedResult
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request> .
+
+# Token for buddies
+
+<#authorization>
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
+                                                  auth:targetAtom [ ] ;
+                                                  auth:connection [ auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph [ auth:operation auth:opRead ] ] .
+
+<#request>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom3 ;
+    auth:reqPosition auth:positionAtomGraph ;
+    auth:bearsToken  ex:token1 .
+
+ex:token1
+    a               auth:AuthToken ;
+    auth:tokenScope wx-buddy:BuddySocket ;
+    auth:tokenIss   ex:atom1 ;
+    auth:tokenSub   ex:atom2 ;
+    auth:tokenSig   ex:node ;
+    auth:tokenIat   "2020-12-03T22:30:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T23:30:00"^^xsd:dateTime .
+
+
+ex:atom1
+    a                    won:Atom ;
+    won:socket           atom1:buddySocket, atom1:holderSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
+
+atom1:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom1:buddySocketConnections .
+
+atom1:buddySocketConnections
+    rdfs:member atom1:bsConn1 .
+
+atom1:bsConn1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom2 ;
+    won:connectionState won:Connected ;
+    won:socket          atom2:buddySocket .
+
+atom1:holderSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HolderSocket ;
+    won:connections      atom1:holderSocketConnections .
+
+atom1:holderSocketConnections
+    rdfs:member atom1:hsConn1 .
+
+atom1:hsConn1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom3 ;
+    won:connectionState won:Connected ;
+    won:socket          atom1:holderSocket .
+
+ex:atom3
+    a                    won:Atom ;
+    won:socket           atom3:holdableSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom3:msg ;
+    won:wonNode          ex:node .
+
+atom3:holdableSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HoldableSocket ;
+    won:connections      atom3:holdableSocketConnections .
+
+atom3:holdableSocketConnections
+    rdfs:member atom3:hdConn1 .
+
+atom3:hdConn1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected ;
+    won:socket          atom3:holdableSocket .
+
+
+ex:atom2
+    a                    won:Atom ;
+    won:socket           atom2:buddySocket ;
+    won:state            won:Active ;
+    won:messageContainer atom2:msg ;
+    won:wonNode          ex:node .
+
+atom2:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom2:buddySocketConnections .
+
+atom2:buddySocketConnections
+    rdfs:member atom2:bsConn1 .
+
+atom2:bsConn1
+    a                   won:Connection ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected ;
+    won:socket          atom2:buddySocket .
+

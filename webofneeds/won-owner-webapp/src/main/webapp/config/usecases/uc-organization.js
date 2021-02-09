@@ -18,28 +18,35 @@ export const organization = {
       content: {
         type: ["s:Organization"],
         sockets: {
-          "#worksForInverseSocket":
-            vocab.WXSCHEMA.WorksForInverseSocketCompacted,
+          // TODO: Currently not in use in favour of more generic member -> Role -> member relation
+          // "#worksForInverseSocket":
+          //   vocab.WXSCHEMA.WorksForInverseSocketCompacted,
           "#memberSocket": vocab.WXSCHEMA.MemberSocketCompacted,
           "#associatedArticleSocket":
             vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
           "#parentOrgSocket": vocab.WXSCHEMA.ParentOrganizationSocketCompacted,
           "#subOrgSocket": vocab.WXSCHEMA.SubOrganizationSocketCompacted,
           "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
+          "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
         },
       },
     }),
   },
   reactions: {
     ...defaultReactions,
-    [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
-      [vocab.WXSCHEMA.WorksForSocketCompacted]: {
-        useCaseIdentifiers: ["persona"],
-      },
-    },
+    // TODO: Currently not in use in favour of more generic member -> Role -> member relation
+    // [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
+    //   [vocab.WXSCHEMA.WorksForSocketCompacted]: {
+    //     useCaseIdentifiers: ["persona"],
+    //   },
+    // },
     [vocab.WXSCHEMA.MemberSocketCompacted]: {
       [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
+      },
+      [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: {
+        useCaseIdentifiers: ["role"],
+        refuseNonOwned: true,
       },
     },
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
@@ -64,6 +71,7 @@ export const organization = {
     location: { ...details.location },
     tags: { ...details.tags },
     images: { ...details.images },
+    website: { ...details.website },
   },
   seeksDetails: undefined,
 };

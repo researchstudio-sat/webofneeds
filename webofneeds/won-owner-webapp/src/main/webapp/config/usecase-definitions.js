@@ -11,8 +11,10 @@ import { interestsGroup, plansGroup } from "./usecases/group-interests";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
 import { persona } from "./usecases/uc-persona.js";
+import { genericExpertise } from "./usecases/uc-expertise.js";
 import { serviceAtom } from "./usecases/uc-serviceatom.js";
 import { review } from "./usecases/uc-review.js";
+import { role } from "./usecases/uc-role.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -75,6 +77,8 @@ export const hiddenUseCases = {
   persona: persona,
   serviceAtom: serviceAtom,
   review: review,
+  genericExpertise: genericExpertise,
+  role: role,
 };
 
 // generate a list of usecases from all use case groups

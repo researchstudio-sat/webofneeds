@@ -44,6 +44,7 @@ vocab.WON.RequestSent = vocab.WON.baseUri + "RequestSent";
 vocab.WON.RequestSentCompacted = vocab.WON.baseUri + ":RequestSent";
 
 vocab.WON.Connected = vocab.WON.baseUri + "Connected";
+vocab.WON.ConnectedCompacted = vocab.WON.prefix + ":Connected";
 
 //TOAST TYPES
 vocab.WON.infoToast = vocab.WON.baseUri + "InfoToast";
@@ -285,6 +286,23 @@ vocab.DEMO = {};
 vocab.DEMO.baseUri = "https://w3id.org/won/ext/demo#";
 vocab.DEMO.prefix = "demo";
 
+vocab.WXPERSONA = {};
+vocab.WXPERSONA.baseUri = "https://w3id.org/won/ext/persona#";
+vocab.WXPERSONA.prefix = "wx-persona";
+vocab.WXPERSONA.InterestSocket = vocab.WXPERSONA.baseUri + "InterestSocket";
+vocab.WXPERSONA.InterestSocketCompacted =
+  vocab.WXPERSONA.prefix + ":InterestSocket";
+vocab.WXPERSONA.ExpertiseSocket = vocab.WXPERSONA.baseUri + "ExpertiseSocket";
+vocab.WXPERSONA.ExpertiseSocketCompacted =
+  vocab.WXPERSONA.prefix + ":ExpertiseSocket";
+vocab.WXPERSONA.InterestOfSocket = vocab.WXPERSONA.baseUri + "InterestOfSocket";
+vocab.WXPERSONA.InterestOfSocketCompacted =
+  vocab.WXPERSONA.prefix + ":InterestOfSocket";
+vocab.WXPERSONA.ExpertiseOfSocket =
+  vocab.WXPERSONA.baseUri + "ExpertiseOfSocket";
+vocab.WXPERSONA.ExpertiseOfSocketCompacted =
+  vocab.WXPERSONA.prefix + ":ExpertiseOfSocket";
+
 vocab.CHAT = {};
 vocab.CHAT.baseUri = "https://w3id.org/won/ext/chat#";
 vocab.CHAT.prefix = "chat";
@@ -311,6 +329,11 @@ vocab.WXSCHEMA.prefix = "wx-schema";
 vocab.WXSCHEMA.MemberOfSocket = vocab.WXSCHEMA.baseUri + "MemberOfSocket";
 vocab.WXSCHEMA.MemberOfSocketCompacted =
   vocab.WXSCHEMA.prefix + ":MemberOfSocket";
+
+vocab.WXSCHEMA.OrganizationRoleOfSocket =
+  vocab.WXSCHEMA.baseUri + "OrganizationRoleOfSocket";
+vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":OrganizationRoleOfSocket";
 
 vocab.WXSCHEMA.MemberSocket = vocab.WXSCHEMA.baseUri + "MemberSocket";
 vocab.WXSCHEMA.MemberSocketCompacted = vocab.WXSCHEMA.prefix + ":MemberSocket";
@@ -356,10 +379,78 @@ vocab.WXSCHEMA.ParentOrganizationSocketCompacted =
 vocab.WXSCHEMA.ReviewSocket = vocab.WXSCHEMA.baseUri + "ReviewSocket";
 vocab.WXSCHEMA.ReviewSocketCompacted = vocab.WXSCHEMA.prefix + ":ReviewSocket";
 
+vocab.WXSCHEMA.EventSocket = vocab.WXSCHEMA.baseUri + "EventSocket";
+vocab.WXSCHEMA.EventSocketCompacted = vocab.WXSCHEMA.prefix + ":EventSocket";
+
+vocab.WXSCHEMA.EventInverseSocket =
+  vocab.WXSCHEMA.baseUri + "EventInverseSocket";
+vocab.WXSCHEMA.EventInverseSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":EventInverseSocket";
+
+vocab.WXSCHEMA.EventInverseSocket =
+  vocab.WXSCHEMA.baseUri + "EventInverseSocket";
+vocab.WXSCHEMA.EventInverseSocketCompacted =
+  vocab.WXSCHEMA.prefix + ":EventInverseSocket";
+
 vocab.WXSCHEMA.ReviewInverseSocket =
   vocab.WXSCHEMA.baseUri + "ReviewInverseSocket";
 vocab.WXSCHEMA.ReviewInverseSocketCompacted =
   vocab.WXSCHEMA.prefix + ":ReviewInverseSocket";
+
+vocab.AUTH = {};
+vocab.AUTH.baseUri = "https://w3id.org/won/auth#";
+vocab.AUTH.prefix = "auth";
+vocab.AUTH.acl = vocab.AUTH.baseUri + "acl";
+vocab.AUTH.aclCompacted = vocab.AUTH.prefix + ":acl";
+vocab.AUTH.Authorization = vocab.AUTH.baseUri + "Authorization";
+vocab.AUTH.AuthorizationCompacted = vocab.AUTH.prefix + ":Authorization";
+vocab.AUTH.bearer = vocab.AUTH.baseUri + "bearer";
+vocab.AUTH.bearerCompacted = vocab.AUTH.prefix + ":bearer";
+vocab.AUTH.grantee = vocab.AUTH.baseUri + "grantee";
+vocab.AUTH.granteeCompacted = vocab.AUTH.prefix + ":grantee";
+vocab.AUTH.grant = vocab.AUTH.baseUri + "grant";
+vocab.AUTH.grantCompacted = vocab.AUTH.prefix + ":grant";
+vocab.AUTH.socket = vocab.AUTH.baseUri + "socket";
+vocab.AUTH.socketCompacted = vocab.AUTH.prefix + ":socket";
+vocab.AUTH.socketType = vocab.AUTH.baseUri + "socketType";
+vocab.AUTH.socketTypeCompacted = vocab.AUTH.prefix + ":socketType";
+vocab.AUTH.connection = vocab.AUTH.baseUri + "connection";
+vocab.AUTH.connectionCompacted = vocab.AUTH.prefix + ":connection";
+vocab.AUTH.connections = vocab.AUTH.baseUri + "connections";
+vocab.AUTH.connectionsCompacted = vocab.AUTH.prefix + ":connections";
+vocab.AUTH.connectionState = vocab.AUTH.baseUri + "connectionState";
+vocab.AUTH.connectionStateCompacted = vocab.AUTH.prefix + ":connectionState";
+vocab.AUTH.targetAto = vocab.AUTH.baseUri + "targetAtom";
+vocab.AUTH.targetAtomCompacted = vocab.AUTH.prefix + ":targetAtom";
+vocab.AUTH.graph = vocab.AUTH.baseUri + "graph";
+vocab.AUTH.graphCompacted = vocab.AUTH.prefix + ":graph";
+vocab.AUTH.operation = vocab.AUTH.baseUri + "operation";
+vocab.AUTH.operationCompacted = vocab.AUTH.prefix + ":operation";
+vocab.AUTH.atom = vocab.AUTH.baseUri + "atom";
+vocab.AUTH.atomCompacted = vocab.AUTH.prefix + ":atom";
+vocab.AUTH.opRead = vocab.AUTH.baseUri + "opRead";
+vocab.AUTH.opReadCompacted = vocab.AUTH.prefix + ":opRead";
+vocab.AUTH.opConnectClose = vocab.AUTH.baseUri + "opConnectClose";
+vocab.AUTH.opConnectCloseCompacted = vocab.AUTH.prefix + ":opConnectClose";
+vocab.AUTH.opCommunicate = vocab.AUTH.baseUri + "opCommunicate";
+vocab.AUTH.opCommunicateCompacted = vocab.AUTH.prefix + ":opCommunicate";
+vocab.AUTH.connectionMessages = vocab.AUTH.baseUri + "connectionMessages";
+vocab.AUTH.connectionMessagesCompacted =
+  vocab.AUTH.prefix + ":connectionMessages";
+vocab.AUTH.inherit = vocab.AUTH.baseUri + "inherit";
+vocab.AUTH.inheritCompacted = vocab.AUTH.prefix + ":inherit";
+vocab.AUTH.atomExpressionShape = vocab.AUTH.baseUri + "atomExpressionShape";
+vocab.AUTH.atomExpressionShapeCompacted =
+  vocab.AUTH.prefix + ":atomExpressionShape";
+vocab.AUTH.anyone = vocab.AUTH.baseUri + "anyone";
+vocab.AUTH.anyoneCompacted = vocab.AUTH.prefix + ":anyone";
+vocab.AUTH.operationRequestor = vocab.AUTH.baseUri + "operationRequestor";
+vocab.AUTH.operationRequestorCompacted =
+  vocab.AUTH.prefix + ":operationRequestor";
+vocab.AUTH.tokenScope = vocab.AUTH.baseUri + "tokenScope";
+vocab.AUTH.tokenScopeCompacted = vocab.AUTH.prefix + ":tokenScope";
+vocab.AUTH.issuer = vocab.AUTH.baseUri + "issuer";
+vocab.AUTH.issuerCompacted = vocab.AUTH.prefix + ":issuer";
 
 vocab.VALUEFLOWS = {};
 vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";
@@ -437,15 +528,52 @@ vocab.socketCapacity = {
   [vocab.HOLD.HoldableSocketCompacted]: 1,
   [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: 1,
   [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: 1,
+  [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.ActorSocketCompacted]: 1,
   [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: 1,
+  [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: 1,
+  [vocab.WXPERSONA.InterestOfSocketCompacted]: 1,
+};
+
+/* These sockets are defined as holdable sockets (to show the connected atom as a holder of the atom in question)
+* Although it is not a strict rule, an atom should only have either one of those sockets, or at least only one
+* connected connection over all defined socket
+* */
+vocab.holdableSocketTypes = [
+  vocab.WXPERSONA.ExpertiseOfSocketCompacted,
+  vocab.WXPERSONA.InterestOfSocketCompacted,
+  vocab.HOLD.HoldableSocketCompacted,
+  vocab.WXSCHEMA.ParentOrganizationSocketCompacted,
+  vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted,
+];
+
+vocab.holderSockets = {
+  [vocab.WXPERSONA.ExpertiseOfSocketCompacted]:
+    vocab.WXPERSONA.ExpertiseSocketCompacted,
+  [vocab.WXPERSONA.InterestOfSocketCompacted]:
+    vocab.WXPERSONA.InterestSocketCompacted,
+  [vocab.HOLD.HoldableSocketCompacted]: vocab.HOLD.HolderSocketCompacted,
+  [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]:
+    vocab.WXSCHEMA.SubOrganizationSocketCompacted,
+  [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]:
+    vocab.WXSCHEMA.MemberSocketCompacted,
+};
+
+/* This constant is switching the element view of the specific socket
+ from a extra tab entry, to listing all the exisiting connections within the detail tab of an atom
+*/
+vocab.tagViewSockets = {
+  [vocab.WXPERSONA.ExpertiseSocketCompacted]: true,
+  [vocab.WXPERSONA.InterestSocketCompacted]: true,
 };
 
 /* This constant is to prevent connections to non owned atoms for specific sockets */
 vocab.refuseAddToNonOwned = {
   [vocab.HOLD.HoldableSocketCompacted]: true,
+  [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: true,
+  [vocab.WXPERSONA.InterestOfSocketCompacted]: true,
 };
 
 export default vocab;

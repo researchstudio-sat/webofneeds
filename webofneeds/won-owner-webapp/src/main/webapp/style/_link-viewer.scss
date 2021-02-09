@@ -1,0 +1,5 @@
+@import "detail-viewer-mixin";
+
+won-link-viewer {
+  @include won-detail-viewer("linkv");
+}

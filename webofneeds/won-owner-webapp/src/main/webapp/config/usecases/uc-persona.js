@@ -2,6 +2,9 @@ import {
   details,
   mergeInEmptyDraft,
   defaultReactions,
+  connectedConectionsAuthorization,
+  defaultPublicAtomAuthorization,
+  seeHolderSocketConnectionsAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 
@@ -17,46 +20,57 @@ export const persona = {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,
           "#holderSocket": vocab.HOLD.HolderSocketCompacted,
           "#buddySocket": vocab.BUDDY.BuddySocketCompacted,
-          "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted,
+          // "#worksForSocket": vocab.WXSCHEMA.WorksForSocketCompacted, // TODO: Currently not in use in favour of more generic member -> Role -> member relation
           "#memberOfSocket": vocab.WXSCHEMA.MemberOfSocketCompacted,
-          "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
-          "#PrimaryAccountableOfSocket":
-            vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted,
-          "#CustodianOfSocket": vocab.WXVALUEFLOWS.CustodianOfSocketCompacted,
-          "#ActorActivitySocket":
-            vocab.WXVALUEFLOWS.ActorActivitySocketCompacted,
+          "#interestSocket": vocab.WXPERSONA.InterestSocketCompacted,
+          "#expertiseSocket": vocab.WXPERSONA.ExpertiseSocketCompacted,
+          // "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted, //TODO: exclude the ability to review a persona for now
+          "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
+          "#sAttendeeInverseSocket":
+            vocab.WXSCHEMA.AttendeeInverseSocketCompacted,
+          // "#PrimaryAccountableOfSocket":
+          //   vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted,
+          // "#CustodianOfSocket": vocab.WXVALUEFLOWS.CustodianOfSocketCompacted,
+          // "#ActorActivitySocket":
+          //   vocab.WXVALUEFLOWS.ActorActivitySocketCompacted, //TODO VALUEFLOWS SOCKETS CURRENTLY EXCLUDED
         },
       },
       seeks: {},
+      acl: [
+        defaultPublicAtomAuthorization,
+        seeHolderSocketConnectionsAuthorization,
+        connectedConectionsAuthorization,
+      ],
     }),
   },
   reactions: {
     ...defaultReactions,
-    [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: {
-      [vocab.WXVALUEFLOWS.ActorSocketCompacted]: {
-        useCaseIdentifiers: ["activity"],
-      },
-    },
-    [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: {
-      [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: {
-        useCaseIdentifiers: ["resource"],
-      },
-    },
-    [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: {
-      [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: {
-        useCaseIdentifiers: ["resource"],
-      },
-    },
-    [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: {
-      [vocab.WXVALUEFLOWS.ActorSocket]: {
-        useCaseIdentifiers: ["action"],
-      },
-    },
-    [vocab.WXSCHEMA.WorksForSocketCompacted]: {
-      [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
-        useCaseIdentifiers: ["organization"],
-      },
-    },
+    // [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: {
+    //   [vocab.WXVALUEFLOWS.ActorSocketCompacted]: {
+    //     useCaseIdentifiers: ["activity"],
+    //   },
+    // },
+    // [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: {
+    //   [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: {
+    //     useCaseIdentifiers: ["resource"],
+    //   },
+    // },
+    // [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: {
+    //   [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: {
+    //     useCaseIdentifiers: ["resource"],
+    //   },
+    // },
+    // [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: {
+    //   [vocab.WXVALUEFLOWS.ActorSocket]: {
+    //     useCaseIdentifiers: ["action"],
+    //   },
+    // },
+    // TODO: Currently not in use in favour of more generic member -> Role -> member relation
+    // [vocab.WXSCHEMA.WorksForSocketCompacted]: {
+    //   [vocab.WXSCHEMA.WorksForInverseSocketCompacted]: {
+    //     useCaseIdentifiers: ["organization"],
+    //   },
+    // },
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
@@ -64,6 +78,26 @@ export const persona = {
     },
     [vocab.HOLD.HolderSocketCompacted]: {
       [vocab.HOLD.HoldableSocketCompacted]: {
+        useCaseIdentifiers: ["*"],
+        refuseNonOwned: true,
+      },
+    },
+    [vocab.WXPERSONA.InterestSocketCompacted]: {
+      [vocab.WXPERSONA.InterestOfSocketCompacted]: {
+        useCaseIdentifiers: [
+          "afterpartyInterest",
+          "breakfastInterest",
+          "cyclingInterest",
+          "genericInterest",
+          "lunchInterest",
+          "pokemonInterest",
+          "sightseeingInterest",
+        ],
+        refuseNonOwned: true,
+      },
+    },
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: {
+      [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: {
         useCaseIdentifiers: ["*"],
         refuseNonOwned: true,
       },
@@ -77,12 +111,18 @@ export const persona = {
         useCaseIdentifiers: ["*"],
       },
     },
+    [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
+      [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
+        useCaseIdentifiers: ["event"],
+      },
+    },
   },
   details: {
     personaName: { ...details.personaName, mandatory: true },
     description: { ...details.description },
     website: { ...details.website },
     images: { ...details.images },
+    location: { ...details.location },
   },
   seeksDetails: {},
 };

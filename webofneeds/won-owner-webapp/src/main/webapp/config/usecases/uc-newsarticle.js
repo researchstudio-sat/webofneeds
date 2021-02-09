@@ -35,6 +35,7 @@ export const newsarticle = {
   details: {
     title: { ...details.title, mandatory: true },
     description: { ...details.description, mandatory: true },
+    website: { ...details.website },
   },
   seeksDetails: {},
 };

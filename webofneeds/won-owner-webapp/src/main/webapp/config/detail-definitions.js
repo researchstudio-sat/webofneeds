@@ -16,7 +16,113 @@ import vocab from "../app/service/vocab.js";
 export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
 
-const emptyDraftImm = Immutable.fromJS({
+// Atoms can only be seen by buddies of holder
+export const buddyTokenNeededAuthorization = {
+  [vocab.AUTH.bearerCompacted]: {
+    [vocab.AUTH.tokenScopeCompacted]: {
+      "@id": vocab.BUDDY.BuddySocketCompacted,
+    },
+    [vocab.AUTH.issuerCompacted]: {
+      [vocab.AUTH.socketCompacted]: {
+        [vocab.AUTH.socketTypeCompacted]: {
+          "@id": vocab.HOLD.HoldableSocketCompacted,
+        },
+        [vocab.AUTH.targetAtomCompacted]: {},
+        [vocab.AUTH.connectionCompacted]: {
+          [vocab.AUTH.connectionStateCompacted]: {
+            "@id": vocab.AUTH.ConnectedCompacted,
+          },
+        },
+      },
+    },
+  },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+    },
+  },
+};
+
+// See holderSocket connections of atoms buddies
+export const seeHolderSocketConnectionsAuthorization = {
+  [vocab.AUTH.granteeCompacted]: {
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.socketTypeCompacted]: {
+        "@id": vocab.BUDDY.BuddySocketCompacted,
+      },
+      [vocab.AUTH.connectionCompacted]: {
+        [vocab.AUTH.targetAtomCompacted]: {},
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
+        },
+      },
+    },
+  },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+    },
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.socketTypeCompacted]: {
+        "@id": vocab.HOLD.HolderSocketCompacted,
+      },
+      [vocab.AUTH.connectionsCompacted]: {
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
+        },
+        [vocab.AUTH.operationCompacted]: [
+          { "@id": vocab.AUTH.opReadCompacted },
+        ],
+        [vocab.AUTH.connectionMessagesCompacted]: {
+          [vocab.AUTH.inheritCompacted]: false,
+        },
+      },
+    },
+  },
+};
+
+// Atoms that are connected can see their connections to communicate
+export const connectedConectionsAuthorization = {
+  [vocab.AUTH.granteeCompacted]: {
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.connectionCompacted]: {
+        [vocab.AUTH.targetAtomCompacted]: {},
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
+        },
+      },
+    },
+  },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.connectionCompacted]: {
+      [vocab.AUTH.targetAtomCompacted]: {
+        [vocab.AUTH.atomCompacted]: {
+          "@id": vocab.AUTH.operationRequestorCompacted,
+        },
+      },
+      [vocab.AUTH.operationCompacted]: [
+        { "@id": vocab.AUTH.opReadCompacted },
+        { "@id": vocab.AUTH.opConnectCloseCompacted },
+        { "@id": vocab.AUTH.opCommunicateCompacted },
+      ],
+      [vocab.AUTH.connectionMessagesCompacted]: {
+        [vocab.AUTH.inheritCompacted]: false,
+      },
+    },
+  },
+};
+
+// Atom can be seen by any other atom
+export const defaultPublicAtomAuthorization = {
+  [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+    },
+  },
+};
+
+export const emptyDraftImm = Immutable.fromJS({
   content: {
     sockets: {
       "#chatSocket": vocab.CHAT.ChatSocketCompacted,
@@ -25,6 +131,7 @@ const emptyDraftImm = Immutable.fromJS({
     },
   },
   seeks: {},
+  acl: [defaultPublicAtomAuthorization, connectedConectionsAuthorization],
 });
 
 export const defaultReactions = {
@@ -52,6 +159,29 @@ export const defaultReactions = {
       refuseNonOwned: true,
     },
   },
+  [vocab.WXPERSONA.InterestOfSocketCompacted]: {
+    [vocab.WXPERSONA.InterestSocketCompacted]: {
+      useCaseIdentifiers: ["persona"],
+      refuseNonOwned: true,
+    },
+  },
+  [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: {
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: {
+      useCaseIdentifiers: ["persona"],
+      refuseNonOwned: true,
+    },
+  },
+  [vocab.WXSCHEMA.EventSocketCompacted]: {
+    [vocab.WXSCHEMA.EventInverseSocketCompacted]: {
+      useCaseIdentifiers: ["event"],
+      refuseNonOwned: true,
+    },
+  },
+  [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
+    [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
+      useCaseIdentifier: ["persona"],
+    },
+  },
 };
 
 /**
@@ -62,18 +192,22 @@ export const defaultReactions = {
  * @param contentToMerge
  * @returns {any|*}
  */
-export function mergeInEmptyDraft(contentToMerge) {
-  if (!contentToMerge) return emptyDraftImm.toJS();
-  const contentToMergeImm = Immutable.fromJS(contentToMerge);
-  const mergeSockets = contentToMergeImm.getIn(["content", "sockets"]);
-
+export function mergeInEmptyDraft(draftToMerge) {
+  if (!draftToMerge) return emptyDraftImm.toJS();
+  const draftToMergeImm = Immutable.fromJS(draftToMerge);
+  const mergeSockets = draftToMergeImm.getIn(["content", "sockets"]);
   let mergedDraftImm = emptyDraftImm;
 
   if (mergeSockets && mergeSockets.size > 0) {
     mergedDraftImm = mergedDraftImm.removeIn(["content", "sockets"]);
   }
+  const mergeAcl = draftToMergeImm.getIn(["acl"]);
+  if (mergeAcl && mergeAcl.size > 0) {
+    mergedDraftImm = mergedDraftImm.removeIn(["acl"]);
+  }
 
-  mergedDraftImm = mergedDraftImm.mergeDeep(contentToMergeImm);
+  mergedDraftImm = mergedDraftImm.mergeDeep(draftToMergeImm);
+
   return mergedDraftImm.toJS();
 }
 
