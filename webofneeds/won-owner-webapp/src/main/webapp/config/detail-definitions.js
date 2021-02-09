@@ -117,7 +117,10 @@ export const defaultPublicAtomAuthorization = {
   [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
   [vocab.AUTH.grantCompacted]: {
     [vocab.AUTH.graphCompacted]: {
-      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+      [vocab.AUTH.operationCompacted]: [
+        { "@id": vocab.AUTH.opReadCompacted },
+        { "@id": vocab.AUTH.opConnectCloseCompacted },
+      ],
     },
   },
 };
