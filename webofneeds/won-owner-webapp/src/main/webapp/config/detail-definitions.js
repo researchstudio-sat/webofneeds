@@ -130,6 +130,44 @@ export const connectedConectionsAuthorization = {
   },
 };
 
+// Only members see members of organizsation 008
+export const onlyMembersSeeMembersAuthorization = {
+  [vocab.AUTH.granteeCompacted]: {
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.socketTypeCompacted]: {
+        "@id": vocab.WXSCHEMA.MemberSocketCompacted,
+      },
+      [vocab.AUTH.connectionCompacted]: {
+        [vocab.AUTH.targetAtomCompacted]: {},
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
+        },
+      },
+    },
+  },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+    },
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.socketTypeCompacted]: {
+        "@id": vocab.WXSCHEMA.MemberSocketCompacted,
+      },
+      [vocab.AUTH.connectionsCompacted]: {
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
+        },
+        [vocab.AUTH.operationCompacted]: [
+          { "@id": vocab.AUTH.opReadCompacted },
+        ],
+        [vocab.AUTH.connectionMessagesCompacted]: {
+          [vocab.AUTH.inheritCompacted]: false,
+        },
+      },
+    },
+  },
+};
+
 // Atom can be seen by any other atom
 export const defaultPublicAtomAuthorization = {
   [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },

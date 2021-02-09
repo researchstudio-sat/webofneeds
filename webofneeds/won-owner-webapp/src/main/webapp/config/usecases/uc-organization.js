@@ -5,6 +5,10 @@ import {
   details,
   mergeInEmptyDraft,
   defaultReactions,
+  onlyMembersSeeMembersAuthorization,
+  defaultPublicAtomAuthorization,
+  connectedConectionsAuthorization,
+  connectToSocketsAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_uc_wtf from "../../images/won-icons/ico36_uc_wtf.svg";
@@ -29,6 +33,12 @@ export const organization = {
           "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
           "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
         },
+        acl: [
+          defaultPublicAtomAuthorization,
+          connectedConectionsAuthorization,
+          connectToSocketsAuthorization,
+          onlyMembersSeeMembersAuthorization,
+        ],
       },
     }),
   },
