@@ -9,19 +9,12 @@ import {
   getQueryParams,
   extractAtomUriFromConnectionUri,
 } from "../../utils.js";
-import * as accountUtils from "../../redux/utils/account-utils.js";
-import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils";
 import * as processUtils from "../../redux/utils/process-utils.js";
-import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonTopnav from "../../components/topnav.jsx";
-import WonMenu from "../../components/menu.jsx";
-import WonToasts from "../../components/toasts.jsx";
-import WonSlideIn from "../../components/slide-in.jsx";
-import WonFooter from "../../components/footer.jsx";
 import WonActivityMessages from "../../components/activity-messages.jsx";
 import WonGroupAtomMessages from "../../components/group-atom-messages.jsx";
 import WonConnectionsOverview from "../../components/connections-overview.jsx";
+import WonGenericPage from "~/app/pages/genericPage";
 
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
@@ -95,11 +88,6 @@ export default function PageActivities() {
     generalSelectors.getAllPartnerActivityConnections
   );
   const storedAtoms = useSelector(generalSelectors.getAtoms);
-  const isLoggedIn = useSelector(state =>
-    accountUtils.isLoggedIn(generalSelectors.getAccountState(state))
-  );
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   let contentElements;
   if (selectedConnection && atomUriInRoute) {
@@ -182,17 +170,5 @@ export default function PageActivities() {
     );
   }
 
-  return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle="Chats" />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
-
-      {contentElements}
-
-      {!isLoggedIn && <WonFooter />}
-    </section>
-  );
+  return <WonGenericPage pageTitle="Chats">{contentElements}</WonGenericPage>;
 }

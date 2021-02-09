@@ -2,17 +2,12 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { ownerBaseUrl } from "~/config/default.js";
 import { get, toAbsoluteURL, getQueryParams } from "../../utils.js";
-import * as accountUtils from "../../redux/utils/account-utils.js";
-import * as viewSelectors from "../../redux/selectors/view-selectors.js";
+
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import WonFooter from "../../components/footer.jsx";
+
 import WonAccordion from "../../components/accordion.jsx";
 import WonHowTo from "../../components/howto.jsx";
-import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonTopnav from "../../components/topnav.jsx";
-import WonMenu from "../../components/menu.jsx";
-import WonToasts from "../../components/toasts.jsx";
-import WonSlideIn from "../../components/slide-in.jsx";
+import WonGenericPage from "~/app/pages/genericPage";
 import WonFlexGrid from "../../components/flexgrid.jsx";
 
 import "~/style/_about.scss";
@@ -166,27 +161,17 @@ export default function PageAbout() {
   const theme = useSelector(generalSelectors.getTheme);
   const themeName = get(theme, "name");
 
-  const isLoggedIn = useSelector(state =>
-    accountUtils.isLoggedIn(generalSelectors.getAccountState(state))
-  );
   const tosTemplateHtml = get(theme, "tosTemplate");
   const imprintTemplateHtml = get(theme, "imprintTemplate");
   const privacyPolicyTemplateHtml = get(theme, "privacyPolicyTemplate");
   const peopleGrid = getPeopleGrid({ themeName });
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   function toggleMoreInfo() {
     setMoreInfo(!moreInfo);
   }
 
   return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle="About" />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
+    <WonGenericPage pageTitle="About">
       <main className="about" id="allSections">
         {!aboutSection && (
           <section className="about__welcome">
@@ -273,7 +258,6 @@ export default function PageAbout() {
           </section>
         )}
       </main>
-      {!isLoggedIn && <WonFooter />}
-    </section>
+    </WonGenericPage>
   );
 }

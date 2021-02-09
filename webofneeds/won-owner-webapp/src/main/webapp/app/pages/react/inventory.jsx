@@ -7,23 +7,16 @@ import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as viewUtils from "../../redux/utils/view-utils.js";
-import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonTopnav from "../../components/topnav.jsx";
-import WonMenu from "../../components/menu.jsx";
-import WonToasts from "../../components/toasts.jsx";
-import WonSlideIn from "../../components/slide-in.jsx";
-import WonFooter from "../../components/footer.jsx";
+import WonAtomContent from "~/app/components/atom-content";
+import WonGenericPage from "~/app/pages/genericPage";
 import WonHowTo from "../../components/howto.jsx";
 import WonAtomCardGrid from "../../components/atom-card-grid.jsx";
 
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 import "~/style/_inventory.scss";
-import { useHistory } from "react-router-dom";
-import WonAtomContent from "~/app/components/atom-content";
 
 export default function PageInventory() {
-  const history = useHistory();
   const dispatch = useDispatch();
   const viewState = useSelector(generalSelectors.getViewState);
   const theme = useSelector(generalSelectors.getTheme);
@@ -82,8 +75,6 @@ export default function PageInventory() {
   const inactiveAtomUriSize = ownedInactiveAtoms ? ownedInactiveAtoms.size : 0;
   const hasOwnedInactiveAtomUris = ownedInactiveAtoms > 0;
 
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const showClosedAtoms = viewUtils.showClosedAtoms(viewState);
 
   let additionalLogosElement;
@@ -108,13 +99,7 @@ export default function PageInventory() {
   const [showAddPicker, toggleAddPicker] = useState(false);
 
   return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle="Inventory" />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
-
+    <WonGenericPage pageTitle="Inventory">
       {isLoggedIn ? (
         <main className="ownerinventory">
           {activePersona ? (
@@ -204,8 +189,6 @@ export default function PageInventory() {
           <WonHowTo />
         </main>
       )}
-
-      {!isLoggedIn && <WonFooter />}
-    </section>
+    </WonGenericPage>
   );
 }

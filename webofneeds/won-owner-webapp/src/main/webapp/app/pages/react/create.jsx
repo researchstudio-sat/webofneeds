@@ -3,20 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { getQueryParams } from "../../utils.js";
 import { actionCreators } from "../../actions/actions.js";
-import * as accountUtils from "../../redux/utils/account-utils.js";
 import * as processUtils from "../../redux/utils/process-utils.js";
-import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonTopnav from "../../components/topnav.jsx";
-import WonMenu from "../../components/menu.jsx";
-import WonToasts from "../../components/toasts.jsx";
-import WonSlideIn from "../../components/slide-in.jsx";
-import WonFooter from "../../components/footer.jsx";
 import WonCreateAtom from "../../components/atom-editor/create-atom.jsx";
 import WonEditAtom from "../../components/atom-editor/edit-atom.jsx";
 import WonUseCaseGroup from "../../components/usecase-group.jsx";
 import WonUseCasePicker from "../../components/usecase-picker.jsx";
+import WonGenericPage from "~/app/pages/genericPage";
 
 import "~/style/_create.scss";
 import "~/style/_responsiveness-utils.scss";
@@ -38,10 +31,6 @@ export default function PageCreate() {
   } = getQueryParams(history.location);
   const processState = useSelector(generalSelectors.getProcessState);
   const fromAtom = useSelector(generalSelectors.getAtom(fromAtomUri));
-  const accountState = useSelector(generalSelectors.getAccountState);
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   const visibleUseCasesByConfig = useSelector(
     generalSelectors.getVisibleUseCasesByConfig
@@ -191,15 +180,8 @@ export default function PageCreate() {
   }
 
   return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle="Create" />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
-      {/* RIGHT SIDE */}
+    <WonGenericPage pageTitle="Create">
       <main className="ownercreate">{contentElement}</main>
-      {!isLoggedIn && <WonFooter />}
-    </section>
+    </WonGenericPage>
   );
 }

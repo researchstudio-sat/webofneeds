@@ -211,10 +211,12 @@ export default function WonMenu({ className }) {
             "personas__persona personas__persona--anon " +
             (!activePersonaUri ? "personas__persona--active" : "clickable")
           }
-          onClick={() =>
-            !!activePersonaUri &&
-            dispatch(actionCreators.view__setActivePersonaUri())
-          }
+          onClick={() => {
+            if (activePersonaUri) {
+              dispatch(actionCreators.view__setActivePersonaUri());
+              hideMenuIfVisible();
+            }
+          }}
         >
           <svg className="personas__persona__anonicon">
             <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
@@ -222,6 +224,7 @@ export default function WonMenu({ className }) {
         </div>
         <Link
           className="personas__create"
+          onClick={hideMenuIfVisible}
           to={location =>
             generateLink(
               location,

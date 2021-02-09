@@ -2,15 +2,8 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { getQueryParams } from "../../utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import * as accountUtils from "../../redux/utils/account-utils.js";
-import * as viewSelectors from "../../redux/selectors/view-selectors.js";
-import WonModalDialog from "../../components/modal-dialog.jsx";
 import WonAtomInfo from "../../components/atom-info.jsx";
-import WonTopnav from "../../components/topnav.jsx";
-import WonMenu from "../../components/menu.jsx";
-import WonToasts from "../../components/toasts.jsx";
-import WonSlideIn from "../../components/slide-in.jsx";
-import WonFooter from "../../components/footer.jsx";
+import WonGenericPage from "~/app/pages/genericPage";
 
 import "~/style/_post.scss";
 import { useHistory } from "react-router-dom";
@@ -26,21 +19,12 @@ export default function PagePost() {
     generalSelectors.getOwnedConnection(connectionUri)
   );
 
-  const accountState = useSelector(generalSelectors.getAccountState);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const atomTitle = atomUtils.getTitle(atom, externalDataState);
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
 
   return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle={atomTitle} />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
+    <WonGenericPage pageTitle={atomTitle}>
       <main className="atomcontent">
         <WonAtomInfo
           atom={atom}
@@ -50,7 +34,6 @@ export default function PagePost() {
           initialTab={tab}
         />
       </main>
-      {!isLoggedIn && <WonFooter />}
-    </section>
+    </WonGenericPage>
   );
 }

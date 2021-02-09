@@ -10,13 +10,8 @@ import * as useCaseUtils from "../../usecase-utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 
-import WonTopnav from "../../components/topnav.jsx";
-import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonMenu from "../../components/menu.jsx";
-import WonToasts from "../../components/toasts.jsx";
-import WonSlideIn from "../../components/slide-in.jsx";
 import WonAtomCardGrid from "../../components/atom-card-grid";
-import WonFooter from "../../components/footer";
+import WonGenericPage from "~/app/pages/genericPage";
 
 import "~/style/_overview.scss";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
@@ -31,8 +26,6 @@ export default function PageOverview() {
   const debugModeEnabled = useSelector(viewSelectors.isDebugModeEnabled);
   const accountState = useSelector(generalSelectors.getAccountState);
   const currentLocation = useSelector(generalSelectors.getCurrentLocation);
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
   const isOwnerAtomUrisLoading = useSelector(
     processSelectors.isProcessingWhatsNew
   );
@@ -70,7 +63,6 @@ export default function PageOverview() {
   const isOwnerAtomUrisToLoad =
     !lastAtomUrisUpdateDate && !isOwnerAtomUrisLoading;
 
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const friendlyLastAtomUrisUpdateTimestamp =
     lastAtomUrisUpdateDate &&
     wonLabelUtils.relativeTime(globalLastUpdateTime, lastAtomUrisUpdateDate);
@@ -249,14 +241,8 @@ export default function PageOverview() {
   }
 
   return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle="What's New" />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
+    <WonGenericPage pageTitle="What's New">
       {overviewContentElement}
-      {!isLoggedIn && <WonFooter />}
-    </section>
+    </WonGenericPage>
   );
 }

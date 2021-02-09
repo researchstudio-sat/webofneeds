@@ -1,17 +1,10 @@
 import React, { useState } from "react";
 import won from "../../won-es6";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
 import * as ownerApi from "../../api/owner-api.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
-import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import WonModalDialog from "../../components/modal-dialog.jsx";
-import WonTopnav from "../../components/topnav.jsx";
-import WonMenu from "../../components/menu.jsx";
-import WonToasts from "../../components/toasts.jsx";
-import WonSlideIn from "../../components/slide-in.jsx";
-import WonFooter from "../../components/footer.jsx";
+import WonGenericPage from "~/app/pages/genericPage";
 
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import "~/style/_settings.scss";
@@ -24,12 +17,8 @@ const SETTING = {
 };
 
 export default function PageSettings() {
-  const history = useHistory();
   const accountState = useSelector(generalSelectors.getAccountState);
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const isEmailVerified = accountUtils.isEmailVerified(accountState);
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   const [visibleSetting, setVisibleSetting] = useState(SETTING.ACCOUNT);
   const [dataEncryptionPassword, setDataEncryptionPassword] = useState();
@@ -286,12 +275,7 @@ export default function PageSettings() {
   }
 
   return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle="Settings" />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
+    <WonGenericPage pageTitle="Settings">
       <aside className="settings__left">
         {generateMenuItem("Account", SETTING.ACCOUNT)}
         {generateMenuItem("Export", SETTING.EXPORT)}
@@ -299,7 +283,6 @@ export default function PageSettings() {
       <main className="settings__right">
         <won-settings-content>{settingsContent}</won-settings-content>
       </main>
-      {!isLoggedIn && <WonFooter />}
-    </section>
+    </WonGenericPage>
   );
 }

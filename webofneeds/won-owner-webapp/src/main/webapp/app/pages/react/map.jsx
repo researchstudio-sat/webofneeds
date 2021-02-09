@@ -16,15 +16,10 @@ import {
   searchNominatim,
 } from "../../api/nominatim-api.js";
 
-import WonTopnav from "../../components/topnav.jsx";
-import WonModalDialog from "../../components/modal-dialog.jsx";
 import WonAtomMap from "../../components/atom-map.jsx";
-import WonMenu from "../../components/menu.jsx";
-import WonToasts from "../../components/toasts.jsx";
-import WonSlideIn from "../../components/slide-in.jsx";
 import WonAtomCardGrid from "../../components/atom-card-grid.jsx";
-import WonFooter from "../../components/footer.jsx";
 import WonTitlePicker from "../../components/details/picker/title-picker.jsx";
+import WonGenericPage from "~/app/pages/genericPage";
 
 import _debounce from "lodash/debounce";
 
@@ -33,11 +28,9 @@ import ico36_detail_location from "~/images/won-icons/ico36_detail_location.svg"
 import ico36_location_current from "~/images/won-icons/ico36_location_current.svg";
 import ico16_indicator_location from "~/images/won-icons/ico16_indicator_location.svg";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
-import { useHistory } from "react-router-dom";
 
 export default function PageMap() {
   const dispatch = useDispatch();
-  const history = useHistory();
 
   const isLocationAccessDenied = useSelector(
     generalSelectors.isLocationAccessDenied
@@ -66,7 +59,6 @@ export default function PageMap() {
 
   const debugModeEnabled = useSelector(viewSelectors.isDebugModeEnabled);
 
-  const accountState = useSelector(generalSelectors.getAccountState);
   const whatsAroundMetaAtoms = useSelector(state =>
     generalSelectors
       .getWhatsAroundAtoms(state)
@@ -106,7 +98,6 @@ export default function PageMap() {
       locations.push(atomLocation);
     });
 
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const globalLastUpdateDate = useSelector(
     generalSelectors.selectLastUpdateTime
   );
@@ -115,8 +106,6 @@ export default function PageMap() {
     wonLabelUtils.relativeTime(globalLastUpdateDate, lastAtomUrisUpdateDate);
 
   const hasVisibleAtoms = whatsAroundMetaAtoms && whatsAroundMetaAtoms.size > 0;
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
 
   const startSearch = _debounce(value => {
     searchNominatim(value).then(searchResults => {
@@ -296,12 +285,7 @@ export default function PageMap() {
   });
 
   return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle="What's around" />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
+    <WonGenericPage pageTitle="What's around">
       <main className="ownermap">
         {(isLocationAccessDenied || lastWhatsAroundLocation) && (
           <div className="ownermap__header">
@@ -502,7 +486,6 @@ export default function PageMap() {
             </div>
           ))}
       </main>
-      {!isLoggedIn && <WonFooter />}
-    </section>
+    </WonGenericPage>
   );
 }

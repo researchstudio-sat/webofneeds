@@ -1,34 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import * as accountUtils from "../../redux/utils/account-utils.js";
-import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
-import WonModalDialog from "../../components/modal-dialog";
-import WonTopnav from "../../components/topnav";
-import WonMenu from "../../components/menu";
-import WonToasts from "../../components/toasts";
-import WonSlideIn from "../../components/slide-in";
-import WonFooter from "../../components/footer";
 import WonLabelledHr from "../../components/labelled-hr.jsx";
 
 import "~/style/_signup.scss";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import { actionCreators } from "../../actions/actions";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
+import WonGenericPage from "~/app/pages/genericPage";
 
 const MINPW_LENGTH = 6;
 
 export default function PageSignUp() {
-  const history = useHistory();
   const dispatch = useDispatch();
 
   const accountState = useSelector(generalSelectors.getAccountState);
   const privateId = accountUtils.getPrivateId(accountState);
-  const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const registerError = accountUtils.getRegisterError(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
-  const showModalDialog = useSelector(viewSelectors.showModalDialog);
-  const showSlideIns = useSelector(viewSelectors.showSlideIns(history));
 
   const [state, setState] = useState({
     email: "",
@@ -138,12 +128,7 @@ export default function PageSignUp() {
   }
 
   return (
-    <section className={!isLoggedIn ? "won-signed-out" : ""}>
-      {showModalDialog && <WonModalDialog />}
-      <WonTopnav pageTitle="Sign Up" />
-      {isLoggedIn && <WonMenu />}
-      <WonToasts />
-      {showSlideIns && <WonSlideIn />}
+    <WonGenericPage pageTitle="Sign Up">
       <main className="signup" id="signupSection">
         <div className="signup__content">
           <div className="signup__content__form" name="registerForm">
@@ -285,7 +270,6 @@ export default function PageSignUp() {
           </button>
         </div>
       </main>
-      {!isLoggedIn && <WonFooter />}
-    </section>
+    </WonGenericPage>
   );
 }
