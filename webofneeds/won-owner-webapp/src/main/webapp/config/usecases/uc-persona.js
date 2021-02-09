@@ -6,6 +6,7 @@ import {
   defaultPublicAtomAuthorization,
   seeHolderSocketConnectionsAuthorization,
   connectToSocketsAuthorization,
+  tokenForReadHeldAtoms,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 
@@ -42,6 +43,7 @@ export const persona = {
         seeHolderSocketConnectionsAuthorization,
         connectedConectionsAuthorization,
         connectToSocketsAuthorization,
+        tokenForReadHeldAtoms,
       ],
     }),
   },

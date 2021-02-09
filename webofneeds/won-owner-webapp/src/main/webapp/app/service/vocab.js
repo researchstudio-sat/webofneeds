@@ -451,6 +451,10 @@ vocab.AUTH.tokenScope = vocab.AUTH.baseUri + "tokenScope";
 vocab.AUTH.tokenScopeCompacted = vocab.AUTH.prefix + ":tokenScope";
 vocab.AUTH.issuer = vocab.AUTH.baseUri + "issuer";
 vocab.AUTH.issuerCompacted = vocab.AUTH.prefix + ":issuer";
+vocab.AUTH.requestToken = vocab.AUTH.baseUri + "requestToken";
+vocab.AUTH.requestTokenCompacted = vocab.AUTH.prefix + ":requestToken";
+vocab.AUTH.expiresAfter = vocab.AUTH.baseUri + "expiresAfter";
+vocab.AUTH.expiresAfterCompacted = vocab.AUTH.prefix + ":expiresAfter";
 
 vocab.VALUEFLOWS = {};
 vocab.VALUEFLOWS.baseUri = "https://w3id.org/valueflows#";

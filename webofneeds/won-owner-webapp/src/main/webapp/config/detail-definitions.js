@@ -16,33 +16,6 @@ import vocab from "../app/service/vocab.js";
 export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
 
-// Atoms can only be seen by buddies of holder
-export const buddyTokenNeededAuthorization = {
-  [vocab.AUTH.bearerCompacted]: {
-    [vocab.AUTH.tokenScopeCompacted]: {
-      "@id": vocab.BUDDY.BuddySocketCompacted,
-    },
-    [vocab.AUTH.issuerCompacted]: {
-      [vocab.AUTH.socketCompacted]: {
-        [vocab.AUTH.socketTypeCompacted]: {
-          "@id": vocab.HOLD.HoldableSocketCompacted,
-        },
-        [vocab.AUTH.targetAtomCompacted]: {},
-        [vocab.AUTH.connectionCompacted]: {
-          [vocab.AUTH.connectionStateCompacted]: {
-            "@id": vocab.AUTH.ConnectedCompacted,
-          },
-        },
-      },
-    },
-  },
-  [vocab.AUTH.grantCompacted]: {
-    [vocab.AUTH.graphCompacted]: {
-      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
-    },
-  },
-};
-
 // Grant access to connect to all sockets 009
 export const connectToSocketsAuthorization = {
   [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
@@ -174,6 +147,56 @@ export const defaultPublicAtomAuthorization = {
   [vocab.AUTH.grantCompacted]: {
     [vocab.AUTH.graphCompacted]: {
       [vocab.AUTH.operationCompacted]: [{ "@id": vocab.AUTH.opReadCompacted }],
+    },
+  },
+};
+
+// Token for readHeldAtoms 010
+export const tokenForReadHeldAtoms = {
+  [vocab.AUTH.granteeCompacted]: {
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.socketTypeCompacted]: {
+        "@id": vocab.BUDDY.BuddySocketCompacted,
+      },
+      [vocab.AUTH.connectionCompacted]: {
+        [vocab.AUTH.targetAtomCompacted]: {},
+        [vocab.AUTH.connectionStateCompacted]: {
+          "@id": vocab.WON.ConnectedCompacted,
+        },
+      },
+    },
+  },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.operationCompacted]: {
+      [vocab.AUTH.requestTokenCompacted]: {
+        [vocab.AUTH.tokenScopeCompacted]: "readHeldAtoms",
+        [vocab.AUTH.expiresAfterCompacted]: 3600,
+      },
+    },
+  },
+};
+
+// Token bearer for readHeldAtoms 011
+export const tokenNeededToReadAtom = {
+  [vocab.AUTH.bearerCompacted]: {
+    [vocab.AUTH.tokenScopeCompacted]: "readHeldAtoms",
+    [vocab.AUTH.issuerCompacted]: {
+      [vocab.AUTH.socketCompacted]: {
+        [vocab.AUTH.socketTypeCompacted]: {
+          "@id": vocab.HOLD.HoldableSocketCompacted,
+        },
+        [vocab.AUTH.connectionCompacted]: {
+          [vocab.AUTH.targetAtomCompacted]: {},
+          [vocab.AUTH.connectionStateCompacted]: {
+            "@id": vocab.AUTH.ConnectedCompacted,
+          },
+        },
+      },
+    },
+  },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
     },
   },
 };

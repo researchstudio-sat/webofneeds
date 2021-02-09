@@ -39,7 +39,7 @@ ex:expectedResult5
     auth:decision           auth:accessDenied ;
     auth:requestedOperation <#request5> .
 
-# Atom is holdable
+# Atom is connectable on socket layer
 
 <#authorization>
     a            auth:Authorization ;

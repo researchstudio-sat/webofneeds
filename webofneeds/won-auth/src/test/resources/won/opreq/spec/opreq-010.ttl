@@ -19,14 +19,14 @@ ex:expectedResult
     auth:decision           auth:accessGranted ;
     auth:requestedOperation <#request> .
 
-# Token for buddies
+# Token for readHeldAtoms
 
 <#authorization>
     a           auth:Authorization ;
-    auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+    auth:bearer [ auth:tokenScope "readHeldAtoms" ;
                   auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
-                                                  auth:targetAtom [ ] ;
-                                                  auth:connection [ auth:connectionState won:Connected ] ] ] ] ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
     auth:grant  [ auth:graph [ auth:operation auth:opRead ] ] .
 
 <#request>
@@ -39,7 +39,7 @@ ex:expectedResult
 
 ex:token1
     a               auth:AuthToken ;
-    auth:tokenScope wx-buddy:BuddySocket ;
+    auth:tokenScope "readHeldAtoms" ;
     auth:tokenIss   ex:atom1 ;
     auth:tokenSub   ex:atom2 ;
     auth:tokenSig   ex:node ;
@@ -66,7 +66,7 @@ atom1:bsConn1
     a                   won:Connection ;
     won:targetAtom      ex:atom2 ;
     won:connectionState won:Connected ;
-    won:socket          atom2:buddySocket .
+    won:socket          atom1:buddySocket .
 
 atom1:holderSocket
     a                    won:Socket ;
