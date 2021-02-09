@@ -190,9 +190,7 @@ export default function PageConnections() {
     <section className={!isLoggedIn ? "won-signed-out" : ""}>
       {showModalDialog && <WonModalDialog />}
       <WonTopnav pageTitle="Chats" />
-      {isLoggedIn && (
-        <WonMenu className={atomUriInRoute && "show-in-responsive"} />
-      )}
+      {isLoggedIn && <WonMenu />}
       <WonToasts />
       {showSlideIns && <WonSlideIn />}
 

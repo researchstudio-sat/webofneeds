@@ -274,9 +274,7 @@ export default function WonMenu({ className }) {
                   history.location.pathname === "/"
                 )
               ) {
-                history.replace(
-                  generateLink(history.location, {}, "/inventory")
-                );
+                history.push(generateLink(history.location, {}, "/inventory"));
               }
             }}
             relevantConnectionsMap={relevantActivePersonaConnectionsMap}
