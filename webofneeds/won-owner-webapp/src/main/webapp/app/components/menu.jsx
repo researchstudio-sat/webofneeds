@@ -74,10 +74,12 @@ export default function WonMenu({ className }) {
               ? "personas__persona--active"
               : "clickable")
           }
-          onClick={() =>
-            activePersonaUri !== personaUri &&
-            dispatch(actionCreators.view__setActivePersonaUri(personaUri))
-          }
+          onClick={() => {
+            if (activePersonaUri !== personaUri) {
+              hideMenuIfVisible();
+              dispatch(actionCreators.view__setActivePersonaUri(personaUri));
+            }
+          }}
           title={atomUtils.getTitle(persona)}
           key={personaUri}
         >
