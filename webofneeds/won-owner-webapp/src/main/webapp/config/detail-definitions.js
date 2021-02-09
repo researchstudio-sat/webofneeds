@@ -43,6 +43,24 @@ export const buddyTokenNeededAuthorization = {
   },
 };
 
+// Grant access to connect to all sockets 009
+export const connectToSocketsAuthorization = {
+  [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
+  [vocab.AUTH.grantCompacted]: {
+    [vocab.AUTH.graphCompacted]: {
+      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+    },
+    [vocab.AUTH.socketCompacted]: {
+      [vocab.AUTH.operationCompacted]: [
+        { "@id": vocab.AUTH.opConnectCloseCompacted },
+      ],
+      [vocab.AUTH.connectionsCompacted]: {
+        [vocab.AUTH.inheritCompacted]: false,
+      },
+    },
+  },
+};
+
 // See holderSocket connections of atoms buddies
 export const seeHolderSocketConnectionsAuthorization = {
   [vocab.AUTH.granteeCompacted]: {
@@ -117,10 +135,7 @@ export const defaultPublicAtomAuthorization = {
   [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
   [vocab.AUTH.grantCompacted]: {
     [vocab.AUTH.graphCompacted]: {
-      [vocab.AUTH.operationCompacted]: [
-        { "@id": vocab.AUTH.opReadCompacted },
-        { "@id": vocab.AUTH.opConnectCloseCompacted },
-      ],
+      [vocab.AUTH.operationCompacted]: [{ "@id": vocab.AUTH.opReadCompacted }],
     },
   },
 };
@@ -134,7 +149,11 @@ export const emptyDraftImm = Immutable.fromJS({
     },
   },
   seeks: {},
-  acl: [defaultPublicAtomAuthorization, connectedConectionsAuthorization],
+  acl: [
+    defaultPublicAtomAuthorization,
+    connectedConectionsAuthorization,
+    connectToSocketsAuthorization,
+  ],
 });
 
 export const defaultReactions = {
