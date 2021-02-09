@@ -353,7 +353,7 @@ export default function WonMenu({ className }) {
           </NavLink>
         )}
       </div>
-      <WonFooter className="menu__footer" />
+      <WonFooter className="menu__footer" onClick={hideMenuIfVisible} />
     </won-menu>
   );
 }

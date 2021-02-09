@@ -9,7 +9,7 @@ import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import "~/style/_footer.scss";
 import { Link } from "react-router-dom";
 
-export default function WonFooter({ className }) {
+export default function WonFooter({ className, onClick }) {
   const dispatch = useDispatch();
   // const theme = useSelector(generalSelectors.getTheme);
   // const themeName = get(theme, "name");
@@ -31,12 +31,17 @@ export default function WonFooter({ className }) {
         </div>
         <div class="footer__tagLine">Web of Needs</div>-->*/}
         <div className="footer__linksdesktop hide-in-responsive">
-          <Link className="footer__linksdesktop__link" to="/about">
+          <Link
+            className="footer__linksdesktop__link"
+            onClick={onClick}
+            to="/about"
+          >
             About
           </Link>
           <span className="footer__linksdesktop__divider">|</span>
           <Link
             className="footer__linksdesktop__link"
+            onClick={onClick}
             to="/about?aboutSection=aboutPrivacyPolicy"
           >
             Privacy
@@ -44,6 +49,7 @@ export default function WonFooter({ className }) {
           <span className="footer__linksdesktop__divider">|</span>
           <Link
             className="footer__linksdesktop__link"
+            onClick={onClick}
             to="/about?aboutSection=aboutFaq"
           >
             FAQ
@@ -51,6 +57,7 @@ export default function WonFooter({ className }) {
           <span className="footer__linksdesktop__divider">|</span>
           <Link
             className="footer__linksdesktop__link"
+            onClick={onClick}
             to="/about?aboutSection=aboutTermsOfService"
           >
             Terms Of Service
@@ -58,49 +65,68 @@ export default function WonFooter({ className }) {
           <span className="footer__linksdesktop__divider">|</span>
           <span
             className="footer__linksdesktop__link"
-            onClick={() => dispatch(actionCreators.view__toggleDebugMode())}
+            onClick={() => {
+              dispatch(actionCreators.view__toggleDebugMode());
+              onClick && onClick();
+            }}
           >
             {getDebugModeLabel()}
           </span>
           <span className="footer__linksdesktop__divider">|</span>
           <span
             className="footer__linksdesktop__link"
-            onClick={() => dispatch(actionCreators.view__toggleRdf())}
+            onClick={() => {
+              dispatch(actionCreators.view__toggleRdf());
+              onClick && onClick();
+            }}
           >
             {shouldShowRdf ? "Hide raw RDF data" : "Show raw RDF data"}
           </span>
         </div>
         <div className="footer__linksmobile show-in-responsive">
-          <Link className="footer__linksmobile__link" to="/about">
+          <Link
+            className="footer__linksmobile__link"
+            onClick={onClick}
+            to="/about"
+          >
             About
           </Link>
           <Link
             className="footer__linksmobile__link"
+            onClick={onClick}
             to="/about?aboutSection=aboutPrivacyPolicy"
           >
             Privacy
           </Link>
           <Link
             className="footer__linksmobile__link"
+            onClick={onClick}
             to="/about?aboutSection=aboutFaq"
           >
             FAQ
           </Link>
           <Link
             className="footer__linksmobile__link"
+            onClick={onClick}
             to="/about?aboutSection=aboutTermsOfService"
           >
             Terms Of Service
           </Link>
           <span
             className="footer__linksmobile__link"
-            onClick={() => dispatch(actionCreators.view__toggleDebugMode())}
+            onClick={() => {
+              dispatch(actionCreators.view__toggleDebugMode());
+              onClick && onClick();
+            }}
           >
             {getDebugModeLabel()}
           </span>
           <span
             className="footer__linksmobile__link"
-            onClick={() => dispatch(actionCreators.view__toggleRdf())}
+            onClick={() => {
+              dispatch(actionCreators.view__toggleRdf());
+              onClick && onClick();
+            }}
           >
             {shouldShowRdf ? "Hide raw RDF data" : "Show raw RDF data"}
           </span>
@@ -111,4 +137,5 @@ export default function WonFooter({ className }) {
 }
 WonFooter.propTypes = {
   className: PropTypes.string,
+  onClick: PropTypes.func,
 };

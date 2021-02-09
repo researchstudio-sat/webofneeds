@@ -4,8 +4,9 @@ import { actionTypes } from "../actions/actions.js";
 import * as generalSelectors from "./selectors/general-selectors.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as processUtils from "./utils/process-utils.js";
+import * as connectionUtils from "./utils/connection-utils.js";
 import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
-import { get, is } from "../utils.js";
+import { extractAtomUriFromConnectionUri, get, is, getUri } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
 import { fetchWikiData } from "~/app/api/wikidata-api";
@@ -150,15 +151,59 @@ export function fetchAtomAndDispatch(
     );
     return Promise.resolve();
   }
-  console.debug("Proceed Fetch of Atom<", atomUri, ">");
 
+  const isOwned = generalSelectors.isAtomOwned(atomUri)(state);
+  console.debug(
+    "Proceed Fetch of",
+    isOwned ? "Owned" : "",
+    "Atom<",
+    atomUri,
+    ">"
+  );
   dispatch({
     type: actionTypes.atoms.storeUriInLoading,
     payload: Immutable.fromJS({ uri: atomUri }),
   });
 
+  const determineRequesterWebId = atomUri => {
+    console.debug("## Determine requesterWebId for", atomUri);
+    const allOwnedConnections = generalSelectors.getOwnedAllConnections(state);
+    const filteredConnections = allOwnedConnections.filter(
+      conn => connectionUtils.getTargetAtomUri(conn) === atomUri
+    );
+
+    let requesterWebId = atomUri;
+
+    if (filteredConnections.size > 0) {
+      requesterWebId = extractAtomUriFromConnectionUri(
+        getUri(filteredConnections.first())
+      );
+
+      if (filteredConnections.size > 1) {
+        console.debug(
+          "## more than one connection found for this non owned Atom, using first one as requesterWebId: ",
+          requesterWebId,
+          filteredConnections
+        );
+      } else {
+        console.debug(
+          "## one connection found for this non owned Atom, using first one as requesterWebId: ",
+          requesterWebId
+        );
+      }
+    } else {
+      console.debug(
+        "## no connections found for this non owned atom, using atomUri as requesterWebId maybe we are lucky..."
+      );
+    }
+
+    return requesterWebId;
+  };
+
+  const requesterWebId = isOwned ? atomUri : determineRequesterWebId(atomUri);
+
   return won
-    .getAtom(atomUri)
+    .getAtom(atomUri, requesterWebId)
     .then(atom => {
       dispatch({
         type: actionTypes.atoms.store,
@@ -168,10 +213,18 @@ export function fetchAtomAndDispatch(
     })
     .then(atom => {
       //Fetch All MetaConnections Of NonOwnedAtomAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
-      if (generalSelectors.isAtomOwned(atomUri)(state)) {
-        fetchConnectionsOfAtomAndDispatch(atomUri, dispatch);
+      if (isOwned) {
+        fetchConnectionsOfOwnedAtomAndDispatch(
+          atomUri,
+          requesterWebId,
+          dispatch
+        );
       } else {
-        fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch);
+        fetchConnectionsOfNonOwnedAtomAndDispatch(
+          atomUri,
+          requesterWebId,
+          dispatch
+        );
       }
       return atom;
     })
@@ -327,9 +380,13 @@ export function fetchMessages(
     });
 }
 
-export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
+function fetchConnectionsOfOwnedAtomAndDispatch(
+  atomUri,
+  requesterWebId,
+  dispatch
+) {
   return won
-    .getConnectionUrisWithStateByAtomUri(atomUri)
+    .getConnectionUrisWithStateByAtomUri(atomUri, requesterWebId)
     .then(connectionsWithStateAndSocket => {
       dispatch({
         type: actionTypes.connections.storeMetaConnections,
@@ -363,9 +420,13 @@ export function fetchConnectionsOfAtomAndDispatch(atomUri, dispatch) {
     );
 }
 
-export function fetchConnectionsOfNonOwnedAtomAndDispatch(atomUri, dispatch) {
+function fetchConnectionsOfNonOwnedAtomAndDispatch(
+  atomUri,
+  requesterWebId,
+  dispatch
+) {
   return won
-    .getConnectionUrisWithStateByAtomUri(atomUri, true)
+    .getConnectionUrisWithStateByAtomUri(atomUri, requesterWebId, true)
     .then(connectionsWithStateAndSocket => {
       const connectedConnections = connectionsWithStateAndSocket.filter(
         conn => conn.connectionState === vocab.WON.Connected

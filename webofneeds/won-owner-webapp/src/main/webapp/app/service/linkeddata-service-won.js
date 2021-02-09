@@ -30,9 +30,9 @@ import vocab from "./vocab.js";
    * with a request for the connection-container
    * to get the connection-uris. Thus it's faster.
    */
-  won.getAtom = atomUri =>
+  won.getAtom = (atomUri, requesterWebId) =>
     ownerApi
-      .getJsonLdDataset(atomUri)
+      .getJsonLdDataset(atomUri, { requesterWebId: requesterWebId })
       .then(jsonLdData => {
         // console.time("Atom parseTime for: " + atomUri);
         return jsonld.frame(jsonLdData, {
@@ -103,11 +103,13 @@ import vocab from "./vocab.js";
   /**
    * Fetches all MetaConnections of the given atomUri
    * @param atomUri
+   * @param requesterWebId -> usually unset or set to the atomUri itself, this needs to be adapted to include the correct requesterWebId that has credentials to view the connectionContainer of the given atom
    * @param connectedOnly -> if set to true, only connections with the state "Connected" will be returned
    * @returns {Promise<never>}
    */
   won.getConnectionUrisWithStateByAtomUri = (
     atomUri,
+    requesterWebId,
     connectedOnly = false
   ) => {
     return won
@@ -121,7 +123,9 @@ import vocab from "./vocab.js";
       .then(connectionContainerUri =>
         won.getJsonLdNode(
           connectionContainerUri,
-          connectedOnly ? { state: "Connected" } : undefined
+          connectedOnly
+            ? { state: "Connected", requesterWebId: requesterWebId }
+            : { requesterWebId: requesterWebId }
         )
       )
       .then(
