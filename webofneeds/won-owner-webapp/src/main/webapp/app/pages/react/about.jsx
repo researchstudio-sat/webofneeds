@@ -273,7 +273,7 @@ export default function PageAbout() {
           </section>
         )}
       </main>
-      <WonFooter />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }

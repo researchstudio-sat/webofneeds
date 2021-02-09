@@ -76,6 +76,27 @@
   }
 }
 
+@mixin genericFooter() {
+  > .footer {
+    > .footer__linksdesktop {
+      flex-direction: column;
+
+      > .footer__linksdesktop__link {
+        padding-top: 0.25rem;
+      }
+
+      > .footer__linksdesktop__divider {
+        display: none;
+      }
+    }
+
+    > .footer__linksmobile {
+      > .footer__linksmobile__link {
+      }
+    }
+  }
+}
+
 @mixin genericMenu() {
   display: grid;
   box-sizing: border-box;
@@ -211,13 +232,24 @@ won-menu.won-menu--show-mobile {
   background: $won-light-gray;
   display: grid;
   grid-template-columns: min-content 1fr;
+  grid-template-rows: 1fr min-content;
+  grid-template-areas:
+    "personas menu"
+    "personas footer";
   align-items: self-start;
 
   > .personas {
+    grid-area: personas;
     @include personaMenu();
   }
 
+  > won-footer.menu__footer {
+    grid-area: footer;
+    @include genericFooter();
+  }
+
   > .menu {
+    grid-area: menu;
     @include genericMenu();
 
     & > .menu__tab {
@@ -230,13 +262,24 @@ won-menu:not(.won-menu--show-mobile) {
   background: $won-light-gray;
   display: grid;
   grid-template-columns: min-content 1fr;
+  grid-template-rows: 1fr min-content;
+  grid-template-areas:
+    "personas menu"
+    "personas footer";
   align-items: self-start;
 
   > .personas {
+    grid-area: personas;
     @include personaMenu();
   }
 
+  > won-footer.menu__footer {
+    grid-area: footer;
+    @include genericFooter();
+  }
+
   > .menu {
+    grid-area: menu;
     @include genericMenu();
 
     @media (min-width: $responsivenessBreakPoint) {

@@ -299,7 +299,7 @@ export default function PageSettings() {
       <main className="settings__right">
         <won-settings-content>{settingsContent}</won-settings-content>
       </main>
-      <WonFooter />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }

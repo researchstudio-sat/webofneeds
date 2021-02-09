@@ -199,7 +199,7 @@ export default function PageCreate() {
       {showSlideIns && <WonSlideIn />}
       {/* RIGHT SIDE */}
       <main className="ownercreate">{contentElement}</main>
-      <WonFooter />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }

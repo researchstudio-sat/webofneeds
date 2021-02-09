@@ -50,7 +50,7 @@ export default function PagePost() {
           initialTab={tab}
         />
       </main>
-      <WonFooter />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }

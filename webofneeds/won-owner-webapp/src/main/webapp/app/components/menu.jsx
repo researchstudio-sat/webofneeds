@@ -17,6 +17,7 @@ import WonAtomIcon from "~/app/components/atom-icon";
 import WonShareDropdown from "~/app/components/share-dropdown";
 import WonAtomContextDropdown from "~/app/components/atom-context-dropdown";
 import WonAtomMenu from "~/app/components/atom-menu";
+import WonFooter from "~/app/components/footer";
 import VisibilitySensor from "react-visibility-sensor";
 import * as processUtils from "~/app/redux/utils/process-utils";
 
@@ -347,6 +348,7 @@ export default function WonMenu({ className }) {
           </NavLink>
         )}
       </div>
+      <WonFooter className="menu__footer" />
     </won-menu>
   );
 }

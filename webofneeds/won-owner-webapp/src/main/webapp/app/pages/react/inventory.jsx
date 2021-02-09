@@ -205,7 +205,7 @@ export default function PageInventory() {
         </main>
       )}
 
-      <WonFooter />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }

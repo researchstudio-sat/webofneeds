@@ -256,7 +256,7 @@ export default function PageOverview() {
       <WonToasts />
       {showSlideIns && <WonSlideIn />}
       {overviewContentElement}
-      <WonFooter />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }

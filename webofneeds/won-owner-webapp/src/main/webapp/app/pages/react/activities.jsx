@@ -192,10 +192,7 @@ export default function PageActivities() {
 
       {contentElements}
 
-      {/* Connection view does not show the footer in responsive mode as there should not be two scrollable areas imho */}
-      <WonFooter
-        className={selectedConnection ? "hide-in-responsive" : undefined}
-      />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }

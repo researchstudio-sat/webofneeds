@@ -285,7 +285,7 @@ export default function PageSignUp() {
           </button>
         </div>
       </main>
-      <WonFooter />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }

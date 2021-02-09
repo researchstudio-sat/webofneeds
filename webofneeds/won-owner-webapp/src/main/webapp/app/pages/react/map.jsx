@@ -502,7 +502,7 @@ export default function PageMap() {
             </div>
           ))}
       </main>
-      <WonFooter />
+      {!isLoggedIn && <WonFooter />}
     </section>
   );
 }
