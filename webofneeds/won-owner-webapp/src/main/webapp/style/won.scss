@@ -4,14 +4,7 @@
 @import "reset";
 
 body {
-  @media (max-width: $responsivenessBreakPoint) {
-    --headerHeight: 3.3rem;
-    --menuHeight: 0rem;
-  }
-  @media (min-width: $responsivenessBreakPoint) {
-    --headerHeight: 3.3rem;
-    --menuHeight: 2.7rem;
-  }
+  --headerHeight: 3.3rem;
 
   //this font will be inherited down the cascade
   @include default-font;
@@ -140,7 +133,7 @@ body {
         box-sizing: border-box;
         position: sticky;
         top: var(--headerHeight);
-        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
+        height: calc(100vh - var(--headerHeight));
       }
     }
 
@@ -151,7 +144,7 @@ body {
         box-sizing: border-box;
         position: sticky;
         top: var(--headerHeight);
-        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
+        height: calc(100vh - var(--headerHeight));
       }
     }
 
@@ -176,7 +169,7 @@ body {
       > won-settings-content,
       > won-group-atom-messages,
       > won-atom-messages {
-        height: calc(100vh - var(--headerHeight) - var(--menuHeight));
+        height: calc(100vh - var(--headerHeight));
       }
     }
 
