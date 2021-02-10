@@ -19,6 +19,10 @@ public class LDSocketAuthorizationSource implements SocketAuthorizationSource {
     @Override
     public Optional<SocketAuthorizations> getSocketAuthorizations(URI socketDefinitionURI) {
         Dataset data = linkedDataSource.getDataForPublicResource(socketDefinitionURI);
+        if (data == null || data.isEmpty()) {
+            throw new IllegalStateException(
+                            String.format("Could not load RDF for socket definition %s", socketDefinitionURI));
+        }
         Shacl2JavaInstanceFactory factory = WonAclInstanceFactory.get();
         factory.load(data.getDefaultModel().getGraph());
         Optional<SocketDefinition> sd = factory

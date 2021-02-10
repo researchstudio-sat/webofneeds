@@ -45,12 +45,14 @@ public class SocketAclService {
                         ? atomDataset.getNamedModel(socketAclGraphUri.toString()).getGraph()
                         : GraphFactory.createDefaultGraph();
         for (Socket socketEntity : socketEntities) {
-            SocketAuthorizations sa = socketAuthorizationSource.getSocketAuthorizations(socketEntity.getTypeURI())
-                            .get();
-            sa.getLocalAuths();
-            socketAcls = socketAuthorizationAclModifierAlgorithms
-                            .addAuthorizationsForSocket(socketAcls, sa.getLocalAuths(), socketEntity.getSocketURI(),
-                                            atomURI);
+            Optional<SocketAuthorizations> sa = socketAuthorizationSource
+                            .getSocketAuthorizations(socketEntity.getTypeURI());
+            if (sa.isPresent()) {
+                socketAcls = socketAuthorizationAclModifierAlgorithms
+                                .addAuthorizationsForSocket(socketAcls, sa.get().getLocalAuths(),
+                                                socketEntity.getSocketURI(),
+                                                atomURI);
+            }
         }
         atomDataset.addNamedModel(socketAclGraphUri.toString(), ModelFactory.createModelForGraph(socketAcls));
     }
@@ -72,10 +74,12 @@ public class SocketAclService {
                         ? atomDataset.getNamedModel(socketAclGraphUri.toString()).getGraph()
                         : GraphFactory.createDefaultGraph();
         Optional<URI> targetSocketType = socketService.getSocketType(con.getTargetSocketURI());
-        SocketAuthorizations sa = socketAuthorizationSource.getSocketAuthorizations(targetSocketType.get()).get();
-        socketAcls = socketAuthorizationAclModifierAlgorithms
-                        .addAuthorizationsForSocket(socketAcls, sa.getTargetAuths(), con.getSocketURI(),
-                                        con.getTargetAtomURI());
+        Optional<SocketAuthorizations> sa = socketAuthorizationSource.getSocketAuthorizations(targetSocketType.get());
+        if (sa.isPresent()) {
+            socketAcls = socketAuthorizationAclModifierAlgorithms
+                            .addAuthorizationsForSocket(socketAcls, sa.get().getTargetAuths(), con.getSocketURI(),
+                                            con.getTargetAtomURI());
+        }
         atomDataset.addNamedModel(socketAclGraphUri.toString(), ModelFactory.createModelForGraph(socketAcls));
     }
 
@@ -119,8 +123,6 @@ public class SocketAclService {
         Graph socketAcls = atomDataset.containsNamedModel(socketAclGraphUri.toString())
                         ? atomDataset.getNamedModel(socketAclGraphUri.toString()).getGraph()
                         : GraphFactory.createDefaultGraph();
-        Optional<URI> targetSocketType = socketService.getSocketType(con.getTargetSocketURI());
-        SocketAuthorizations sa = socketAuthorizationSource.getSocketAuthorizations(targetSocketType.get()).get();
         boolean removeAsRequestingSocket = connectionService.hasEstablishedConnections(con.getSocketURI());
         socketAcls = socketAuthorizationAclModifierAlgorithms
                         .removeAuthorizationsForSocket(socketAcls, con.getSocketURI(),
