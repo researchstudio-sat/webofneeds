@@ -77,7 +77,26 @@ public class SignatureCheckingWonMessageProcessor implements WonMessageProcessor
                     // obtain public keys
                     sw.start("get public keys");
                     Map<String, PublicKey> keys = WonKeysReaderWriter.readKeyFromMessage(toCheck);
-                    keys.putAll(getRequiredPublicKeys(toCheck.getCompleteDataset()));
+                    WonMessageType type = toCheck.getMessageType();
+                    switch (type) {
+                        case CREATE_ATOM:
+                            if (keys.isEmpty()) {
+                                throw new WonMessageProcessingException("No key found in CREATE message");
+                            }
+                            break;
+                        case REPLACE:
+                            if (keys.isEmpty()) {
+                                keys.putAll(getRequiredPublicKeys(toCheck.getCompleteDataset()));
+                            }
+                            break;
+                        default:
+                            if (!keys.isEmpty()) {
+                                throw new WonMessageProcessingException(String.format(
+                                                "An Atom key may only be embedded in CREATE or REPLACE messages! Found one in %s message %s",
+                                                type, message.getMessageURIRequired()));
+                            }
+                            keys.putAll(getRequiredPublicKeys(toCheck.getCompleteDataset()));
+                    }
                     sw.stop();
                     // verify with those public keys
                     sw.start("verify");
