@@ -61,6 +61,7 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
         }
         Set<Connection> connections = sockets
                         .stream()
+                        .filter(s -> s.getConnections() != null)
                         .flatMap(s -> s.getConnections().getMembers().stream())
                         .filter(c -> check.isConnectionStateAllowed(c.getConnectionState()))
                         .collect(Collectors.toSet());
