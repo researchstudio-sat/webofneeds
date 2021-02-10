@@ -2,7 +2,7 @@
  * Created by ksinger on 10.05.2016.
  */
 import { actionTypes } from "../actions/actions.js";
-import { getUri } from "../utils.js";
+import { getUri, get } from "../utils.js";
 import Immutable from "immutable";
 
 import { isDisclaimerAccepted } from "../won-localstorage.js";
@@ -20,13 +20,14 @@ const initialState = Immutable.fromJS({
 export default function(userData = initialState, action = {}) {
   switch (action.type) {
     case actionTypes.account.store: {
-      const username = action.payload.get("username");
-      const emailVerified = action.payload.get("emailVerified");
-      const acceptedTermsOfService = action.payload.get(
+      const username = get(action.payload, "username");
+      const emailVerified = get(action.payload, "emailVerified");
+      const acceptedTermsOfService = get(
+        action.payload,
         "acceptedTermsOfService"
       );
-      const privateId = action.payload.get("privateId");
-      const isAnonymous = action.payload.get("isAnonymous");
+      const privateId = get(action.payload, "privateId");
+      const isAnonymous = get(action.payload, "isAnonymous");
 
       return userData
         .set("loggedIn", true)
@@ -38,7 +39,7 @@ export default function(userData = initialState, action = {}) {
     }
 
     case actionTypes.atoms.storeOwnedMetaAtoms: {
-      const metaAtoms = action.payload.get("metaAtoms");
+      const metaAtoms = get(action.payload, "metaAtoms");
 
       metaAtoms &&
         metaAtoms.map((metaAtom, metaAtomUri) => {
@@ -50,17 +51,18 @@ export default function(userData = initialState, action = {}) {
       return userData;
     }
 
+    case actionTypes.atoms.createFailure:
     case actionTypes.atoms.removeDeleted:
     case actionTypes.atoms.delete: {
       const atomUri = getUri(action.payload);
 
-      const ownedAtomUris = userData.get("ownedAtomUris");
+      const ownedAtomUris = get(userData, "ownedAtomUris");
       return userData.set("ownedAtomUris", ownedAtomUris.remove(atomUri));
     }
 
     case actionTypes.atoms.create: //for optimistic additions
     case actionTypes.atoms.createSuccessful: {
-      const ownedAtomUris = userData.get("ownedAtomUris");
+      const ownedAtomUris = get(userData, "ownedAtomUris");
       return userData.set(
         "ownedAtomUris",
         ownedAtomUris.add(action.payload.atomUri)
@@ -89,7 +91,7 @@ export default function(userData = initialState, action = {}) {
     case actionTypes.account.reset:
       return initialState.set(
         "acceptedDisclaimer",
-        userData.get("acceptedDisclaimer")
+        get(userData, "acceptedDisclaimer")
       );
 
     case actionTypes.account.loginFailed:
@@ -98,7 +100,7 @@ export default function(userData = initialState, action = {}) {
         .set("loggedIn", false);
 
     case actionTypes.view.clearLoginError:
-      if (!userData.get("loggedIn")) {
+      if (!get(userData, "loggedIn")) {
         return userData.set("loginError", undefined);
       } else {
         return userData;

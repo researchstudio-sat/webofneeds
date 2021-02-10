@@ -36,13 +36,14 @@ export function runMessagingAgent(redux) {
 
   const responseProcessingArray = [
     function(message) {
-      if (
-        message.isFromSystem() &&
-        message.isSuccessResponse() &&
-        message.isResponseToCreateMessage()
-      ) {
-        redux.dispatch(actionCreators.messages__create__success(message));
-        return true;
+      if (message.isFromSystem() && message.isResponseToCreateMessage()) {
+        if (message.isSuccessResponse()) {
+          redux.dispatch(actionCreators.messages__create__success(message));
+          return true;
+        } else if (message.isFailureResponse()) {
+          redux.dispatch(actionCreators.messages__create__failure(message));
+          return true;
+        }
       }
       return false;
     },

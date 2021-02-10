@@ -28,6 +28,14 @@ export default function(allToasts = initialState, action = {}) {
       );
     }
 
+    case actionTypes.atoms.createFailure: {
+      return pushNewToast(
+        allToasts,
+        "Could not create Atom, further information in console log",
+        vocab.WON.errorToast
+      );
+    }
+
     case actionTypes.account.registerFailed: {
       const privateId = getIn(action, ["payload", "privateId"]);
       if (privateId) {
@@ -150,7 +158,7 @@ export default function(allToasts = initialState, action = {}) {
 
     //SPECIFIC TOAST ACTIONS
     case actionTypes.toasts.delete:
-      return allToasts.deleteIn([action.payload.get("id")]);
+      return allToasts.deleteIn([get(action.payload, "id")]);
 
     default:
       return allToasts;

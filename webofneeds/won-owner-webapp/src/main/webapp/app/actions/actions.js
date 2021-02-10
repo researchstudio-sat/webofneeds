@@ -126,6 +126,7 @@ const actionHierarchy = {
     editSuccessful: INJ_DEFAULT,
     editFailure: INJ_DEFAULT,
     createSuccessful: INJ_DEFAULT,
+    createFailure: INJ_DEFAULT,
     reopen: atomActions.open,
     close: atomActions.close,
     delete: atomActions.deleteAtom,
@@ -176,7 +177,7 @@ const actionHierarchy = {
 
     create: {
       success: messages.successfulCreate,
-      //TODO failure: messages.failedCreate
+      failure: messages.failedCreate,
     },
     edit: {
       success: messages.successfulEdit,

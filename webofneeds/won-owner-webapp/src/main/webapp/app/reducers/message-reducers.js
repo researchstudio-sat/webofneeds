@@ -41,6 +41,7 @@ export function messagesReducer(messages = initialState, action = {}) {
 
     case actionTypes.atoms.editSuccessful:
     case actionTypes.atoms.createSuccessful:
+    case actionTypes.atoms.createFailure:
     case actionTypes.messages.chatMessage.failure:
     case actionTypes.messages.chatMessage.success:
       return messages.removeIn(["waitingForAnswer", action.payload.eventUri]);

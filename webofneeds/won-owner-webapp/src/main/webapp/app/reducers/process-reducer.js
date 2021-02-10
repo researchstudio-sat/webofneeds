@@ -243,6 +243,13 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingPublish", false);
     }
 
+    case actionTypes.atoms.createFailure: {
+      const atomUri = getUri(action.payload);
+      return processState
+        .deleteIn(["atoms", atomUri])
+        .set("processingPublish", false);
+    }
+
     case actionTypes.account.logoutStarted:
       return processState.set("processingLogout", true);
 

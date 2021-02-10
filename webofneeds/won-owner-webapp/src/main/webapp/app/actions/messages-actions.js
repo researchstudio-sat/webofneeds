@@ -111,6 +111,19 @@ export function successfulCloseConnection(event) {
   };
 }
 
+export function failedCreate(wonMessage) {
+  return dispatch => {
+    console.error("Failed To Create Atom, Cause in WonMessage: ", wonMessage);
+
+    dispatch(
+      actionCreators.atoms__createFailure({
+        eventUri: wonMessage.getIsResponseTo(),
+        uri: wonMessage.getAtom(),
+      })
+    );
+  };
+}
+
 export function successfulCreate(event) {
   return dispatch => {
     //const state = getState();

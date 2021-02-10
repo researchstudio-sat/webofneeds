@@ -73,7 +73,10 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.atoms.storeWhatsNew:
     case actionTypes.atoms.storeWhatsAround:
     case actionTypes.atoms.storeOwnedMetaAtoms: {
-      return addMetaAtomStubs(allAtomsInState, action.payload.get("metaAtoms"));
+      return addMetaAtomStubs(
+        allAtomsInState,
+        get(action.payload, "metaAtoms")
+      );
     }
 
     case actionTypes.atoms.storeUriInLoading: {
@@ -81,7 +84,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.store: {
-      let atoms = action.payload.get("atoms");
+      let atoms = get(action.payload, "atoms");
       atoms = atoms ? atoms : Immutable.Set();
 
       return atoms.reduce(
@@ -93,15 +96,15 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.connections.storeMetaConnections: {
       return addMetaConnections(
         allAtomsInState,
-        action.payload.get("atomUri"),
-        action.payload.get("connections")
+        get(action.payload, "atomUri"),
+        get(action.payload, "connections")
       );
     }
 
     case actionTypes.connections.storeActive: {
       return storeConnectionsData(
         allAtomsInState,
-        action.payload.get("connections")
+        get(action.payload, "connections")
       );
     }
 
@@ -117,6 +120,7 @@ export default function(allAtomsInState = initialState, action = {}) {
         vocab.WON.InactiveCompacted
       );
 
+    case actionTypes.atoms.createFailure:
     case actionTypes.atoms.removeDeleted:
     case actionTypes.atoms.delete:
       return deleteAtom(allAtomsInState, getUri(action.payload));
@@ -162,7 +166,8 @@ export default function(allAtomsInState = initialState, action = {}) {
       return addAtom(allAtomsInState, action.payload.atom);
 
     case actionTypes.messages.connectMessageReceived: {
-      const ownedAtomFromState = allAtomsInState.get(
+      const ownedAtomFromState = get(
+        allAtomsInState,
         action.payload.ownedAtomUri
       );
 
@@ -843,7 +848,7 @@ export default function(allAtomsInState = initialState, action = {}) {
     }
 
     case actionTypes.connections.fetchMessagesSuccess: {
-      const loadedMessages = action.payload.get("events");
+      const loadedMessages = get(action.payload, "events");
       if (loadedMessages) {
         allAtomsInState = addExistingMessages(allAtomsInState, loadedMessages);
       }
