@@ -212,7 +212,9 @@ public class AtomService {
         removeAttachmentsFromAtomContent(newAtomContent, attachmentHolders);
         final AtomModelWrapper atomModelWrapper = new AtomModelWrapper(newAtomContent);
         URI atomURI = getAtomURIAndCheck(atomModelWrapper);
-        checkReplaceAllowed(newAtomContent, atomURI, evaluator, request);
+        if (evaluator != null) {
+            checkReplaceAllowed(newAtomContent, atomURI, evaluator, request);
+        }
         checkCanThisMessageCreateOrModifyThisAtom(wonMessage, atomURI);
         checkResourcesInAtomContent(atomModelWrapper);
         URI messageURI = wonMessage.getMessageURI();

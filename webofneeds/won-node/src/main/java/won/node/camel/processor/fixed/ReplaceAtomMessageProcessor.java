@@ -31,7 +31,7 @@ public class ReplaceAtomMessageProcessor extends AbstractCamelProcessor {
         Message message = exchange.getIn();
         WonMessage wonMessage = (WonMessage) message.getHeader(WonCamelConstants.MESSAGE_HEADER);
         Atom atom = atomService.replaceAtom(wonMessage,
-                        WonCamelHelper.getWonAclEvaluatorRequired(exchange),
-                        WonCamelHelper.getWonAclOperationRequestRequired(exchange));
+                        WonCamelHelper.getWonAclEvaluator(exchange).orElse(null),
+                        WonCamelHelper.getWonAclOperationRequest(exchange).orElse(null));
     }
 }
