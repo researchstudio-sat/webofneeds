@@ -30,16 +30,8 @@ export function messagesReducer(messages = initialState, action = {}) {
       );
     }
 
-    case actionTypes.atoms.editFailure: {
-      //TODO: IMPL
-      console.debug(
-        "message-reducer actionTypes.atoms.editFailure todo: impl / payload-> ",
-        action.payload
-      );
-      return messages;
-    }
-
     case actionTypes.atoms.editSuccessful:
+    case actionTypes.atoms.editFailure:
     case actionTypes.atoms.createSuccessful:
     case actionTypes.atoms.createFailure:
     case actionTypes.messages.chatMessage.failure:

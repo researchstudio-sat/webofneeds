@@ -181,7 +181,7 @@ const actionHierarchy = {
     },
     edit: {
       success: messages.successfulEdit,
-      //TODO failure: messages.failedEdit
+      failure: messages.failedEdit,
     },
     close: {
       //TODO: NAME SEEMS GENERIC EVEN THOUGH IT IS ONLY USED FOR CLOSING CONNECITONS; REFACTOR THIS SOMEDAY

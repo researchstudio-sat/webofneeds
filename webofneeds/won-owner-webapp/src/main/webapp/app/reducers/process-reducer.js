@@ -213,11 +213,14 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingPublish", false);
 
     case actionTypes.atoms.editFailure: {
-      console.debug(
-        "process-reducer actionTypes.atoms.editFailure todo: impl / payload-> ",
-        action.payload
-      );
-      //TODO: IMPL
+      const atomUri = getUri(action.payload);
+
+      if (atomUri) {
+        processState = updateAtomProcess(processState, atomUri, {
+          processUpdate: false,
+        });
+      }
+
       return processState;
     }
 

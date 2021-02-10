@@ -36,6 +36,14 @@ export default function(allToasts = initialState, action = {}) {
       );
     }
 
+    case actionTypes.atoms.editFailure: {
+      return pushNewToast(
+        allToasts,
+        "Could not edit Atom, further information in console log",
+        vocab.WON.errorToast
+      );
+    }
+
     case actionTypes.account.registerFailed: {
       const privateId = getIn(action, ["payload", "privateId"]);
       if (privateId) {

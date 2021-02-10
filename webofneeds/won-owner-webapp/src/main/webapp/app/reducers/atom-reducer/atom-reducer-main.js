@@ -126,14 +126,8 @@ export default function(allAtomsInState = initialState, action = {}) {
       return deleteAtom(allAtomsInState, getUri(action.payload));
 
     case actionTypes.atoms.edit: {
-      console.debug(
-        "payload = {eventUri, message, atomUri, atom: draft, oldAtom}"
-      );
-      console.debug(
-        "atom-reducer-main actionTypes.atoms.edit todo: impl / payload-> ",
-        action.payload
-      );
-      //TODO: IMPL Optimistic change
+      // No optimistic change here since we do not know if the edit is going to be successful or not
+      // action.payload = {eventUri, message, atomUri, atom: draft, oldAtom}"
       return allAtomsInState;
     }
 
@@ -146,19 +140,17 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.atoms.editFailure: {
       console.debug(
-        "atom-reducer-main actionTypes.atoms.editFailure todo: impl / payload-> ",
+        "atom-reducer-main actionTypes.atoms.editFailure, do not do anything since old atom state is still in the state",
         action.payload
       );
-      //TODO: IMPL change
       return allAtomsInState;
     }
 
     case actionTypes.atoms.editSuccessful: {
       console.debug(
-        "atom-reducer-main actionTypes.atoms.editSuccessful todo: impl / payload-> ",
+        "atom-reducer-main actionTypes.atoms.editSuccessful, do not do anything since atom will be fetched again to receive updates",
         action.payload
       );
-      //TODO: IMPL change
       return allAtomsInState;
     }
 

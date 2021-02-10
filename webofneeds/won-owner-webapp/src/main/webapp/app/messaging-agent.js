@@ -48,13 +48,14 @@ export function runMessagingAgent(redux) {
       return false;
     },
     function(message) {
-      if (
-        message.isFromSystem() &&
-        message.isSuccessResponse() &&
-        message.isResponseToReplaceMessage()
-      ) {
-        redux.dispatch(actionCreators.messages__edit__success(message));
-        return true;
+      if (message.isFromSystem() && message.isResponseToReplaceMessage()) {
+        if (message.isSuccessResponse()) {
+          redux.dispatch(actionCreators.messages__edit__success(message));
+          return true;
+        } else if (message.isFailureResponse()) {
+          redux.dispatch(actionCreators.messages__edit__failure(message));
+          return true;
+        }
       }
       return false;
     },

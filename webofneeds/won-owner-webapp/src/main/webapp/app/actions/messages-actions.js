@@ -133,8 +133,10 @@ export function successfulCreate(event) {
 
     //load the data into the local rdf store and publish AtomCreatedEvent when done
     const atomURI = event.getAtom();
+    // since we know that created Atoms are only dispatched for owned atoms we add the atomUri as the requesterWebId for the atom fetch
+    const requesterWebId = atomURI;
 
-    won.getAtom(atomURI).then(atom => {
+    won.getAtom(atomURI, requesterWebId).then(atom => {
       dispatch(
         actionCreators.atoms__createSuccessful({
           eventUri: event.getIsResponseTo(),
@@ -143,6 +145,19 @@ export function successfulCreate(event) {
         })
       );
     });
+  };
+}
+
+export function failedEdit(wonMessage) {
+  return dispatch => {
+    console.error("Failed To Edit Atom, Cause in WonMessage: ", wonMessage);
+
+    dispatch(
+      actionCreators.atoms__editFailure({
+        eventUri: wonMessage.getIsResponseTo(),
+        uri: wonMessage.getAtom(),
+      })
+    );
   };
 }
 
