@@ -201,6 +201,7 @@ export function fetchAtomAndDispatch(
   };
 
   const requesterWebId = isOwned ? atomUri : determineRequesterWebId(atomUri);
+  //TODO
 
   return won
     .getAtom(atomUri, requesterWebId)

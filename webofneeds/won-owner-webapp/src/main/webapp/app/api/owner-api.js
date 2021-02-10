@@ -422,59 +422,7 @@ export function getAllActiveMetaPersonas() {
 }
 
 export function getJsonLdDataset(uri, params = {}, includeLinkHeader = false) {
-  /**
-   * This function is used to generate the query-strings.
-   * Should anything about the way the API is accessed changed,
-   * adapt this function.
-   * @param dataUri
-   * @param queryParams a config object whose fields get appended as get parameters.
-   *     important parameters include:
-   *         * requesterWebId: the WebID used to access the ressource (used
-   *                 by the owner-server to pick the right key-pair)
-   *         * deep: 'true' to automatically resolve containers (e.g.
-   *                 the message-container)
-   *         * paging parameters as found
-   *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
-   *         * "p",
-   *         * "resumebefore",
-   *         * "resumeafter",
-   *         * "type",
-   *         * "state",
-   *         * "socket",
-   *         * "targetSocket",
-   *         * "timeof",
-   *         * "deep"
-   *         * "state"
-   * @param includeLinkHeader if set to true, the response will be a json object of the json response and a link to the next page (if not present, the link will be undefined)
-   * @returns {string}
-   */
-  /**
-   * paging parameters as found
-   * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
-   * @type {string[]}
-   */
-  const queryString = (dataUri, queryParams = {}) => {
-    let queryOnOwner = urljoin(ownerBaseUrl, "/rest/linked-data/") + "?";
-
-    if (queryParams.requesterWebId) {
-      queryOnOwner +=
-        "requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
-    }
-
-    const paramsString = generateQueryParamsString({
-      ...queryParams,
-      requesterWebId: undefined,
-    });
-    let query = (
-      queryOnOwner +
-      "uri=" +
-      encodeURIComponent(dataUri + (paramsString ? paramsString : ""))
-    ).replace(new RegExp("%3A", "g"), ":"); // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
-
-    return query;
-  };
-
-  const requestUri = queryString(uri, params);
+  const requestUri = generateLinkedDataQueryString(uri, params);
 
   // return bestfetch(requestUri, {
   return (
@@ -529,6 +477,58 @@ export function getJsonLdDataset(uri, params = {}, includeLinkHeader = false) {
         }
       })
   );
+}
+
+export function fetchTokenForAtom(uri, params, includeLinkHeader = false) {
+  const requestUri = generateLinkedDataQueryString(uri, params);
+
+  return fetch(requestUri, {
+    method: "get",
+    credentials: "same-origin",
+    headers: {
+      // cachePolicy: "network-only",
+      Accept: "application/json",
+      Prefer: params.pagingSize
+        ? `return=representation; max-member-count="${params.pagingSize}"`
+        : undefined,
+    },
+  })
+    .then(response => {
+      if (
+        (response.status >= 200 && response.status < 300) ||
+        response.status === 304
+      ) {
+        return response;
+      } else {
+        let error = new Error(
+          `${response.status} - ${
+            response.statusText
+          } for request ${uri}, ${JSON.stringify(params)}`
+        );
+
+        error.response = response;
+        throw error;
+      }
+    })
+    .then(response => {
+      if (includeLinkHeader) {
+        const linkHeaderString =
+          response.headers && response.headers.get("Link");
+        const linkHeaders = parseHeaderLinks(linkHeaderString);
+
+        const nextPageLinkObject =
+          linkHeaders && linkHeaders.next && getLinkAndParams(linkHeaders.next);
+        return Promise.all([
+          response.json(),
+          Promise.resolve(nextPageLinkObject),
+        ]).then(([jsonLdData, nextPage]) => ({
+          jsonLdData: jsonLdData,
+          nextPage: nextPage,
+        }));
+      } else {
+        return response.json();
+      }
+    });
 }
 
 export function getMetaAtoms(
@@ -738,4 +738,57 @@ function checkHttpStatus(response) {
     error.status = response.status;
     throw error;
   }
+}
+
+/**
+ * This function is used to generate the query-strings.
+ * Should anything about the way the API is accessed changed,
+ * adapt this function.
+ * @param dataUri
+ * @param queryParams a config object whose fields get appended as get parameters.
+ *     important parameters include:
+ *         * requesterWebId: the WebID used to access the ressource (used
+ *                 by the owner-server to pick the right key-pair)
+ *         * deep: 'true' to automatically resolve containers (e.g.
+ *                 the message-container)
+ *         * paging parameters as found
+ *           [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+ *         * "p",
+ *         * "resumebefore",
+ *         * "resumeafter",
+ *         * "type",
+ *         * "state",
+ *         * "socket",
+ *         * "targetSocket",
+ *         * "timeof",
+ *         * "deep",
+ *         * "state",
+ *         * "scope"
+ * @param includeLinkHeader if set to true, the response will be a json object of the json response and a link to the next page (if not present, the link will be undefined)
+ * @returns {string}
+ */
+/**
+ * paging parameters as found
+ * [here](https://github.com/researchstudio-sat/webofneeds/blob/master/webofneeds/won-node-webapp/doc/linked-data-paging.md)
+ * @type {string[]}
+ */
+function generateLinkedDataQueryString(dataUri, queryParams) {
+  let queryOnOwner = urljoin(ownerBaseUrl, "/rest/linked-data/") + "?";
+
+  if (queryParams.requesterWebId) {
+    queryOnOwner +=
+      "requester=" + encodeURIComponent(queryParams.requesterWebId) + "&";
+  }
+
+  const paramsString = generateQueryParamsString({
+    ...queryParams,
+    requesterWebId: undefined,
+  });
+  let query = (
+    queryOnOwner +
+    "uri=" +
+    encodeURIComponent(dataUri + (paramsString ? paramsString : ""))
+  ).replace(new RegExp("%3A", "g"), ":"); // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
+
+  return query;
 }

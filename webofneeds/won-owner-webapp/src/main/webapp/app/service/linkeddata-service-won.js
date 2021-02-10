@@ -323,6 +323,31 @@ import vocab from "./vocab.js";
       }));
   };
 
+  window.getToken4dbg = won.getTokenForAtom;
+  /**
+   *
+   * @param atomUri
+   * @param requesterWebId
+   * @param scope
+   */
+  won.getTokenForAtom = function(atomUri, requesterWebId, scopes) {
+    const fetchParams = {
+      requesterWebId: requesterWebId,
+      scopes: scopes,
+    };
+    return ownerApi
+      .fetchTokenForAtom(atomUri + "/token", fetchParams)
+      .then(response => {
+        console.debug(
+          "Result when retrieving token for atom(",
+          atomUri,
+          ") => ",
+          response
+        );
+        return response;
+      });
+  };
+
   /**
    * @param senderSocketUri
    * @param targetSocketUri
