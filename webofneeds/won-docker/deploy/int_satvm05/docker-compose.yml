@@ -238,49 +238,49 @@ services:
       - wonnode1
       - wonnode2
 
-  hokify_bot:
-    restart: always
-    image: webofneeds/won-jobbot:latest
-    environment:
-      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
-      - "WON_NODE_URI=https://satvm05.researchstudio.at/won"
-      #      - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
-      - "URI_PREFIX_OWNER=https://satvm05.researchstudio.at/hokify_bot" # set this for the trust store alias
-      - "WON_NODE_URIS=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
-      - "HOKIFYJOBBOT_JSONURL=https://hokify.at/jobfeed-webofneeds.json/"
-      - "HOKIFYJOBBOT_GEOURL=https://nominatim.openstreetmap.org/search"
-      - "HOKIFYJOBBOT_UPDATETIME=70"
-      - "HOKIFYJOBBOT_PUBLISHTIME=10"
-      - "HOKIFYJOBBOT_CREATEALLINONE=false"
-    volumes:
-      - $base_folder/won-client-certs/hokify_bot:/usr/src/bots/client-certs/
-    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
-    depends_on:
-      - wonnode1
-      - wonnode2
-
-  spoco_raid_bot:
-    restart: always
-    image: webofneeds/won-spoco-raidbot:latest
-    environment:
-      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
-      - "WON_NODE_URI=https://satvm05.researchstudio.at/won"
-      # - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
-      - "URI_PREFIX_OWNER=https://satvm05.researchstudio.at/raid_bot" # set this for the trust store alias
-      - "WON_NODE_URIS=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
-      - "API_LINZ_ENDPOINT=$RB_ENDPOINT_LINZ"
-      - "API_LINZ_TOKEN=$RB_TOKEN_LINZ"
-      - "API_VIENNA_ENDPOINT=$RB_ENDPOINT_VIENNA"
-      - "API_VIENNA_USERNAME=$RB_USER_VIENNA"
-      - "API_VIENNA_REQUEST=$RB_REQUEST_VIENNA"
-      - "RAIDBOT_FETCHINTERVAL=600" #fetch new raids every 600 seconds (10min)
-      - "RAIDBOT_SANITIZEINTERVAL=900" #sanitize existing raids every 900 seconds (15min)
-    volumes:
-      - $base_folder/won-client-certs/raid_bot:/usr/src/bots/client-certs/
-    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
-    depends_on:
-      - wonnode1
-      - wonnode2
+#  hokify_bot:
+#    restart: always
+#    image: webofneeds/won-jobbot:latest
+#    environment:
+#      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
+#      - "WON_NODE_URI=https://satvm05.researchstudio.at/won"
+#      #      - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
+#      - "URI_PREFIX_OWNER=https://satvm05.researchstudio.at/hokify_bot" # set this for the trust store alias
+#      - "WON_NODE_URIS=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
+#      - "HOKIFYJOBBOT_JSONURL=https://hokify.at/jobfeed-webofneeds.json/"
+#      - "HOKIFYJOBBOT_GEOURL=https://nominatim.openstreetmap.org/search"
+#      - "HOKIFYJOBBOT_UPDATETIME=70"
+#      - "HOKIFYJOBBOT_PUBLISHTIME=10"
+#      - "HOKIFYJOBBOT_CREATEALLINONE=false"
+#    volumes:
+#      - $base_folder/won-client-certs/hokify_bot:/usr/src/bots/client-certs/
+#    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
+#    depends_on:
+#      - wonnode1
+#      - wonnode2
+#
+#  spoco_raid_bot:
+#    restart: always
+#    image: webofneeds/won-spoco-raidbot:latest
+#    environment:
+#      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
+#      - "WON_NODE_URI=https://satvm05.researchstudio.at/won"
+#      # - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
+#      - "URI_PREFIX_OWNER=https://satvm05.researchstudio.at/raid_bot" # set this for the trust store alias
+#      - "WON_NODE_URIS=https://satvm05.researchstudio.at:8888/won/resource https://satvm05.researchstudio.at/won/resource"
+#      - "API_LINZ_ENDPOINT=$RB_ENDPOINT_LINZ"
+#      - "API_LINZ_TOKEN=$RB_TOKEN_LINZ"
+#      - "API_VIENNA_ENDPOINT=$RB_ENDPOINT_VIENNA"
+#      - "API_VIENNA_USERNAME=$RB_USER_VIENNA"
+#      - "API_VIENNA_REQUEST=$RB_REQUEST_VIENNA"
+#      - "RAIDBOT_FETCHINTERVAL=600" #fetch new raids every 600 seconds (10min)
+#      - "RAIDBOT_SANITIZEINTERVAL=900" #sanitize existing raids every 900 seconds (15min)
+#    volumes:
+#      - $base_folder/won-client-certs/raid_bot:/usr/src/bots/client-certs/
+#    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
+#    depends_on:
+#      - wonnode1
+#      - wonnode2
 
   #  mail_bot:
   #    restart: always
