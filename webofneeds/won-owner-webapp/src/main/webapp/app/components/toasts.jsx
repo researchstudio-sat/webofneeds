@@ -1,4 +1,5 @@
 import React from "react";
+import won from "../won-es6";
 import { actionCreators } from "../actions/actions.js";
 import { useSelector, useDispatch } from "react-redux";
 import { get } from "../utils.js";
@@ -12,7 +13,6 @@ import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.
 import ico16_indicator_info from "~/images/won-icons/ico16_indicator_info.svg";
 import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg";
 
-import vocab from "../service/vocab.js";
 import ReactMarkdown from "react-markdown";
 
 export default function WonToasts() {
@@ -28,7 +28,7 @@ export default function WonToasts() {
       <div className="topnav__toasts">
         {toastsArray.map((toast, index) => {
           switch (get(toast, "type")) {
-            case vocab.WON.warnToast:
+            case won.TOASTS.WARN:
               return (
                 <div className="topnav__toasts__element warn" key={index}>
                   <svg className="topnav__toasts__element__icon">
@@ -56,7 +56,7 @@ export default function WonToasts() {
                 </div>
               );
 
-            case vocab.WON.infoToast:
+            case won.TOASTS.INFO:
               return (
                 <div className="topnav__toasts__element info" key={index}>
                   <svg className="topnav__toasts__element__icon">
@@ -84,7 +84,7 @@ export default function WonToasts() {
                 </div>
               );
 
-            case vocab.WON.errorToast:
+            case won.TOASTS.ERROR:
             default:
               return (
                 <div className="topnav__toasts__element error" key={index}>

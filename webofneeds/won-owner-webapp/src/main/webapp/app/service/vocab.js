@@ -46,11 +46,6 @@ vocab.WON.RequestSentCompacted = vocab.WON.baseUri + ":RequestSent";
 vocab.WON.Connected = vocab.WON.baseUri + "Connected";
 vocab.WON.ConnectedCompacted = vocab.WON.prefix + ":Connected";
 
-//TOAST TYPES
-vocab.WON.infoToast = vocab.WON.baseUri + "InfoToast";
-vocab.WON.warnToast = vocab.WON.baseUri + "WarnToast";
-vocab.WON.errorToast = vocab.WON.baseUri + "ErrorToast";
-
 vocab.WON.graph = vocab.WON.baseUri + "graph";
 vocab.WON.graphCompacted = vocab.WON.prefix + ":graph";
 

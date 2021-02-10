@@ -85,6 +85,12 @@ won.RESPONSECODE = Object.freeze({
   PRIVATEID_NOT_FOUND: 666, //this one is not defined in RestStatusResponse.java
 });
 
+won.TOASTS = Object.freeze({
+  INFO: "InfoToast",
+  WARN: "WarnToast",
+  ERROR: "ErrorToast",
+});
+
 //we need to define this error here because we will not retrieve it from the rest endpoint
 won.PRIVATEID_NOT_FOUND_ERROR = Object.freeze({
   code: 666,
