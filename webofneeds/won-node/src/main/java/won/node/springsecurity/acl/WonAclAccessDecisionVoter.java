@@ -358,7 +358,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                         tokenScopeUri = new URI(scopes[i]);
                     } catch (URISyntaxException e) {
                     }
-                    if (tokenScopeUri != null) {
+                    if (tokenScopeUri != null && tokenScopeUri.getScheme() != null) {
                         tokenSpec.setTokenScopeURI(tokenScopeUri);
                     } else {
                         tokenSpec.setTokenScopeString(scopes[i]);
