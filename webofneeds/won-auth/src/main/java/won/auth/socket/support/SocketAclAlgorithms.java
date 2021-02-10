@@ -1,7 +1,7 @@
-package won.auth.socket.impl;
+package won.auth.socket.support;
 
 import org.apache.jena.graph.Graph;
-import won.auth.AuthUtils;
+import won.auth.WonAclInstanceFactory;
 import won.auth.model.*;
 import won.shacl2java.Shacl2JavaInstanceFactory;
 
@@ -16,17 +16,7 @@ import java.util.stream.Collectors;
 import static won.shacl2java.runtime.DeepEqualsUtils.same;
 import static won.shacl2java.runtime.DeepEqualsUtils.sameContent;
 
-public class SocketAuthorizationAclModifierAlgorithms {
-    private static ThreadLocal<Shacl2JavaInstanceFactory> instanceFactoryThreadLocal = new ThreadLocal<>();
-
-    private static Shacl2JavaInstanceFactory getInstanceFactory() {
-        Shacl2JavaInstanceFactory factory = instanceFactoryThreadLocal.get();
-        if (factory == null) {
-            factory = AuthUtils.newInstanceFactory();
-        }
-        return factory;
-    }
-
+public class SocketAclAlgorithms {
     private static void replaceAuthorizationRequestorPlaceholder(Authorization auth, URI requestingAtom) {
         GeneralVisitor visitor = new DefaultGeneralVisitor() {
             @Override
@@ -51,7 +41,7 @@ public class SocketAuthorizationAclModifierAlgorithms {
         if (authGraph == null && authGraph.isEmpty()) {
             return new HashSet<>();
         }
-        Shacl2JavaInstanceFactory factory = getInstanceFactory();
+        Shacl2JavaInstanceFactory factory = WonAclInstanceFactory.get();
         factory.load(authGraph);
         return factory.getInstancesOfType(Authorization.class);
     }
@@ -142,7 +132,7 @@ public class SocketAuthorizationAclModifierAlgorithms {
         Objects.requireNonNull(authGraph);
         Objects.requireNonNull(localSocket);
         Objects.requireNonNull(requestingAtom);
-        Shacl2JavaInstanceFactory factory = getInstanceFactory();
+        Shacl2JavaInstanceFactory factory = WonAclInstanceFactory.get();
         factory.load(authGraph);
         Set<Authorization> existingAuths = factory.getInstancesOfType(Authorization.class);
         Set<Authorization> modifiedAuths = existingAuths.stream()

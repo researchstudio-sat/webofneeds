@@ -74,6 +74,8 @@
     <context:component-scan base-package="won.node.camel.service"/>
     <context:component-scan base-package="won.protocol.service.impl"/>
 
+    <bean id="socketAuthorizationSource" class="won.auth.socket.impl.LDSocketAuthorizationSource"/>
+
     <bean id="aclEnforcer" class="won.node.springsecurity.acl.AclEnforcer"/>
 
     <bean id="atomInformationService" primary="true"

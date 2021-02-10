@@ -14,9 +14,10 @@
 @prefix rdfg:    <http://www.w3.org/2004/04/trix/rdfg-1/> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
+#granted because of implicit grants because of the established connection
 ex:expectedResult1
     a                       auth:ExpectedAclEvalResult ;
-    auth:decision           auth:accessDenied ;
+    auth:decision           auth:accessGranted ;
     auth:requestedOperation <#request1> .
 
 ex:expectedResult2

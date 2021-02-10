@@ -349,7 +349,12 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         if (other.getTargetAtom() != null) {
             if (other.getTargetAtom().getAtomsRelativeAtomExpression()
                             .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
-                if (!operationRequest.getRequestor().equals(operationRequest.getReqConnectionTargetAtom())) {
+                // if the connection filters by requestor and we cannot be sure of the
+                // requestore
+                // (which is the case if we process a token-based auth), we must abort.
+                if (operationRequest.getRequestor() == null
+                                || !operationRequest.getRequestor()
+                                                .equals(operationRequest.getReqConnectionTargetAtom())) {
                     markBranchNothingGranted();
                 }
             }

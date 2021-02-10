@@ -13,6 +13,7 @@ import won.protocol.exception.WonMessageNotWellFormedException;
 import won.protocol.exception.WonMessageProcessingException;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.WONMSG;
 
 import java.io.Serializable;
@@ -714,7 +715,7 @@ public class WonMessage implements Serializable {
                                 "Underlying dataset is expected to contain named graphs, but none were found");
             }
             String graphURI = it.next();
-            headMessage.messageURI = WonMessageUtils.stripFragment(URI.create(graphURI));
+            headMessage.messageURI = WonRelativeUriHelper.stripFragment(URI.create(graphURI));
         }
         return headMessage.messageURI;
     }
@@ -813,7 +814,7 @@ public class WonMessage implements Serializable {
         }
         URI socketURI = headMessage.getSenderSocketURI();
         if (socketURI != null) {
-            return WonMessageUtils.stripFragment(socketURI);
+            return WonRelativeUriHelper.stripFragment(socketURI);
         }
         return null;
     }
@@ -829,7 +830,7 @@ public class WonMessage implements Serializable {
     public synchronized URI getSenderNodeURI() {
         URI atomURI = getSenderAtomURI();
         if (atomURI != null) {
-            return WonMessageUtils.stripAtomSuffix(atomURI);
+            return WonRelativeUriHelper.stripAtomSuffix(atomURI);
         }
         return null;
     }
@@ -837,7 +838,7 @@ public class WonMessage implements Serializable {
     public synchronized URI getSenderNodeURIRequired() {
         URI atomURI = getSenderAtomURIRequired();
         if (atomURI != null) {
-            return WonMessageUtils.stripAtomSuffix(atomURI);
+            return WonRelativeUriHelper.stripAtomSuffix(atomURI);
         }
         throw new WonMessageProcessingException("Could not determine sender node URI");
     }
@@ -864,7 +865,7 @@ public class WonMessage implements Serializable {
         }
         URI socketURI = headMessage.getRecipientSocketURI();
         if (socketURI != null) {
-            return WonMessageUtils.stripFragment(socketURI);
+            return WonRelativeUriHelper.stripFragment(socketURI);
         }
         return null;
     }
@@ -880,7 +881,7 @@ public class WonMessage implements Serializable {
     public synchronized URI getRecipientNodeURI() {
         URI atomURI = getRecipientAtomURI();
         if (atomURI != null) {
-            return WonMessageUtils.stripAtomSuffix(atomURI);
+            return WonRelativeUriHelper.stripAtomSuffix(atomURI);
         }
         return null;
     }
@@ -888,7 +889,7 @@ public class WonMessage implements Serializable {
     public synchronized URI getRecipientNodeURIRequired() {
         URI atomURI = getRecipientAtomURIRequired();
         if (atomURI != null) {
-            return WonMessageUtils.stripAtomSuffix(atomURI);
+            return WonRelativeUriHelper.stripAtomSuffix(atomURI);
         }
         throw new WonMessageProcessingException("Could not determine recipient node URI");
     }

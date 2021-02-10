@@ -187,7 +187,7 @@ public class AclTests extends AbstractBotBasedTest {
         });
     }
 
-    @Test(timeout = 600 * 1000)
+    @Test(timeout = 60 * 1000)
     public void testImplicitOwnerToken() throws Exception {
         runTest(ctx -> {
             EventBus bus = ctx.getEventBus();
@@ -1014,7 +1014,7 @@ public class AclTests extends AbstractBotBasedTest {
         });
     }
 
-    @Test(timeout = 600 * 1000)
+    @Test(timeout = 60 * 1000)
     public void testTokenExchange() throws Exception {
         final AtomicReference<URI> createMessageUri1 = new AtomicReference();
         final AtomicReference<URI> createMessageUri2 = new AtomicReference();

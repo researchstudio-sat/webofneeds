@@ -10,14 +10,14 @@
  */
 package won.bot.framework.eventbot.event.impl.command.connect;
 
-import java.net.URI;
-import java.util.Objects;
-
 import won.bot.framework.eventbot.event.BaseAtomSpecificEvent;
 import won.bot.framework.eventbot.event.TargetAtomSpecificEvent;
 import won.bot.framework.eventbot.event.impl.command.MessageCommandEvent;
 import won.protocol.message.WonMessageType;
-import won.protocol.message.WonMessageUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
+
+import java.net.URI;
+import java.util.Objects;
 
 /**
  * Instructs the bot to connect to the specified targetAtom on behalf of the
@@ -47,10 +47,10 @@ public class ConnectCommandEvent extends BaseAtomSpecificEvent implements Messag
 
     public ConnectCommandEvent(URI localSocket, URI targetSocket,
                     String welcomeMessage) {
-        super(WonMessageUtils.stripFragment(localSocket));
+        super(WonRelativeUriHelper.stripFragment(localSocket));
         Objects.requireNonNull(localSocket);
         Objects.requireNonNull(targetSocket);
-        this.targetAtomURI = WonMessageUtils.stripFragment(targetSocket);
+        this.targetAtomURI = WonRelativeUriHelper.stripFragment(targetSocket);
         this.localSocket = localSocket;
         this.targetSocket = targetSocket;
         this.welcomeMessage = welcomeMessage;

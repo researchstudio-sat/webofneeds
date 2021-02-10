@@ -15,7 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
 import won.auth.model.SocketDefinition;
-import won.auth.socket.impl.SocketAuthorizationAclModifierAlgorithms;
+import won.auth.socket.support.SocketAclAlgorithms;
 import won.protocol.util.RdfUtils;
 import won.shacl2java.Shacl2JavaInstanceFactory;
 
@@ -81,7 +81,7 @@ public class SocketAuthorizationTest {
     @Test
     public void testAddLocalAuth() throws IOException {
         Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
-        SocketAuthorizationAclModifierAlgorithms socketAclAlgos = new SocketAuthorizationAclModifierAlgorithms();
+        SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "addLocalAuth";
         for (Resource socketGraphResource : getInputs(folder)) {
             String baseName = getTestBaseName(socketGraphResource.getFilename());
@@ -104,7 +104,7 @@ public class SocketAuthorizationTest {
     @Test
     public void testAddTargetAuth() throws IOException {
         Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
-        SocketAuthorizationAclModifierAlgorithms socketAclAlgos = new SocketAuthorizationAclModifierAlgorithms();
+        SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "addTargetAuth";
         for (Resource socketGraphResource : getInputs(folder)) {
             String baseName = getTestBaseName(socketGraphResource.getFilename());
@@ -128,7 +128,7 @@ public class SocketAuthorizationTest {
     @Test
     public void testRemoveTargetAuthRemoveSocket() throws IOException {
         Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
-        SocketAuthorizationAclModifierAlgorithms socketAclAlgos = new SocketAuthorizationAclModifierAlgorithms();
+        SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "removeTargetAuthRemoveSocket";
         for (Resource socketGraphResource : getInputs(folder)) {
             String baseName = getTestBaseName(socketGraphResource.getFilename());
@@ -151,7 +151,7 @@ public class SocketAuthorizationTest {
     @Test
     public void testRemoveTargetAuth() throws IOException {
         Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
-        SocketAuthorizationAclModifierAlgorithms socketAclAlgos = new SocketAuthorizationAclModifierAlgorithms();
+        SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "removeTargetAuth";
         for (Resource socketGraphResource : getInputs(folder)) {
             String baseName = getTestBaseName(socketGraphResource.getFilename());
@@ -174,7 +174,7 @@ public class SocketAuthorizationTest {
     @Test
     public void testRemoveLocalAuthRemoveSocket() throws IOException {
         Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
-        SocketAuthorizationAclModifierAlgorithms socketAclAlgos = new SocketAuthorizationAclModifierAlgorithms();
+        SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "removeLocalAuthRemoveSocket";
         for (Resource socketGraphResource : getInputs(folder)) {
             String baseName = getTestBaseName(socketGraphResource.getFilename());
@@ -197,7 +197,7 @@ public class SocketAuthorizationTest {
     @Test
     public void testRemoveLocalAuth() throws IOException {
         Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
-        SocketAuthorizationAclModifierAlgorithms socketAclAlgos = new SocketAuthorizationAclModifierAlgorithms();
+        SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "removeLocalAuth";
         for (Resource socketGraphResource : getInputs(folder)) {
             String baseName = getTestBaseName(socketGraphResource.getFilename());

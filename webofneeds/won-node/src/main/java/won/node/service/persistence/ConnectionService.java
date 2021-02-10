@@ -22,6 +22,7 @@ import won.protocol.repository.*;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.WONCON;
 import won.protocol.vocabulary.WONMSG;
 
@@ -60,6 +61,8 @@ public class ConnectionService {
     DataDerivationService dataDerivationService;
     @Autowired
     EntityManager entityManager;
+    @Autowired
+    SocketAclService socketAclService;
 
     public Optional<Connection> getConnection(URI connectionURI) {
         return connectionRepository.findOneByConnectionURI(connectionURI);
@@ -158,6 +161,9 @@ public class ConnectionService {
                             con.get().getState());
         }
         dataDerivationService.deriveDataIfNecessary(con.get());
+        if (con.get().getState() == ConnectionState.CONNECTED) {
+            socketAclService.addTargetSocketAcls(con.get());
+        }
         return connectionRepository.save(con.get());
     }
 
@@ -236,6 +242,9 @@ public class ConnectionService {
             logger.debug("connect from node: set connection {} state to: {}", con.getConnectionURI(), con.getState());
         }
         dataDerivationService.deriveDataIfNecessary(con);
+        if (con.getState() == ConnectionState.CONNECTED) {
+            socketAclService.addTargetSocketAcls(con);
+        }
         return connectionRepository.save(con);
     }
 
@@ -453,6 +462,9 @@ public class ConnectionService {
         con.changeStateTo(nextState);
         // save in the db
         dataDerivationService.deriveDataIfNecessary(con);
+        if (con.getState() == ConnectionState.CLOSED) {
+            socketAclService.removeTargetSocketAcls(con);
+        }
         return connectionRepository.save(con);
     }
 
@@ -464,7 +476,6 @@ public class ConnectionService {
     /**
      * Finds feedback in the message, processes it and removes it from the message.
      *
-     * @param con the feedback should be processed in
      * @param message contains the feedback
      */
     public void hintFeedbackFromOwner(final WonMessage message) {
@@ -607,5 +618,10 @@ public class ConnectionService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public boolean hasEstablishedConnections(URI socketURI) {
+        URI atomUri = WonRelativeUriHelper.stripFragment(socketURI);
+        return connectionRepository.existsWithtomURIAndSocketURIAndState(atomUri, socketURI, ConnectionState.CONNECTED);
     }
 }

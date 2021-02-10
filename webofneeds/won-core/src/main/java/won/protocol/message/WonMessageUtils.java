@@ -11,6 +11,7 @@
 package won.protocol.message;
 
 import won.protocol.exception.WonMessageProcessingException;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -32,7 +33,7 @@ public class WonMessageUtils {
     public static URI getSenderAtomURIFromSenderSocketURI(WonMessage msg, URI atomUri) {
         URI socketUri = msg.getSenderSocketURI();
         if (socketUri != null) {
-            atomUri = stripFragment(socketUri);
+            atomUri = WonRelativeUriHelper.stripFragment(socketUri);
         }
         return atomUri;
     }
@@ -53,7 +54,7 @@ public class WonMessageUtils {
     public static URI getRecipientAtomURIFromRecipientSocketURI(WonMessage msg) {
         URI socketUri = msg.getRecipientSocketURI();
         if (socketUri != null) {
-            return stripFragment(socketUri);
+            return WonRelativeUriHelper.stripFragment(socketUri);
         }
         return null;
     }
@@ -107,43 +108,6 @@ public class WonMessageUtils {
         }
     }
 
-    public static URI stripFragment(URI uriWithFragment) {
-        URI atomUri;
-        Objects.requireNonNull(uriWithFragment);
-        // just strip the fragment
-        String fragment = uriWithFragment.getRawFragment();
-        if (fragment == null) {
-            return uriWithFragment;
-        }
-        String uri = uriWithFragment.toString();
-        atomUri = URI.create(uri.substring(0, uri.length() - fragment.length() - 1));
-        return atomUri;
-    }
-
-    /**
-     * Strip the connection suffix, return the atom URI.
-     * 
-     * @param connectionURI
-     * @return
-     */
-    public static URI stripConnectionSuffix(URI connectionURI) {
-        Objects.requireNonNull(connectionURI);
-        String uri = connectionURI.toString();
-        return URI.create(uri.replaceFirst("/c/.+$", ""));
-    }
-
-    /**
-     * Strip the atom suffix, return the WoN node URI.
-     * 
-     * @param atomURI
-     * @return
-     */
-    public static URI stripAtomSuffix(URI atomURI) {
-        Objects.requireNonNull(atomURI);
-        String uri = atomURI.toString();
-        return URI.create(uri.replaceFirst("/atom/.+$", ""));
-    }
-
     /**
      * Get the targetAtom of a hint (even if it is a SocketHint).
      * 
@@ -166,7 +130,7 @@ public class WonMessageUtils {
         if (atomUri == null) {
             URI socketUri = wonMessage.getHintTargetSocketURI();
             if (socketUri != null) {
-                atomUri = stripFragment(socketUri);
+                atomUri = WonRelativeUriHelper.stripFragment(socketUri);
             }
         }
         return Optional.ofNullable(atomUri);

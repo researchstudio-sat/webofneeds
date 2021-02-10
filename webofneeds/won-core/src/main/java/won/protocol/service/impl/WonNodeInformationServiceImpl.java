@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import won.cryptography.service.RandomNumberService;
 import won.protocol.exception.IllegalAtomURIException;
-import won.protocol.message.WonMessageUtils;
 import won.protocol.service.WonNodeInfo;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 
 import java.net.URI;
 import java.util.Objects;
@@ -85,7 +85,7 @@ public class WonNodeInformationServiceImpl implements WonNodeInformationService 
             throw new IllegalAtomURIException(
                             "Atom URI " + atomURI + " does not conform to this WoN node's URI patterns");
         }
-        return URI.create(WonMessageUtils.stripFragment(atomURI).toString() + "/c/" + generateRandomID());
+        return URI.create(WonRelativeUriHelper.stripFragment(atomURI).toString() + "/c/" + generateRandomID());
     }
 
     @Override

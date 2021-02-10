@@ -1,12 +1,5 @@
 package won.protocol.util.pretty;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
@@ -21,17 +14,15 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.Quad;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.util.iterator.ExtendedIterator;
-import won.protocol.message.WonMessageUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.util.pretty.sort.SortGraph;
 import won.protocol.util.pretty.sort.SortNode;
 
-import static org.apache.jena.riot.writer.WriterConst.GDFT_BRACE;
-import static org.apache.jena.riot.writer.WriterConst.INDENT_GDFT;
-import static org.apache.jena.riot.writer.WriterConst.INDENT_GNMD;
-import static org.apache.jena.riot.writer.WriterConst.NL_GDFT_END;
-import static org.apache.jena.riot.writer.WriterConst.NL_GDFT_START;
-import static org.apache.jena.riot.writer.WriterConst.NL_GNMD_END;
-import static org.apache.jena.riot.writer.WriterConst.NL_GNMD_START;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.apache.jena.riot.writer.WriterConst.*;
 
 public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactory {
     @Override
@@ -46,7 +37,7 @@ public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactor
         Iterator<Node> graphsIt = dsg.listGraphNodes();
         while (graphsIt.hasNext()) {
             Node graphNode = graphsIt.next();
-            String messageURI = WonMessageUtils.stripFragment(URI.create(graphNode.getURI())).toString();
+            String messageURI = WonRelativeUriHelper.stripFragment(URI.create(graphNode.getURI())).toString();
             List<Node> graphUris = messageURIToGraph.get(messageURI);
             if (graphUris == null) {
                 graphUris = new ArrayList<>();
@@ -62,7 +53,7 @@ public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactor
         while (graphsIt.hasNext()) {
             Node graphNode = graphsIt.next();
             Graph g = dsg.getGraph(graphNode);
-            String messageURI = WonMessageUtils.stripFragment(URI.create(graphNode.getURI())).toString();
+            String messageURI = WonRelativeUriHelper.stripFragment(URI.create(graphNode.getURI())).toString();
             SortNode<String> searchNode = sg.getSortNode(messageURI);
             if (searchNode == null) {
                 searchNode = new SortNode<String>(messageURI);
@@ -74,7 +65,7 @@ public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactor
                 if (!linkedGraphNode.isURI()) {
                     continue;
                 }
-                String linkedMessageUri = WonMessageUtils.stripFragment(URI.create(linkedGraphNode.getURI()))
+                String linkedMessageUri = WonRelativeUriHelper.stripFragment(URI.create(linkedGraphNode.getURI()))
                                 .toString();
                 if (dsg.containsGraph(linkedGraphNode)) {
                     // graph name is object of triple: that's a direct mention, add it
@@ -115,16 +106,18 @@ public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactor
                 List<Node> orderedGraphNames = orderGraphNames(dsg);
                 writeBase(baseURI);
                 writePrefixes(prefixMap);
-                if (!prefixMap.isEmpty() && !dsg.isEmpty())
+                if (!prefixMap.isEmpty() && !dsg.isEmpty()) {
                     out.println();
+                }
                 Iterator<Node> graphNames = orderedGraphNames.iterator();
                 String lastEntity = null;
                 boolean anyGraphOutput = writeGraphTriG(dsg, null);
                 for (; graphNames.hasNext();) {
-                    if (anyGraphOutput)
+                    if (anyGraphOutput) {
                         out.println();
+                    }
                     Node gn = graphNames.next();
-                    String entity = WonMessageUtils.stripFragment(URI.create(gn.getURI())).toString();
+                    String entity = WonRelativeUriHelper.stripFragment(URI.create(gn.getURI())).toString();
                     if (lastEntity == null || !lastEntity.equals(entity)) {
                         out.println("# graphs of entity " + entity);
                         out.println("");
@@ -137,8 +130,9 @@ public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactor
             /** Return true if anything written */
             private boolean writeGraphTriG(DatasetGraph dsg, Node name) {
                 boolean dftGraph = (name == null || name == Quad.defaultGraphNodeGenerated);
-                if (dftGraph && dsg.getDefaultGraph().isEmpty())
+                if (dftGraph && dsg.getDefaultGraph().isEmpty()) {
                     return false;
+                }
                 if (dftGraph && !GDFT_BRACE) {
                     // Non-empty default graph, no braces.
                     // No indenting.
@@ -155,15 +149,17 @@ public class ConversationDatasetWriterFactory implements WriterDatasetRIOTFactor
                     out.print(" ");
                 }
                 out.print("{");
-                if (NL_START)
+                if (NL_START) {
                     out.println();
-                else
+                } else {
                     out.print(" ");
+                }
                 out.incIndent(INDENT_GRAPH);
                 writeGraphTTL(dsg.getGraph(name));
                 out.decIndent(INDENT_GRAPH);
-                if (NL_END)
+                if (NL_END) {
                     out.ensureStartOfLine();
+                }
                 out.println("}");
                 return true;
             }

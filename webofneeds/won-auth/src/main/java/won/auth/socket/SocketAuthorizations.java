@@ -7,13 +7,13 @@ import java.util.Collections;
 import java.util.Set;
 
 public class SocketAuthorizations {
-    private URI socketUri;
+    private URI socketDefinitionUri;
     private Set<Authorization> localAuths;
     private Set<Authorization> targetAuths;
 
-    public SocketAuthorizations(URI socketUri, Set<Authorization> localAuths,
+    public SocketAuthorizations(URI socketDefinitionUri, Set<Authorization> localAuths,
                     Set<Authorization> requests) {
-        this.socketUri = socketUri;
+        this.socketDefinitionUri = socketDefinitionUri;
         this.localAuths = Collections.unmodifiableSet(localAuths != null ? localAuths : Collections.emptySet());
         this.targetAuths = Collections.unmodifiableSet(requests != null ? localAuths : Collections.emptySet());
     }
@@ -26,7 +26,7 @@ public class SocketAuthorizations {
         return targetAuths;
     }
 
-    public URI getSocketUri() {
-        return socketUri;
+    public URI getSocketDefinitionUri() {
+        return socketDefinitionUri;
     }
 }

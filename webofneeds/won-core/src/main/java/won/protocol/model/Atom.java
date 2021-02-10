@@ -11,6 +11,7 @@
 package won.protocol.model;
 
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.Union;
 import org.apache.jena.rdf.model.Model;
 import won.protocol.model.parentaware.VersionedEntity;
 import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
@@ -33,6 +34,7 @@ import java.util.Optional;
 // @Inheritance(strategy=InheritanceType.JOINED)
 public class Atom implements VersionedEntity {
     public static final String ACL_GRAPH_URI_FRAGMENT = "#acl";
+    public static final String SOCKET_ACL_GRAPH_URI_FRAGMENT = "#socket-acl";
     /* The URI of the atom */
     @Column(name = "atomURI", unique = true)
     @Convert(converter = URIConverter.class)
@@ -139,21 +141,36 @@ public class Atom implements VersionedEntity {
         lastUpdate = creationDate;
     }
 
+    /**
+     * Returns the union of all acl graphs (#acl and #socket-acl)
+     *
+     * @return
+     */
     public Optional<Graph> getAclGraph() {
         DatasetHolder atomDatasetHolder = getDatatsetHolder();
         URI aclGraphUri = WonRelativeUriHelper.createAclGraphURIForAtomURI(getAtomURI());
+        URI socketAclGraphUri = WonRelativeUriHelper.createSocketAclGraphURIForAtomURI(getAtomURI());
         // caution: at least some dataset implementations will create a new model
         // in the dataset if getNamedModel(name) is called and there is no model for
         // 'name' yet.
-        if (!atomDatasetHolder.getDataset().containsNamedModel(aclGraphUri.toString())) {
+        if (!atomDatasetHolder.getDataset().containsNamedModel(aclGraphUri.toString())
+                        && !atomDatasetHolder.getDataset().containsNamedModel(socketAclGraphUri.toString())) {
             return Optional.empty();
         }
-        Model model = atomDatasetHolder.getDataset()
+        Model aclGraph = atomDatasetHolder.getDataset()
                         .getNamedModel(aclGraphUri.toString());
-        if (model == null) {
-            return Optional.empty();
+        Model socketAclGraph = atomDatasetHolder.getDataset().getNamedModel(socketAclGraphUri.toString());
+        if (aclGraph == null) {
+            if (socketAclGraph == null) {
+                return Optional.empty();
+            } else {
+                return Optional.of(socketAclGraph.getGraph());
+            }
         }
-        return Optional.of(model.getGraph());
+        if (socketAclGraph == null) {
+            return Optional.of(aclGraph.getGraph());
+        }
+        return Optional.of(new Union(socketAclGraph.getGraph(), aclGraph.getGraph()));
     }
 
     @XmlTransient

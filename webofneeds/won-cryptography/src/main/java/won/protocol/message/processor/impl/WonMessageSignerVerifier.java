@@ -6,11 +6,11 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import won.cryptography.rdfsign.*;
 import won.protocol.message.WonMessage;
-import won.protocol.message.WonMessageUtils;
 import won.protocol.message.WonSignatureData;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.WonMessageUriHelper;
 import won.protocol.util.WonRdfUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.WONMSG;
 
 import java.net.URI;
@@ -113,7 +113,8 @@ public class WonMessageSignerVerifier {
                     throws Exception {
         WonSignatureData wonSignatureData = null;
         // String outerEnvUri = null;
-        String signatureUri = WonMessageUtils.stripFragment(messageURI).toString() + WonMessage.SIGNATURE_URI_SUFFIX;
+        String signatureUri = WonRelativeUriHelper.stripFragment(messageURI).toString()
+                        + WonMessage.SIGNATURE_URI_SUFFIX;
         wonSignatureData = signer.signWholeDataset(privateKey, privateKeyUri, publicKey, signatureUri);
         Objects.requireNonNull(wonSignatureData);
         // this is the signature of the outermost envelopoe. put it in a new graph.
@@ -141,7 +142,7 @@ public class WonMessageSignerVerifier {
             // this way.
             graphNode.addProperty(WONMSG.containsSignature, sigNode);
         } else if (Objects.equals(graphNode.getURI(), sigNode.getURI())) {
-            URI messageURI = WonMessageUtils.stripFragment(URI.create(graphUri));
+            URI messageURI = WonRelativeUriHelper.stripFragment(URI.create(graphUri));
             Resource msgNode = graph.getResource(messageURI.toString());
             graph.add(msgNode, WONMSG.signature, sigNode);
         }

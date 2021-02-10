@@ -46,7 +46,6 @@ import won.protocol.exception.NoSuchAtomException;
 import won.protocol.exception.NoSuchConnectionException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageType;
-import won.protocol.message.WonMessageUtils;
 import won.protocol.model.*;
 import won.protocol.model.unread.UnreadMessageInfo;
 import won.protocol.model.unread.UnreadMessageInfoForAtom;
@@ -513,7 +512,7 @@ public class LinkedDataServiceImpl implements LinkedDataService, InitializingBea
     public Dataset listConnection(URI socketUri, URI targetSocketUri, boolean deep) throws NoSuchConnectionException {
         Optional<Connection> con = atomInformationService.getConnection(socketUri, targetSocketUri);
         Dataset data = makeConnectionContainer(this.uriService
-                        .createConnectionContainerURIForAtom(WonMessageUtils.stripFragment(socketUri)).toString(),
+                        .createConnectionContainerURIForAtom(WonRelativeUriHelper.stripFragment(socketUri)).toString(),
                         Arrays.asList(con.get()));
         if (deep) {
             addDeepConnectionData(data, Arrays.asList(con.get().getConnectionURI()));

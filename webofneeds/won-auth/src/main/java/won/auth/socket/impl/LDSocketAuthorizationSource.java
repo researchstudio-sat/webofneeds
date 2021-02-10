@@ -1,0 +1,34 @@
+package won.auth.socket.impl;
+
+import org.apache.jena.query.Dataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import won.auth.WonAclInstanceFactory;
+import won.auth.model.SocketDefinition;
+import won.auth.socket.SocketAuthorizationSource;
+import won.auth.socket.SocketAuthorizations;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.shacl2java.Shacl2JavaInstanceFactory;
+
+import java.net.URI;
+import java.util.Optional;
+
+public class LDSocketAuthorizationSource implements SocketAuthorizationSource {
+    @Autowired
+    private LinkedDataSource linkedDataSource;
+
+    @Override
+    public Optional<SocketAuthorizations> getSocketAuthorizations(URI socketDefinitionURI) {
+        Dataset data = linkedDataSource.getDataForPublicResource(socketDefinitionURI);
+        Shacl2JavaInstanceFactory factory = WonAclInstanceFactory.get();
+        factory.load(data.getDefaultModel().getGraph());
+        Optional<SocketDefinition> sd = factory
+                        .getInstanceOfType(socketDefinitionURI.toString(), SocketDefinition.class);
+        if (sd.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(new SocketAuthorizations(
+                        socketDefinitionURI,
+                        sd.get().getLocalAuths(), sd.get()
+                                        .getTargetAuths()));
+    }
+}

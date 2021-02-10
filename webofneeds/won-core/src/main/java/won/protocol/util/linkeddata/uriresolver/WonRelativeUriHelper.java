@@ -4,6 +4,7 @@ import won.protocol.message.WonMessage;
 import won.protocol.model.Atom;
 
 import java.net.URI;
+import java.util.Objects;
 
 public class WonRelativeUriHelper {
     public static URI createConnectionContainerURIForAtom(URI atomURI) {
@@ -16,6 +17,10 @@ public class WonRelativeUriHelper {
 
     public static URI createAclGraphURIForAtomURI(URI atomUri) {
         return URI.create(atomUri + Atom.ACL_GRAPH_URI_FRAGMENT);
+    }
+
+    public static URI createSocketAclGraphURIForAtomURI(URI atomUri) {
+        return URI.create(atomUri + Atom.SOCKET_ACL_GRAPH_URI_FRAGMENT);
     }
 
     public static URI createSysInfoGraphURIForAtomURI(final URI atomURI) {
@@ -43,5 +48,42 @@ public class WonRelativeUriHelper {
      */
     public static URI createTokenRequestURIForAtomURIWithQuery(URI atomURI, String query) {
         return URI.create(atomURI.toString() + "/token" + (query == null ? "" : "?" + query));
+    }
+
+    public static URI stripFragment(URI uriWithFragment) {
+        URI uriWithoutFragment;
+        Objects.requireNonNull(uriWithFragment);
+        // just strip the fragment
+        String fragment = uriWithFragment.getRawFragment();
+        if (fragment == null) {
+            return uriWithFragment;
+        }
+        String uri = uriWithFragment.toString();
+        uriWithoutFragment = URI.create(uri.substring(0, uri.length() - fragment.length() - 1));
+        return uriWithoutFragment;
+    }
+
+    /**
+     * Strip the connection suffix, return the atom URI.
+     *
+     * @param connectionURI
+     * @return
+     */
+    public static URI stripConnectionSuffix(URI connectionURI) {
+        Objects.requireNonNull(connectionURI);
+        String uri = connectionURI.toString();
+        return URI.create(uri.replaceFirst("/c/.+$", ""));
+    }
+
+    /**
+     * Strip the atom suffix, return the WoN node URI.
+     *
+     * @param atomURI
+     * @return
+     */
+    public static URI stripAtomSuffix(URI atomURI) {
+        Objects.requireNonNull(atomURI);
+        String uri = atomURI.toString();
+        return URI.create(uri.replaceFirst("/atom/.+$", ""));
     }
 }

@@ -1,7 +1,8 @@
 package won.auth.socket;
 
 import java.net.URI;
+import java.util.Optional;
 
 public interface SocketAuthorizationSource {
-    SocketAuthorizations getSocketAuthorizations(URI socketDefinitionURI);
+    Optional<SocketAuthorizations> getSocketAuthorizations(URI socketDefinitionURI);
 }

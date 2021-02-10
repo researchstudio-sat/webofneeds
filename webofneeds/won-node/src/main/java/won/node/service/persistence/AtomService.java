@@ -16,13 +16,13 @@ import won.auth.model.AclEvalResult;
 import won.auth.model.DecisionValue;
 import won.auth.model.GraphType;
 import won.auth.model.OperationRequest;
+import won.auth.socket.SocketAuthorizationSource;
 import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
-import won.protocol.message.WonMessageUtils;
 import won.protocol.model.*;
 import won.protocol.repository.*;
 import won.protocol.util.AtomModelWrapper;
@@ -67,6 +67,10 @@ public class AtomService {
     ConnectionService connectionService;
     @Autowired
     EntityManager entityManager;
+    @Autowired
+    SocketAuthorizationSource socketAuthorizationSource;
+    @Autowired
+    SocketAclService socketAclService;
 
     public Optional<Atom> getAtomForUpdate(URI atomURI) {
         Optional<Atom> atom = atomRepository.findOneByAtomURIForUpdate(atomURI);
@@ -104,7 +108,7 @@ public class AtomService {
             if (socketURI == null) {
                 return Optional.empty();
             }
-            atomURI = WonMessageUtils.stripFragment(socketURI);
+            atomURI = WonRelativeUriHelper.stripFragment(socketURI);
         } else {
             atomURI = msg.getRecipientAtomURI();
         }
@@ -126,7 +130,7 @@ public class AtomService {
             } else {
                 socketURI = msg.getSenderSocketURIRequired();
             }
-            atomURI = WonMessageUtils.stripFragment(socketURI);
+            atomURI = WonRelativeUriHelper.stripFragment(socketURI);
         } else {
             atomURI = msg.getRecipientAtomURI();
         }
@@ -162,6 +166,8 @@ public class AtomService {
             return f;
         }).collect(Collectors.toSet());
         checkResourcesInAtomContent(atomModelWrapper);
+        Dataset atomDataset = atomModelWrapper.getDataset();
+        socketAclService.addLocalSocketAcls(atomURI, socketEntities, atomDataset);
         // add everything to the atom model class and save it
         checkCanThisMessageCreateOrModifyThisAtom(wonMessage, atomURI);
         Atom atom = new Atom();
@@ -301,6 +307,8 @@ public class AtomService {
         socketRepository.saveAll(newSocketEntities);
         socketRepository.saveAll(changedSockets);
         socketRepository.deleteAll(removedSockets);
+        socketAclService.addLocalSocketAcls(atomURI, newSocketEntities, newAtomContent);
+        socketAclService.removeLocalSocketAcls(atomURI, removedSockets, newAtomContent);
         datasetHolder.setDataset(newAtomContent);
         atom.setDatatsetHolder(datasetHolder);
         atom.setAttachmentDatasetHolders(attachments);

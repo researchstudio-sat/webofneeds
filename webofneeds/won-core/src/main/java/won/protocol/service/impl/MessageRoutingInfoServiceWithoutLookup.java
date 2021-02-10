@@ -1,13 +1,13 @@
 package won.protocol.service.impl;
 
-import java.net.URI;
-import java.util.Optional;
-
 import org.springframework.stereotype.Component;
-
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageUtils;
 import won.protocol.service.MessageRoutingInfoService;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
+
+import java.net.URI;
+import java.util.Optional;
 
 /**
  * Determines sender|recipient atom|node for a given message by inspecting the
@@ -39,11 +39,11 @@ public class MessageRoutingInfoServiceWithoutLookup implements MessageRoutingInf
 
     @Override
     public Optional<URI> senderNode(WonMessage msg) {
-        return senderAtom(msg).map(WonMessageUtils::stripAtomSuffix);
+        return senderAtom(msg).map(WonRelativeUriHelper::stripAtomSuffix);
     }
 
     @Override
     public Optional<URI> recipientNode(WonMessage msg) {
-        return recipientAtom(msg).map(WonMessageUtils::stripAtomSuffix);
+        return recipientAtom(msg).map(WonRelativeUriHelper::stripAtomSuffix);
     }
 }

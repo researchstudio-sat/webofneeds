@@ -158,7 +158,16 @@ public class WonAclEvaluator {
         boolean grantAuthInfo = canProvideAuthInfo(authorizations, request,
                         requestorIsGranteeOf);
         Optional<AclEvalResult> result = authorizations.stream()
-                        .map(auth -> decide(auth, request, grantAuthInfo, requestorIsGranteeOf))
+                        .map(auth -> {
+                            try {
+                                return decide(auth, request, grantAuthInfo, requestorIsGranteeOf);
+                            } catch (Exception e) {
+                                throw new WonAclEvaluationException(
+                                                String.format("Evaluating the following authorzation (node %s) causes exception\n%s",
+                                                                auth.getNode(), AuthUtils.toRdfString(auth)),
+                                                e);
+                            }
+                        })
                         .reduce((left, right) -> mergeAclEvalResults(left, right));
         return result.orElse(accessControlDecision(false, request));
     }
@@ -378,10 +387,9 @@ public class WonAclEvaluator {
                 logger.warn("ASE is logged on level DEBUG");
             }
             throw new WonAclEvaluationException(
-                            String.format("Expected a targetAtomExpression in  ASE %s of %s for candidate %s, but none was found",
-                                            aseRoot.getNode(),
-                                            candidate,
-                                            baseAtom));
+                            String.format("Expected a targetAtomExpression in this expression of atom %s but none was found:\n%s\n",
+                                            baseAtom,
+                                            AuthUtils.toRdfString(aseRoot)));
         }
         for (TargetAtomCheck check : v.getTargetAtomChecks()) {
             if (logger.isDebugEnabled()) {

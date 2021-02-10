@@ -1,13 +1,5 @@
 package won.protocol.util.linkeddata;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -16,8 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 
-import won.protocol.message.WonMessageUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class IncludedWonOntologies {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -56,7 +55,7 @@ public class IncludedWonOntologies {
      */
     public static Optional<Model> get(URI ontologyURI) {
         logger.debug("Checking if we have an included ontology for resource {} ", ontologyURI);
-        ontologyURI = WonMessageUtils.stripFragment(ontologyURI);
+        ontologyURI = WonRelativeUriHelper.stripFragment(ontologyURI);
         logger.debug("Using ontology URI {} ", ontologyURI);
         if (ontoResources.containsKey(ontologyURI)) {
             logger.debug("Ontology present for URI {}, loading...", ontologyURI);

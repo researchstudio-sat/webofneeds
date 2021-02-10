@@ -437,10 +437,10 @@ auth:messageTypeShape
                 msg:ConnectionMessage
                 msg:CreateMessage
                 msg:DeactivateMessage
-            msg:FailureResponse
-            msg:ReplaceMessage
-            msg:SocketHintMessage
-            msg:SuccessResponse ) .
+                msg:FailureResponse
+                msg:ReplaceMessage
+                msg:SocketHintMessage
+                msg:SuccessResponse ) .
 
 # Definition 20 (inherit expression)
 
@@ -925,6 +925,8 @@ auth:OwnerToken
     a            owl:NamedIndividual ;
     rdfs:comment "URI reserved for the value of the scope claim of owner tokens" .
 
+# Implicit authorizations for all atoms:
+
 auth:ownerTokenAuthorization
     a           auth:Authorization ;
     auth:grant  [ auth:operation auth:anyOperation ] ;
@@ -938,6 +940,24 @@ auth:grantOwnerTokenAuthorization
                                                         auth:nodeSigned   true ;
                                                         auth:expiresAfter 3600 ] ] ] ;
     auth:grantee [ auth:atom auth:self ] .
+
+auth:grantReadToConnectRecipient
+    a            auth:Authorization ;
+    auth:grant   [ auth:graph [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                auth:operation auth:opRead ] ] ;
+    auth:grantee [ auth:connection [ auth:targetAtom      [ ] ;
+                                     auth:connectionState won:RequestSent ] ] .
+
+auth:grantReadAndMessageToConnected
+    a            auth:Authorization ;
+    auth:grant   [ auth:graph      [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                     auth:operation auth:opRead ] ;
+                   auth:connection [ auth:targetAtom [ auth:atom auth:operationRequestor ] ;
+                                     auth:operation  auth:opCommunicate ] ] ;
+    auth:grantee [ auth:connection [ auth:targetAtom      [ ] ;
+                                     auth:connectionState won:Connected ] ] .
+
+# Operations
 
 auth:anyOperation
     a auth:SimpleOperation .
