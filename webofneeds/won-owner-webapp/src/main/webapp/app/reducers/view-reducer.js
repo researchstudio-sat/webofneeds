@@ -3,7 +3,12 @@
  */
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
-import { get, getIn } from "../utils.js";
+import * as atomUtils from "~/app/redux/utils/atom-utils.js";
+import { get, getIn, getUri } from "../utils.js";
+import {
+  parseAtom,
+  parseMetaAtom,
+} from "~/app/reducers/atom-reducer/parse-atom";
 
 const initialState = Immutable.fromJS({
   debugMode: false,
@@ -135,6 +140,39 @@ export default function(viewState = initialState, action = {}) {
       return viewState
         .set("showModalDialog", true)
         .set("modalDialog", termsDialog);
+    }
+
+    // This sets the first found metaPersona as the selected Persona (after login/reload)
+    case actionTypes.atoms.storeOwnedMetaAtoms: {
+      const metaAtoms = action.payload.get("metaAtoms");
+      if (metaAtoms) {
+        const parsedMetaAtoms = metaAtoms.map(metaAtom =>
+          parseMetaAtom(metaAtom)
+        );
+        const firstPersonaUri = getUri(
+          parsedMetaAtoms
+            .filter(metaAtom => atomUtils.isPersona(metaAtom))
+            .first()
+        );
+        if (firstPersonaUri) {
+          return viewState
+            .setIn(["activePersona", "uri"], firstPersonaUri)
+            .setIn(["activePersona", "tab"], "DETAIL");
+        }
+      }
+      return viewState;
+    }
+
+    // This sets a newly created Persona as the currently selected Persona
+    case actionTypes.atoms.createSuccessful: {
+      let parsedAtom = parseAtom(action.payload.atom);
+      if (atomUtils.isPersona(parsedAtom)) {
+        const parsedAtomUri = getUri(parsedAtom);
+        return viewState
+          .setIn(["activePersona", "uri"], parsedAtomUri)
+          .setIn(["activePersona", "tab"], "DETAIL");
+      }
+      return viewState;
     }
 
     case actionTypes.view.setActivePersonaUri: {
