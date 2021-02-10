@@ -73,7 +73,7 @@ export const seeHolderSocketConnectionsAuthorization = {
 };
 
 // Atoms that are connected can see their connections to communicate
-export const connectedConectionsAuthorization = {
+export const connectedConnectionsAuthorization = {
   [vocab.AUTH.granteeCompacted]: {
     [vocab.AUTH.socketCompacted]: {
       [vocab.AUTH.connectionCompacted]: {
@@ -212,7 +212,7 @@ export const emptyDraftImm = Immutable.fromJS({
   seeks: {},
   acl: [
     defaultPublicAtomAuthorization,
-    connectedConectionsAuthorization,
+    connectedConnectionsAuthorization,
     connectToSocketsAuthorization,
   ],
 });

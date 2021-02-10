@@ -2,7 +2,7 @@ import {
   details,
   mergeInEmptyDraft,
   defaultReactions,
-  connectedConectionsAuthorization,
+  connectedConnectionsAuthorization,
   defaultPublicAtomAuthorization,
   seeHolderSocketConnectionsAuthorization,
   connectToSocketsAuthorization,
@@ -41,7 +41,7 @@ export const persona = {
       acl: [
         defaultPublicAtomAuthorization,
         seeHolderSocketConnectionsAuthorization,
-        connectedConectionsAuthorization,
+        connectedConnectionsAuthorization,
         connectToSocketsAuthorization,
         tokenForReadHeldAtoms,
       ],
