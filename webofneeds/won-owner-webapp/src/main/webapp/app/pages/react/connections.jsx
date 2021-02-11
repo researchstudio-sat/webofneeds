@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { actionCreators } from "~/app/actions/actions";
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import {
   getUri,
   getQueryParams,
@@ -88,8 +89,15 @@ export default function PageConnections() {
       selectedConnection,
       atomUtils.getGroupSocket(selectedTargetAtom)
     );
+
+  const activePinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
+
   const allChatConnections = useSelector(
-    generalSelectors.getAllChatConnections
+    activePinnedAtomUri
+      ? generalSelectors.getChatConnectionsOfActivePinnedAtom(
+          activePinnedAtomUri
+        )
+      : generalSelectors.getAllUnassigneUnpinnedChatConnections
   );
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 

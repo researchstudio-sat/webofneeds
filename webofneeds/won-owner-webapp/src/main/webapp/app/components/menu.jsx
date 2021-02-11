@@ -57,8 +57,6 @@ export default function WonMenu({ className }) {
     generalSelectors.getOwnedPinnedAtomsUnreads
   );
 
-  console.debug("ownedPinnedAtomUnreads", ownedPinnedAtomUnreads);
-
   const activePinnedAtom = get(ownedPinnedAtoms, activePinnedAtomUri);
 
   const relevantActivePinnedAtomConnectionsMap = useSelector(

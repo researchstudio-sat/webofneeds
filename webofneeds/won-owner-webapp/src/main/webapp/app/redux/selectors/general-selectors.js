@@ -20,6 +20,8 @@ import vocab from "../../service/vocab";
 
 export const selectLastUpdateTime = state => get(state, "lastUpdateTime");
 
+export const emptyMapSelector = createSelector(() => Immutable.Map());
+
 export const getAccountState = createSelector(
   state => get(state, "account"),
   state => state
@@ -191,8 +193,8 @@ export const getOwnedAllConnections = createSelector(
     allOwnedAtoms.flatMap(atom => atomUtils.getConnections(atom))
 );
 
-export const getAllChatConnections = createSelector(
-  getOwnedAtoms,
+export const getAllUnassigneUnpinnedChatConnections = createSelector(
+  getUnassignedUnpinnedAtoms,
   allOwnedAtoms =>
     allOwnedAtoms &&
     allOwnedAtoms
@@ -262,6 +264,7 @@ export const getOwnedPinnedAtomsUnreads = createSelector(
       atom =>
         atomUtils.hasUnreadConnections(atom) ||
         !!atomUtils.getConnections(atom).find(conn => {
+          //TODO: THIS DOES NOT DO WHAT ITS SUPPOSED TO DO
           for (let holdableSocketType in vocab.holderSockets) {
             if (
               atomUtils.hasUnreadConnections(
@@ -276,6 +279,44 @@ export const getOwnedPinnedAtomsUnreads = createSelector(
         })
     )
 );
+
+export const getChatConnectionsOfActivePinnedAtom = atomUri =>
+  createSelector(
+    getOwnedAtoms,
+    getActivePinnedAtom(atomUri),
+    (ownedAtoms, activePinnedAtom) => {
+      if (activePinnedAtom) {
+        let chatConnections = atomUtils.getConnections(
+          activePinnedAtom,
+          vocab.CHAT.ChatSocketCompacted
+        );
+
+        for (let holdableSocketType in vocab.holderSockets) {
+          atomUtils
+            .getConnections(
+              activePinnedAtom,
+              vocab.holderSockets[holdableSocketType]
+            )
+            .map(conn => {
+              const targetAtom = get(
+                ownedAtoms,
+                connectionUtils.getTargetAtomUri(conn)
+              );
+              if (targetAtom) {
+                chatConnections = chatConnections.merge(
+                  atomUtils.getConnections(
+                    targetAtom,
+                    vocab.CHAT.ChatSocketCompacted
+                  )
+                );
+              }
+            });
+        }
+
+        return chatConnections;
+      }
+    }
+  );
 
 export const hasUnassignedUnpinnedAtomChatUnreads = createSelector(
   getUnassignedUnpinnedAtoms,

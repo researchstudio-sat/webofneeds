@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import { getUri } from "../utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as viewSelectors from "../redux/selectors/view-selectors.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as viewUtils from "../redux/utils/view-utils.js";
@@ -28,6 +29,14 @@ export default function WonAtomMenu({
 
   const viewState = useSelector(generalSelectors.getViewState);
   const process = useSelector(generalSelectors.getProcessState);
+  const activePinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
+  const chatConnections = useSelector(
+    activePinnedAtomUri
+      ? generalSelectors.getChatConnectionsOfActivePinnedAtom(
+          activePinnedAtomUri
+        )
+      : generalSelectors.emptyMapSelector
+  );
 
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
@@ -102,14 +111,19 @@ export default function WonAtomMenu({
 
       switch (socketType) {
         case vocab.CHAT.ChatSocketCompacted: {
+          //IF AN ATOM IS PINNED WE DISPLAY THE CHILDCHATS ALSO
+
           const socketUri = atomUtils.getSocketUri(atom, socketType);
-          const activeConnections = socketTypeConnections
-            .filter(
-              conn =>
-                // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
-                isOwned || connectionUtils.hasTargetSocketUri(conn, socketUri)
-            )
-            .filter(conn => !connectionUtils.isClosed(conn));
+          const activeConnections = activePinnedAtomUri
+            ? chatConnections.filter(conn => !connectionUtils.isClosed(conn))
+            : socketTypeConnections
+                .filter(
+                  conn =>
+                    // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+                    isOwned ||
+                    connectionUtils.hasTargetSocketUri(conn, socketUri)
+                )
+                .filter(conn => !connectionUtils.isClosed(conn));
           countLabel =
             activeConnections && activeConnections.size > 0
               ? "(" + activeConnections.size + ")"
