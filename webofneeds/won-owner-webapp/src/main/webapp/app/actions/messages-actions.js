@@ -349,7 +349,7 @@ function processMessageEffectsAndMessage(
   });
 
   const petriNetPromise = ownerApi
-    .getPetriNetUris(connectionUri)
+    .fetchPetriNetUris(connectionUri)
     .then(response => {
       const petriNetData = {};
 
@@ -381,7 +381,7 @@ function processMessageEffectsAndMessage(
     });
 
   const messageEffectsPromise = ownerApi
-    .getMessageEffects(connectionUri, wonMessage.getMessageUri())
+    .fetchMessageEffects(connectionUri, wonMessage.getMessageUri())
     .then(response => {
       for (const effect of response) {
         switch (effect.type) {

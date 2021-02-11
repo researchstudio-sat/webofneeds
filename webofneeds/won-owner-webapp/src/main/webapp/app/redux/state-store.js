@@ -15,7 +15,7 @@ import { actionCreators } from "../actions/actions";
 import * as useCaseUtils from "~/app/usecase-utils";
 
 export function fetchOwnedMetaData(dispatch) {
-  return ownerApi.getOwnedMetaAtoms().then(metaAtoms => {
+  return ownerApi.fetchOwnedMetaAtoms().then(metaAtoms => {
     const atomsImm = Immutable.fromJS(metaAtoms);
     dispatch({
       type: actionTypes.atoms.storeOwnedMetaAtoms,
@@ -239,7 +239,7 @@ export function fetchAtomAndDispatch(
 }
 
 export function fetchPersonas(dispatch /*, getState,*/) {
-  return ownerApi.getAllActiveMetaPersonas().then(atoms => {
+  return ownerApi.fetchAllActiveMetaPersonas().then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -257,7 +257,7 @@ export function fetchWhatsNew(
   getState,
   createdAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
 ) {
-  return ownerApi.getAllMetaAtoms(createdAfterDate).then(atoms => {
+  return ownerApi.fetchAllMetaAtoms(createdAfterDate).then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -277,7 +277,7 @@ export function fetchWhatsAround(
   maxDistance
 ) {
   return ownerApi
-    .getAllMetaAtomsNear(createdAfterDate, location, maxDistance)
+    .fetchAllMetaAtomsNear(createdAfterDate, location, maxDistance)
     .then(atoms => {
       const atomsImm = Immutable.fromJS(atoms);
       const atomUris = [...atomsImm.keys()];

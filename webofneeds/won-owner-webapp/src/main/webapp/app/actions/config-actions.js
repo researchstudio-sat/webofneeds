@@ -15,7 +15,7 @@ export function configInit() {
     const defaultTheme = generalSelectors.getTheme(getState());
     const defaultThemeName = get(defaultTheme, "name");
     Promise.all([
-      ownerApi.getDefaultNodeUri(),
+      ownerApi.fetchDefaultNodeUri(),
       loadSkinConfig(defaultThemeName),
     ]).then(([defaultNodeUri, defaultThemeConfig]) =>
       dispatch({

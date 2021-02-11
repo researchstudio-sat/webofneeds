@@ -277,7 +277,7 @@ export default function WonAtomMessages({
   }
 
   function addMessageToState(messageUri) {
-    return ownerApi.getMessage(senderAtomUri, messageUri).then(response => {
+    return ownerApi.fetchMessage(senderAtomUri, messageUri).then(response => {
       won.wonMessageFromJsonLd(response, messageUri).then(msg => {
         //If message isnt in the state we add it
         if (!get(chatMessages, messageUri)) {
@@ -385,7 +385,7 @@ export default function WonAtomMessages({
       );
 
       try {
-        const response = await ownerApi.getPetriNetUris(connectionUri);
+        const response = await ownerApi.fetchPetriNetUris(connectionUri);
         const petriNetData = {};
 
         response.forEach(entry => {
@@ -428,7 +428,7 @@ export default function WonAtomMessages({
             loadingAgreementDataset: true,
           })
         );
-        const response = await ownerApi.getAgreementProtocolDataset(
+        const response = await ownerApi.fetchAgreementProtocolDataset(
           connectionUri
         );
         dispatch(
@@ -470,7 +470,7 @@ export default function WonAtomMessages({
         })
       );
       ownerApi
-        .getAgreementProtocolUris(connectionUri)
+        .fetchAgreementProtocolUris(connectionUri)
         .then(response => {
           const agreementDataImm = Immutable.fromJS({
             agreementUris: Immutable.Set(response.agreementUris),

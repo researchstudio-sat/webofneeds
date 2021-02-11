@@ -76,7 +76,7 @@ export default function WonReferencedMessageContent({
         let onClick;
         if (!referencedMessage) {
           onClick = () =>
-            ownerApi.getMessage(senderAtomUri, msgUri).then(response => {
+            ownerApi.fetchMessage(senderAtomUri, msgUri).then(response => {
               won.wonMessageFromJsonLd(response, msgUri).then(msg => {
                 //If message isnt in the state we add it
                 dispatch(actionCreators.messages__processAgreementMessage(msg));

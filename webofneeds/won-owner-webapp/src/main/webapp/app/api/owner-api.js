@@ -14,10 +14,10 @@ import * as N3 from "n3";
  * Created by quasarchimaere on 11.06.2019.
  */
 
-export function getDefaultNodeUri() {
+export function fetchDefaultNodeUri() {
   /* this allows the owner-app-server to dynamically switch default nodes. */
   return fetch(/*relativePathToConfig=*/ "appConfig/getDefaultWonNodeUri")
-    .then(checkHttpStatus)
+    .then(checkHttpStatus("appConfig/getDefaultWonNodeUri"))
     .then(resp => resp.json())
     .catch((/*err*/) => {
       const defaultNodeUri = `${location.protocol}://${
@@ -59,13 +59,13 @@ export function login(credentials) {
     body: params,
     credentials: "include",
   })
-    .then(checkHttpStatus)
+    .then(checkHttpStatus(loginUrl))
     .then(resp => resp.json());
 }
 
 export function logout() {
   const url = urljoin(ownerBaseUrl, "/rest/users/signout");
-  const httpOptions = {
+  return fetch(url, {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -73,8 +73,7 @@ export function logout() {
     },
     credentials: "include",
     body: JSON.stringify({}),
-  };
-  return fetch(url, httpOptions).then(checkHttpStatus);
+  }).then(checkHttpStatus(url));
 }
 
 export function exportAccount(dataEncryptionPassword) {
@@ -90,7 +89,7 @@ export function exportAccount(dataEncryptionPassword) {
     },
     credentials: "include",
   };
-  return fetch(url, httpOptions).then(checkHttpStatus);
+  return fetch(url, httpOptions).then(checkHttpStatus(url));
 }
 /**
  * Checks whether the user has a logged-in session.
@@ -101,7 +100,7 @@ export function exportAccount(dataEncryptionPassword) {
  */
 export function checkLoginStatus() {
   return fetch("rest/users/isSignedIn", { credentials: "include" })
-    .then(checkHttpStatus) // will reject if not logged in
+    .then(checkHttpStatus("rest/users/isSignedIn")) // will reject if not logged in
     .then(resp => resp.json());
 }
 
@@ -116,7 +115,8 @@ export function checkLoginStatus() {
 export function registerAccount(credentials) {
   const { email, password } = wonUtils.parseCredentials(credentials);
   const url = urljoin(ownerBaseUrl, "/rest/users/");
-  const httpOptions = {
+
+  return fetch(url, {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -128,8 +128,7 @@ export function registerAccount(credentials) {
       password: password,
       privateId: credentials.privateId,
     }),
-  };
-  return fetch(url, httpOptions).then(checkHttpStatus);
+  }).then(checkHttpStatus(url));
 }
 
 /**
@@ -159,7 +158,7 @@ export function acceptTermsOfService() {
  */
 export function confirmRegistration(verificationToken) {
   const url = urljoin(ownerBaseUrl, "/rest/users/confirmRegistration");
-  const httpOptions = {
+  return fetch(url, {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -168,9 +167,8 @@ export function confirmRegistration(verificationToken) {
     body: JSON.stringify({
       token: verificationToken,
     }),
-  };
-  return fetch(url, httpOptions)
-    .then(checkHttpStatus)
+  })
+    .then(checkHttpStatus(url))
     .then(resp => {
       return resp.json();
     })
@@ -190,7 +188,7 @@ export function confirmRegistration(verificationToken) {
  */
 export function resendEmailVerification(email) {
   const url = urljoin(ownerBaseUrl, "/rest/users/resendVerificationEmail");
-  const httpOptions = {
+  return fetch(url, {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -199,9 +197,8 @@ export function resendEmailVerification(email) {
     body: JSON.stringify({
       username: email,
     }),
-  };
-  return fetch(url, httpOptions)
-    .then(checkHttpStatus)
+  })
+    .then(checkHttpStatus(url))
     .then(resp => {
       return resp.json();
     })
@@ -221,7 +218,7 @@ export function resendEmailVerification(email) {
  */
 export function sendAnonymousLinkEmail(email, privateId) {
   const url = urljoin(ownerBaseUrl, "/rest/users/sendAnonymousLinkEmail");
-  const httpOptions = {
+  return fetch(url, {
     method: "post",
     headers: {
       Accept: "application/json",
@@ -232,9 +229,8 @@ export function sendAnonymousLinkEmail(email, privateId) {
       email: email,
       privateId: privateId,
     }),
-  };
-  return fetch(url, httpOptions)
-    .then(checkHttpStatus)
+  })
+    .then(checkHttpStatus(url))
     .then(resp => {
       return resp.json();
     })
@@ -268,7 +264,7 @@ export function changePassword(credentials) {
       oldPassword: oldPassword,
       newPassword: newPassword,
     }),
-  }).then(checkHttpStatus);
+  }).then(checkHttpStatus("/owner/rest/users/changePassword"));
 }
 
 /**
@@ -295,7 +291,7 @@ export function transferPrivateAccount(credentials) {
       privateUsername: privateUsername,
       privatePassword: privatePassword,
     }),
-  }).then(checkHttpStatus);
+  }).then(checkHttpStatus("/owner/rest/users/transfer"));
 }
 
 /**
@@ -319,7 +315,7 @@ export function resetPassword(credentials) {
       newPassword: newPassword,
       verificationToken: "",
     }),
-  }).then(checkHttpStatus);
+  }).then(checkHttpStatus("/owner/rest/users/resetPassword"));
 }
 
 export function serverSideConnect(
@@ -352,13 +348,14 @@ export function serverSideConnect(
  * @param state either "ACTIVE" or "INACTIVE"
  * @returns {*}
  */
-export function getOwnedMetaAtoms(state) {
+export function fetchOwnedMetaAtoms(state) {
   let paramString = "";
   if (state === "ACTIVE" || state === "INACTIVE") {
     paramString = "?state=" + state;
   }
+  const url = urljoin(ownerBaseUrl, "/rest/atoms" + paramString);
 
-  return fetch(urljoin(ownerBaseUrl, "/rest/atoms" + paramString), {
+  return fetch(url, {
     method: "get",
     headers: {
       Accept: "application/json",
@@ -366,37 +363,36 @@ export function getOwnedMetaAtoms(state) {
     },
     credentials: "include",
   })
-    .then(checkHttpStatus)
+    .then(checkHttpStatus(url))
     .then(response => response.json());
 }
 
-export function getMessage(atomUri, eventUri) {
-  return fetch(
-    urljoin(
-      ownerBaseUrl,
-      "/rest/linked-data/",
-      `?requester=${encodeURIComponent(atomUri)}`,
-      `&uri=${encodeURIComponent(eventUri)}`
-    ),
-    {
-      method: "get",
-      headers: {
-        Accept: "application/ld+json",
-        "Content-Type": "application/ld+json",
-      },
-      credentials: "include",
-    }
-  )
-    .then(checkHttpStatus)
+export function fetchMessage(atomUri, eventUri) {
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/linked-data/",
+    `?requester=${encodeURIComponent(atomUri)}`,
+    `&uri=${encodeURIComponent(eventUri)}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
     .then(response => response.json());
 }
 
-export function getAllMetaAtoms(
+export function fetchAllMetaAtoms(
   createdAfterDate,
   state = "ACTIVE",
   limit = 600
 ) {
-  return getMetaAtoms(
+  return fetchMetaAtoms(
     undefined,
     createdAfterDate,
     state,
@@ -408,8 +404,8 @@ export function getAllMetaAtoms(
   );
 }
 
-export function getAllActiveMetaPersonas() {
-  return getMetaAtoms(
+export function fetchAllActiveMetaPersonas() {
+  return fetchMetaAtoms(
     undefined,
     undefined,
     "ACTIVE",
@@ -438,24 +434,7 @@ export const fetchJsonLdDataset = (
         : undefined,
     },
   })
-    .then(response => {
-      if (
-        (response.status >= 200 && response.status < 300) ||
-        response.status === 304
-      ) {
-        return response;
-      } else {
-        let error = new Error(
-          `${response.status} - ${
-            response.statusText
-          } for request ${uri}, ${JSON.stringify(params)}`
-        );
-
-        error.response = response;
-        throw error;
-      }
-    })
-    //.then(dataset => dataset.data);
+    .then(checkHttpStatus(uri, params))
     .then(response => {
       if (includeLinkHeader) {
         const linkHeaderString =
@@ -476,56 +455,19 @@ export const fetchJsonLdDataset = (
       }
     });
 
-export const fetchTokenForAtom = (uri, params, includeLinkHeader = false) =>
+export const fetchTokenForAtom = (uri, params) =>
   fetch(generateLinkedDataQueryString(uri, params), {
     method: "get",
     credentials: "same-origin",
     headers: {
       // cachePolicy: "network-only",
       Accept: "application/json",
-      Prefer: params.pagingSize
-        ? `return=representation; max-member-count="${params.pagingSize}"`
-        : undefined,
     },
   })
-    .then(response => {
-      if (
-        (response.status >= 200 && response.status < 300) ||
-        response.status === 304
-      ) {
-        return response;
-      } else {
-        let error = new Error(
-          `${response.status} - ${
-            response.statusText
-          } for request ${uri}, ${JSON.stringify(params)}`
-        );
+    .then(checkHttpStatus(uri, params))
+    .then(response => response.json());
 
-        error.response = response;
-        throw error;
-      }
-    })
-    .then(response => {
-      if (includeLinkHeader) {
-        const linkHeaderString =
-          response.headers && response.headers.get("Link");
-        const linkHeaders = parseHeaderLinks(linkHeaderString);
-
-        const nextPageLinkObject =
-          linkHeaders && linkHeaders.next && getLinkAndParams(linkHeaders.next);
-        return Promise.all([
-          response.json(),
-          Promise.resolve(nextPageLinkObject),
-        ]).then(([jsonLdData, nextPage]) => ({
-          jsonLdData: jsonLdData,
-          nextPage: nextPage,
-        }));
-      } else {
-        return response.json();
-      }
-    });
-
-export function getMetaAtoms(
+function fetchMetaAtoms(
   modifiedAfterDate,
   createdAfterDate,
   state,
@@ -535,62 +477,58 @@ export function getMetaAtoms(
   maxDistance,
   limit
 ) {
-  return fetch(
-    urljoin(
-      ownerBaseUrl,
-      "/rest/atoms/all?" +
-        (state ? "state=" + state + "&" : "") +
-        (limit ? "limit=" + limit + "&" : "") +
-        (modifiedAfterDate
-          ? "modifiedafter=" + modifiedAfterDate.toISOString() + "&"
-          : "") +
-        (createdAfterDate
-          ? "createdAfterDate=" + createdAfterDate.toISOString() + "&"
-          : "") +
-        (filterBySocketTypeUri
-          ? "filterBySocketTypeUri=" +
-            encodeURIComponent(filterBySocketTypeUri) +
-            "&"
-          : "") +
-        (filterByAtomTypeUri
-          ? "filterByAtomTypeUri=" +
-            encodeURIComponent(filterByAtomTypeUri) +
-            "&"
-          : "") +
-        (location &&
-        location.lat &&
-        location.lng &&
-        (maxDistance || maxDistance == 0)
-          ? "latitude=" + location.lat + "&"
-          : "") +
-        (location &&
-        location.lat &&
-        location.lng &&
-        (maxDistance || maxDistance == 0)
-          ? "longitude=" + location.lng + "&"
-          : "") +
-        (location &&
-        location.lat &&
-        location.lng &&
-        (maxDistance || maxDistance == 0)
-          ? "maxDistance=" + maxDistance + "&"
-          : "")
-    ),
-    {
-      method: "get",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(),
-      credentials: "include",
-    }
-  )
-    .then(checkHttpStatus)
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/atoms/all?" +
+      (state ? "state=" + state + "&" : "") +
+      (limit ? "limit=" + limit + "&" : "") +
+      (modifiedAfterDate
+        ? "modifiedafter=" + modifiedAfterDate.toISOString() + "&"
+        : "") +
+      (createdAfterDate
+        ? "createdAfterDate=" + createdAfterDate.toISOString() + "&"
+        : "") +
+      (filterBySocketTypeUri
+        ? "filterBySocketTypeUri=" +
+          encodeURIComponent(filterBySocketTypeUri) +
+          "&"
+        : "") +
+      (filterByAtomTypeUri
+        ? "filterByAtomTypeUri=" + encodeURIComponent(filterByAtomTypeUri) + "&"
+        : "") +
+      (location &&
+      location.lat &&
+      location.lng &&
+      (maxDistance || maxDistance == 0)
+        ? "latitude=" + location.lat + "&"
+        : "") +
+      (location &&
+      location.lat &&
+      location.lng &&
+      (maxDistance || maxDistance == 0)
+        ? "longitude=" + location.lng + "&"
+        : "") +
+      (location &&
+      location.lat &&
+      location.lng &&
+      (maxDistance || maxDistance == 0)
+        ? "maxDistance=" + maxDistance + "&"
+        : "")
+  );
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(),
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
     .then(response => response.json());
 }
 
-export function getAllMetaAtomsNear(
+export function fetchAllMetaAtomsNear(
   createdAfterDate,
   location,
   maxDistance = 5000,
@@ -598,7 +536,7 @@ export function getAllMetaAtomsNear(
   state = "ACTIVE"
 ) {
   if (location && location.lat && location.lng) {
-    return getMetaAtoms(
+    return fetchMetaAtoms(
       undefined,
       createdAfterDate,
       state,
@@ -613,7 +551,7 @@ export function getAllMetaAtomsNear(
   }
 }
 
-export function getMessageEffects(connectionUri, messageUri) {
+export function fetchMessageEffects(connectionUri, messageUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/agreement/getMessageEffects",
@@ -629,11 +567,11 @@ export function getMessageEffects(connectionUri, messageUri) {
     },
     credentials: "include",
   })
-    .then(checkHttpStatus)
+    .then(checkHttpStatus(url))
     .then(response => response.json());
 }
 
-export function getAgreementProtocolUris(connectionUri) {
+export function fetchAgreementProtocolUris(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/agreement/getAgreementProtocolUris",
@@ -648,11 +586,11 @@ export function getAgreementProtocolUris(connectionUri) {
     },
     credentials: "include",
   })
-    .then(checkHttpStatus)
+    .then(checkHttpStatus(url))
     .then(response => response.json());
 }
 
-export async function getAgreementProtocolDataset(connectionUri) {
+export async function fetchAgreementProtocolDataset(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/agreement/getAgreementProtocolDataset",
@@ -667,14 +605,14 @@ export async function getAgreementProtocolDataset(connectionUri) {
     },
     credentials: "include",
   });
-  response = await checkHttpStatus(response);
+  response = await checkHttpStatus(url)(response);
   response = await response.text();
   const trigParser = new N3.Parser({ format: "application/trig" });
 
   return trigParser.parse(response);
 }
 
-export function getPetriNetUris(connectionUri) {
+export function fetchPetriNetUris(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/petrinet/getPetriNetUris",
@@ -689,7 +627,7 @@ export function getPetriNetUris(connectionUri) {
     },
     credentials: "include",
   })
-    .then(checkHttpStatus)
+    .then(checkHttpStatus(url))
     .then(response => response.json());
 }
 
@@ -707,7 +645,7 @@ export function sendMessage(msg) {
     }),
     credentials: "include",
   })
-    .then(checkHttpStatus)
+    .then(checkHttpStatus("/owner/rest/messages/send"))
     .then(response => response.json())
     .then(jsonResponse => ({
       messageUri: jsonResponse.messageUri,
@@ -720,19 +658,24 @@ export function sendMessage(msg) {
  * @param response
  * @returns {*}
  */
-function checkHttpStatus(response) {
+const checkHttpStatus = (uri, params = {}) => response => {
   if (
     (response.status >= 200 && response.status < 300) ||
     response.status === 304
   ) {
     return response;
   } else {
-    const error = new Error(response.statusText);
+    let error = new Error(
+      `${response.status} - ${
+        response.statusText
+      } for request ${uri}, ${JSON.stringify(params)}`
+    );
+
     error.response = response;
     error.status = response.status;
     throw error;
   }
-}
+};
 
 /**
  * This function is used to generate the query-strings.
