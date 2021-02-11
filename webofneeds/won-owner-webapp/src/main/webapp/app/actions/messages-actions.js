@@ -136,7 +136,7 @@ export function successfulCreate(event) {
     // since we know that created Atoms are only dispatched for owned atoms we add the atomUri as the requesterWebId for the atom fetch
     const requesterWebId = atomURI;
 
-    won.getAtom(atomURI, requesterWebId).then(atom => {
+    won.fetchAtom(atomURI, requesterWebId).then(atom => {
       dispatch(
         actionCreators.atoms__createSuccessful({
           eventUri: event.getIsResponseTo(),

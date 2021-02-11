@@ -421,68 +421,63 @@ export function getAllActiveMetaPersonas() {
   );
 }
 
-export function getJsonLdDataset(uri, params = {}, includeLinkHeader = false) {
-  const requestUri = generateLinkedDataQueryString(uri, params);
+export const fetchJsonLdDataset = (
+  uri,
+  params = {},
+  includeLinkHeader = false
+) =>
+  // bestfetch(requestUri, {
+  fetch(generateLinkedDataQueryString(uri, params), {
+    method: "get",
+    credentials: "same-origin",
+    headers: {
+      // cachePolicy: "network-only",
+      Accept: "application/ld+json",
+      Prefer: params.pagingSize
+        ? `return=representation; max-member-count="${params.pagingSize}"`
+        : undefined,
+    },
+  })
+    .then(response => {
+      if (
+        (response.status >= 200 && response.status < 300) ||
+        response.status === 304
+      ) {
+        return response;
+      } else {
+        let error = new Error(
+          `${response.status} - ${
+            response.statusText
+          } for request ${uri}, ${JSON.stringify(params)}`
+        );
 
-  // return bestfetch(requestUri, {
-  return (
-    fetch(requestUri, {
-      method: "get",
-      credentials: "same-origin",
-      headers: {
-        // cachePolicy: "network-only",
-        Accept: "application/ld+json",
-        Prefer: params.pagingSize
-          ? `return=representation; max-member-count="${params.pagingSize}"`
-          : undefined,
-      },
+        error.response = response;
+        throw error;
+      }
     })
-      .then(response => {
-        if (
-          (response.status >= 200 && response.status < 300) ||
-          response.status === 304
-        ) {
-          return response;
-        } else {
-          let error = new Error(
-            `${response.status} - ${
-              response.statusText
-            } for request ${uri}, ${JSON.stringify(params)}`
-          );
+    //.then(dataset => dataset.data);
+    .then(response => {
+      if (includeLinkHeader) {
+        const linkHeaderString =
+          response.headers && response.headers.get("Link");
+        const linkHeaders = parseHeaderLinks(linkHeaderString);
 
-          error.response = response;
-          throw error;
-        }
-      })
-      //.then(dataset => dataset.data);
-      .then(response => {
-        if (includeLinkHeader) {
-          const linkHeaderString =
-            response.headers && response.headers.get("Link");
-          const linkHeaders = parseHeaderLinks(linkHeaderString);
+        const nextPageLinkObject =
+          linkHeaders && linkHeaders.next && getLinkAndParams(linkHeaders.next);
+        return Promise.all([
+          response.json(),
+          Promise.resolve(nextPageLinkObject),
+        ]).then(([jsonLdData, nextPage]) => ({
+          jsonLdData: jsonLdData,
+          nextPage: nextPage,
+        }));
+      } else {
+        return response.json();
+      }
+    });
 
-          const nextPageLinkObject =
-            linkHeaders &&
-            linkHeaders.next &&
-            getLinkAndParams(linkHeaders.next);
-          return Promise.all([
-            response.json(),
-            Promise.resolve(nextPageLinkObject),
-          ]).then(([jsonLdData, nextPage]) => ({
-            jsonLdData: jsonLdData,
-            nextPage: nextPage,
-          }));
-        } else {
-          return response.json();
-        }
-      })
-  );
-}
-
-export function fetchTokenForAtom(uri, params, includeLinkHeader = false) {
-  const requestUri = generateLinkedDataQueryString(uri, params);
-
-  return fetch(requestUri, {
+export const fetchTokenForAtom = (uri, params, includeLinkHeader = false) =>
+  fetch(generateLinkedDataQueryString(uri, params), {
     method: "get",
     credentials: "same-origin",
     headers: {
@@ -529,7 +524,6 @@ export function fetchTokenForAtom(uri, params, includeLinkHeader = false) {
         return response.json();
       }
     });
-}
 
 export function getMetaAtoms(
   modifiedAfterDate,

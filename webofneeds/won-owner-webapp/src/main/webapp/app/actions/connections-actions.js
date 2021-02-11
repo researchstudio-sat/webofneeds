@@ -626,7 +626,7 @@ export function connectionsRate(connectionUri, rating) {
     const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
 
     won
-      .getConnection(connectionUri, {
+      .fetchConnection(connectionUri, {
         requesterWebId: getUri(ownedAtom),
       })
       .then(connection => {

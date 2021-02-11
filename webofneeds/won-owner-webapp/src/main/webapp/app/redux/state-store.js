@@ -34,7 +34,7 @@ export function fetchOwnedMetaData(dispatch) {
 
 export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
   return won
-    .getConnection(connUri, { requesterWebId: atomUri })
+    .fetchConnection(connUri, { requesterWebId: atomUri })
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -56,7 +56,7 @@ export function fetchConnectionUriBySocketUris(
   atomUri
 ) {
   return won
-    .getConnectionUrisBySocket(senderSocketUri, targetSocketUri, {
+    .fetchConnectionUrisBySocket(senderSocketUri, targetSocketUri, {
       requesterWebId: atomUri,
     })
     .catch(() => {
@@ -77,7 +77,7 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
   dispatch
 ) {
   return won
-    .getConnectionBySocket(senderSocketUri, targetSocketUri, {
+    .fetchConnectionBySocket(senderSocketUri, targetSocketUri, {
       requesterWebId: atomUri,
     })
     .then(conn => {
@@ -201,10 +201,10 @@ export function fetchAtomAndDispatch(
   };
 
   const requesterWebId = isOwned ? atomUri : determineRequesterWebId(atomUri);
-  //TODO
+  //TODO: retrieve tokens
 
   return won
-    .getAtom(atomUri, requesterWebId)
+    .fetchAtom(atomUri, requesterWebId)
     .then(atom => {
       dispatch({
         type: actionTypes.atoms.store,
@@ -221,6 +221,7 @@ export function fetchAtomAndDispatch(
           dispatch
         );
       } else {
+        //TODO: Connection fetch probably not even possible for non owned atoms (depending on the connectionstate)
         fetchConnectionsOfNonOwnedAtomAndDispatch(
           atomUri,
           requesterWebId,
@@ -320,7 +321,11 @@ export function fetchMessages(
   );
 
   return won
-    .getMessagesOfConnection(connectionUri, connectionContainerUri, fetchParams)
+    .fetchMessagesOfConnection(
+      connectionUri,
+      connectionContainerUri,
+      fetchParams
+    )
     .then(({ nextPage, messages }) => {
       const lookupMap = { success: {}, failed: {} };
       const loadingArray = [];
@@ -387,7 +392,7 @@ function fetchConnectionsOfOwnedAtomAndDispatch(
   dispatch
 ) {
   return won
-    .getConnectionUrisWithStateByAtomUri(atomUri, requesterWebId)
+    .fetchConnectionUrisWithStateByAtomUri(atomUri, requesterWebId)
     .then(connectionsWithStateAndSocket => {
       dispatch({
         type: actionTypes.connections.storeMetaConnections,
@@ -427,7 +432,7 @@ function fetchConnectionsOfNonOwnedAtomAndDispatch(
   dispatch
 ) {
   return won
-    .getConnectionUrisWithStateByAtomUri(atomUri, requesterWebId, true)
+    .fetchConnectionUrisWithStateByAtomUri(atomUri, requesterWebId, true)
     .then(connectionsWithStateAndSocket => {
       const connectedConnections = connectionsWithStateAndSocket.filter(
         conn => conn.connectionState === vocab.WON.Connected
