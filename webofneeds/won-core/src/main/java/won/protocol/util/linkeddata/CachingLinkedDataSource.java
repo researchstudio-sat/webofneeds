@@ -39,15 +39,14 @@ import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.EnumSet.noneOf;
 
@@ -60,6 +59,8 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     private static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
     private static final int DEFAULT_BYTE_ARRAY_SIZE = 500;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final long DEFAULT_LIFETIME = 600 * 1000;
+    private static Pattern CACHE_CONTROL_MAX_AGE_PATTERN = Pattern.compile("max-age=(\\d+)");
     @Autowired(required = true)
     private EhCacheCacheManager cacheManager;
     private Ehcache cache;
@@ -448,6 +449,18 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
     private DatasetResponseWithStatusCodeAndHeaders fetch(final URI resource, final URI requesterWebID,
                     final HttpHeaders headers) {
         final DatasetResponseWithStatusCodeAndHeaders responseData;
+        if (headers.containsKey(HttpHeaders.CACHE_CONTROL)) {
+            String cacheControl = headers.getCacheControl();
+            String[] directives = cacheControl.split("\\s*,\\s*");
+            headers.setCacheControl(
+                            Stream.concat(
+                                            Arrays.stream(directives),
+                                            Stream.of("max-age=0", "must-revalidate"))
+                                            .distinct()
+                                            .collect(Collectors.joining(", ")));
+        } else {
+            headers.setCacheControl("max-age=0, must-revalidate");
+        }
         if (requesterWebID != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("fetching linked data for URI {} with WebID {}", resource, requesterWebID);
@@ -532,18 +545,17 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         if (cacheControlHeaderValue == null) {
             return null;
         }
-        Pattern maxagePattern = Pattern.compile("$max-age=(\\d+)$");
-        Matcher m = maxagePattern.matcher(cacheControlHeaderValue);
+        Matcher m = CACHE_CONTROL_MAX_AGE_PATTERN.matcher(cacheControlHeaderValue);
         if (!m.find()) {
             return null;
         }
         String maxAgeValueString = m.group(1);
-        int maxAgeInt = 3600;
+        int maxAgeInt = (int) DEFAULT_LIFETIME / 1000;
         try {
             maxAgeInt = Integer.parseInt(maxAgeValueString);
         } catch (NumberFormatException e) {
             logger.warn("could not parse 'Expires' header ' " + cacheControlHeaderValue + "' obtained for '" + resource
-                            + "' using default expiry period of 1 hour", e);
+                            + "' using default expiry period of {} seconds", maxAgeInt, e);
         }
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());

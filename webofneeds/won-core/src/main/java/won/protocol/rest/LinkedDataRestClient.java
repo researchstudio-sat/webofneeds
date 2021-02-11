@@ -174,8 +174,15 @@ public abstract class LinkedDataRestClient {
                             e);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("fetched model with {} statements in default model for resource {}",
-                            result.getDefaultModel().size(), resourceURI);
+            if (result == null) {
+                logger.debug("fetching resulted in null dataset for resource {}", resourceURI);
+            } else if (result.getDefaultModel() == null) {
+                logger.debug("fetched dataset with empty default model for resource {}", resourceURI);
+            } else {
+                logger.debug("fetched dataset with {} statements in default model for resource {}",
+                                result.getDefaultModel().size(),
+                                resourceURI);
+            }
         }
         sw.stop();
         logger.debug(LogMarkers.TIMING, "fetching {} took {} millis", resourceURI, sw.getLastTaskTimeMillis());
