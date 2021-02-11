@@ -138,7 +138,27 @@ export default function WonMenu({ className }) {
   }
 
   function logout() {
-    dispatch(actionCreators.account__logout(history));
+    const payload = {
+      caption: "Sign out",
+      text: "Do you really want to sign out?",
+      buttons: [
+        {
+          caption: "Yes",
+          callback: () => {
+            dispatch(actionCreators.view__hideModalDialog());
+            dispatch(actionCreators.account__logout(history));
+            history.push("/inventory");
+          },
+        },
+        {
+          caption: "No",
+          callback: () => {
+            dispatch(actionCreators.view__hideModalDialog());
+          },
+        },
+      ],
+    };
+    dispatch(actionCreators.view__showModalDialog(payload));
   }
 
   function viewWhatsNew() {
