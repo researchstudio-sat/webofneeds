@@ -927,28 +927,46 @@ auth:OwnerToken
 
 # Implicit authorizations for all atoms:
 
-auth:ownerTokenAuthorization
+auth:grantsForOwnerTokenBearer
     a           auth:Authorization ;
     auth:grant  [ auth:operation auth:anyOperation ] ;
     auth:bearer [ auth:tokenScope auth:OwnerToken ;
                   auth:nodeSigned true ;
                   auth:issuer     [ auth:atom auth:self ] ] .
 
-auth:grantOwnerTokenAuthorization
+auth:grantOwnerTokenToOwner
     a            auth:Authorization ;
     auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   auth:OwnerToken ;
                                                         auth:nodeSigned   true ;
                                                         auth:expiresAfter 3600 ] ] ] ;
     auth:grantee [ auth:atom auth:self ] .
 
-auth:grantReadToConnectRecipient
+auth:grantsForConnStateRequestSent
     a            auth:Authorization ;
-    auth:grant   [ auth:graph [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
-                                auth:operation auth:opRead ] ] ;
+    auth:grant   [ auth:graph      [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                     auth:operation auth:opRead ] ;
+                   auth:connection [ auth:targetAtom [ auth:atom auth:operationRequestor ] ;
+                                     auth:operation  auth:opConnectClose ] ] ;
     auth:grantee [ auth:connection [ auth:targetAtom      [ ] ;
                                      auth:connectionState won:RequestSent ] ] .
 
-auth:grantReadAndMessageToConnected
+auth:grantsForConnStateRequestReceived
+    a            auth:Authorization ;
+    auth:grant   [ auth:graph      [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                     auth:operation auth:opRead ] ;
+                   auth:connection [ auth:targetAtom [ auth:atom auth:operationRequestor ] ;
+                                     auth:operation  auth:opConnectClose ] ] ;
+    auth:grantee [ auth:connection [ auth:targetAtom      [ ] ;
+                                     auth:connectionState won:RequestReceived ] ] .
+
+auth:grantsForConnStateClosed
+    a            auth:Authorization ;
+    auth:grant   [ auth:connection [ auth:targetAtom [ auth:atom auth:operationRequestor ] ;
+                                     auth:operation  auth:opConnectClose ] ] ;
+    auth:grantee [ auth:connection [ auth:targetAtom      [ ] ;
+                                     auth:connectionState won:Closed ] ] .
+
+auth:grantsForConnStateConnected
     a            auth:Authorization ;
     auth:grant   [ auth:graph      [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
                                      auth:operation auth:opRead ] ;

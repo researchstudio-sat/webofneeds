@@ -26,8 +26,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Optional;
 
-import static won.auth.model.Individuals.POSITION_ROOT;
-import static won.auth.model.Individuals.POSITION_SOCKET;
+import static won.auth.model.Individuals.*;
 
 public class AclChecker extends AbstractCamelProcessor {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -86,7 +85,6 @@ public class AclChecker extends AbstractCamelProcessor {
                         .setRequestor(requestor)
                         .build();
         if (message.getMessageType().isConnectionSpecificMessage()) {
-            operationRequest.setReqPosition(POSITION_SOCKET);
             if (direction.isFromOwner()) {
                 Optional<Socket> s = socketService.getSocket(message.getSenderSocketURIRequired());
                 operationRequest.setReqSocketType(s.get().getTypeURI());
@@ -101,10 +99,13 @@ public class AclChecker extends AbstractCamelProcessor {
         }
         Optional<Connection> con = WonCamelHelper.getConnection(exchange, connectionService);
         if (con.isPresent()) {
+            operationRequest.setReqPosition(POSITION_CONNECTION);
             Connection c = con.get();
             operationRequest.setReqConnection(c.getConnectionURI());
             operationRequest.setReqConnectionTargetAtom(c.getTargetAtomURI());
             operationRequest.setReqConnectionState(AuthUtils.toAuthConnectionState(c.getState()));
+        } else {
+            operationRequest.setReqPosition(POSITION_SOCKET);
         }
         if (isMessageOnBehalf) {
             operationRequest.setOperationMessageOperationExpression(
