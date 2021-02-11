@@ -1,7 +1,7 @@
 package won.auth.socket.support;
 
 import org.apache.jena.graph.Graph;
-import won.auth.WonAclInstanceFactory;
+import won.auth.AuthUtils;
 import won.auth.model.*;
 import won.shacl2java.Shacl2JavaInstanceFactory;
 
@@ -41,9 +41,8 @@ public class SocketAclAlgorithms {
         if (authGraph == null && authGraph.isEmpty()) {
             return new HashSet<>();
         }
-        Shacl2JavaInstanceFactory factory = WonAclInstanceFactory.get();
-        factory.load(authGraph);
-        return factory.getInstancesOfType(Authorization.class);
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
+        return factory.accessor(authGraph).getInstancesOfType(Authorization.class);
     }
 
     /**
@@ -132,9 +131,8 @@ public class SocketAclAlgorithms {
         Objects.requireNonNull(authGraph);
         Objects.requireNonNull(localSocket);
         Objects.requireNonNull(requestingAtom);
-        Shacl2JavaInstanceFactory factory = WonAclInstanceFactory.get();
-        factory.load(authGraph);
-        Set<Authorization> existingAuths = factory.getInstancesOfType(Authorization.class);
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
+        Set<Authorization> existingAuths = factory.accessor(authGraph).getInstancesOfType(Authorization.class);
         Set<Authorization> modifiedAuths = existingAuths.stream()
                         .map(existingAuth -> {
                             if (removeAsRequestingSocket || mentionsAtom(existingAuth, requestingAtom)) {

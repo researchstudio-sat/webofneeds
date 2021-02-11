@@ -47,8 +47,6 @@ public class Shacl2JavaInstanceFactory {
     private Shapes shapes;
     private String[] packagesToScan;
     private InstantiationContext baseInstantiationContext;
-    private InstantiationContext dataInstantiationContext;
-    private boolean instantiateViolatingNodes = false;
 
     public Shacl2JavaInstanceFactory(Shapes shapes, String... packagesToScan) {
         this.shapes = shapes;
@@ -75,112 +73,117 @@ public class Shacl2JavaInstanceFactory {
     }
 
     /**
-     * Removes the results of any prior calls to <code>load(Graph)</code>.
+     * Instantiates everything found in data.
+     * Returns an {@link Accessor} object for obtaining the instances.
+     *
+     * @param data the data to load
      */
-    public void reset() {
-        this.dataInstantiationContext = null;
+    public Accessor accessor(Graph data) {
+        DerivedInstantiationContext dataContext = new DerivedInstantiationContext(data, baseInstantiationContext);
+        instantiateAll(dataContext);
+        return new Accessor(dataContext);
     }
 
     /**
-     * Instantiates everything found in data. Replaces any results from previous
-     * calls to <code>load(Graph)</code>.
+     * Returns an {@link Accessor} object for obtaining the instances found in the base data.
      *
-     * @param data the data to load
-     * @param instantiateViolatingNodes if <code>true</code>, instances are
-     * generated for nodes even if they violate one or more of their shapes.
+     * @return
      */
-    public void load(Graph data, boolean instantiateViolatingNodes) {
-        reset();
-        this.instantiateViolatingNodes = instantiateViolatingNodes;
-        DerivedInstantiationContext dataContext = new DerivedInstantiationContext(data, baseInstantiationContext);
-        instantiateAll(dataContext);
-        this.dataInstantiationContext = dataContext;
+    public Accessor accessor() {
+        return new Accessor();
     }
 
-    public void load(Graph data) {
-        load(data, false);
-    }
-
-    public boolean isLoaded() {
-        return this.dataInstantiationContext != null;
-    }
-
-    public Set<Object> getInstances(String uri) {
-        return getInstances(uri, false);
-    }
-
-    public Set<Object> getInstances(String uri, boolean includeBaseContext) {
-        Set<Object> result = new HashSet<>();
-        if (includeBaseContext) {
-            result.addAll(baseInstantiationContext.getInstances(uri));
+    public class Accessor {
+        private Accessor() {
         }
-        if (dataInstantiationContext != null) {
-            result.addAll(dataInstantiationContext.getInstances(uri));
+
+        private Accessor(InstantiationContext dataInstantiationContext) {
+            Accessor.this.dataInstantiationContext = dataInstantiationContext;
         }
-        return result;
-    }
 
-    public <T> Set<T> getInstancesOfType(Class<T> type) {
-        return getInstancesOfType(type, false);
-    }
+        private InstantiationContext dataInstantiationContext;
 
-    public <T> Set<T> getInstancesOfType(Class<T> type, boolean includeBaseContext) {
-        Set<T> result = new HashSet<>();
-        if (includeBaseContext) {
-            result.addAll(baseInstantiationContext.getInstancesOfType(type));
+        public int size() {
+            return dataInstantiationContext.size();
         }
-        if (dataInstantiationContext != null) {
-            result.addAll(dataInstantiationContext.getInstancesOfType(type));
+
+        public Set<Object> getInstances(String uri) {
+            return getInstances(uri, false);
         }
-        return result;
-    }
 
-    public <T> Optional<T> getInstanceOfType(String uri, Class<T> type) {
-        return getInstanceOfType(uri, type, false);
-    }
-
-    public <T> Optional<T> getInstanceOfType(String uri, Class<T> type,
-                    boolean includeBaseContext) {
-        if (includeBaseContext) {
-            Optional<T> inst = baseInstantiationContext.getInstanceOfType(uri, type);
-            if (inst.isPresent()) {
-                return inst;
+        public Set<Object> getInstances(String uri, boolean includeBaseContext) {
+            Set<Object> result = new HashSet<>();
+            if (includeBaseContext) {
+                result.addAll(baseInstantiationContext.getInstances(uri));
             }
+            if (dataInstantiationContext != null) {
+                result.addAll(dataInstantiationContext.getInstances(uri));
+            }
+            return result;
         }
-        if (dataInstantiationContext != null) {
-            return dataInstantiationContext.getInstanceOfType(uri, type);
-        }
-        return Optional.empty();
-    }
 
-    public Map<String, Set<Object>> getInstanceMap() {
-        return getInstanceMap(false);
-    }
+        public <T> Set<T> getInstancesOfType(Class<T> type) {
+            return getInstancesOfType(type, false);
+        }
 
-    public Map<String, Set<Object>> getInstanceMap(boolean includeBaseContext) {
-        Map<String, Set<Object>> result = new HashMap<>();
-        if (includeBaseContext) {
-            result.putAll(baseInstantiationContext.getInstanceMap());
+        public <T> Set<T> getInstancesOfType(Class<T> type, boolean includeBaseContext) {
+            Set<T> result = new HashSet<>();
+            if (includeBaseContext) {
+                result.addAll(baseInstantiationContext.getInstancesOfType(type));
+            }
+            if (dataInstantiationContext != null) {
+                result.addAll(dataInstantiationContext.getInstancesOfType(type));
+            }
+            return result;
         }
-        if (dataInstantiationContext != null) {
-            result.putAll(dataInstantiationContext.getInstanceMap());
-        }
-        return result;
-    }
 
-    public Collection<Object> getInstances() {
-        return getInstances(false);
-    }
+        public <T> Optional<T> getInstanceOfType(String uri, Class<T> type) {
+            return getInstanceOfType(uri, type, false);
+        }
 
-    public Collection<Object> getInstances(boolean includeBaseContext) {
-        Set<Object> result = new HashSet<>();
-        if (includeBaseContext) {
-            result.addAll(baseInstantiationContext.getInstances());
+        public <T> Optional<T> getInstanceOfType(String uri, Class<T> type,
+                        boolean includeBaseContext) {
+            if (includeBaseContext) {
+                Optional<T> inst = baseInstantiationContext.getInstanceOfType(uri, type);
+                if (inst.isPresent()) {
+                    return inst;
+                }
+            }
+            if (dataInstantiationContext != null) {
+                return dataInstantiationContext.getInstanceOfType(uri, type);
+            }
+            return Optional.empty();
         }
-        if (dataInstantiationContext == null) {
-            result.addAll(dataInstantiationContext.getInstances());
+
+        public Map<String, Set<Object>> getInstanceMap() {
+            return getInstanceMap(false);
         }
-        return result;
+
+        public Map<String, Set<Object>> getInstanceMap(boolean includeBaseContext) {
+            Map<String, Set<Object>> result = new HashMap<>();
+            if (includeBaseContext) {
+                result.putAll(baseInstantiationContext.getInstanceMap());
+            }
+            if (dataInstantiationContext != null) {
+                result.putAll(dataInstantiationContext.getInstanceMap());
+            }
+            return result;
+        }
+
+        public Collection<Object> getInstances() {
+            return getInstances(false);
+        }
+
+        public Collection<Object> getInstances(boolean includeBaseContext) {
+            Set<Object> result = new HashSet<>();
+            if (includeBaseContext) {
+                result.addAll(baseInstantiationContext.getInstances());
+            }
+            if (dataInstantiationContext == null) {
+                result.addAll(dataInstantiationContext.getInstances());
+            }
+            return result;
+        }
     }
 
     private void scanPackages(InstantiationContext ctx) {
@@ -311,13 +314,13 @@ public class Shacl2JavaInstanceFactory {
     /**
      * Creates all instances for the given node / shape combination.
      *
-     * @param node may be null, in which case all target nodes of the shape are
-     * chosen.
+     * @param node  may be null, in which case all target nodes of the shape are
+     *              chosen.
      * @param shape
      * @return the set of nodes reached during instantiation that have not been
      * instantiated yet
      */
-    public Set<DataNodeAndShapes> instantiate(Node node, Shape shape, boolean forceApplyShape,
+    private Set<DataNodeAndShapes> instantiate(Node node, Shape shape, boolean forceApplyShape,
                     InstantiationContext ctx) {
         if (shape.getShapeNode().isBlank()) {
             if (node == null) {
@@ -353,9 +356,6 @@ public class Shacl2JavaInstanceFactory {
         }
         final Set<Node> finalFocusNodes = removeNodesInstantiatedInBaseContext(focusNodes)
                         .stream().filter(fnode -> {
-                            if (instantiateViolatingNodes) {
-                                return true;
-                            }
                             // check if focusnode conforms to shape
                             ValidationContext vCtx = ctx.newValidationContext();
                             VLib.validateShape(vCtx, ctx.getData(), shape, fnode);
@@ -456,7 +456,7 @@ public class Shacl2JavaInstanceFactory {
         return ret;
     }
 
-    public Set<Node> removeNodesInstantiatedInBaseContext(Collection<Node> focusNodes) {
+    private Set<Node> removeNodesInstantiatedInBaseContext(Collection<Node> focusNodes) {
         return focusNodes.stream()
                         .filter(Objects::nonNull)
                         .filter(n -> {
@@ -473,7 +473,7 @@ public class Shacl2JavaInstanceFactory {
                         }).collect(Collectors.toSet());
     }
 
-    public Object instantiate(Shape shape, String shapeURI, Node focusNode, Class<?> classForShape,
+    private Object instantiate(Shape shape, String shapeURI, Node focusNode, Class<?> classForShape,
                     InstantiationContext ctx)
                     throws InstantiationException,
                     IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -487,7 +487,7 @@ public class Shacl2JavaInstanceFactory {
         return instantiateClass(focusNode, classForShape, ctx.getData());
     }
 
-    public Object instantiateClass(Node focusNode, Class<?> classForShape, Graph graph)
+    private Object instantiateClass(Node focusNode, Class<?> classForShape, Graph graph)
                     throws InstantiationException,
                     IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Object instance;
@@ -495,7 +495,7 @@ public class Shacl2JavaInstanceFactory {
         return instance;
     }
 
-    public Object instantiateEnum(Node focusNode, Class<Enum> type) {
+    private Object instantiateEnum(Node focusNode, Class<Enum> type) {
         String enumName = NameUtils.enumConstantName(focusNode);
         if (enumName != null) {
             Enum[] enumConstants = type.getEnumConstants();
@@ -509,7 +509,7 @@ public class Shacl2JavaInstanceFactory {
         return null;
     }
 
-    public void wireDependencies(Object instance, InstantiationContext ctx) {
+    private void wireDependencies(Object instance, InstantiationContext ctx) {
         Map<Path, Set<Field>> fieldsByPath = new HashMap<>();
         Class<?> type = instance.getClass();
         Field[] instanceFields = type.getDeclaredFields();
@@ -765,9 +765,5 @@ public class Shacl2JavaInstanceFactory {
             }
         }
         return false;
-    }
-
-    public int size() {
-        return dataInstantiationContext.size();
     }
 }

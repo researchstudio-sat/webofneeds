@@ -21,13 +21,14 @@ import java.util.stream.Collectors;
 public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     Shacl2JavaInstanceFactory instanceFactory;
+    Shacl2JavaInstanceFactory.Accessor accessor = null;
 
     public ModelBasedTargetAtomCheckEvaluator(Shapes shapes, String packageName) {
         this.instanceFactory = new Shacl2JavaInstanceFactory(shapes, packageName);
     }
 
     public void loadData(Graph data) {
-        this.instanceFactory.load(data, true);
+        this.accessor = this.instanceFactory.accessor(data);
     }
 
     public Shacl2JavaInstanceFactory getInstanceFactory() {
@@ -36,7 +37,7 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
 
     @Override
     public boolean isRequestorAllowedTarget(TargetAtomCheck check) {
-        Optional<Atom> atomOpt = instanceFactory.getInstanceOfType(check.getAtom().toString(), Atom.class);
+        Optional<Atom> atomOpt = accessor.getInstanceOfType(check.getAtom().toString(), Atom.class);
         if (!atomOpt.isPresent()) {
             logger.debug("No data found for atom {} ", check.getAtom());
             return false;

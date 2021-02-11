@@ -120,7 +120,7 @@ public class AclChecker extends AbstractCamelProcessor {
                                                             AuthUtils.toAuthMessageType(message.getMessageType()))
                                             .build());
         }
-        WonAclEvaluator evaluator = wonAclEvaluatorFactory.getWonAclEvaluator(aclGraph.get());
+        WonAclEvaluator evaluator = wonAclEvaluatorFactory.create(aclGraph.get());
         if (message.getMessageType().isReplace()) {
             // decision for replace messages is deferred to where replacement actually
             // happens

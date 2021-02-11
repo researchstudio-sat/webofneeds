@@ -54,7 +54,7 @@ ex:token1
 
 ex:atom1
     a                    won:Atom ;
-    won:socket           atom1:buddySocket, ex:exSocket ;
+    won:socket           atom1:buddySocket, atom1:exSocket ;
     won:state            won:Active ;
     won:messageContainer atom1:msg ;
     won:wonNode          ex:node .
@@ -64,7 +64,7 @@ atom1:buddySocket
     won:socketDefinition wx-buddy:BuddySocket ;
     won:connections      atom1:buddySocketConnections .
 
-ex:exSocket
+atom1:exSocket
     a                    won:Socket ;
     won:socketDefinition ex:ExSocketDef ;
     won:connections      atom1:exSocketConnections .
@@ -79,19 +79,33 @@ atom1:exSocketConnections
 atom1:bsConn1
     a                   won:Connection ;
     won:targetAtom      ex:atom2 ;
+    won:socket          atom1:buddySocket ;
     won:connectionState won:RequestReceived .
 
 atom1:bsConn2
     a                   won:Connection ;
     won:targetAtom      ex:atom3 ;
+    won:socket          atom1:buddySocket ;
     won:connectionState won:Connected .
 
 
 atom1:exConn1
     a                   won:Connection ;
     won:targetAtom      ex:atom4 ;
+    won:socket          atom1:exSocket ;
     won:connectionState won:RequestSent .
+
+ex:atom2
+    a           won:Atom ;
+    won:state   won:Active ;
+    won:wonNode ex:node .
 
 ex:atom3
     a           won:Atom ;
+    won:state   won:Active ;
+    won:wonNode ex:node .
+
+ex:atom4
+    a           won:Atom ;
+    won:state   won:Active ;
     won:wonNode ex:node .

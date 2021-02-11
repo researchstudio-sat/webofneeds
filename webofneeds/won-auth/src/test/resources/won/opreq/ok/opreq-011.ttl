@@ -19,6 +19,7 @@ ex:atom1
     a                    won:Atom ;
     won:socket           atom1:buddySocket ;
     won:state            won:Active ;
+    won:wonNode          ex:node ;
     won:messageContainer atom1:msg .
 
 atom1:buddySocket
@@ -32,8 +33,13 @@ atom1:buddySocketConnections
 atom1:bsConn1
     a                   won:Connection ;
     won:targetAtom      ex:atom2 ;
+    won:socket          atom1:buddySocket ;
     won:connectionState won:Connected .
 
+ex:atom2
+    a           won:Atom ;
+    won:wonNode ex:node ;
+    won:state   won:Active .
 
 <#authorization>
     a            auth:Authorization ;

@@ -54,9 +54,8 @@ won:socketShape
 
 won:connectionContainerShape
     a           sh:NodeShape ;
-    sh:property [ sh:path     rdfs:member ;
-                  sh:nodeKind sh:IRI ;
-                  sh:class    won:Connection ] .
+    sh:property [ sh:path rdfs:member ;
+                  sh:node won:connectionShape ] .
 
 won:connectionShape
     a              sh:NodeShape ;
@@ -68,13 +67,12 @@ won:connectionShape
                      sh:in       ( won:Suggested won:RequestSent won:RequestReceived won:Connected
                                    won:Closed ) ] ;
     sh:property    [ sh:path     won:targetAtom ;
-                     sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
-                     sh:class    won:Atom ] ;
+                     sh:node     won:atomShape ] ;
     sh:property    [ sh:path     won:targetConnection ;
                      sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
-                     sh:class    won:Connection ] ;
+                     sh:node     won:connectionShape ] ;
     sh:property    [ sh:path     won:targetSocket ;
                      sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
@@ -82,7 +80,7 @@ won:connectionShape
     sh:property    [ sh:path     won:atom ;
                      sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
-                     sh:class    won:Atom ] ;
+                     sh:node     won:atomShape ] ;
     sh:property    [ sh:path     won:socket ;
                      sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;

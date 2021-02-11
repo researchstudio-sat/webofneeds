@@ -80,7 +80,7 @@ public class SocketAuthorizationTest {
 
     @Test
     public void testAddLocalAuth() throws IOException {
-        Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
         SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "addLocalAuth";
         for (Resource socketGraphResource : getInputs(folder)) {
@@ -91,8 +91,8 @@ public class SocketAuthorizationTest {
                             "/won/socket/" + folder + "/" + baseName + "-acl-after.ttl"));
             Graph aclBefore = loadGraph(new ClassPathResource(
                             "/won/socket/" + folder + "/" + baseName + "-acl-before.ttl"));
-            factory.load(loadGraph(socketGraphResource));
-            Set<SocketDefinition> sockets = factory.getInstancesOfType(SocketDefinition.class);
+            Shacl2JavaInstanceFactory.Accessor ac = factory.accessor(loadGraph(socketGraphResource));
+            Set<SocketDefinition> sockets = ac.getInstancesOfType(SocketDefinition.class);
             for (SocketDefinition socket : sockets) {
                 Graph actualResult = socketAclAlgos
                                 .addAuthorizationsForSocket(aclBefore, socket.getLocalAuths(), OWN_SOCKET1, OWN_ATOM);
@@ -103,7 +103,7 @@ public class SocketAuthorizationTest {
 
     @Test
     public void testAddTargetAuth() throws IOException {
-        Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
         SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "addTargetAuth";
         for (Resource socketGraphResource : getInputs(folder)) {
@@ -114,8 +114,8 @@ public class SocketAuthorizationTest {
                             "/won/socket/" + folder + "/" + baseName + "-acl-after.ttl"));
             Graph aclBefore = loadGraph(new ClassPathResource(
                             "/won/socket/" + folder + "/" + baseName + "-acl-before.ttl"));
-            factory.load(loadGraph(socketGraphResource));
-            Set<SocketDefinition> sockets = factory.getInstancesOfType(SocketDefinition.class);
+            Shacl2JavaInstanceFactory.Accessor ac = factory.accessor(loadGraph(socketGraphResource));
+            Set<SocketDefinition> sockets = ac.getInstancesOfType(SocketDefinition.class);
             for (SocketDefinition socket : sockets) {
                 Graph actualResult = socketAclAlgos
                                 .addAuthorizationsForSocket(aclBefore, socket.getTargetAuths(), OWN_SOCKET1,
@@ -127,7 +127,7 @@ public class SocketAuthorizationTest {
 
     @Test
     public void testRemoveTargetAuthRemoveSocket() throws IOException {
-        Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
         SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "removeTargetAuthRemoveSocket";
         for (Resource socketGraphResource : getInputs(folder)) {
@@ -138,8 +138,8 @@ public class SocketAuthorizationTest {
                             "/won/socket/" + folder + "/" + baseName + "-acl-after.ttl"));
             Graph aclBefore = loadGraph(new ClassPathResource(
                             "/won/socket/" + folder + "/" + baseName + "-acl-before.ttl"));
-            factory.load(loadGraph(socketGraphResource));
-            Set<SocketDefinition> sockets = factory.getInstancesOfType(SocketDefinition.class);
+            Shacl2JavaInstanceFactory.Accessor ac = factory.accessor(loadGraph(socketGraphResource));
+            Set<SocketDefinition> sockets = ac.getInstancesOfType(SocketDefinition.class);
             for (SocketDefinition socket : sockets) {
                 Graph actualResult = socketAclAlgos
                                 .removeAuthorizationsForSocket(aclBefore, OWN_SOCKET1, TARGET_ATOM, true);
@@ -150,7 +150,7 @@ public class SocketAuthorizationTest {
 
     @Test
     public void testRemoveTargetAuth() throws IOException {
-        Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
         SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "removeTargetAuth";
         for (Resource socketGraphResource : getInputs(folder)) {
@@ -161,8 +161,8 @@ public class SocketAuthorizationTest {
                             "/won/socket/" + folder + "/" + baseName + "-acl-after.ttl"));
             Graph aclBefore = loadGraph(new ClassPathResource(
                             "/won/socket/" + folder + "/" + baseName + "-acl-before.ttl"));
-            factory.load(loadGraph(socketGraphResource));
-            Set<SocketDefinition> sockets = factory.getInstancesOfType(SocketDefinition.class);
+            Shacl2JavaInstanceFactory.Accessor ac = factory.accessor(loadGraph(socketGraphResource));
+            Set<SocketDefinition> sockets = ac.getInstancesOfType(SocketDefinition.class);
             for (SocketDefinition socket : sockets) {
                 Graph actualResult = socketAclAlgos
                                 .removeAuthorizationsForSocket(aclBefore, OWN_SOCKET1, TARGET_ATOM, false);
@@ -173,7 +173,7 @@ public class SocketAuthorizationTest {
 
     @Test
     public void testRemoveLocalAuthRemoveSocket() throws IOException {
-        Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
         SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "removeLocalAuthRemoveSocket";
         for (Resource socketGraphResource : getInputs(folder)) {
@@ -184,8 +184,8 @@ public class SocketAuthorizationTest {
                             "/won/socket/" + folder + "/" + baseName + "-acl-after.ttl"));
             Graph aclBefore = loadGraph(new ClassPathResource(
                             "/won/socket/" + folder + "/" + baseName + "-acl-before.ttl"));
-            factory.load(loadGraph(socketGraphResource));
-            Set<SocketDefinition> sockets = factory.getInstancesOfType(SocketDefinition.class);
+            Shacl2JavaInstanceFactory.Accessor ac = factory.accessor(loadGraph(socketGraphResource));
+            Set<SocketDefinition> sockets = ac.getInstancesOfType(SocketDefinition.class);
             for (SocketDefinition socket : sockets) {
                 Graph actualResult = socketAclAlgos
                                 .removeAuthorizationsForSocket(aclBefore, OWN_SOCKET1, TARGET_ATOM, true);
@@ -196,7 +196,7 @@ public class SocketAuthorizationTest {
 
     @Test
     public void testRemoveLocalAuth() throws IOException {
-        Shacl2JavaInstanceFactory factory = AuthUtils.newInstanceFactory();
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
         SocketAclAlgorithms socketAclAlgos = new SocketAclAlgorithms();
         String folder = "removeLocalAuth";
         for (Resource socketGraphResource : getInputs(folder)) {
@@ -207,8 +207,8 @@ public class SocketAuthorizationTest {
                             "/won/socket/" + folder + "/" + baseName + "-acl-after.ttl"));
             Graph aclBefore = loadGraph(new ClassPathResource(
                             "/won/socket/" + folder + "/" + baseName + "-acl-before.ttl"));
-            factory.load(loadGraph(socketGraphResource));
-            Set<SocketDefinition> sockets = factory.getInstancesOfType(SocketDefinition.class);
+            Shacl2JavaInstanceFactory.Accessor ac = factory.accessor(loadGraph(socketGraphResource));
+            Set<SocketDefinition> sockets = ac.getInstancesOfType(SocketDefinition.class);
             for (SocketDefinition socket : sockets) {
                 Graph actualResult = socketAclAlgos
                                 .removeAuthorizationsForSocket(aclBefore, OWN_SOCKET1, TARGET_ATOM, false);

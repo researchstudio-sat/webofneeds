@@ -1,14 +1,10 @@
 package won.auth;
 
-import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.compose.Union;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.Shapes;
-import org.apache.jena.shacl.ValidationReport;
-import org.apache.jena.shacl.lib.ShLib;
-import org.apache.jena.shacl.sys.ShaclSystem;
 import org.apache.jena.sparql.graph.GraphFactory;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,22 +16,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
-import won.auth.model.*;
 import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
@@ -88,9 +76,9 @@ public class InstantiationTest {
         Shapes shapes = loadShapes(shapesDef);
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
         Graph data = loadGraph(loader.getResource("classpath:/won/basic/basic-005.ttl"));
-        factory.load(new Union(shapes.getGraph(), data));
+        Shacl2JavaInstanceFactory.Accessor accessor = factory.accessor(new Union(shapes.getGraph(), data));
         logger.debug("done instantiating");
-        Assert.assertEquals(3, factory.size());
+        Assert.assertEquals(3, accessor.size());
     }
 
     @Test
@@ -98,9 +86,9 @@ public class InstantiationTest {
         Shapes shapes = loadShapes(shapesDef);
         Shacl2JavaInstanceFactory factory = new Shacl2JavaInstanceFactory(shapes, "won.auth.model");
         Graph data = loadGraph(loader.getResource("classpath:/won/basic/basic-006.ttl"));
-        factory.load(new Union(shapes.getGraph(), data));
+        Shacl2JavaInstanceFactory.Accessor accessor = factory.accessor(new Union(shapes.getGraph(), data));
         logger.debug("done instantiating");
-        Assert.assertEquals(3, factory.size());
+        Assert.assertEquals(3, accessor.size());
     }
 
     private static void logDuration(String message, long start) {

@@ -29,7 +29,9 @@ public class AuthUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String JWT_FIELD_SIG = "sig";
     private static final String JWT_FIELD_SCOPE = "scope";
-    private static final Shapes shapes = Shapes.parse(readShapesData());
+    private static final Shapes AUTH_SHAPES = Shapes.parse(readShapesData());
+    private static final Shacl2JavaInstanceFactory INSTANCE_FACTORY = new Shacl2JavaInstanceFactory(shapes(),
+                    "won.auth.model");
 
     private static Graph readShapesData() {
         Graph graph = GraphFactory.createGraphMem();
@@ -40,11 +42,11 @@ public class AuthUtils {
     }
 
     public static Shapes shapes() {
-        return shapes;
+        return AUTH_SHAPES;
     }
 
-    public static Shacl2JavaInstanceFactory newInstanceFactory() {
-        return new Shacl2JavaInstanceFactory(shapes(), "won.auth.model");
+    public static Shacl2JavaInstanceFactory instanceFactory() {
+        return INSTANCE_FACTORY;
     }
 
     public static Optional<Long> getExpiresAfterSecondsLong(TokenSpecification spec) {

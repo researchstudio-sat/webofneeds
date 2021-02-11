@@ -32,6 +32,8 @@
     <logger name="won.node" level="info"/>
     <logger name="won.owner" level="info"/>
     <logger name="won.auth.WonAclEvaluator" level="info"/>
+    <logger name="won.protocol.rest.LinkedDataRestClient" level="debug"/>
+    <logger name="won.auth.WonAclInstanceFactory" level="debug"/>
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

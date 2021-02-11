@@ -113,8 +113,7 @@ ex:atom2
 
 atom2:holdableSocket
     a                    won:Socket ;
-    won:socketDefinition wx-hold:HoldableSocket ;
-    won:connections      atom3:holdableSocketConnections .
+    won:socketDefinition wx-hold:HoldableSocket .
 
 # Atom 3 - not holdable
 
@@ -125,9 +124,8 @@ ex:atom3
     won:messageContainer atom3:msg ;
     won:wonNode          ex:node .
 
-atom3:holdableSocket
+atom3:chatSocket
     a                    won:Socket ;
-    won:socketDefinition chat:ChatSocket ;
-    won:connections      atom3:chatSocketConnections .
+    won:socketDefinition chat:ChatSocket .
 
 

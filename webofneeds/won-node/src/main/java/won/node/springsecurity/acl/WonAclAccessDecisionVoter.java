@@ -223,7 +223,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         for (URI atomUri : aclGraphs.keySet()) {
             Graph aclGraph = aclGraphs.get(atomUri);
             for (OperationRequest opReq : opReqs.get(atomUri)) {
-                aclEvalResults.add(wonAclEvaluatorFactory.getWonAclEvaluator(aclGraph).decide(opReq));
+                aclEvalResults.add(wonAclEvaluatorFactory.create(aclGraph).decide(opReq));
             }
         }
         Optional<AclEvalResult> aclEvalResult = aclEvalResults.stream().reduce(WonAclEvaluator::mergeAclEvalResults);
@@ -273,7 +273,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                             WonAclEvalContext.allowAll());
             return legacyImpl.get();
         }
-        WonAclEvaluator wonAclEvaluator = wonAclEvaluatorFactory.getWonAclEvaluator(aclGraph.get());
+        WonAclEvaluator wonAclEvaluator = wonAclEvaluatorFactory.create(aclGraph.get());
         // set up request object
         OperationRequest request = new OperationRequest();
         request.setReqAtom(atomUri);

@@ -143,6 +143,7 @@ shrek:holderSocket
 shrek:held1
     a                   won:Connection ;
     won:targetAtom      ex:party ;
+    won:socket          shrek:holderSocket ;
     won:connectionState won:Connected .
 
 shrek:buddyConnections
@@ -151,16 +152,19 @@ shrek:buddyConnections
 shrek:buddy1
     a                   won:Connection ;
     won:targetAtom      ex:donkey ;
+    won:socket          shrek:buddySocket ;
     won:connectionState won:Connected .
 
 shrek:buddy2
     a                   won:Connection ;
     won:targetAtom      ex:fiona ;
+    won:socket          shrek:buddySocket ;
     won:connectionState won:Connected .
 
 shrek:buddy3
     a                   won:Connection ;
     won:targetAtom      ex:lordfarquaad ;
+    won:socket          shrek:buddySocket ;
     won:connectionState won:RequestReceived .
 
 
@@ -183,16 +187,19 @@ donkey:buddyConnections
 donkey:buddy1
     a                   won:Connection ;
     won:targetAtom      ex:shrek ;
+    won:socket          donkey:buddySocket ;
     won:connectionState won:Connected .
 
 donkey:buddy2
     a                   won:Connection ;
     won:targetAtom      ex:dragon ;
+    won:socket          donkey:buddySocket ;
     won:connectionState won:Connected .
 
 donkey:buddy3
     a                   won:Connection ;
     won:targetAtom      ex:lordfarquaad ;
+    won:socket          donkey:buddySocket ;
     won:connectionState won:RequestReceived .
 
 ## The party
@@ -214,6 +221,7 @@ party:holdableSocketConnections
 
 party:heldBy
     a                   won:Connection ;
+    won:socket          party:holdableSocket ;
     won:targetAtom      ex:shrek ;
     won:connectionState won:Connected .
 
@@ -228,17 +236,45 @@ party:attendeeSocketConnections
 party:guest1
     a                   won:Connection ;
     won:targetAtom      ex:shrek ;
+    won:socket          party:attendeeSocket ;
     won:connectionState won:Connected .
 
 party:guest2
     a                   won:Connection ;
     won:targetAtom      ex:magicmirror ;
+    won:socket          party:attendeeSocket ;
     won:connectionState won:RequestSent .
 
 party:guest3
     a                   won:Connection ;
     won:targetAtom      ex:pinocchio ;
+    won:socket          party:attendeeSocket ;
     won:connectionState won:Connected .
+
+ex:pinocchio
+    a           won:Atom ;
+    won:wonNode ftc:node ;
+    won:state   won:Active .
+
+ex:lordfarquaad
+    a           won:Atom ;
+    won:wonNode ftc:node ;
+    won:state   won:Active .
+
+ex:fiona
+    a           won:Atom ;
+    won:wonNode ftc:node ;
+    won:state   won:Active .
+
+ex:magicmirror
+    a           won:Atom ;
+    won:wonNode ftc:node ;
+    won:state   won:Active .
+
+ex:dragon
+    a           won:Atom ;
+    won:wonNode ftc:node ;
+    won:state   won:Active .
 
 ftc:node
     a won:Node .

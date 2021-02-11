@@ -60,9 +60,11 @@ atom1:buddySocketConnections
 
 atom1:bsConn1
     a                   won:Connection ;
+    won:socket          atom1:buddySocket ;
     won:targetAtom      ex:atom3 ;
     won:connectionState won:Connected .
 
 ex:atom3
     a           won:Atom ;
+    won:state   won:Active ;
     won:wonNode ex:node .

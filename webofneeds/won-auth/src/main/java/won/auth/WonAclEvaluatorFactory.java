@@ -1,28 +1,23 @@
 package won.auth;
 
 import org.apache.jena.graph.Graph;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.shacl.Shapes;
-import org.apache.jena.sparql.graph.GraphFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
 import won.auth.check.AtomNodeChecker;
 import won.auth.check.TargetAtomCheckEvaluator;
-import won.auth.support.InternalWonAclEvaluatorFactory;
+import won.auth.model.Authorization;
 import won.cryptography.rdfsign.WebIdKeyLoader;
+import won.shacl2java.Shacl2JavaInstanceFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Set;
 
-@Component
-public class WonAclEvaluatorFactory implements InitializingBean, DisposableBean {
+public class WonAclEvaluatorFactory {
+    public static final long DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS = 3600;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    protected Shacl2JavaInstanceFactory instanceFactory = AuthUtils.instanceFactory();
     protected Shapes shapes;
     @Autowired
     protected TargetAtomCheckEvaluator targetAtomCheckEvaluator;
@@ -30,39 +25,31 @@ public class WonAclEvaluatorFactory implements InitializingBean, DisposableBean 
     protected AtomNodeChecker atomNodeChecker;
     @Autowired
     protected WebIdKeyLoader webIdKeyLoader;
-    private ThreadLocal<InternalWonAclEvaluatorFactory> wonAclEvaluatorFactoryThreadLocal = new ThreadLocal<>();
-    private Shapes aclShapes;
-    private Graph aclShapesGraph;
 
     public WonAclEvaluatorFactory() {
     }
 
-    public WonAclEvaluator getWonAclEvaluator(Graph aclGraph) {
-        InternalWonAclEvaluatorFactory evaluatorFactory = this.wonAclEvaluatorFactoryThreadLocal.get();
-        // note: because of the ThreadLocal, we don't need to synchronize. Eeach thread
-        // does this
-        // on its own data (and the WAEF's dependencies are thread-safe)
-        if (evaluatorFactory == null) {
-            evaluatorFactory = new InternalWonAclEvaluatorFactory(
-                            this.aclShapes,
-                            this.targetAtomCheckEvaluator,
-                            this.atomNodeChecker,
-                            webIdKeyLoader);
-            this.wonAclEvaluatorFactoryThreadLocal.set(evaluatorFactory);
-        }
-        return evaluatorFactory.create(aclGraph);
+    public WonAclEvaluatorFactory(
+                    TargetAtomCheckEvaluator targetAtomCheckEvaluator,
+                    AtomNodeChecker atomNodeChecker,
+                    WebIdKeyLoader webIdKeyLoader) {
+        this.targetAtomCheckEvaluator = targetAtomCheckEvaluator;
+        this.shapes = AuthUtils.shapes();
+        this.webIdKeyLoader = webIdKeyLoader;
+        this.atomNodeChecker = atomNodeChecker;
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Resource res = new ClassPathResource("shacl/won-auth-shapes.ttl");
-        aclShapesGraph = GraphFactory.createGraphMem();
-        RDFDataMgr.read(aclShapesGraph, res.getInputStream(), Lang.TTL);
-        aclShapes = Shapes.parse(aclShapesGraph);
+    public WonAclEvaluator create(Graph dataGraph) {
+        return new WonAclEvaluator(
+                        getAuthorizations(dataGraph),
+                        targetAtomCheckEvaluator,
+                        atomNodeChecker,
+                        webIdKeyLoader);
     }
 
-    @Override
-    public void destroy() throws Exception {
-        this.wonAclEvaluatorFactoryThreadLocal = null;
+    public Set<Authorization> getAuthorizations(Graph dataGraph) {
+        Shacl2JavaInstanceFactory.Accessor accessor = this.instanceFactory.accessor(dataGraph);
+        Set<Authorization> auths = accessor.getInstancesOfType(Authorization.class, true);
+        return auths;
     }
 }

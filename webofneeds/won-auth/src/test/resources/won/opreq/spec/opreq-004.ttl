@@ -101,6 +101,7 @@ atom1:chatSocketConnections
 atom1:bsConn1
     a                   won:Connection ;
     won:targetAtom      ex:atom2 ;
+    won:socket          atom1:chatSocket ;
     won:connectionState won:Connected .
 
 ex:atom2
@@ -121,5 +122,6 @@ atom2:chatSocketConnections
 atom2:bsConn2
     a                   won:Connection ;
     won:targetAtom      ex:atom1 ;
+    won:socket          atom2:chatSocket ;
     won:connectionState won:Connected .
 

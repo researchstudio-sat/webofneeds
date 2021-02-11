@@ -2,7 +2,7 @@ package won.auth.socket.impl;
 
 import org.apache.jena.query.Dataset;
 import org.springframework.beans.factory.annotation.Autowired;
-import won.auth.WonAclInstanceFactory;
+import won.auth.AuthUtils;
 import won.auth.model.SocketDefinition;
 import won.auth.socket.SocketAuthorizationSource;
 import won.auth.socket.SocketAuthorizations;
@@ -23,9 +23,8 @@ public class LDSocketAuthorizationSource implements SocketAuthorizationSource {
             throw new IllegalStateException(
                             String.format("Could not load RDF for socket definition %s", socketDefinitionURI));
         }
-        Shacl2JavaInstanceFactory factory = WonAclInstanceFactory.get();
-        factory.load(data.getDefaultModel().getGraph());
-        Optional<SocketDefinition> sd = factory
+        Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
+        Optional<SocketDefinition> sd = factory.accessor(data.getDefaultModel().getGraph())
                         .getInstanceOfType(socketDefinitionURI.toString(), SocketDefinition.class);
         if (sd.isEmpty()) {
             return Optional.empty();

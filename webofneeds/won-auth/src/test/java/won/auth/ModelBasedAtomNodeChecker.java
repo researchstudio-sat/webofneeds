@@ -14,22 +14,23 @@ import java.util.Optional;
 public class ModelBasedAtomNodeChecker implements AtomNodeChecker {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     Shacl2JavaInstanceFactory instanceFactory;
+    Shacl2JavaInstanceFactory.Accessor accessor = null;
 
     public ModelBasedAtomNodeChecker(Shapes shapes, String packageName) {
         this.instanceFactory = new Shacl2JavaInstanceFactory(shapes, packageName);
     }
 
     public void loadData(Graph data) {
-        this.instanceFactory.load(data, true);
+        this.accessor = this.instanceFactory.accessor(data);
     }
 
-    public Shacl2JavaInstanceFactory getInstanceFactory() {
-        return instanceFactory;
+    public Shacl2JavaInstanceFactory.Accessor getAccessor() {
+        return accessor;
     }
 
     @Override
     public boolean isNodeOfAtom(URI atomUri, URI nodeUri) {
-        Optional<won.auth.test.model.Atom> atom = instanceFactory.getInstanceOfType(atomUri.toString(),
+        Optional<won.auth.test.model.Atom> atom = accessor.getInstanceOfType(atomUri.toString(),
                         won.auth.test.model.Atom.class);
         if (!atom.isPresent()) {
             return false;
@@ -39,7 +40,7 @@ public class ModelBasedAtomNodeChecker implements AtomNodeChecker {
 
     @Override
     public Optional<URI> getNodeOfAtom(URI atomUri) {
-        Optional<won.auth.test.model.Atom> atom = instanceFactory.getInstanceOfType(atomUri.toString(),
+        Optional<won.auth.test.model.Atom> atom = accessor.getInstanceOfType(atomUri.toString(),
                         won.auth.test.model.Atom.class);
         if (!atom.isPresent()) {
             return Optional.empty();

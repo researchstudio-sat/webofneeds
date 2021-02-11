@@ -109,3 +109,7 @@ atom2:bsConn1
     won:connectionState won:Connected ;
     won:socket          atom2:buddySocket .
 
+ex:atom3
+    a           won:Atom ;
+    won:state   won:Active ;
+    won:wonNode ex:node .
