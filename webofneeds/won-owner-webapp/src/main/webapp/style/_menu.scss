@@ -26,6 +26,20 @@
   padding: 1rem 0.5rem;
 
   .pinnedatoms__pinnedatom {
+    position: relative;
+
+    &__unreads {
+      position: absolute;
+      background-color: $won-unread-attention;
+      border-radius: 100%;
+      opacity: 1;
+      @include fixed-square(0.75rem);
+      right: 0;
+      top: 0;
+      box-shadow: 0 0 3px 3px var(--won-dark-gray);
+      z-index: 2;
+    }
+
     &--anon {
       --local-primary: #{$won-line-gray};
 

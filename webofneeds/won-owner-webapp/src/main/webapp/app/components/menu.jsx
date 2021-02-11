@@ -20,6 +20,7 @@ import WonAtomMenu from "~/app/components/atom-menu";
 import WonFooter from "~/app/components/footer";
 import VisibilitySensor from "react-visibility-sensor";
 import * as processUtils from "~/app/redux/utils/process-utils";
+import vocab from "~/app/service/vocab";
 
 export default function WonMenu({ className }) {
   const dispatch = useDispatch();
@@ -33,14 +34,11 @@ export default function WonMenu({ className }) {
   const isLocationAccessDenied = useSelector(
     generalSelectors.isLocationAccessDenied
   );
-  const hasUnreadSuggestedConnections = useSelector(
-    generalSelectors.hasUnreadSuggestedConnections
+  const hasUnassignedUnpinnedAtomNonChatUnreads = useSelector(
+    generalSelectors.hasUnassignedUnpinnedAtomNonChatUnreads
   );
-  const hasUnreadBuddyConnections = useSelector(
-    generalSelectors.hasUnreadBuddyConnections(true, false)
-  );
-  const hasUnreadChatConnections = useSelector(
-    generalSelectors.hasUnreadChatConnections
+  const hasUnassignedUnpinnedAtomChatUnreads = useSelector(
+    generalSelectors.hasUnassignedUnpinnedAtomChatUnreads
   );
 
   const processState = useSelector(generalSelectors.getProcessState);
@@ -54,6 +52,12 @@ export default function WonMenu({ className }) {
       .toOrderedMap()
       .sortBy(atom => atomUtils.getTitle(atom))
   );
+
+  const ownedPinnedAtomUnreads = useSelector(
+    generalSelectors.getOwnedPinnedAtomsUnreads
+  );
+
+  console.debug("ownedPinnedAtomUnreads", ownedPinnedAtomUnreads);
 
   const activePinnedAtom = get(ownedPinnedAtoms, activePinnedAtomUri);
 
@@ -80,11 +84,26 @@ export default function WonMenu({ className }) {
               dispatch(
                 actionCreators.view__setActivePinnedAtomUri(pinnedAtomUri)
               );
+              if (
+                !(
+                  history.location.pathname === "/inventory" ||
+                  history.location.pathname === "/"
+                )
+              ) {
+                history.replace(
+                  generateLink(history.location, {}, "/inventory")
+                );
+              }
             }
           }}
           title={atomUtils.getTitle(pinnedAtom)}
           key={pinnedAtomUri}
         >
+          {get(ownedPinnedAtomUnreads, pinnedAtomUri) ? (
+            <span className="pinnedatoms__pinnedatom__unreads" />
+          ) : (
+            undefined
+          )}
           <VisibilitySensor
             onChange={isVisible => {
               if (isVisible) {
@@ -249,6 +268,12 @@ export default function WonMenu({ className }) {
             }
           }}
         >
+          {hasUnassignedUnpinnedAtomChatUnreads ||
+          hasUnassignedUnpinnedAtomNonChatUnreads ? (
+            <span className="pinnedatoms__pinnedatom__unreads" />
+          ) : (
+            undefined
+          )}
           <svg className="pinnedatoms__pinnedatom__anonicon">
             <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
           </svg>
@@ -298,7 +323,8 @@ export default function WonMenu({ className }) {
             atom={activePinnedAtom}
             visibleTab={
               history.location.pathname === "/inventory" ||
-              history.location.pathname === "/"
+              history.location.pathname === "/" ||
+              history.location.pathname === "/connections"
                 ? activePinnedAtomTab
                 : "FIXME:NOTEXISTS"
             }
@@ -306,7 +332,11 @@ export default function WonMenu({ className }) {
             setVisibleTab={tabName => {
               hideMenuIfVisible();
               dispatch(actionCreators.view__setActivePinnedAtomTab(tabName));
-              if (
+              if (tabName === vocab.CHAT.ChatSocketCompacted) {
+                history.push(
+                  generateLink(history.location, {}, "/connections", false)
+                );
+              } else if (
                 !(
                   history.location.pathname === "/inventory" ||
                   history.location.pathname === "/"
@@ -322,7 +352,7 @@ export default function WonMenu({ className }) {
             <NavLink
               className={generateTabClasses(
                 false,
-                hasUnreadSuggestedConnections || hasUnreadBuddyConnections
+                hasUnassignedUnpinnedAtomNonChatUnreads
               )}
               activeClassName="menu__tab--selected"
               onClick={hideMenuIfVisible}
@@ -332,7 +362,10 @@ export default function WonMenu({ className }) {
               <span className="menu__tab__label">Inventory</span>
             </NavLink>
             <NavLink
-              className={generateTabClasses(false, hasUnreadChatConnections)}
+              className={generateTabClasses(
+                false,
+                hasUnassignedUnpinnedAtomChatUnreads
+              )}
               activeClassName="menu__tab--selected"
               onClick={hideMenuIfVisible}
               to="/connections"

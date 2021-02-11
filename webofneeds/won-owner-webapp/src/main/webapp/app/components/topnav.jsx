@@ -40,9 +40,10 @@ export default function WonTopnav({ pageTitle }) {
   );
   const hasUnreads = useSelector(
     state =>
-      generalSelectors.hasUnreadSuggestedConnections(state) ||
-      generalSelectors.hasUnreadBuddyConnections(true, false)(state) ||
-      generalSelectors.hasUnreadChatConnections(state)
+      generalSelectors.hasUnassignedUnpinnedAtomUnreads(state) ||
+      !!generalSelectors
+        .getOwnedPinnedAtomsUnreads(state)
+        .find(unread => unread)
   );
 
   useEffect(() => {

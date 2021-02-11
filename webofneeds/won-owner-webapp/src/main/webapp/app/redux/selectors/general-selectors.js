@@ -74,6 +74,9 @@ export const getOwnedAtomUris = createSelector(getAccountState, account =>
   get(account, "ownedAtomUris")
 );
 
+export const getActivePinnedAtom = atomUri =>
+  createSelector(getOwnedPinnedAtoms, atoms => get(atoms, atomUri));
+
 export const getAtom = atomUri =>
   createSelector(getAtoms, atoms => get(atoms, atomUri));
 
@@ -117,14 +120,12 @@ export const getWhatsAroundAtoms = createSelector(
       .filter(atom => !!atom)
 );
 
-export const getOwnedPosts = createSelector(
+export const getUnassignedUnpinnedAtoms = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
     ownedAtoms &&
     ownedAtoms.filter(
-      ownedAtom =>
-        !getIn(ownedAtom, ["content", "type"]) ||
-        (atomUtils.isAtom(ownedAtom) && !atomUtils.isPersona(ownedAtom))
+      atom => !atomUtils.isPinnedAtom(atom) && !atomUtils.isHeld(atom)
     )
 );
 
@@ -239,95 +240,67 @@ export const getAllConnectedChatAndGroupConnections = createSelector(
 );
 
 /**
- * Determines if there are any connections that are unread and suggested
+ * Determines if there are any UnassignedUnpinnedAtoms that have connections that are unread
  * (used for the inventory unread indicator)
  * @param state
  * @returns {boolean}
  */
-export const hasUnreadSuggestedConnections = createSelector(
-  getOwnedAtoms,
+export const hasUnassignedUnpinnedAtomUnreads = createSelector(
+  getUnassignedUnpinnedAtoms,
   ownedAtoms =>
     ownedAtoms &&
     !!ownedAtoms
       .filter(atom => atomUtils.isActive(atom))
-      .find(atom => atomUtils.hasUnreadSuggestedConnections(atom))
+      .find(atom => atomUtils.hasUnreadConnections(atom))
 );
 
-/**
- * Determines if there are any buddy connections that are unread
- * (used for the inventory unread indicator)
- * @param state
- * @returns {function(state)}
- */
-export const hasUnreadBuddyConnections = (excludeClosed, excludeSuggested) =>
-  createSelector(
-    state => state,
-    getOwnedAtoms,
-    (state, allOwnedAtoms) =>
-      allOwnedAtoms &&
-      !!allOwnedAtoms
-        .filter(atomUtils.isActive)
-        .find(
-          atom =>
-            !!getBuddyConnectionsByAtomUri(
-              getUri(atom),
-              excludeClosed,
-              excludeSuggested
-            )(state).find(conn => connectionUtils.isUnread(conn))
-        )
-  );
-
-/**
- * Returns all buddyConnections of an atom
- * @param state
- * @param atomUri
- * @param excludeClosed  -> exclude Closed connections
- * @param excludeSuggested -> exclude Suggested connections
- * @returns {function(state)}
- */
-const getBuddyConnectionsByAtomUri = (
-  atomUri,
-  excludeClosed,
-  excludeSuggested
-) =>
-  createSelector(getAtoms, atoms => {
-    const atom = get(atoms, atomUri);
-    const connections = atomUtils.getConnections(atom);
-
-    return connections
-      ? connections
-          .filter(conn => !(excludeClosed && connectionUtils.isClosed(conn)))
-          .filter(
-            conn => !(excludeSuggested && connectionUtils.isSuggested(conn))
-          )
-          .filter(conn => isBuddyConnection(atoms, conn))
-      : Immutable.Map();
-  });
-
-/**
- * Returns true if both sockets are BuddySockets
- * @param allAtoms all atoms of the state
- * @param connection to check sockettypes of
- * @returns {boolean}
- */
-function isBuddyConnection(allAtoms, connection) {
-  return (
-    getSenderSocketType(allAtoms, connection) ===
-      vocab.BUDDY.BuddySocketCompacted &&
-    getTargetSocketType(allAtoms, connection) ===
-      vocab.BUDDY.BuddySocketCompacted
-  );
-}
-
-export const hasUnreadChatConnections = createSelector(
-  getAllChatConnections,
-  chatConnections =>
-    chatConnections &&
-    !!chatConnections.find(
-      conn =>
-        connectionUtils.isUnread(conn) &&
-        !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
+export const getOwnedPinnedAtomsUnreads = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms &&
+    ownedAtoms.filter(atom => atomUtils.isPinnedAtom(atom)).map(
+      atom =>
+        atomUtils.hasUnreadConnections(atom) ||
+        !!atomUtils.getConnections(atom).find(conn => {
+          for (let holdableSocketType in vocab.holderSockets) {
+            if (
+              atomUtils.hasUnreadConnections(
+                get(ownedAtoms, connectionUtils.getTargetAtomUri(conn)),
+                vocab.holderSockets[holdableSocketType]
+              )
+            ) {
+              return true;
+            }
+          }
+          return false;
+        })
     )
+);
+
+export const hasUnassignedUnpinnedAtomChatUnreads = createSelector(
+  getUnassignedUnpinnedAtoms,
+  ownedAtoms =>
+    ownedAtoms &&
+    !!ownedAtoms
+      .filter(atom => atomUtils.isActive(atom))
+      .find(atom =>
+        atomUtils.hasUnreadConnections(atom, vocab.CHAT.ChatSocketCompacted)
+      )
+);
+
+export const hasUnassignedUnpinnedAtomNonChatUnreads = createSelector(
+  getUnassignedUnpinnedAtoms,
+  ownedAtoms =>
+    ownedAtoms &&
+    !!ownedAtoms
+      .filter(atom => atomUtils.isActive(atom))
+      .find(atom =>
+        atomUtils.hasUnreadConnections(
+          atom,
+          vocab.CHAT.ChatSocketCompacted,
+          true
+        )
+      )
 );
 
 export const getActiveAtoms = createSelector(

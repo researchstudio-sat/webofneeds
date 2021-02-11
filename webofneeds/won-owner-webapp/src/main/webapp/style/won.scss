@@ -91,8 +91,11 @@ body {
     > won-menu {
       box-sizing: border-box;
       border-right: $thinGrayBorder;
-      box-shadow: 0 0 5px 5px var(--won-line-gray);
       z-index: 999;
+
+      @media (min-width: $responsivenessBreakPoint) {
+        box-shadow: 0 0 5px 5px var(--won-line-gray);
+      }
 
       &.won-menu--show-mobile {
         position: fixed;
@@ -102,6 +105,7 @@ body {
         max-width: 80vw;
         transition: max-width linear 0.25s;
         overflow-y: hidden;
+        box-shadow: 0 0 5px 5px var(--won-line-gray);
       }
 
       &:not(.won-menu--show-mobile) {
@@ -115,6 +119,7 @@ body {
           transition: max-width linear 0.25s;
           overflow-y: hidden;
           border-right: 0;
+          box-shadow: 0;
         }
       }
     }

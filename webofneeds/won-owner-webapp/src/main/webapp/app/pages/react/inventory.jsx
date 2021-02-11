@@ -24,23 +24,10 @@ export default function PageInventory() {
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 
-  const ownedActivePinnedAtoms = useSelector(state =>
+  const unpinnedActiveAtoms = useSelector(state =>
     generalSelectors
-      .getOwnedPinnedAtoms(state)
-      .toOrderedMap()
-      .sortBy(atom => atomUtils.getTitle(atom))
-  );
-
-  const ownedUnassignedActivePosts = useSelector(state =>
-    generalSelectors
-      .getOwnedPosts(state)
+      .getUnassignedUnpinnedAtoms(state)
       .filter(atomUtils.isActive)
-      .filter(
-        atom =>
-          !atomUtils.isPinnedAtom(atom) ||
-          !atomUtils.isHeld(atom) ||
-          !accountUtils.isAtomOwned(accountState, atomUtils.getHeldByUri(atom))
-      )
       .toOrderedMap()
       .sortBy(atom => {
         const creationDate = atomUtils.getCreationDate(atom);
@@ -49,9 +36,9 @@ export default function PageInventory() {
       .reverse()
   );
 
-  const ownedInactiveAtoms = useSelector(state =>
+  const unpinnedInactiveAtoms = useSelector(state =>
     generalSelectors
-      .getOwnedAtoms(state)
+      .getUnassignedUnpinnedAtoms(state)
       .filter(atomUtils.isInactive)
       .toOrderedMap()
       .sortBy(atom => {
@@ -68,13 +55,13 @@ export default function PageInventory() {
       ? get(theme, "additionalLogos").toArray()
       : undefined;
   const currentLocation = useSelector(generalSelectors.getCurrentLocation);
-  const unassignedAtomSize = ownedUnassignedActivePosts
-    ? ownedUnassignedActivePosts.size
-    : 0;
+  const unassignedAtomSize = unpinnedActiveAtoms ? unpinnedActiveAtoms.size : 0;
   const hasOwnedUnassignedAtomUris = unassignedAtomSize > 0;
 
-  const inactiveAtomUriSize = ownedInactiveAtoms ? ownedInactiveAtoms.size : 0;
-  const hasOwnedInactiveAtomUris = ownedInactiveAtoms > 0;
+  const inactiveAtomUriSize = unpinnedInactiveAtoms
+    ? unpinnedInactiveAtoms.size
+    : 0;
+  const hasOwnedInactiveAtomUris = unpinnedInactiveAtoms > 0;
 
   const showClosedAtoms = viewUtils.showClosedAtoms(viewState);
 
@@ -89,7 +76,9 @@ export default function PageInventory() {
 
   const activePinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
   const activePinnedAtomTab = useSelector(viewSelectors.getActivePinnedAtomTab);
-  const activePinnedAtom = get(ownedActivePinnedAtoms, activePinnedAtomUri);
+  const activePinnedAtom = useSelector(
+    generalSelectors.getActivePinnedAtom(activePinnedAtomUri)
+  );
 
   const relevantActivePinnedAtomConnectionsMap = useSelector(
     generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(
@@ -121,7 +110,7 @@ export default function PageInventory() {
             <React.Fragment>
               <div className="ownerinventory__header">
                 <div className="ownerinventory__header__title">
-                  Anonymous Postings
+                  Unassigned Postings
                   {hasOwnedUnassignedAtomUris && (
                     <span className="ownerinventory__header__title__count">
                       {"(" + unassignedAtomSize + ")"}
@@ -131,7 +120,7 @@ export default function PageInventory() {
               </div>
               <div className="ownerinventory__content">
                 <WonAtomCardGrid
-                  atoms={ownedUnassignedActivePosts}
+                  atoms={unpinnedActiveAtoms}
                   currentLocation={currentLocation}
                   showIndicators={true}
                   showHolder={true}
@@ -167,7 +156,7 @@ export default function PageInventory() {
                 hasOwnedInactiveAtomUris && (
                   <div className="ownerinventory__content">
                     <WonAtomCardGrid
-                      atoms={ownedInactiveAtoms}
+                      atoms={unpinnedInactiveAtoms}
                       currentLocation={currentLocation}
                       showIndicators={false}
                       showHolder={false}

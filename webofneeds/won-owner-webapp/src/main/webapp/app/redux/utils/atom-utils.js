@@ -497,6 +497,12 @@ export function hasUnreadSuggestedConnections(atom) {
   );
 }
 
+export function hasUnreadConnections(atom, socketType, exclude) {
+  return !!getConnections(atom, socketType, exclude).find(conn =>
+    connectionUtils.isUnread(conn)
+  );
+}
+
 export function getConnectionBySocketUris(atom, socketUri, targetSocketUri) {
   return getConnections(atom).find(
     conn =>
@@ -697,16 +703,20 @@ export function getConnection(atomImm, connectionUri) {
  * Return all connections of the given atom
  * @param atomImm immutable atom that stores connections
  * @param socketType compactedSocketType Uri (senderSocket)
+ * @param exclude if set to true, return everything but the given socketType
  */
-export function getConnections(atomImm, socketType) {
+export function getConnections(atomImm, socketType, exclude = false) {
   const socketUri = getSocketUri(atomImm, socketType);
 
   const connections = get(atomImm, "connections");
 
   if (socketUri) {
     return connections
-      ? connections.filter(conn =>
-          connectionUtils.hasSocketUri(conn, socketUri)
+      ? connections.filter(
+          conn =>
+            exclude
+              ? !connectionUtils.hasSocketUri(conn, socketUri)
+              : connectionUtils.hasSocketUri(conn, socketUri)
         )
       : Immutable.Map();
   }
