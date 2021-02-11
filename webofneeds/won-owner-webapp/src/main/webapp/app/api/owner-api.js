@@ -81,15 +81,14 @@ export function exportAccount(dataEncryptionPassword) {
     ownerBaseUrl,
     `/rest/users/exportAccount?keyStorePassword=${dataEncryptionPassword}`
   );
-  const httpOptions = {
+  return fetch(url, {
     method: "post",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
     credentials: "include",
-  };
-  return fetch(url, httpOptions).then(checkHttpStatus(url));
+  }).then(checkHttpStatus(url));
 }
 /**
  * Checks whether the user has a logged-in session.
@@ -134,24 +133,21 @@ export function registerAccount(credentials) {
 /**
  * Accept the Terms Of Service
  */
-export function acceptTermsOfService() {
-  const url = urljoin(ownerBaseUrl, "/rest/users/acceptTermsOfService");
-  const httpOptions = {
+export const acceptTermsOfService = () =>
+  fetch(urljoin(ownerBaseUrl, "/rest/users/acceptTermsOfService"), {
     method: "post",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
     credentials: "include",
-  };
-  return fetch(url, httpOptions)
+  })
     .then(resp => {
       return resp.json();
     })
     .catch(error => {
       return error.json();
     });
-}
 
 /**
  * Confirm the Registration with the verificationToken-link provided in the registration-email
@@ -590,26 +586,28 @@ export function fetchAgreementProtocolUris(connectionUri) {
     .then(response => response.json());
 }
 
-export async function fetchAgreementProtocolDataset(connectionUri) {
+export function fetchAgreementProtocolDataset(connectionUri) {
   const url = urljoin(
     ownerBaseUrl,
     "/rest/agreement/getAgreementProtocolDataset",
     `?connectionUri=${connectionUri}`
   );
 
-  let response = await fetch(url, {
+  return fetch(url, {
     method: "get",
     headers: {
       Accept: "application/trig",
       "Content-Type": "application/trig",
     },
     credentials: "include",
-  });
-  response = await checkHttpStatus(url)(response);
-  response = await response.text();
-  const trigParser = new N3.Parser({ format: "application/trig" });
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.text())
+    .then(textResponse => {
+      const trigParser = new N3.Parser({ format: "application/trig" });
 
-  return trigParser.parse(response);
+      return trigParser.parse(textResponse);
+    });
 }
 
 export function fetchPetriNetUris(connectionUri) {
