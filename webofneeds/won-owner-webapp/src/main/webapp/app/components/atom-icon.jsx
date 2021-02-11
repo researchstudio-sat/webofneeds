@@ -33,7 +33,7 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
 
   const processState = useSelector(generalSelectors.getProcessState);
 
-  function generateSubIcon(atom) {
+  function generateSubIcon(atom, mainAtom) {
     const image = atomUtils.getDefaultImage(atom);
 
     if (image) {
@@ -76,6 +76,10 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
           </div>
         );
       } else {
+        if (atomUtils.isOrganization(mainAtom) && !atom) {
+          return undefined;
+        }
+
         const identiconSvg = atomUtils.getIdenticonSvg(atom);
 
         return identiconSvg ? (
@@ -193,7 +197,7 @@ export default function WonAtomIcon({ atom, className, onClick, flipIcons }) {
     >
       {generateAtomIcon(mainIconAtom)}
       {atomUtils.hasHoldableSocket(atom) && !atomUtils.hasGroupSocket(atom)
-        ? generateSubIcon(subIconAtom)
+        ? generateSubIcon(subIconAtom, mainIconAtom)
         : undefined}
     </won-atom-icon>
   );

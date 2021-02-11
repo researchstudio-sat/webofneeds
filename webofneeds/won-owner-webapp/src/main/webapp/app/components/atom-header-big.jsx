@@ -262,11 +262,22 @@ export default function WonAtomHeaderBig({
       <h1 className="ahb__title ahb__title--notitle">No Title</h1>
     );
 
-    const holderName =
-      atomUtils.hasHoldableSocket(atom) && !atomUtils.hasGroupSocket(atom)
-        ? atomUtils.getTitle(holderAtom, externalDataState) ||
-          atomUtils.getFakePersonaName(atom)
-        : undefined;
+    let holderName = undefined;
+
+    if (atomUtils.isOrganization(atom)) {
+      holderName =
+        atomUtils.hasHoldableSocket(atom) &&
+        !atomUtils.hasGroupSocket(atom) &&
+        atomUtils.isHeld(atom)
+          ? atomUtils.getTitle(holderAtom, externalDataState)
+          : undefined;
+    } else {
+      holderName =
+        atomUtils.hasHoldableSocket(atom) && !atomUtils.hasGroupSocket(atom)
+          ? atomUtils.getTitle(holderAtom, externalDataState) ||
+            atomUtils.getFakePersonaName(atom)
+          : undefined;
+    }
 
     const holderNameElement = holderName && (
       <span className="ahb__info__holder">{holderName}</span>

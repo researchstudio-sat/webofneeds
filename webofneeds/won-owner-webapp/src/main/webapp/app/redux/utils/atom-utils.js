@@ -49,6 +49,10 @@ export function getContent(atom) {
 export function getSeeks(atom) {
   return get(atom, "seeks");
 }
+
+export function isPinnedAtom(atom) {
+  return isOrganization(atom) || isPersona(atom);
+}
 /**
  * Determines if a given atom is a Inactive
  * @param atom

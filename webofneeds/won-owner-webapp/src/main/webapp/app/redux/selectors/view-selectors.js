@@ -47,11 +47,11 @@ export const showAnonymousSlideInEmailInput = createSelector(
   viewState => viewUtils.showAnonymousSlideInEmailInput(viewState)
 );
 
-export const getActivePersonaUri = createSelector(getViewState, viewState =>
-  viewUtils.getActivePersonaUri(viewState)
+export const getActivePinnedAtomUri = createSelector(getViewState, viewState =>
+  viewUtils.getActivePinnedAtomUri(viewState)
 );
-export const getActivePersonaTab = createSelector(getViewState, viewState =>
-  viewUtils.getActivePersonaTab(viewState)
+export const getActivePinnedAtomTab = createSelector(getViewState, viewState =>
+  viewUtils.getActivePinnedAtomTab(viewState)
 );
 
 export const showSlideInConnectionLost = createSelector(

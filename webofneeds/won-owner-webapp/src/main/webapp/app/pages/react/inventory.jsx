@@ -24,11 +24,11 @@ export default function PageInventory() {
 
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 
-  const ownedActivePersonas = useSelector(state =>
+  const ownedActivePinnedAtoms = useSelector(state =>
     generalSelectors
-      .getOwnedPersonas(state)
+      .getOwnedPinnedAtoms(state)
       .toOrderedMap()
-      .sortBy(persona => atomUtils.getTitle(persona))
+      .sortBy(atom => atomUtils.getTitle(atom))
   );
 
   const ownedUnassignedActivePosts = useSelector(state =>
@@ -37,6 +37,7 @@ export default function PageInventory() {
       .filter(atomUtils.isActive)
       .filter(
         atom =>
+          !atomUtils.isPinnedAtom(atom) ||
           !atomUtils.isHeld(atom) ||
           !accountUtils.isAtomOwned(accountState, atomUtils.getHeldByUri(atom))
       )
@@ -86,13 +87,13 @@ export default function PageInventory() {
     ));
   }
 
-  const activePersonaUri = useSelector(viewSelectors.getActivePersonaUri);
-  const activePersonaTab = useSelector(viewSelectors.getActivePersonaTab);
-  const activePersona = get(ownedActivePersonas, activePersonaUri);
+  const activePinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
+  const activePinnedAtomTab = useSelector(viewSelectors.getActivePinnedAtomTab);
+  const activePinnedAtom = get(ownedActivePinnedAtoms, activePinnedAtomUri);
 
-  const relevantActivePersonaConnectionsMap = useSelector(
+  const relevantActivePinnedAtomConnectionsMap = useSelector(
     generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(
-      activePersonaUri
+      activePinnedAtomUri
     )
   );
 
@@ -102,16 +103,16 @@ export default function PageInventory() {
     <WonGenericPage pageTitle="Inventory">
       {isLoggedIn ? (
         <main className="ownerinventory">
-          {activePersona ? (
+          {activePinnedAtom ? (
             <div className="ownerinventory__activepersona">
               <WonAtomContent
-                atom={activePersona}
-                visibleTab={activePersonaTab}
-                relevantConnectionsMap={relevantActivePersonaConnectionsMap}
+                atom={activePinnedAtom}
+                visibleTab={activePinnedAtomTab}
+                relevantConnectionsMap={relevantActivePinnedAtomConnectionsMap}
                 toggleAddPicker={toggleAddPicker}
                 showAddPicker={showAddPicker}
                 setVisibleTab={tabName =>
-                  dispatch(actionCreators.view__setActivePersonaTab(tabName))
+                  dispatch(actionCreators.view__setActivePinnedAtomTab(tabName))
                 }
                 storedAtoms={storedAtoms}
               />

@@ -45,55 +45,59 @@ export default function WonMenu({ className }) {
 
   const processState = useSelector(generalSelectors.getProcessState);
 
-  const activePersonaUri = useSelector(viewSelectors.getActivePersonaUri);
-  const activePersonaTab = useSelector(viewSelectors.getActivePersonaTab);
+  const activePinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
+  const activePinnedAtomTab = useSelector(viewSelectors.getActivePinnedAtomTab);
 
-  const ownedPersonas = useSelector(state =>
+  const ownedPinnedAtoms = useSelector(state =>
     generalSelectors
-      .getOwnedPersonas(state)
+      .getOwnedPinnedAtoms(state)
       .toOrderedMap()
-      .sortBy(persona => atomUtils.getTitle(persona))
+      .sortBy(atom => atomUtils.getTitle(atom))
   );
 
-  const activePersona = get(ownedPersonas, activePersonaUri);
+  const activePinnedAtom = get(ownedPinnedAtoms, activePinnedAtomUri);
 
-  const relevantActivePersonaConnectionsMap = useSelector(
+  const relevantActivePinnedAtomConnectionsMap = useSelector(
     generalSelectors.getConnectionsOfAtomWithOwnedTargetConnections(
-      activePersonaUri
+      activePinnedAtomUri
     )
   );
 
-  const personaElements = [];
-  ownedPersonas &&
-    ownedPersonas.map((persona, personaUri) => {
-      personaElements.push(
+  const pinnedAtomElements = [];
+  ownedPinnedAtoms &&
+    ownedPinnedAtoms.map((pinnedAtom, pinnedAtomUri) => {
+      pinnedAtomElements.push(
         <div
           className={
-            "personas__persona " +
-            (activePersonaUri === personaUri
-              ? "personas__persona--active"
+            "pinnedatoms__pinnedatom " +
+            (activePinnedAtomUri === pinnedAtomUri
+              ? "pinnedatoms__pinnedatom--active"
               : "clickable")
           }
           onClick={() => {
-            if (activePersonaUri !== personaUri) {
+            if (activePinnedAtomUri !== pinnedAtomUri) {
               hideMenuIfVisible();
-              dispatch(actionCreators.view__setActivePersonaUri(personaUri));
+              dispatch(
+                actionCreators.view__setActivePinnedAtomUri(pinnedAtomUri)
+              );
             }
           }}
-          title={atomUtils.getTitle(persona)}
-          key={personaUri}
+          title={atomUtils.getTitle(pinnedAtom)}
+          key={pinnedAtomUri}
         >
           <VisibilitySensor
             onChange={isVisible => {
               if (isVisible) {
                 const isAtomFetchNecessary = processUtils.isAtomFetchNecessary(
                   processState,
-                  personaUri,
-                  persona
+                  pinnedAtomUri,
+                  pinnedAtom
                 );
                 if (isAtomFetchNecessary) {
-                  console.debug("fetch personaUri, ", personaUri);
-                  dispatch(actionCreators.atoms__fetchUnloadedAtom(personaUri));
+                  console.debug("fetch pinnedAtomUri, ", pinnedAtomUri);
+                  dispatch(
+                    actionCreators.atoms__fetchUnloadedAtom(pinnedAtomUri)
+                  );
                 }
               }
             }}
@@ -101,7 +105,10 @@ export default function WonMenu({ className }) {
             partialVisibility={true}
             offset={{ top: -300, bottom: -300 }}
           >
-            <WonAtomIcon className="personas__persona__icon" atom={persona} />
+            <WonAtomIcon
+              className="pinnedatoms__pinnedatom__icon"
+              atom={pinnedAtom}
+            />
           </VisibilitySensor>
         </div>
       );
@@ -226,26 +233,28 @@ export default function WonMenu({ className }) {
 
   return (
     <won-menu class={generateRootClasses()} ref={node => (thisNode = node)}>
-      <div className="personas">
-        {personaElements}
+      <div className="pinnedatoms">
+        {pinnedAtomElements}
         <div
           className={
-            "personas__persona personas__persona--anon " +
-            (!activePersonaUri ? "personas__persona--active" : "clickable")
+            "pinnedatoms__pinnedatom pinnedatoms__pinnedatom--anon " +
+            (!activePinnedAtomUri
+              ? "pinnedatoms__pinnedatom--active"
+              : "clickable")
           }
           onClick={() => {
-            if (activePersonaUri) {
-              dispatch(actionCreators.view__setActivePersonaUri());
+            if (activePinnedAtomUri) {
+              dispatch(actionCreators.view__setActivePinnedAtomUri());
               hideMenuIfVisible();
             }
           }}
         >
-          <svg className="personas__persona__anonicon">
+          <svg className="pinnedatoms__pinnedatom__anonicon">
             <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
           </svg>
         </div>
         <Link
-          className="personas__create"
+          className="pinnedatoms__create"
           onClick={hideMenuIfVisible}
           to={location =>
             generateLink(
@@ -258,20 +267,23 @@ export default function WonMenu({ className }) {
             )
           }
         >
-          <svg className="personas__create__icon" title="Create a new Persona">
+          <svg
+            className="pinnedatoms__create__icon"
+            title="Create a new Persona"
+          >
             <use xlinkHref={ico32_buddy_add} href={ico32_buddy_add} />
           </svg>
         </Link>
       </div>
       <div className="menu">
         <div className="menu__user">
-          {activePersona ? (
-            <div className="menu__user__persona">
+          {activePinnedAtom ? (
+            <div className="menu__user__pinnedatom">
               <span className="menu__user__caption">
-                {atomUtils.getTitle(activePersona)}
+                {atomUtils.getTitle(activePinnedAtom)}
               </span>
-              <WonShareDropdown atom={activePersona} />
-              <WonAtomContextDropdown atom={activePersona} />
+              <WonShareDropdown atom={activePinnedAtom} />
+              <WonAtomContextDropdown atom={activePinnedAtom} />
             </div>
           ) : (
             <span className="menu__user__caption">Anonymous</span>
@@ -280,20 +292,20 @@ export default function WonMenu({ className }) {
             Sign out
           </a>
         </div>
-        {activePersona ? (
+        {activePinnedAtom ? (
           <WonAtomMenu
-            className="persona__menu"
-            atom={activePersona}
+            className="pinnedatom__menu"
+            atom={activePinnedAtom}
             visibleTab={
               history.location.pathname === "/inventory" ||
               history.location.pathname === "/"
-                ? activePersonaTab
+                ? activePinnedAtomTab
                 : "FIXME:NOTEXISTS"
             }
             toggleAddPicker={() => {}}
             setVisibleTab={tabName => {
               hideMenuIfVisible();
-              dispatch(actionCreators.view__setActivePersonaTab(tabName));
+              dispatch(actionCreators.view__setActivePinnedAtomTab(tabName));
               if (
                 !(
                   history.location.pathname === "/inventory" ||
@@ -303,7 +315,7 @@ export default function WonMenu({ className }) {
                 history.push(generateLink(history.location, {}, "/inventory"));
               }
             }}
-            relevantConnectionsMap={relevantActivePersonaConnectionsMap}
+            relevantConnectionsMap={relevantActivePinnedAtomConnectionsMap}
           />
         ) : (
           <React.Fragment>

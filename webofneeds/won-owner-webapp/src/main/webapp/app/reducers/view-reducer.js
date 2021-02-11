@@ -29,7 +29,7 @@ const initialState = Immutable.fromJS({
   showSlideIns: true,
   locationAccessDenied: false,
   currentLocation: undefined,
-  activePersona: {
+  activePinnedAtom: {
     uri: undefined,
     tab: "DETAIL",
   },
@@ -149,15 +149,15 @@ export default function(viewState = initialState, action = {}) {
         const parsedMetaAtoms = metaAtoms.map(metaAtom =>
           parseMetaAtom(metaAtom)
         );
-        const firstPersonaUri = getUri(
+        const firstPinnedAtomUri = getUri(
           parsedMetaAtoms
-            .filter(metaAtom => atomUtils.isPersona(metaAtom))
+            .filter(metaAtom => atomUtils.isPinnedAtom(metaAtom))
             .first()
         );
-        if (firstPersonaUri) {
+        if (firstPinnedAtomUri) {
           return viewState
-            .setIn(["activePersona", "uri"], firstPersonaUri)
-            .setIn(["activePersona", "tab"], "DETAIL");
+            .setIn(["activePinnedAtom", "uri"], firstPinnedAtomUri)
+            .setIn(["activePinnedAtom", "tab"], "DETAIL");
         }
       }
       return viewState;
@@ -166,25 +166,25 @@ export default function(viewState = initialState, action = {}) {
     // This sets a newly created Persona as the currently selected Persona
     case actionTypes.atoms.createSuccessful: {
       let parsedAtom = parseAtom(action.payload.atom);
-      if (atomUtils.isPersona(parsedAtom)) {
+      if (atomUtils.isPinnedAtom(parsedAtom)) {
         const parsedAtomUri = getUri(parsedAtom);
         return viewState
-          .setIn(["activePersona", "uri"], parsedAtomUri)
-          .setIn(["activePersona", "tab"], "DETAIL");
+          .setIn(["activePinnedAtom", "uri"], parsedAtomUri)
+          .setIn(["activePinnedAtom", "tab"], "DETAIL");
       }
       return viewState;
     }
 
-    case actionTypes.view.setActivePersonaUri: {
+    case actionTypes.view.setActivePinnedAtomUri: {
       const personaUri = action.payload;
       return viewState
-        .setIn(["activePersona", "uri"], personaUri)
-        .setIn(["activePersona", "tab"], "DETAIL");
+        .setIn(["activePinnedAtom", "uri"], personaUri)
+        .setIn(["activePinnedAtom", "tab"], "DETAIL");
     }
 
-    case actionTypes.view.setActivePersonaTab: {
+    case actionTypes.view.setActivePinnedAtomTab: {
       const tab = action.payload;
-      return viewState.setIn(["activePersona", "tab"], tab);
+      return viewState.setIn(["activePinnedAtom", "tab"], tab);
     }
 
     case actionTypes.view.showModalDialog: {

@@ -42,7 +42,7 @@ export default function WonCreateAtom({
   const processState = useSelector(generalSelectors.getProcessState);
   const accountState = useSelector(generalSelectors.getAccountState);
 
-  const activePersonaUri = useSelector(viewSelectors.getActivePersonaUri);
+  const activePinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
 
   const isHolderAtomValid = useSelector(
     state =>
@@ -187,10 +187,10 @@ export default function WonCreateAtom({
           )
         );
 
-        //if fromAtomUri is the uri of the activePersona we simply go to the tab of the inventory instead of the fromAtomUri itself
-        if (activePersonaUri === fromAtomUri) {
+        //if fromAtomUri is the uri of the activePinnedAtom we simply go to the tab of the inventory instead of the fromAtomUri itself
+        if (activePinnedAtomUri === fromAtomUri) {
           dispatch(
-            actionCreators.view__setActivePersonaTab(
+            actionCreators.view__setActivePinnedAtomTab(
               isTagViewSocket(targetSocketType) ? "DETAIL" : targetSocketType
             )
           );

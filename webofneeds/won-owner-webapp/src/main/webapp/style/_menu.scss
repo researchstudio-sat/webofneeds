@@ -11,12 +11,12 @@
   padding: 0.5rem 0;
   max-width: 20rem;
 
-  .menu__user > .menu__user__persona > .menu__user__caption {
+  .menu__user > .menu__user__pinnedatom > .menu__user__caption {
     min-width: 10rem;
   }
 }
 
-@mixin personaMenu() {
+@mixin pinnedatomMenu() {
   display: flex;
   flex-direction: column;
   grid-gap: 1rem;
@@ -25,11 +25,11 @@
   align-self: stretch;
   padding: 1rem 0.5rem;
 
-  .personas__persona {
+  .pinnedatoms__pinnedatom {
     &--anon {
       --local-primary: #{$won-line-gray};
 
-      .personas__persona__anonicon {
+      .pinnedatoms__pinnedatom__anonicon {
         border-radius: 100%;
         @include fixed-square($feedIconSize);
       }
@@ -42,18 +42,18 @@
     @include square-image($feedIconSize);
 
     &--active {
-      .personas__persona__anonicon,
+      .pinnedatoms__pinnedatom__anonicon,
       .image {
         box-shadow: 0 0 5px 5px var(--won-secondary-text-color);
       }
 
-      .personas__persona__anonicon {
+      .pinnedatoms__pinnedatom__anonicon {
         --local-primary: #{$won-secondary-text-color};
       }
     }
   }
 
-  .personas__create {
+  .pinnedatoms__create {
     display: block;
     padding: 0.3rem 0.5rem;
     border-radius: 100%;
@@ -69,7 +69,7 @@
     &:hover {
       border-color: $won-secondary-text-color;
 
-      .personas__create__icon {
+      .pinnedatoms__create__icon {
         --local-primary: #{$won-secondary-text-color};
       }
     }
@@ -111,7 +111,7 @@
     align-items: center;
     white-space: nowrap;
 
-    .menu__user__persona {
+    .menu__user__pinnedatom {
       display: grid;
       grid-template-columns: 1fr min-content min-content;
       align-items: end;
@@ -141,7 +141,7 @@
     }
   }
 
-  won-atom-menu.persona__menu {
+  won-atom-menu.pinnedatom__menu {
     flex-direction: column;
     align-items: stretch;
     padding: 0;
@@ -234,13 +234,13 @@ won-menu.won-menu--show-mobile {
   grid-template-columns: min-content 1fr;
   grid-template-rows: 1fr min-content;
   grid-template-areas:
-    "personas menu"
-    "personas footer";
+    "pinnedatoms menu"
+    "pinnedatoms footer";
   align-items: self-start;
 
-  > .personas {
-    grid-area: personas;
-    @include personaMenu();
+  > .pinnedatoms {
+    grid-area: pinnedatoms;
+    @include pinnedatomMenu();
   }
 
   > won-footer.menu__footer {
@@ -264,13 +264,13 @@ won-menu:not(.won-menu--show-mobile) {
   grid-template-columns: min-content 1fr;
   grid-template-rows: 1fr min-content;
   grid-template-areas:
-    "personas menu"
-    "personas footer";
+    "pinnedatoms menu"
+    "pinnedatoms footer";
   align-items: self-start;
 
-  > .personas {
-    grid-area: personas;
-    @include personaMenu();
+  > .pinnedatoms {
+    grid-area: pinnedatoms;
+    @include pinnedatomMenu();
   }
 
   > won-footer.menu__footer {

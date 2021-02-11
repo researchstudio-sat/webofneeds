@@ -372,6 +372,12 @@ export const getOwnedPersonas = createSelector(
     ownedAtoms && ownedAtoms.filter(atom => atomUtils.isPersona(atom))
 );
 
+export const getOwnedPinnedAtoms = createSelector(
+  getOwnedAtoms,
+  ownedAtoms =>
+    ownedAtoms && ownedAtoms.filter(atom => atomUtils.isPinnedAtom(atom))
+);
+
 export const getOwnedAtomsWithBuddySocket = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
