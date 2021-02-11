@@ -335,12 +335,12 @@ vocab.WXSCHEMA.MemberSocketCompacted = vocab.WXSCHEMA.prefix + ":MemberSocket";
 
 vocab.WXSCHEMA.AttendeeSocket = vocab.WXSCHEMA.baseUri + "AttendeeSocket";
 vocab.WXSCHEMA.AttendeeSocketCompacted =
-  vocab.WXSCHEMA.prefix + "::AttendeeSocket";
+  vocab.WXSCHEMA.prefix + ":AttendeeSocket";
 
 vocab.WXSCHEMA.AttendeeInverseSocket =
   vocab.WXSCHEMA.baseUri + "AttendeeInverseSocket";
 vocab.WXSCHEMA.AttendeeInverseSocketCompacted =
-  vocab.WXSCHEMA.prefix + "::AttendeeInverseSocket";
+  vocab.WXSCHEMA.prefix + ":AttendeeInverseSocket";
 
 vocab.WXSCHEMA.WorksForSocket = vocab.WXSCHEMA.baseUri + "WorksForSocket";
 vocab.WXSCHEMA.WorksForSocketCompacted =
