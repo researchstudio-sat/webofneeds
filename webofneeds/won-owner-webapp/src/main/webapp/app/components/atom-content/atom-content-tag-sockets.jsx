@@ -12,11 +12,6 @@ export default function WonAtomContentTagSockets({
   storedAtoms,
   isOwned,
 }) {
-  console.debug(
-    "relevantTagViewSocketsConnectionsMap: ",
-    relevantConnectionsMap
-  );
-
   const tagViewSocketElements = [];
 
   relevantConnectionsMap.map((connections, socketType) => {

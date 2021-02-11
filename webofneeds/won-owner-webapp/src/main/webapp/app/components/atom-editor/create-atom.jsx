@@ -151,16 +151,13 @@ export default function WonCreateAtom({
   );
 
   function updateDraftSeeksImm(updatedDraftBranchImm) {
-    console.debug("updateDraftSeeksImm: ", updatedDraftBranchImm);
     updateDraftImm(updatedDraftBranchImm, "seeks");
   }
   function updateDraftContentImm(updatedDraftBranchImm) {
-    console.debug("updateDraftContentImm: ", updatedDraftBranchImm);
     updateDraftImm(updatedDraftBranchImm, "content");
   }
 
   function updateDraftImm(updatedDraftImm, branch) {
-    console.debug("updateDraftImm", branch, ": ", updatedDraftImm);
     setDraftObjectImm(draftObjectImm.set(branch, updatedDraftImm));
   }
 
