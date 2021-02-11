@@ -153,6 +153,11 @@ export function successfulCreate(event) {
             type: actionTypes.atoms.delete,
             payload: Immutable.fromJS({ uri: atomUri }),
           });
+        } else if (error.status && error.status === 403) {
+          dispatch({
+            type: actionTypes.atoms.storeUriAccessDenied,
+            payload: Immutable.fromJS({ uri: atomUri }),
+          });
         } else {
           dispatch({
             type: actionTypes.atoms.storeUriFailed,

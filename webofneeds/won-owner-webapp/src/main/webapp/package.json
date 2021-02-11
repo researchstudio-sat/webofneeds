@@ -41,7 +41,7 @@
     "redux-thunk": "^1.0.3",
     "reselect": "^2.5.4",
     "sha.js": "^2.4.11",
-    "sockjs-client": "^1.4.0",
+    "sockjs-client": "^1.5.0",
     "sparqljs": "^2.1.0",
     "style": "0.0.3",
     "url-join": "^4.0.1",

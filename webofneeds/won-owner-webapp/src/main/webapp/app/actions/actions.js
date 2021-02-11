@@ -93,8 +93,11 @@ const actionHierarchy = {
     markAsRead: INJ_DEFAULT,
     setLoadingAgreementData: INJ_DEFAULT,
     setLoadingAgreementDataset: INJ_DEFAULT,
-    setLoadedAgreementDataset: INJ_DEFAULT,
     setLoadingPetriNetData: INJ_DEFAULT,
+    failedLoadingAgreementData: INJ_DEFAULT,
+    failedLoadingAgreementDataset: INJ_DEFAULT,
+    failedLoadingPetriNetData: INJ_DEFAULT,
+    setLoadedAgreementDataset: INJ_DEFAULT,
     showAgreementData: INJ_DEFAULT,
     showPetriNetData: INJ_DEFAULT,
     setMultiSelectType: INJ_DEFAULT,
@@ -117,6 +120,7 @@ const actionHierarchy = {
     storeActive: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
+    storeUriAccessDenied: INJ_DEFAULT,
   },
   atoms: {
     received: INJ_DEFAULT,

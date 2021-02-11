@@ -36,6 +36,7 @@ export const emptyAtomProcess = Immutable.fromJS({
   loaded: false,
   failedToLoad: false,
   processUpdate: false,
+  accessDenied: false,
 });
 
 export const emptyConnectionProcess = Immutable.fromJS({
@@ -48,14 +49,17 @@ export const emptyConnectionProcess = Immutable.fromJS({
     loading: false,
     dirty: false,
     loaded: false,
+    failCount: 0,
   },
   agreementDataset: {
     loading: false,
     loaded: false,
+    failCount: 0,
   },
   agreementData: {
     loading: false,
     loaded: false,
+    failCount: 0,
   },
   messages: Immutable.Map(),
 });
@@ -240,6 +244,7 @@ export default function(processState = initialState, action = {}) {
       processState = updateAtomProcess(processState, action.payload.atomUri, {
         toLoad: false,
         failedToLoad: false,
+        accessDenied: false,
         loading: false,
         loaded: true,
       });
@@ -304,11 +309,22 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.sendAnonymousLinkEmailSuccess:
       return processState.set("processingSendAnonymousLinkEmail", false);
 
+    case actionTypes.atoms.storeUriAccessDenied: {
+      return updateAtomProcess(processState, getUri(action.payload), {
+        toLoad: false,
+        loaded: false,
+        failedToLoad: true,
+        accessDenied: true,
+        loading: false,
+      });
+    }
+
     case actionTypes.atoms.storeUriFailed: {
       return updateAtomProcess(processState, getUri(action.payload), {
         toLoad: false,
         loaded: false,
         failedToLoad: true,
+        accessDenied: false,
         loading: false,
       });
     }
@@ -413,6 +429,23 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.failedLoadingPetriNetData: {
+      const connUri = action.payload.connectionUri;
+
+      let failCount = processUtils.getConnectionPetriNetDataFailCount(
+        processState,
+        connUri
+      );
+
+      return updateConnectionProcess(processState, connUri, {
+        petriNetData: {
+          loading: false,
+          dirty: false,
+          failCount: ++failCount,
+        },
+      });
+    }
+
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
       console.debug(
@@ -437,7 +470,12 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
       return updateConnectionProcess(processState, connUri, {
-        petriNetData: { loading: false, dirty: false, loaded: true },
+        petriNetData: {
+          loading: false,
+          dirty: false,
+          loaded: true,
+          failCount: 0,
+        },
       });
     }
 
@@ -449,7 +487,7 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
       return updateConnectionProcess(processState, connUri, {
-        agreementData: { loading: false, loaded: true },
+        agreementData: { loading: false, loaded: true, failCount: 0 },
       });
     }
 
@@ -461,7 +499,19 @@ export default function(processState = initialState, action = {}) {
         return processState;
       }
       return updateConnectionProcess(processState, connUri, {
-        agreementDataset: { loading: false, loaded: true },
+        agreementDataset: { loading: false, loaded: true, failCount: 0 },
+      });
+    }
+
+    case actionTypes.connections.failedLoadingAgreementData: {
+      const connUri = action.payload.connectionUri;
+
+      let failCount = processUtils.getConnectionAgreementDataFailCount(
+        processState,
+        connUri
+      );
+      return updateConnectionProcess(processState, connUri, {
+        agreementData: { loading: false, failCount: ++failCount },
       });
     }
 
@@ -483,12 +533,31 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.connections.failedLoadingAgreementDataset: {
+      const connUri = action.payload.connectionUri;
+
+      let failCount = processUtils.getConnectionAgreementDatasetFailCount(
+        processState,
+        connUri
+      );
+
+      return updateConnectionProcess(processState, connUri, {
+        agreementDataset: {
+          loading: false,
+          failCount: ++failCount,
+          loaded: false,
+        },
+      });
+    }
+
     case actionTypes.connections.setLoadedAgreementDataset: {
       const connUri = action.payload.connectionUri;
       const loadedAgreementDataset = action.payload.loadedAgreementDataset;
 
       return updateConnectionProcess(processState, connUri, {
-        agreementDataset: { loaded: loadedAgreementDataset },
+        agreementDataset: loadedAgreementDataset
+          ? { loaded: true, failCount: 0 }
+          : { loaded: false },
       });
     }
 
@@ -586,6 +655,7 @@ export default function(processState = initialState, action = {}) {
             processState = updateAtomProcess(processState, getUri(parsedAtom), {
               toLoad: false,
               failedToLoad: false,
+              accessDenied: false,
               loading: false,
               loaded: true,
             });
@@ -600,6 +670,7 @@ export default function(processState = initialState, action = {}) {
       return updateAtomProcess(processState, atomUri, {
         toLoad: false,
         failedToLoad: false,
+        accessDenied: false,
         loading: false,
         loaded: true,
       });

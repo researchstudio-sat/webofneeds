@@ -37,6 +37,8 @@ import Immutable from "immutable";
 import { useHistory } from "react-router-dom";
 import { getOwnedConnections } from "../redux/selectors/general-selectors";
 
+const MAXFAIL_COUNT = 5;
+
 export default function WonAtomMessages({
   connection,
   backToChats,
@@ -129,6 +131,26 @@ export default function WonAtomMessages({
       processState,
       connectionUri
     );
+
+  const agreementDatasetFailCount =
+    connection &&
+    processUtils.getConnectionAgreementDatasetFailCount(
+      processState,
+      connectionUri
+    );
+  const agreementDataFailCount =
+    connection &&
+    processUtils.getConnectionAgreementDataFailCount(
+      processState,
+      connectionUri
+    );
+  const petriNetDataFailCount =
+    connection &&
+    processUtils.getConnectionPetriNetDataFailCount(
+      processState,
+      connectionUri
+    );
+
   const showAgreementData = connectionUtils.showAgreementData(connection);
   const showPetriNetData = connectionUtils.showPetriNetData(connection);
   const petriNetDataArray = petriNetData ? petriNetData.toArray() : [];
@@ -372,7 +394,8 @@ export default function WonAtomMessages({
   async function ensurePetriNetDataIsLoaded(forceFetch = false) {
     if (
       forceFetch ||
-      (connectionUtils.isConnected(connection) &&
+      (petriNetDataFailCount <= MAXFAIL_COUNT &&
+        connectionUtils.isConnected(connection) &&
         !connectionUtils.isUsingTemporaryUri(connection) &&
         !isProcessingLoadingPetriNetData &&
         !petriNetDataLoaded)
@@ -404,9 +427,8 @@ export default function WonAtomMessages({
       } catch (error) {
         console.error("Error:", error);
         dispatch(
-          actionCreators.connections__setLoadingPetriNetData({
+          actionCreators.connections__failedLoadingPetriNetData({
             connectionUri: connectionUri,
-            loadingPetriNetData: false,
           })
         );
       }
@@ -416,7 +438,8 @@ export default function WonAtomMessages({
   async function ensureAgreementDatasetIsLoaded(forceFetch = false) {
     if (
       forceFetch ||
-      (connectionUtils.isConnected(connection) &&
+      (agreementDatasetFailCount <= MAXFAIL_COUNT &&
+        connectionUtils.isConnected(connection) &&
         !connectionUtils.isUsingTemporaryUri(connection) &&
         !isProcessingLoadingAgreementDataset &&
         !agreementDatasetLoaded)
@@ -440,9 +463,8 @@ export default function WonAtomMessages({
       } catch (error) {
         console.error("Error:", error);
         dispatch(
-          actionCreators.connections__setLoadingAgreementDataset({
+          actionCreators.connections__failedLoadingAgreementDataset({
             connectionUri: connectionUri,
-            loadingAgreementDataset: false,
           })
         );
         dispatch(
@@ -458,7 +480,8 @@ export default function WonAtomMessages({
   function ensureAgreementDataIsLoaded(forceFetch = false) {
     if (
       forceFetch ||
-      (connectionUtils.isConnected(connection) &&
+      (agreementDataFailCount <= MAXFAIL_COUNT &&
+        connectionUtils.isConnected(connection) &&
         !connectionUtils.isUsingTemporaryUri(connection) &&
         !isProcessingLoadingAgreementData &&
         !agreementDataLoaded)
@@ -512,9 +535,8 @@ export default function WonAtomMessages({
         .catch(error => {
           console.error("Error:", error);
           dispatch(
-            actionCreators.connections__setLoadingAgreementData({
+            actionCreators.connections__failedLoadingAgreementData({
               connectionUri: connectionUri,
-              loadingAgreementData: false,
             })
           );
         });

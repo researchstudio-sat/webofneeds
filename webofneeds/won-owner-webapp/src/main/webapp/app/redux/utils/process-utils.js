@@ -253,6 +253,15 @@ export function isConnectionPetriNetDataLoading(process, connUri) {
   );
 }
 
+// Return how many times petriNet-Data fetch has failed so far
+export function getConnectionPetriNetDataFailCount(process, connUri) {
+  return (
+    (connUri &&
+      getIn(process, ["connections", connUri, "petriNetData", "failCount"])) ||
+    0
+  );
+}
+
 /**
  * Return true if the petriNet-Data for the given connUri has been loaded
  * @param process
@@ -285,6 +294,15 @@ export function isConnectionAgreementDataLoading(process, connUri) {
   );
 }
 
+// Return how many times agreement-Data fetch has failed so far
+export function getConnectionAgreementDataFailCount(process, connUri) {
+  return (
+    (connUri &&
+      getIn(process, ["connections", connUri, "agreementData", "failCount"])) ||
+    0
+  );
+}
+
 /**
  * Return true if the agreement-Dataset for the given connUri is currently loading
  * @param process
@@ -295,6 +313,20 @@ export function isConnectionAgreementDatasetLoading(process, connUri) {
   return (
     connUri &&
     getIn(process, ["connections", connUri, "agreementDataset", "loading"])
+  );
+}
+
+// Return how many times agreement-Dataset fetch has failed so far
+export function getConnectionAgreementDatasetFailCount(process, connUri) {
+  return (
+    (connUri &&
+      getIn(process, [
+        "connections",
+        connUri,
+        "agreementDataset",
+        "failCount",
+      ])) ||
+    0
   );
 }
 
