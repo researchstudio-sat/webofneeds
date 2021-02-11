@@ -230,11 +230,18 @@ export function fetchAtomAndDispatch(
       }
       return atom;
     })
-    .catch(() => {
-      dispatch({
-        type: actionTypes.atoms.storeUriFailed,
-        payload: Immutable.fromJS({ uri: atomUri }),
-      });
+    .catch(error => {
+      if (error.status && error.status === 410) {
+        dispatch({
+          type: actionTypes.atoms.delete,
+          payload: Immutable.fromJS({ uri: atomUri }),
+        });
+      } else {
+        dispatch({
+          type: actionTypes.atoms.storeUriFailed,
+          payload: Immutable.fromJS({ uri: atomUri }),
+        });
+      }
     });
 }
 

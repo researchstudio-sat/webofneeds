@@ -65,9 +65,7 @@ export default function WonSkeletonCard({
         <div className="card__main__topline__notitle">Atom Loading failed</div>
       </div>
       <div className="card__main__subtitle">
-        <span className="card__main__subtitle__type">
-          Atom might have been deleted.
-        </span>
+        <span className="card__main__subtitle__type" />
       </div>
     </div>
   ) : (

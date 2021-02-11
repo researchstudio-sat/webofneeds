@@ -132,19 +132,34 @@ export function successfulCreate(event) {
     //get URI of newly created atom from message
 
     //load the data into the local rdf store and publish AtomCreatedEvent when done
-    const atomURI = event.getAtom();
+    const atomUri = event.getAtom();
     // since we know that created Atoms are only dispatched for owned atoms we add the atomUri as the requesterWebId for the atom fetch
-    const requesterWebId = atomURI;
+    const requesterWebId = atomUri;
 
-    won.fetchAtom(atomURI, requesterWebId).then(atom => {
-      dispatch(
-        actionCreators.atoms__createSuccessful({
-          eventUri: event.getIsResponseTo(),
-          atomUri: event.getAtom(),
-          atom: atom,
-        })
-      );
-    });
+    won
+      .fetchAtom(atomUri, requesterWebId)
+      .then(atom => {
+        dispatch(
+          actionCreators.atoms__createSuccessful({
+            eventUri: event.getIsResponseTo(),
+            atomUri: atomUri,
+            atom: atom,
+          })
+        );
+      })
+      .catch(error => {
+        if (error.status && error.status === 410) {
+          dispatch({
+            type: actionTypes.atoms.delete,
+            payload: Immutable.fromJS({ uri: atomUri }),
+          });
+        } else {
+          dispatch({
+            type: actionTypes.atoms.storeUriFailed,
+            payload: Immutable.fromJS({ uri: atomUri }),
+          });
+        }
+      });
   };
 }
 

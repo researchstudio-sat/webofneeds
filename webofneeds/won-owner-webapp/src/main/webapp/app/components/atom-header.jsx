@@ -164,9 +164,7 @@ export default function WonAtomHeader({
           <div className="ah__right__topline__notitle">Atom Loading failed</div>
         </div>
         <div className="ah__right__subtitle">
-          <span className="ah__right__subtitle__type">
-            Atom might have been deleted.
-          </span>
+          <span className="ah__right__subtitle__type" />
         </div>
       </div>
     );

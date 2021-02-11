@@ -188,10 +188,7 @@ export default function WonConnectionHeader({
             </div>
           </div>
           <div className="ch__right__subtitle">
-            <span className="ch__right__subtitle__type">
-              Atom might have been deleted, you might want to close this
-              connection.
-            </span>
+            <span className="ch__right__subtitle__type" />
           </div>
         </React.Fragment>
       );

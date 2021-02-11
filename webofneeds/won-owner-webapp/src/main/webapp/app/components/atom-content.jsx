@@ -97,9 +97,7 @@ export default function WonAtomContent({
               href={ico16_indicator_error}
             />
           </svg>
-          <span className="atom-failedtoload__label">
-            Failed To Load - Atom might have been deleted
-          </span>
+          <span className="atom-failedtoload__label">Failed To Load</span>
           <div className="atom-failedtoload__actions">
             <button
               className="atom-failedtoload__actions__button secondary won-button--outlined thin"

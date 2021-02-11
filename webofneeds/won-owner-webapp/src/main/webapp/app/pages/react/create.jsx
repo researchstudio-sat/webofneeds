@@ -146,7 +146,7 @@ export default function PageCreate() {
                   />
                 </svg>
                 <span className="cp__content__failed__label">
-                  Failed To Load - Post might have been deleted
+                  Failed To Load
                 </span>
                 <div className="cp__content__failed__actions">
                   <button
