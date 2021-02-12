@@ -114,16 +114,17 @@ export default function WonAtomMenu({
           //IF AN ATOM IS PINNED WE DISPLAY THE CHILDCHATS ALSO
 
           const socketUri = atomUtils.getSocketUri(atom, socketType);
-          const activeConnections = activePinnedAtomUri
-            ? chatConnections.filter(conn => !connectionUtils.isClosed(conn))
-            : socketTypeConnections
-                .filter(
-                  conn =>
-                    // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
-                    isOwned ||
-                    connectionUtils.hasTargetSocketUri(conn, socketUri)
-                )
-                .filter(conn => !connectionUtils.isClosed(conn));
+          const activeConnections =
+            activePinnedAtomUri === atomUri
+              ? chatConnections.filter(conn => !connectionUtils.isClosed(conn))
+              : socketTypeConnections
+                  .filter(
+                    conn =>
+                      // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+                      isOwned ||
+                      connectionUtils.hasTargetSocketUri(conn, socketUri)
+                  )
+                  .filter(conn => !connectionUtils.isClosed(conn));
           countLabel =
             activeConnections && activeConnections.size > 0
               ? "(" + activeConnections.size + ")"
