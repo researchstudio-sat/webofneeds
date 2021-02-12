@@ -27,7 +27,6 @@ export default function WonBranchDetailInput({
 
   useEffect(
     () => {
-      console.debug("useEffect draftObjectImm changed...", draftObjectImm);
       onUpdateImm(draftObjectImm);
     },
     [draftObjectImm]

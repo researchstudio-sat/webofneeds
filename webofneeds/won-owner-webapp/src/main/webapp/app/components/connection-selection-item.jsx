@@ -38,6 +38,14 @@ export default function WonConnectionSelectionItem({
   );
   const isUnread = connectionUtils.isUnread(connection);
 
+  if (isUnread && openConnectionUri === connectionUri) {
+    dispatch(
+      actionCreators.connections__markAsRead({
+        connectionUri: connectionUri,
+      })
+    );
+  }
+
   const closeButton = targetAtomFailedToLoad ? (
     <button
       className="csi__closebutton secondary won-button--outlined thin"
