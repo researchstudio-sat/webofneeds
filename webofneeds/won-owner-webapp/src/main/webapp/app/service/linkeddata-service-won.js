@@ -33,22 +33,27 @@ import vocab from "./vocab.js";
   won.fetchAtom = (atomUri, requesterWebId) =>
     ownerApi
       .fetchJsonLdDataset(atomUri, { requesterWebId: requesterWebId })
-      .then(jsonLdData => {
-        // console.time("Atom parseTime for: " + atomUri);
-        return jsonld.frame(jsonLdData, {
-          "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
-          "@context": won.defaultContext,
-          "@embed": "@always",
-        });
-      })
-      .then(atomJsonLd => {
+      .then(jsonLdData =>
+        Promise.all([
+          jsonld.frame(jsonLdData, {
+            "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
+            "@context": won.defaultContext,
+            "@embed": "@always",
+          }),
+          jsonld.frame(jsonLdData, {
+            "@type": vocab.AUTH.AuthorizationCompacted,
+            "@context": won.defaultContext,
+            "@embed": "@always",
+          }),
+        ])
+      )
+      .then(([atomJsonLd, authsJsonLd]) => {
         // usually the atom-data will be in a single object in the '@graph' array.
         // We can flatten this and still have valid json-ld
         const flattenedAtomJsonLd = getIn(atomJsonLd, ["@graph", 0])
           ? getIn(atomJsonLd, ["@graph", 0])
           : atomJsonLd;
         flattenedAtomJsonLd["@context"] = atomJsonLd["@context"]; // keep context
-
         if (
           !flattenedAtomJsonLd ||
           getIn(flattenedAtomJsonLd, ["@graph", "length"]) === 0
@@ -61,8 +66,9 @@ import vocab from "./vocab.js";
           );
           return { "@context": flattenedAtomJsonLd["@context"] };
         }
+
         // console.timeEnd("Atom parseTime for: " + atomUri);
-        return flattenedAtomJsonLd;
+        return { atom: flattenedAtomJsonLd, auth: authsJsonLd };
       })
       .catch(e => {
         const msg = "Failed to get atom " + atomUri + ".";

@@ -139,13 +139,16 @@ export function successfulCreate(event) {
     won
       .fetchAtom(atomUri, requesterWebId)
       .then(atom => {
-        dispatch(
-          actionCreators.atoms__createSuccessful({
-            eventUri: event.getIsResponseTo(),
-            atomUri: atomUri,
-            atom: atom,
-          })
-        );
+        const parsedAtom = atomUtils.parseAtom(atom);
+        if (parsedAtom) {
+          dispatch(
+            actionCreators.atoms__createSuccessful({
+              eventUri: event.getIsResponseTo(),
+              atomUri: atomUri,
+              atom: atom,
+            })
+          );
+        }
       })
       .catch(error => {
         if (error.status && error.status === 410) {

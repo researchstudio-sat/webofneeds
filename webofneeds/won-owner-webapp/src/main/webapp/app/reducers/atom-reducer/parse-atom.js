@@ -13,8 +13,10 @@ import {
 import shajs from "sha.js";
 import Identicon from "identicon.js";
 
-export function parseAtom(jsonldAtom) {
-  const jsonldAtomImm = Immutable.fromJS(jsonldAtom);
+export function parseAtom(jsonldAtomAndAuth) {
+  const jsonldAtomAndAuthImm = Immutable.fromJS(jsonldAtomAndAuth);
+  const jsonldAtomImm = get(jsonldAtomAndAuthImm, "atom");
+  const jsonldAuthImm = get(jsonldAtomAndAuthImm, "auth");
 
   const atomUri = get(jsonldAtomImm, "@id");
   if (atomUri) {
@@ -37,6 +39,7 @@ export function parseAtom(jsonldAtom) {
         icon: undefined,
         reactions: undefined,
       },
+      auth: extractAuthList(jsonldAuthImm),
       background: generateBackground(atomUri),
       unread: false,
       isBeingCreated: false,
@@ -102,6 +105,7 @@ export function parseAtom(jsonldAtom) {
       );
     }
 
+    console.debug("parsedAtomImm: ", parsedAtomImm);
     return parsedAtomImm;
   } else {
     console.error(
@@ -300,6 +304,11 @@ function generateContent(contentJsonLd, detailsToParse) {
   }
 
   return content;
+}
+
+function extractAuthList(authList) {
+  const auths = get(authList, "@graph");
+  return auths ? auths.map(auth => auth.delete("@type")) : Immutable.List();
 }
 
 function extractState(atomJsonLd) {

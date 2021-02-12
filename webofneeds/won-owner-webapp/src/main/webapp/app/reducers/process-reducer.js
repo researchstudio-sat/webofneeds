@@ -4,7 +4,6 @@
 import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { get, getIn, getUri, extractAtomUriBySocketUri } from "../utils.js";
-import { parseAtom } from "./atom-reducer/parse-atom.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 
 const initialState = Immutable.fromJS({
@@ -650,7 +649,7 @@ export default function(processState = initialState, action = {}) {
 
       atoms &&
         atoms.map(atom => {
-          const parsedAtom = parseAtom(atom);
+          const parsedAtom = atom;
           if (parsedAtom) {
             processState = updateAtomProcess(processState, getUri(parsedAtom), {
               toLoad: false,

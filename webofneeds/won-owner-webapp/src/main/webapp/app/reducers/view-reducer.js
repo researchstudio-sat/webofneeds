@@ -5,10 +5,7 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import * as atomUtils from "~/app/redux/utils/atom-utils.js";
 import { get, getIn, getUri } from "../utils.js";
-import {
-  parseAtom,
-  parseMetaAtom,
-} from "~/app/reducers/atom-reducer/parse-atom";
+import { parseMetaAtom } from "~/app/reducers/atom-reducer/parse-atom";
 
 const initialState = Immutable.fromJS({
   debugMode: false,
@@ -165,7 +162,7 @@ export default function(viewState = initialState, action = {}) {
 
     // This sets a newly created Persona as the currently selected Persona
     case actionTypes.atoms.createSuccessful: {
-      let parsedAtom = parseAtom(action.payload.atom);
+      let parsedAtom = action.payload.atom;
       if (atomUtils.isPinnedAtom(parsedAtom)) {
         const parsedAtomUri = getUri(parsedAtom);
         return viewState

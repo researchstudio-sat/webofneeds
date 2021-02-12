@@ -5,7 +5,10 @@ import * as generalSelectors from "./selectors/general-selectors.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as processUtils from "./utils/process-utils.js";
 import * as connectionUtils from "./utils/connection-utils.js";
-import { parseMetaAtom } from "../reducers/atom-reducer/parse-atom.js";
+import {
+  parseMetaAtom,
+  parseAtom,
+} from "../reducers/atom-reducer/parse-atom.js";
 import { extractAtomUriFromConnectionUri, get, is, getUri } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
@@ -215,37 +218,42 @@ export function fetchAtomAndDispatch(
   return won
     .fetchAtom(atomUri, requesterWebId)
     .then(atom => {
-      dispatch({
-        type: actionTypes.atoms.store,
-        payload: Immutable.fromJS({ atoms: { [atomUri]: atom } }),
-      });
-      return atom;
-    })
-    .then(atom => {
-      //Fetch All MetaConnections Of NonOwnedAtomAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
-      if (isOwned) {
-        console.debug("### fetch connections for owned atom");
-        fetchConnectionsOfOwnedAtomAndDispatch(
-          atomUri,
-          requesterWebId,
-          dispatch
-        );
-      } else if (requesterWebId) {
-        console.debug(
-          "### fetch connections for non-owned atom, requesterWebId:",
-          requesterWebId
-        );
-        // We only fetch the connections for non owned atoms if we have a requesterWebId, if we do not have one we won't fetch by default
-        // since we will probably not get a result anyway (FIXME: change this behaviour once we figure out how to reload connections)
-        fetchConnectionsOfNonOwnedAtomAndDispatch(
-          atomUri,
-          requesterWebId,
-          dispatch
-        );
-      } else {
-        console.debug("### do NOT fetch connections for non-owned atom");
+      const parsedAtom = parseAtom(atom);
+      if (parsedAtom) {
+        dispatch({
+          type: actionTypes.atoms.store,
+          payload: Immutable.fromJS({ atoms: { [atomUri]: parsedAtom } }),
+        });
       }
-      return atom;
+      return parsedAtom;
+    })
+    .then(parsedAtom => {
+      if (parsedAtom) {
+        //Fetch All MetaConnections Of NonOwnedAtomAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
+        if (isOwned) {
+          console.debug("### fetch connections for owned atom");
+          fetchConnectionsOfOwnedAtomAndDispatch(
+            atomUri,
+            requesterWebId,
+            dispatch
+          );
+        } else if (requesterWebId) {
+          console.debug(
+            "### fetch connections for non-owned atom, requesterWebId:",
+            requesterWebId
+          );
+          // We only fetch the connections for non owned atoms if we have a requesterWebId, if we do not have one we won't fetch by default
+          // since we will probably not get a result anyway (FIXME: change this behaviour once we figure out how to reload connections)
+          fetchConnectionsOfNonOwnedAtomAndDispatch(
+            atomUri,
+            requesterWebId,
+            dispatch
+          );
+        } else {
+          console.debug("### do NOT fetch connections for non-owned atom");
+        }
+      }
+      return parsedAtom;
     })
     .catch(error => {
       if (error.status && error.status === 410) {

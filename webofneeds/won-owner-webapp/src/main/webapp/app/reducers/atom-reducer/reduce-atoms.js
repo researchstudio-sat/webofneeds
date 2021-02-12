@@ -1,12 +1,11 @@
-import { parseAtom, parseMetaAtom } from "./parse-atom.js";
+import { parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get, getIn, getUri } from "../../utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as connectionUtils from "../../redux/utils/connection-utils.js";
 import vocab from "../../service/vocab.js";
 
-export function addAtom(allAtomsInState, jsonldAtom) {
-  let parsedAtom = parseAtom(jsonldAtom);
+export function addAtom(allAtomsInState, parsedAtom) {
   const parsedAtomUri = getUri(parsedAtom);
 
   if (parsedAtomUri) {
@@ -21,7 +20,7 @@ export function addAtom(allAtomsInState, jsonldAtom) {
 
     return allAtomsInState.set(parsedAtomUri, parsedAtom);
   } else {
-    console.error("Tried to add invalid atom-object: ", jsonldAtom);
+    console.error("Tried to add invalid atom-object: ", parsedAtom);
     return allAtomsInState;
   }
 }
