@@ -166,13 +166,17 @@
              <https://w3id.org/won/core#compatibleSocketDefinition> :BuddySocket ;
              <https://w3id.org/won/core#derivesAtomProperty> :buddy ;
              rdfs:comment """Compatible with other BuddySockets, derives the buddy relationship. Installs local
-                                   authorizations that <br>
-
-                                   a) gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket
-                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms. <br>
-
-                                   b) gives buddies access to the connections to other buddies using
-                                   https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"""@en ;
+                                   authorizations that
+                                   <ol>
+                                   <li>
+                                   Gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket
+                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms.
+                                   </li>
+                                   <li>
+                                   Gives buddies access to the connections to other buddies using
+                                   https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy
+                                   </li>
+                                   </ol>"""@en ;
              rdfs:label "BuddySocket" ;
              <https://w3id.org/won/auth#localAuth> :grantAccessToBuddies ,
                                                    :grantReadConnectToBuddyOfBuddy .
@@ -193,41 +197,41 @@
 ###  https://w3id.org/won/ext/buddy#grantAccessToBuddies
 :grantAccessToBuddies rdf:type owl:NamedIndividual ,
                                <https://w3id.org/won/auth#Authorization> ;
-                      <https://w3id.org/won/auth#grant> _:genid1 ,
-                                                        [ <https://w3id.org/won/auth#socket> _:genid7
-                                                        ] ;
+                      <https://w3id.org/won/auth#grant> [ <https://w3id.org/won/auth#socket> _:genid2
+                                                        ] ,
+                                                        _:genid7 ;
                       <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> _:genid13
                                                           ] .
 
-_:genid1 <https://w3id.org/won/auth#operation> [ <https://w3id.org/won/auth#requestToken> _:genid3
-                                                ] ,
-                                                [ <https://w3id.org/won/auth#requestToken> _:genid5
-                                                ] .
-
-_:genid7 <https://w3id.org/won/auth#connections> _:genid8 ;
+_:genid2 <https://w3id.org/won/auth#connections> _:genid3 ;
           <https://w3id.org/won/auth#socketType> :BuddySocket .
+
+_:genid7 <https://w3id.org/won/auth#operation> [ <https://w3id.org/won/auth#requestToken> _:genid9
+                                                ] ,
+                                                [ <https://w3id.org/won/auth#requestToken> _:genid11
+                                                ] .
 
 _:genid13 <https://w3id.org/won/auth#connection> _:genid14 ;
            <https://w3id.org/won/auth#socketType> :BuddySocket .
 
-_:genid3 <https://w3id.org/won/auth#expiresAfter> 3600 ;
-          <https://w3id.org/won/auth#tokenScope> :ScopeReadConnectToBuddyOfBuddy .
+_:genid3 <https://w3id.org/won/auth#connection> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+                                                 ] ,
+                                                 _:genid5 ;
+          <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
-_:genid5 <https://w3id.org/won/auth#expiresAfter> 3600 ;
+_:genid9 <https://w3id.org/won/auth#expiresAfter> 3600 ;
           <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/hold#ScopeReadHeldAtoms> .
 
-_:genid8 <https://w3id.org/won/auth#connection> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
-                                                 ] ,
-                                                 _:genid10 ;
-          <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+_:genid11 <https://w3id.org/won/auth#expiresAfter> 3600 ;
+           <https://w3id.org/won/auth#tokenScope> :ScopeReadConnectToBuddyOfBuddy .
 
 _:genid14 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
            <https://w3id.org/won/auth#targetAtom> [ ] .
 
-_:genid10 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
-                                                          ] ;
-           <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
-           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+_:genid5 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+                                                         ] ;
+          <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+          <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
 
 ###  https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy

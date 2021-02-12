@@ -1,26 +1,21 @@
 [ {
   "@id" : "_:genid1",
-  "https://w3id.org/won/auth#operation" : [ {
+  "https://w3id.org/won/auth#socket" : [ {
     "@id" : "_:genid2"
-  }, {
-    "@id" : "_:genid4"
   } ]
 }, {
   "@id" : "_:genid10",
-  "https://w3id.org/won/auth#connectionMessages" : [ {
+  "https://w3id.org/won/auth#requestToken" : [ {
     "@id" : "_:genid11"
-  } ],
-  "https://w3id.org/won/auth#connectionState" : [ {
-    "@id" : "https://w3id.org/won/core#Connected"
-  } ],
-  "https://w3id.org/won/auth#operation" : [ {
-    "@id" : "https://w3id.org/won/auth#opRead"
   } ]
 }, {
   "@id" : "_:genid11",
-  "https://w3id.org/won/auth#inherit" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
-    "@value" : "false"
+  "https://w3id.org/won/auth#expiresAfter" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "3600"
+  } ],
+  "https://w3id.org/won/auth#tokenScope" : [ {
+    "@id" : "https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"
   } ]
 }, {
   "@id" : "_:genid12",
@@ -74,8 +69,11 @@
   } ]
 }, {
   "@id" : "_:genid2",
-  "https://w3id.org/won/auth#requestToken" : [ {
+  "https://w3id.org/won/auth#connections" : [ {
     "@id" : "_:genid3"
+  } ],
+  "https://w3id.org/won/auth#socketType" : [ {
+    "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
   } ]
 }, {
   "@id" : "_:genid21",
@@ -107,55 +105,57 @@
   } ]
 }, {
   "@id" : "_:genid3",
-  "https://w3id.org/won/auth#expiresAfter" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "3600"
+  "https://w3id.org/won/auth#connection" : [ {
+    "@id" : "_:genid4"
+  }, {
+    "@id" : "_:genid5"
   } ],
-  "https://w3id.org/won/auth#tokenScope" : [ {
-    "@id" : "https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "https://w3id.org/won/auth#opRead"
   } ]
 }, {
   "@id" : "_:genid4",
-  "https://w3id.org/won/auth#requestToken" : [ {
-    "@id" : "_:genid5"
+  "https://w3id.org/won/auth#inherit" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
   } ]
 }, {
   "@id" : "_:genid5",
+  "https://w3id.org/won/auth#connectionMessages" : [ {
+    "@id" : "_:genid6"
+  } ],
+  "https://w3id.org/won/auth#connectionState" : [ {
+    "@id" : "https://w3id.org/won/core#Connected"
+  } ],
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "https://w3id.org/won/auth#opRead"
+  } ]
+}, {
+  "@id" : "_:genid6",
+  "https://w3id.org/won/auth#inherit" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ]
+}, {
+  "@id" : "_:genid7",
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "_:genid8"
+  }, {
+    "@id" : "_:genid10"
+  } ]
+}, {
+  "@id" : "_:genid8",
+  "https://w3id.org/won/auth#requestToken" : [ {
+    "@id" : "_:genid9"
+  } ]
+}, {
+  "@id" : "_:genid9",
   "https://w3id.org/won/auth#expiresAfter" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "3600"
   } ],
   "https://w3id.org/won/auth#tokenScope" : [ {
     "@id" : "https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"
-  } ]
-}, {
-  "@id" : "_:genid6",
-  "https://w3id.org/won/auth#socket" : [ {
-    "@id" : "_:genid7"
-  } ]
-}, {
-  "@id" : "_:genid7",
-  "https://w3id.org/won/auth#connections" : [ {
-    "@id" : "_:genid8"
-  } ],
-  "https://w3id.org/won/auth#socketType" : [ {
-    "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
-  } ]
-}, {
-  "@id" : "_:genid8",
-  "https://w3id.org/won/auth#connection" : [ {
-    "@id" : "_:genid9"
-  }, {
-    "@id" : "_:genid10"
-  } ],
-  "https://w3id.org/won/auth#operation" : [ {
-    "@id" : "https://w3id.org/won/auth#opRead"
-  } ]
-}, {
-  "@id" : "_:genid9",
-  "https://w3id.org/won/auth#inherit" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
-    "@value" : "false"
   } ]
 }, {
   "@id" : "http://purl.org/dc/elements/1.1/abstract",
@@ -285,7 +285,7 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Compatible with other BuddySockets, derives the buddy relationship. Installs local\n                                   authorizations that <br>\n\n                                   a) gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket\n                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms. <br>\n\n                                   b) gives buddies access to the connections to other buddies using\n                                   https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"
+    "@value" : "Compatible with other BuddySockets, derives the buddy relationship. Installs local\n                                   authorizations that\n                                   <ol>\n                                   <li>\n                                   Gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket\n                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms.\n                                   </li>\n                                   <li>\n                                   Gives buddies access to the connections to other buddies using\n                                   https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy\n                                   </li>\n                                   </ol>"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "BuddySocket"
@@ -336,7 +336,7 @@
   "https://w3id.org/won/auth#grant" : [ {
     "@id" : "_:genid1"
   }, {
-    "@id" : "_:genid6"
+    "@id" : "_:genid7"
   } ],
   "https://w3id.org/won/auth#grantee" : [ {
     "@id" : "_:genid12"

@@ -303,13 +303,17 @@
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
         <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/buddy#buddy"/>
         <rdfs:comment xml:lang="en">Compatible with other BuddySockets, derives the buddy relationship. Installs local
-                                   authorizations that &lt;br&gt;
-
-                                   a) gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket
-                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms. &lt;br&gt;
-
-                                   b) gives buddies access to the connections to other buddies using
-                                   https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy</rdfs:comment>
+                                   authorizations that
+                                   &lt;ol&gt;
+                                   &lt;li&gt;
+                                   Gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket
+                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms.
+                                   &lt;/li&gt;
+                                   &lt;li&gt;
+                                   Gives buddies access to the connections to other buddies using
+                                   https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy
+                                   &lt;/li&gt;
+                                   &lt;/ol&gt;</rdfs:comment>
         <rdfs:label>BuddySocket</rdfs:label>
         <auth:localAuth rdf:resource="https://w3id.org/won/ext/buddy#grantAccessToBuddies"/>
         <auth:localAuth rdf:resource="https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy"/>
@@ -342,42 +346,18 @@
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/buddy#grantAccessToBuddies">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
         <auth:grant>
-            <rdf:Description rdf:nodeID="genid1">
-                <auth:operation>
-                    <rdf:Description>
-                        <auth:requestToken>
-                            <rdf:Description rdf:nodeID="genid3">
-                                <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
-                                <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"/>
-                            </rdf:Description>
-                        </auth:requestToken>
-                    </rdf:Description>
-                </auth:operation>
-                <auth:operation>
-                    <rdf:Description>
-                        <auth:requestToken>
-                            <rdf:Description rdf:nodeID="genid5">
-                                <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
-                                <auth:tokenScope rdf:resource="https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"/>
-                            </rdf:Description>
-                        </auth:requestToken>
-                    </rdf:Description>
-                </auth:operation>
-            </rdf:Description>
-        </auth:grant>
-        <auth:grant>
             <rdf:Description>
                 <auth:socket>
-                    <rdf:Description rdf:nodeID="genid7">
+                    <rdf:Description rdf:nodeID="genid2">
                         <auth:connections>
-                            <rdf:Description rdf:nodeID="genid8">
+                            <rdf:Description rdf:nodeID="genid3">
                                 <auth:connection>
                                     <rdf:Description>
                                         <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
                                     </rdf:Description>
                                 </auth:connection>
                                 <auth:connection>
-                                    <rdf:Description rdf:nodeID="genid10">
+                                    <rdf:Description rdf:nodeID="genid5">
                                         <auth:connectionMessages>
                                             <rdf:Description>
                                                 <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
@@ -393,6 +373,30 @@
                         <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
                     </rdf:Description>
                 </auth:socket>
+            </rdf:Description>
+        </auth:grant>
+        <auth:grant>
+            <rdf:Description rdf:nodeID="genid7">
+                <auth:operation>
+                    <rdf:Description>
+                        <auth:requestToken>
+                            <rdf:Description rdf:nodeID="genid9">
+                                <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
+                                <auth:tokenScope rdf:resource="https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"/>
+                            </rdf:Description>
+                        </auth:requestToken>
+                    </rdf:Description>
+                </auth:operation>
+                <auth:operation>
+                    <rdf:Description>
+                        <auth:requestToken>
+                            <rdf:Description rdf:nodeID="genid11">
+                                <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
+                                <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"/>
+                            </rdf:Description>
+                        </auth:requestToken>
+                    </rdf:Description>
+                </auth:operation>
             </rdf:Description>
         </auth:grant>
         <auth:grantee>
