@@ -8,6 +8,7 @@ import { getIn, getUri, get, extractAtomUriBySocketUri } from "../utils.js";
 
 import Immutable from "immutable";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import { parseAtom } from "../reducers/atom-reducer/parse-atom.js";
 
 import { isFetchMessageEffectsNeeded } from "../won-message-utils.js";
 import * as stateStore from "../redux/state-store.js";
@@ -139,13 +140,13 @@ export function successfulCreate(event) {
     won
       .fetchAtom(atomUri, requesterWebId)
       .then(atom => {
-        const parsedAtom = atomUtils.parseAtom(atom);
+        const parsedAtom = parseAtom(atom);
         if (parsedAtom) {
           dispatch(
             actionCreators.atoms__createSuccessful({
               eventUri: event.getIsResponseTo(),
               atomUri: atomUri,
-              atom: atom,
+              atom: parsedAtom,
             })
           );
         }
@@ -156,15 +157,10 @@ export function successfulCreate(event) {
             type: actionTypes.atoms.delete,
             payload: Immutable.fromJS({ uri: atomUri }),
           });
-        } else if (error.status && error.status === 403) {
-          dispatch({
-            type: actionTypes.atoms.storeUriAccessDenied,
-            payload: Immutable.fromJS({ uri: atomUri }),
-          });
         } else {
           dispatch({
             type: actionTypes.atoms.storeUriFailed,
-            payload: Immutable.fromJS({ uri: atomUri }),
+            payload: Immutable.fromJS({ uri: atomUri, status: error }),
           });
         }
       });
