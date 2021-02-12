@@ -490,3 +490,15 @@ export const getConnectionsToCrawl = createSelector(
           )
       : Immutable.Map()
 );
+
+// TODO: MAKE A PRIORITY LIST OF CONNECTION CONTAINERS TO CRAWL AND FETCH
+// export const getConnectionContainersToCrawl = createSelector(
+//   getProcessState,
+//   getActivePinnedAtom,
+//   getOwnedPinnedAtoms,
+//   getOwnedAtoms,
+//   getAtoms,
+//   (processState, activePinnedAtom, ownedPinnedAtoms, ownedAtoms, atoms) => {
+//     processUtils.isConnectionContainerToLoad(processState, getUri(activePinnedAtom))
+//   }
+// );
