@@ -236,8 +236,24 @@ export function fetchAtomAndDispatch(
             atomUri,
             requesterWebId,
             dispatch
-          );
-        } else if (requesterWebId) {
+          ).catch(error => {
+            if (error.status && error.status === 410) {
+              dispatch({
+                type: actionTypes.atoms.delete,
+                payload: Immutable.fromJS({ uri: atomUri }),
+              });
+            } else if (error.status && error.status === 403) {
+              console.debug(
+                "ConnectionContainer/Connection Access denied for atom",
+                parsedAtom,
+                "atomUri: ",
+                atomUri,
+                "-->",
+                error
+              );
+            }
+          });
+        } else {
           console.debug(
             "### fetch connections for non-owned atom, requesterWebId:",
             requesterWebId
@@ -248,9 +264,23 @@ export function fetchAtomAndDispatch(
             atomUri,
             requesterWebId,
             dispatch
-          );
-        } else {
-          console.debug("### do NOT fetch connections for non-owned atom");
+          ).catch(error => {
+            if (error.status && error.status === 410) {
+              dispatch({
+                type: actionTypes.atoms.delete,
+                payload: Immutable.fromJS({ uri: atomUri }),
+              });
+            } else if (error.status && error.status === 403) {
+              console.debug(
+                "ConnectionContainer/Connection Access denied for atom",
+                parsedAtom,
+                "atomUri: ",
+                atomUri,
+                "-->",
+                error
+              );
+            }
+          });
         }
       }
       return parsedAtom;
