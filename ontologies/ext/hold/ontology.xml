@@ -6,6 +6,7 @@
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:auth="https://w3id.org/won/auth#"
      xmlns:core="https://w3id.org/won/core#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
@@ -92,6 +93,97 @@
     
 
 
+    <!-- https://w3id.org/won/auth#bearer -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#bearer"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connection -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connection"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connectionState -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connectionState"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#grant -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#grant"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#graph -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#graph"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#graphType -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#graphType"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#issuer -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#issuer"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#operation -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#operation"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#socket -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#socket"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#socketType -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#socketType"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#targetAtom -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#targetAtom"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#targetAuth -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#targetAuth"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#tokenScope -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#tokenScope"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -128,6 +220,32 @@
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/auth#Authorization -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/auth#Authorization"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#TokenScope -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/auth#TokenScope"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
     // Individuals
     //
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -148,6 +266,45 @@
         <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it.</rdfs:comment>
         <rdfs:label>HoldableSocket</rdfs:label>
+        <auth:targetAuth>
+            <rdf:Description rdf:nodeID="genid1">
+                <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+                <auth:bearer>
+                    <rdf:Description rdf:nodeID="genid2">
+                        <auth:issuer>
+                            <rdf:Description>
+                                <auth:socket>
+                                    <rdf:Description rdf:nodeID="genid4">
+                                        <auth:connection>
+                                            <rdf:Description rdf:nodeID="genid5">
+                                                <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+                                                <auth:targetAtom>
+                                                    <rdf:Description/>
+                                                </auth:targetAtom>
+                                            </rdf:Description>
+                                        </auth:connection>
+                                        <auth:socketType rdf:resource="https://w3id.org/won/ext/hold#HoldableSocket"/>
+                                    </rdf:Description>
+                                </auth:socket>
+                            </rdf:Description>
+                        </auth:issuer>
+                        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"/>
+                    </rdf:Description>
+                </auth:bearer>
+                <auth:grant>
+                    <rdf:Description>
+                        <auth:graph>
+                            <rdf:Description rdf:nodeID="genid8">
+                                <auth:graphType rdf:resource="https://w3id.org/won/auth#contentGraph"/>
+                                <auth:graphType rdf:resource="https://w3id.org/won/auth#keyGraph"/>
+                                <auth:graphType rdf:resource="https://w3id.org/won/auth#sysinfoGraph"/>
+                                <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+                            </rdf:Description>
+                        </auth:graph>
+                    </rdf:Description>
+                </auth:grant>
+            </rdf:Description>
+        </auth:targetAuth>
     </owl:NamedIndividual>
     
 
@@ -162,6 +319,18 @@
         <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
         <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to connect to Atoms it holds.</rdfs:comment>
         <rdfs:label>HolderSocket</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#ScopeReadHeldAtoms -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#ScopeReadHeldAtoms">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#TokenScope"/>
+        <rdfs:comment xml:lang="en">Tokens with this scope, signed by the holder of an atom, provide read/connect
+               access to the holder&apos;s atoms (see https://w3id.org/won/ext/hold#HoldableSocket).</rdfs:comment>
+        <rdfs:label>ScopeReadHeldAtoms</rdfs:label>
     </owl:NamedIndividual>
     
 

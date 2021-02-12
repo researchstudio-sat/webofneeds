@@ -1,4 +1,69 @@
 [ {
+  "@id" : "_:genid1",
+  "@type" : [ "https://w3id.org/won/auth#Authorization" ],
+  "https://w3id.org/won/auth#grant" : [ {
+    "@id" : "_:genid2"
+  } ],
+  "https://w3id.org/won/auth#grantee" : [ {
+    "@id" : "_:genid7"
+  } ]
+}, {
+  "@id" : "_:genid2",
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "_:genid3"
+  } ],
+  "https://w3id.org/won/auth#socket" : [ {
+    "@id" : "_:genid5"
+  } ]
+}, {
+  "@id" : "_:genid3",
+  "https://w3id.org/won/auth#requestToken" : [ {
+    "@id" : "_:genid4"
+  } ]
+}, {
+  "@id" : "_:genid4",
+  "https://w3id.org/won/auth#expiresAfter" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "3600"
+  } ],
+  "https://w3id.org/won/auth#tokenScope" : [ {
+    "@id" : "https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"
+  } ]
+}, {
+  "@id" : "_:genid5",
+  "https://w3id.org/won/auth#connection" : [ {
+    "@id" : "_:genid6"
+  } ],
+  "https://w3id.org/won/auth#socketType" : [ {
+    "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
+  } ]
+}, {
+  "@id" : "_:genid6",
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "https://w3id.org/won/auth#opRead"
+  } ]
+}, {
+  "@id" : "_:genid7",
+  "https://w3id.org/won/auth#socket" : [ {
+    "@id" : "_:genid8"
+  } ]
+}, {
+  "@id" : "_:genid8",
+  "https://w3id.org/won/auth#connection" : [ {
+    "@id" : "_:genid9"
+  } ],
+  "https://w3id.org/won/auth#socketType" : [ {
+    "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
+  } ]
+}, {
+  "@id" : "_:genid9",
+  "https://w3id.org/won/auth#connectionState" : [ {
+    "@id" : "https://w3id.org/won/core#Connected"
+  } ],
+  "https://w3id.org/won/auth#targetAtom" : [ {
+    "@id" : "_:genid10"
+  } ]
+}, {
   "@id" : "http://purl.org/dc/elements/1.1/abstract",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
@@ -25,6 +90,45 @@
 }, {
   "@id" : "http://schema.org/knows",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#Authorization",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#connection",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#connectionState",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#expiresAfter",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#grant",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#grantee",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#localAuth",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#operation",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#requestToken",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#socket",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#socketType",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#targetAtom",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/auth#tokenScope",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "https://w3id.org/won/ext/buddy",
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
@@ -63,10 +167,13 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Compatible with other BuddySockets, derives the buddy relationship."
+    "@value" : "Compatible with other BuddySockets, derives the buddy relationship. Installs a local authorization that gives buddies access to atoms on the wx-hold:HolderSocket."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "BuddySocket"
+  } ],
+  "https://w3id.org/won/auth#localAuth" : [ {
+    "@id" : "_:genid1"
   } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
