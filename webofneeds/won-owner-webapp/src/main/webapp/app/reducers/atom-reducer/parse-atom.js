@@ -105,7 +105,6 @@ export function parseAtom(jsonldAtomAndAuth) {
       );
     }
 
-    console.debug("parsedAtomImm: ", parsedAtomImm);
     return parsedAtomImm;
   } else {
     console.error(
