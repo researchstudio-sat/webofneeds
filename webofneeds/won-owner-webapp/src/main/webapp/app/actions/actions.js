@@ -120,7 +120,6 @@ const actionHierarchy = {
     storeActive: INJ_DEFAULT,
 
     storeUriFailed: INJ_DEFAULT,
-    storeUriAccessDenied: INJ_DEFAULT,
   },
   atoms: {
     received: INJ_DEFAULT,
@@ -149,6 +148,10 @@ const actionHierarchy = {
 
     storeOwnedMetaAtoms: INJ_DEFAULT,
     storeUriInLoading: INJ_DEFAULT,
+
+    storeConnectionContainerInLoading: INJ_DEFAULT,
+    storeConnectionContainerLoaded: INJ_DEFAULT,
+    storeConnectionContainerFailed: INJ_DEFAULT,
 
     store: INJ_DEFAULT,
 

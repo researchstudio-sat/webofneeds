@@ -22,6 +22,7 @@ const initialState = Immutable.fromJS({
   externalData: Immutable.Map(),
   atoms: Immutable.Map(),
   connections: Immutable.Map(),
+  connectionContainers: Immutable.Map(),
 });
 
 export const emptyExternalDataProcess = Immutable.fromJS({
@@ -35,7 +36,14 @@ export const emptyAtomProcess = Immutable.fromJS({
   loaded: false,
   failedToLoad: false,
   processUpdate: false,
-  accessDenied: false,
+});
+
+export const emptyConnectionContainerProcess = Immutable.fromJS({
+  loading: false,
+  toLoad: false,
+  loaded: false,
+  failedToLoad: false,
+  status: undefined,
 });
 
 export const emptyConnectionProcess = Immutable.fromJS({
@@ -44,6 +52,7 @@ export const emptyConnectionProcess = Immutable.fromJS({
   loadingMessages: false,
   nextPage: undefined,
   failedToLoad: false,
+  status: undefined,
   petriNetData: {
     loading: false,
     dirty: false,
@@ -99,6 +108,25 @@ function updateAtomProcess(processState, atomUri, payload) {
     oldAtomProcess
       ? oldAtomProcess.mergeDeep(payloadImm)
       : emptyAtomProcess.mergeDeep(payloadImm)
+  );
+}
+
+function updateConnectionContainerProcess(processState, atomUri, payload) {
+  if (!atomUri) {
+    return processState;
+  }
+
+  const oldConnectionContainerProcess = getIn(processState, [
+    "connectionContainers",
+    atomUri,
+  ]);
+  const payloadImm = Immutable.fromJS(payload);
+
+  return processState.setIn(
+    ["connectionContainers", atomUri],
+    oldConnectionContainerProcess
+      ? oldConnectionContainerProcess.mergeDeep(payloadImm)
+      : emptyConnectionContainerProcess.mergeDeep(payloadImm)
   );
 }
 
@@ -243,7 +271,6 @@ export default function(processState = initialState, action = {}) {
       processState = updateAtomProcess(processState, action.payload.atomUri, {
         toLoad: false,
         failedToLoad: false,
-        accessDenied: false,
         loading: false,
         loaded: true,
       });
@@ -308,31 +335,39 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.sendAnonymousLinkEmailSuccess:
       return processState.set("processingSendAnonymousLinkEmail", false);
 
-    case actionTypes.atoms.storeUriAccessDenied: {
-      return updateAtomProcess(processState, getUri(action.payload), {
-        toLoad: false,
-        loaded: false,
-        failedToLoad: true,
-        accessDenied: true,
-        loading: false,
-      });
-    }
-
     case actionTypes.atoms.storeUriFailed: {
       return updateAtomProcess(processState, getUri(action.payload), {
         toLoad: false,
         loaded: false,
         failedToLoad: true,
-        accessDenied: false,
         loading: false,
+        status: get(action.payload, "status"),
       });
+    }
+
+    case actionTypes.atoms.storeConnectionContainerFailed: {
+      return updateConnectionContainerProcess(
+        processState,
+        getUri(action.payload),
+        {
+          toLoad: false,
+          loaded: false,
+          failedToLoad: true,
+          loading: false,
+          status: get(action.payload, "status"),
+        }
+      );
     }
 
     case actionTypes.connections.storeUriFailed: {
       return updateConnectionProcess(
         processState,
         get(action.payload, "connUri"),
-        { failedToStore: true, loading: false }
+        {
+          failedToLoad: true,
+          loading: false,
+          status: get(action.payload, "status"),
+        }
       );
     }
 
@@ -342,6 +377,7 @@ export default function(processState = initialState, action = {}) {
       return updateConnectionProcess(processState, connUri, {
         loadingMessages: true,
         failedToLoad: false,
+        status: undefined,
       });
     }
 
@@ -352,6 +388,7 @@ export default function(processState = initialState, action = {}) {
       return updateConnectionProcess(processState, connUri, {
         loadingMessages: false,
         failedToLoad: false,
+        status: undefined,
         nextPage: nextPage,
       });
     }
@@ -365,6 +402,7 @@ export default function(processState = initialState, action = {}) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: false,
+          status: undefined,
           nextPage: nextPage,
         });
 
@@ -563,6 +601,18 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.connections.storeMetaConnections: {
       const connections = get(action.payload, "connections");
 
+      processState = updateConnectionContainerProcess(
+        processState,
+        get(action.payload, "atomUri"),
+        {
+          toLoad: false,
+          failedToLoad: false,
+          status: undefined,
+          loading: false,
+          loaded: true,
+        }
+      );
+
       connections &&
         connections.map(conn => {
           processState = updateConnectionProcess(processState, getUri(conn), {
@@ -651,13 +701,21 @@ export default function(processState = initialState, action = {}) {
         atoms.map(atom => {
           const parsedAtom = atom;
           if (parsedAtom) {
-            processState = updateAtomProcess(processState, getUri(parsedAtom), {
+            const atomUri = getUri(parsedAtom);
+            processState = updateAtomProcess(processState, atomUri, {
               toLoad: false,
               failedToLoad: false,
-              accessDenied: false,
+              status: undefined,
               loading: false,
               loaded: true,
             });
+            processState = updateConnectionContainerProcess(
+              processState,
+              atomUri,
+              {
+                toLoad: true,
+              }
+            );
           }
         });
       return processState;
@@ -669,7 +727,7 @@ export default function(processState = initialState, action = {}) {
       return updateAtomProcess(processState, atomUri, {
         toLoad: false,
         failedToLoad: false,
-        accessDenied: false,
+        status: undefined,
         loading: false,
         loaded: true,
       });
@@ -700,6 +758,18 @@ export default function(processState = initialState, action = {}) {
       return processState;
     }
 
+    case actionTypes.atoms.storeConnectionContainerInLoading: {
+      const atomUri = getUri(action.payload);
+
+      if (atomUri) {
+        processState = updateConnectionContainerProcess(processState, atomUri, {
+          toLoad: false,
+          loading: true,
+        });
+      }
+      return processState;
+    }
+
     case actionTypes.externalData.storeUriInLoading: {
       const externalDataUri = getUri(action.payload);
 
@@ -723,7 +793,9 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.atoms.delete:
     case actionTypes.atoms.removeDeleted: {
       const atomUri = getUri(action.payload);
-      return processState.deleteIn(["atoms", atomUri]);
+      return processState
+        .deleteIn(["atoms", atomUri])
+        .deleteIn(["connectionContainers", atomUri]);
     }
 
     default:

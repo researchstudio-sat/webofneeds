@@ -45,10 +45,10 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
       });
       return connection;
     })
-    .catch(() => {
+    .catch(error => {
       dispatch({
         type: actionTypes.connections.storeUriFailed,
-        payload: Immutable.fromJS({ uri: connUri }),
+        payload: Immutable.fromJS({ uri: connUri, status: error }),
       });
     });
 }
@@ -231,7 +231,10 @@ export function fetchAtomAndDispatch(
       if (parsedAtom) {
         //Fetch All MetaConnections Of NonOwnedAtomAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
         if (isOwned) {
-          console.debug("### fetch connections for owned atom");
+          dispatch({
+            type: actionTypes.atoms.storeConnectionContainerInLoading,
+            payload: Immutable.fromJS({ uri: atomUri }),
+          });
           fetchConnectionsOfOwnedAtomAndDispatch(
             atomUri,
             requesterWebId,
@@ -242,22 +245,28 @@ export function fetchAtomAndDispatch(
                 type: actionTypes.atoms.delete,
                 payload: Immutable.fromJS({ uri: atomUri }),
               });
-            } else if (error.status && error.status === 403) {
-              console.debug(
-                "ConnectionContainer/Connection Access denied for atom",
-                parsedAtom,
-                "atomUri: ",
-                atomUri,
-                "-->",
-                error
-              );
+            } else {
+              if (error.status && error.status === 403) {
+                console.debug(
+                  "ConnectionContainer/Connection Access denied for atom",
+                  parsedAtom,
+                  "atomUri: ",
+                  atomUri,
+                  "-->",
+                  error
+                );
+              }
+              dispatch({
+                type: actionTypes.atoms.storeConnectionContainerFailed,
+                payload: Immutable.fromJS({ uri: atomUri, status: error }),
+              });
             }
           });
         } else {
-          console.debug(
-            "### fetch connections for non-owned atom, requesterWebId:",
-            requesterWebId
-          );
+          dispatch({
+            type: actionTypes.atoms.storeConnectionContainerInLoading,
+            payload: Immutable.fromJS({ uri: atomUri }),
+          });
           // We only fetch the connections for non owned atoms if we have a requesterWebId, if we do not have one we won't fetch by default
           // since we will probably not get a result anyway (FIXME: change this behaviour once we figure out how to reload connections)
           fetchConnectionsOfNonOwnedAtomAndDispatch(
@@ -270,15 +279,21 @@ export function fetchAtomAndDispatch(
                 type: actionTypes.atoms.delete,
                 payload: Immutable.fromJS({ uri: atomUri }),
               });
-            } else if (error.status && error.status === 403) {
-              console.debug(
-                "ConnectionContainer/Connection Access denied for atom",
-                parsedAtom,
-                "atomUri: ",
-                atomUri,
-                "-->",
-                error
-              );
+            } else {
+              if (error.status && error.status === 403) {
+                console.debug(
+                  "ConnectionContainer/Connection Access denied for atom",
+                  parsedAtom,
+                  "atomUri: ",
+                  atomUri,
+                  "-->",
+                  error
+                );
+              }
+              dispatch({
+                type: actionTypes.atoms.storeConnectionContainerFailed,
+                payload: Immutable.fromJS({ uri: atomUri, status: error }),
+              });
             }
           });
         }
@@ -291,15 +306,10 @@ export function fetchAtomAndDispatch(
           type: actionTypes.atoms.delete,
           payload: Immutable.fromJS({ uri: atomUri }),
         });
-      } else if (error.status && error.status === 403) {
-        dispatch({
-          type: actionTypes.atoms.storeUriAccessDenied,
-          payload: Immutable.fromJS({ uri: atomUri }),
-        });
       } else {
         dispatch({
           type: actionTypes.atoms.storeUriFailed,
-          payload: Immutable.fromJS({ uri: atomUri }),
+          payload: Immutable.fromJS({ uri: atomUri, status: error }),
         });
       }
     });

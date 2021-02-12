@@ -31,7 +31,8 @@ export const isLoading = createSelector(
     processUtils.isProcessingSendAnonymousLinkEmail(process) ||
     processUtils.isAnyAtomLoading(process) ||
     processUtils.isAnyConnectionLoadingMessages(process) ||
-    processUtils.isAnyConnectionLoading(process, true)
+    processUtils.isAnyConnectionLoading(process, true) ||
+    processUtils.isAnyConnectionContainerLoading(process)
 );
 
 export const isProcessingWhatsNew = createSelector(getProcessState, process =>

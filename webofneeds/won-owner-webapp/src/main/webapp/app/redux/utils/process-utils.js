@@ -159,6 +159,26 @@ export function isAtomToLoad(process, atomUri) {
   return atomUri && getIn(process, ["atoms", atomUri, "toLoad"]);
 }
 
+export function isConnectionContainerToLoad(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "toLoad"]);
+}
+
+export function hasConnectionContainerFailedToLoad(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "failedToLoad"]);
+}
+
+export function getConnectionContainerStatus(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri]);
+}
+
+export function isConnectionContainerLoading(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "loading"]);
+}
+
+export function isConnectionContainerLoaded(process, atomUri) {
+  return atomUri && getIn(process, ["atoms", atomUri, "loaded"]);
+}
+
 /**
  * Return true if given atomUri has failedToLoad
  * @param process (full process from state)
@@ -179,6 +199,19 @@ export function isAnyAtomLoading(process) {
 
   return !!atomProcess.find((atomProcess, atomUri) =>
     isAtomLoading(process, atomUri)
+  );
+}
+
+/**
+ * Return true if any connectionContainer is currently loading
+ * @param process
+ * @returns {boolean}
+ */
+export function isAnyConnectionContainerLoading(process) {
+  const connectionContainerProcess = get(process, "connectionContainers");
+
+  return !!connectionContainerProcess.find((atomProcess, atomUri) =>
+    isConnectionContainerLoading(process, atomUri)
   );
 }
 
