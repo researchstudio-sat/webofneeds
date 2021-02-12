@@ -175,7 +175,7 @@ export function fetchAtomAndDispatch(
       return atomUri;
     }
 
-    const allOwnedConnections = generalSelectors.getOwnedAllConnections(state);
+    const allOwnedConnections = generalSelectors.getOwnedConnections(state);
     const filteredConnections = allOwnedConnections.filter(
       conn => connectionUtils.getTargetAtomUri(conn) === atomUri
     );

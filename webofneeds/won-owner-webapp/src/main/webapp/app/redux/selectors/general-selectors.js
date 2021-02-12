@@ -186,13 +186,6 @@ export const getAllOwnedConnectionsWithTargetSocketUri = targetSocketUri =>
         )
   );
 
-export const getOwnedAllConnections = createSelector(
-  getOwnedAtoms,
-  allOwnedAtoms =>
-    allOwnedAtoms &&
-    allOwnedAtoms.flatMap(atom => atomUtils.getConnections(atom))
-);
-
 export const getAllUnassigneUnpinnedChatConnections = createSelector(
   getUnassignedUnpinnedAtoms,
   allOwnedAtoms =>
@@ -280,6 +273,11 @@ export const getOwnedPinnedAtomsUnreads = createSelector(
     )
 );
 
+/**
+ * Returns all chatConnections of a pinnedAtom (includes all chatConnections of held atoms of the pinned atoms)
+ * @param atomUri
+ * @returns {Reselect.Selector<unknown, *|string|boolean|undefined>}
+ */
 export const getChatConnectionsOfActivePinnedAtom = atomUri =>
   createSelector(
     getOwnedAtoms,
@@ -474,14 +472,6 @@ export const getOwnedConnections = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
     ownedAtoms && ownedAtoms.flatMap(atom => atomUtils.getConnections(atom))
-);
-
-/**
- * Get all the connectionUris storid within the state
- */
-export const getOwnedConnectionUris = createSelector(
-  getOwnedConnections,
-  ownedConnections => ownedConnections && ownedConnections.keySeq().toSet()
 );
 
 export const getConnectionsToCrawl = createSelector(

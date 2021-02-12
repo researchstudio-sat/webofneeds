@@ -15,6 +15,14 @@ won-connections-overview {
     }
   }
 
+  .co__divider {
+    padding: 2rem 0.5rem 0.5rem 0.5rem;
+
+    + .co__item {
+      border-top: $thinGrayBorder;
+    }
+  }
+
   .co__item {
     border-left: $thinGrayBorder;
     border-bottom: $thinGrayBorder;

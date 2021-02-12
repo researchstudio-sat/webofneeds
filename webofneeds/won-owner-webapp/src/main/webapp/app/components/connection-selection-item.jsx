@@ -97,7 +97,14 @@ export default function WonConnectionSelectionItem({
   }
 
   const connectionContent = (
-    <div className="csi__main__connection">
+    <div
+      className={
+        "csi__main__connection " +
+        (connectionUtils.isClosed(connection)
+          ? "csi__main__connection--closed"
+          : "")
+      }
+    >
       {senderAtom ? (
         <Link
           className="csi__senderAtom"

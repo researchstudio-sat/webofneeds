@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as connectionUtils from "../redux/utils/connection-utils.js";
+
 import {
   get,
   generateLink,
@@ -32,26 +34,29 @@ export default function WonConnectionsOverview({
     true
   );
 
-  const generateConnectionElements = () => {
-    let connectionElements = [];
-    if (allChatConnections) {
-      allChatConnections.map((conn, connUri) => {
-        const atomUri = extractAtomUriFromConnectionUri(connUri);
-        connectionElements.push(
-          <div className="co__item" key={connUri}>
-            <WonConnectionSelectionItem
-              connection={conn}
-              senderAtom={get(storedAtoms, atomUri)}
-              toLink={generateLink(history.location, {
-                connectionUri: connUri,
-              })}
-            />
-          </div>
-        );
-      });
-    }
-    return connectionElements;
-  };
+  let connectionElements = [];
+  let closedConnectionElements = [];
+
+  if (allChatConnections) {
+    allChatConnections.map((conn, connUri) => {
+      const atomUri = extractAtomUriFromConnectionUri(connUri);
+
+      (connectionUtils.isClosed(conn)
+        ? closedConnectionElements
+        : connectionElements
+      ).push(
+        <div className="co__item" key={connUri}>
+          <WonConnectionSelectionItem
+            connection={conn}
+            senderAtom={get(storedAtoms, atomUri)}
+            toLink={generateLink(history.location, {
+              connectionUri: connUri,
+            })}
+          />
+        </div>
+      );
+    });
+  }
 
   return (
     <won-connections-overview>
@@ -62,7 +67,17 @@ export default function WonConnectionsOverview({
           detail={{ placeholder: "Filter Chats" }}
         />
       </div>
-      {generateConnectionElements()}
+      {connectionElements}
+      {closedConnectionElements.length > 0 ? (
+        <React.Fragment>
+          <div className="co__divider">
+            {"Closed (" + closedConnectionElements.length + ")"}
+          </div>
+          {closedConnectionElements}
+        </React.Fragment>
+      ) : (
+        undefined
+      )}
     </won-connections-overview>
   );
 }

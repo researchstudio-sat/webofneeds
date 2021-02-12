@@ -27,10 +27,10 @@ import WonConnectionHeader from "./connection-header.jsx";
 import WonShareDropdown from "./share-dropdown.jsx";
 import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
-import WonLabelledHr from "./labelled-hr.jsx";
 import WonPetrinetState from "./petrinet-state.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import WonConnectionAgreementDetails from "./connection-agreement-details.jsx";
+import WonChatSocketActions from "~/app/components/socket-actions/chat-actions";
 import { actionCreators } from "../actions/actions.js";
 import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
@@ -331,39 +331,6 @@ export default function WonAtomMessages({
     );
   }
 
-  function closeConnection(rateBad = false) {
-    if (rateBad) {
-      dispatch(
-        actionCreators.connections__rate(
-          connectionUri,
-          vocab.WONCON.binaryRatingBad
-        )
-      );
-    }
-    dispatch(actionCreators.connections__close(connectionUri));
-    if (backToChats) {
-      history.replace(
-        generateLink(
-          history.location,
-          {
-            connectionUri: undefined,
-          },
-          "/connections",
-          false
-        )
-      );
-    } else {
-      history.replace(
-        generateLink(
-          history.location,
-          { postUri: extractAtomUriFromConnectionUri(connectionUri) },
-          "/post",
-          false
-        )
-      );
-    }
-  }
-
   function selectMessage(msgUri) {
     const msg = connectionUtils.getMessage(connection, msgUri);
 
@@ -593,6 +560,12 @@ export default function WonAtomMessages({
     </div>
   );
 
+  const actionElement = (
+    <div className="am__content__actions">
+      <WonChatSocketActions connection={connection} />
+    </div>
+  );
+
   if (showChatData) {
     const backButtonElement = (
       <React.Fragment>
@@ -687,6 +660,7 @@ export default function WonAtomMessages({
         {unreadIndicatorElement}
         {(isConnectionLoading || isProcessingLoadingMessages) &&
           loadSpinnerElement}
+        {!connectionUtils.isConnected(connection) && actionElement}
         {!connectionUtils.isSuggested(connection) &&
           !isConnectionLoading &&
           !connectionUtils.isUsingTemporaryUri(connection) &&
@@ -968,6 +942,10 @@ export default function WonAtomMessages({
             Waiting for them to accept your chat request.
           </div>
         );
+      } else if (connectionUtils.isClosed(connection)) {
+        footerElement = (
+          <div className="am__footer">Connection has been closed.</div>
+        );
       } else if (connectionUtils.isRequestReceived(connection)) {
         footerElement = (
           <div className="am__footer">
@@ -994,13 +972,6 @@ export default function WonAtomMessages({
                 );
               }}
             />
-            <WonLabelledHr className="am__footer__labelledhr" label="Or" />
-            <button
-              className="am__footer__button won-button--filled black"
-              onClick={() => closeConnection()}
-            >
-              Decline
-            </button>
           </div>
         );
       } else if (connectionUtils.isSuggested(connection)) {
@@ -1016,13 +987,6 @@ export default function WonAtomMessages({
               showPersonas={!connection}
               onSubmit={({ value }) => sendRequest(value)}
             />
-            <WonLabelledHr className="am__footer__labelledhr" label="Or" />
-            <button
-              className="am__footer__button won-button--filled black"
-              onClick={() => closeConnection(true)}
-            >
-              Bad match - remove!
-            </button>
           </div>
         );
       }

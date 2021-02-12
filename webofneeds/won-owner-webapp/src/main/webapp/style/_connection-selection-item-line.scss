@@ -46,11 +46,15 @@ won-connection-selection-item {
       grid-template-columns: min-content 1fr min-content;
       grid-auto-flow: column;
       padding: 0.5rem;
+      &--closed {
+        opacity: 0.5;
+      }
       & .csi__closebutton.won-button--outlined.red.thin {
         font-size: $smallFontSize;
         padding: 0.5rem;
         margin-left: 0.25rem;
       }
+
       & .csi__senderAtom {
         @include square-image($postIconSize);
         padding-right: 0.5rem;
