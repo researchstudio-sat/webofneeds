@@ -612,8 +612,9 @@ public class AclTests extends AbstractBotBasedTest {
                     }
                     Assert.assertEquals(expectedGraphNames, actualNames);
                     Shacl2JavaInstanceFactory instanceFactory = ContentUtils.newInstanceFactory();
-                    instanceFactory.load(atomData.getNamedModel(atomUri1 + "#content").getGraph());
-                    Optional<AtomContent> atomContent = instanceFactory
+                    Shacl2JavaInstanceFactory.Accessor accessor = instanceFactory
+                                    .accessor(atomData.getNamedModel(atomUri1 + "#content").getGraph());
+                    Optional<AtomContent> atomContent = accessor
                                     .getInstanceOfType(atomUri1.toString(), AtomContent.class);
                     Assert.assertTrue("replacing content failed: replaced title not found",
                                     atomContent.get().getTitles().contains("Replaced Title"));
@@ -770,15 +771,16 @@ public class AclTests extends AbstractBotBasedTest {
                     }
                     Assert.assertEquals(expectedGraphNames, actualNames);
                     Shacl2JavaInstanceFactory instanceFactory = ContentUtils.newInstanceFactory();
-                    instanceFactory.load(atomData.getNamedModel(atomUri1 + "#content").getGraph());
-                    Optional<AtomContent> atomContent = instanceFactory
+                    Shacl2JavaInstanceFactory.Accessor accessor = instanceFactory
+                                    .accessor(atomData.getNamedModel(atomUri1 + "#content").getGraph());
+                    Optional<AtomContent> atomContent = accessor
                                     .getInstanceOfType(atomUri1.toString(), AtomContent.class);
                     assertTrue(bus, "replacing content failed: replaced title not found",
                                     atomContent.get().getTitles().contains("Replaced Title"));
                     assertFalse(bus, "replacing content failed: old title still there",
                                     atomContent.get().getTitles().contains("Granting atom"));
-                    instanceFactory.load(atomData.getNamedModel(atomUri1 + "#content2").getGraph());
-                    atomContent = instanceFactory
+                    accessor = instanceFactory.accessor(atomData.getNamedModel(atomUri1 + "#content2").getGraph());
+                    atomContent = accessor
                                     .getInstanceOfType(atomUri1.toString(), AtomContent.class);
                     assertTrue(bus, "adding content failed: new title not found",
                                     atomContent.get().getTitles().contains("New Title"));
