@@ -165,8 +165,16 @@ export function fetchAtomAndDispatch(
     payload: Immutable.fromJS({ uri: atomUri }),
   });
 
-  const determineRequesterWebId = atomUri => {
+  const determineRequesterWebId = (atomUri, isOwned) => {
     console.debug("## Determine requesterWebId for", atomUri);
+    if (isOwned) {
+      console.debug(
+        "## atom is owned, using atomUri as requesterWebId:",
+        atomUri
+      );
+      return atomUri;
+    }
+
     const allOwnedConnections = generalSelectors.getOwnedAllConnections(state);
     const filteredConnections = allOwnedConnections.filter(
       conn => connectionUtils.getTargetAtomUri(conn) === atomUri
@@ -193,14 +201,14 @@ export function fetchAtomAndDispatch(
       }
     } else {
       console.debug(
-        "## no connections found for this non owned atom, using atomUri as requesterWebId maybe we are lucky..."
+        "## no connections found for this non owned atom, using nothing as requesterWebId maybe we are lucky..."
       );
     }
 
-    return requesterWebId;
+    return undefined;
   };
 
-  const requesterWebId = isOwned ? atomUri : determineRequesterWebId(atomUri);
+  const requesterWebId = determineRequesterWebId(atomUri, isOwned);
   //TODO: retrieve tokens
 
   return won
@@ -220,8 +228,9 @@ export function fetchAtomAndDispatch(
           requesterWebId,
           dispatch
         );
-      } else {
-        //TODO: Connection fetch probably not even possible for non owned atoms (depending on the connectionstate)
+      } else if (requesterWebId) {
+        // We only fetch the connections for non owned atoms if we have a requesterWebId, if we do not have one we won't fetch by default
+        // since we will probably not get a result anyway (FIXME: change this behaviour once we figure out how to reload connections)
         fetchConnectionsOfNonOwnedAtomAndDispatch(
           atomUri,
           requesterWebId,
