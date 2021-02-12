@@ -199,13 +199,14 @@ export function fetchAtomAndDispatch(
           requesterWebId
         );
       }
+
+      return requesterWebId;
     } else {
       console.debug(
         "## no connections found for this non owned atom, using nothing as requesterWebId maybe we are lucky..."
       );
+      return undefined;
     }
-
-    return undefined;
   };
 
   const requesterWebId = determineRequesterWebId(atomUri, isOwned);
@@ -223,12 +224,17 @@ export function fetchAtomAndDispatch(
     .then(atom => {
       //Fetch All MetaConnections Of NonOwnedAtomAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
       if (isOwned) {
+        console.debug("### fetch connections for owned atom");
         fetchConnectionsOfOwnedAtomAndDispatch(
           atomUri,
           requesterWebId,
           dispatch
         );
       } else if (requesterWebId) {
+        console.debug(
+          "### fetch connections for non-owned atom, requesterWebId:",
+          requesterWebId
+        );
         // We only fetch the connections for non owned atoms if we have a requesterWebId, if we do not have one we won't fetch by default
         // since we will probably not get a result anyway (FIXME: change this behaviour once we figure out how to reload connections)
         fetchConnectionsOfNonOwnedAtomAndDispatch(
@@ -236,6 +242,8 @@ export function fetchAtomAndDispatch(
           requesterWebId,
           dispatch
         );
+      } else {
+        console.debug("### do NOT fetch connections for non-owned atom");
       }
       return atom;
     })
