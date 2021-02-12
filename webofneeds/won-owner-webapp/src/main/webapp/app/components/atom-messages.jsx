@@ -37,7 +37,7 @@ import Immutable from "immutable";
 import { useHistory } from "react-router-dom";
 import { getOwnedConnections } from "../redux/selectors/general-selectors";
 
-const MAXFAIL_COUNT = 5;
+const MAXFAIL_COUNT = 3;
 
 export default function WonAtomMessages({
   connection,
@@ -394,7 +394,7 @@ export default function WonAtomMessages({
   async function ensurePetriNetDataIsLoaded(forceFetch = false) {
     if (
       forceFetch ||
-      (petriNetDataFailCount <= MAXFAIL_COUNT &&
+      (petriNetDataFailCount < MAXFAIL_COUNT &&
         connectionUtils.isConnected(connection) &&
         !connectionUtils.isUsingTemporaryUri(connection) &&
         !isProcessingLoadingPetriNetData &&
@@ -438,7 +438,7 @@ export default function WonAtomMessages({
   async function ensureAgreementDatasetIsLoaded(forceFetch = false) {
     if (
       forceFetch ||
-      (agreementDatasetFailCount <= MAXFAIL_COUNT &&
+      (agreementDatasetFailCount < MAXFAIL_COUNT &&
         connectionUtils.isConnected(connection) &&
         !connectionUtils.isUsingTemporaryUri(connection) &&
         !isProcessingLoadingAgreementDataset &&
@@ -480,7 +480,7 @@ export default function WonAtomMessages({
   function ensureAgreementDataIsLoaded(forceFetch = false) {
     if (
       forceFetch ||
-      (agreementDataFailCount <= MAXFAIL_COUNT &&
+      (agreementDataFailCount < MAXFAIL_COUNT &&
         connectionUtils.isConnected(connection) &&
         !connectionUtils.isUsingTemporaryUri(connection) &&
         !isProcessingLoadingAgreementData &&
