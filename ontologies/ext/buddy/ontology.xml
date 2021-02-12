@@ -101,10 +101,24 @@
     
 
 
+    <!-- https://w3id.org/won/auth#connectionMessages -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connectionMessages"/>
+    
+
+
     <!-- https://w3id.org/won/auth#connectionState -->
 
 
     <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connectionState"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connections -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connections"/>
     
 
 
@@ -126,6 +140,13 @@
 
 
     <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#grantee"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#inherit -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#inherit"/>
     
 
 
@@ -267,11 +288,27 @@
                         </auth:operation>
                         <auth:socket>
                             <rdf:Description rdf:nodeID="genid5">
-                                <auth:connection>
-                                    <rdf:Description>
+                                <auth:connections>
+                                    <rdf:Description rdf:nodeID="genid6">
+                                        <auth:connection>
+                                            <rdf:Description rdf:nodeID="genid7">
+                                                <auth:connectionMessages>
+                                                    <rdf:Description>
+                                                        <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+                                                    </rdf:Description>
+                                                </auth:connectionMessages>
+                                                <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+                                                <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+                                            </rdf:Description>
+                                        </auth:connection>
+                                        <auth:connection>
+                                            <rdf:Description>
+                                                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+                                            </rdf:Description>
+                                        </auth:connection>
                                         <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
                                     </rdf:Description>
-                                </auth:connection>
+                                </auth:connections>
                                 <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
                             </rdf:Description>
                         </auth:socket>
@@ -280,9 +317,9 @@
                 <auth:grantee>
                     <rdf:Description>
                         <auth:socket>
-                            <rdf:Description rdf:nodeID="genid8">
+                            <rdf:Description rdf:nodeID="genid11">
                                 <auth:connection>
-                                    <rdf:Description rdf:nodeID="genid9">
+                                    <rdf:Description rdf:nodeID="genid12">
                                         <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
                                         <auth:targetAtom>
                                             <rdf:Description/>
