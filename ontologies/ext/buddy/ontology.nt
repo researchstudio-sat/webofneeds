@@ -122,7 +122,7 @@
 <https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/buddy#BuddySocket> .
 <https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/buddy#buddy> .
 <https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/ext/buddy#BuddySocket> <http://www.w3.org/2000/01/rdf-schema#comment> "Compatible with other BuddySockets, derives the buddy relationship. Installs a local authorization that gives buddies access to atoms on the wx-hold:HolderSocket."@en .
+<https://w3id.org/won/ext/buddy#BuddySocket> <http://www.w3.org/2000/01/rdf-schema#comment> "Compatible with other BuddySockets, derives the buddy relationship. Installs a local\n                                   authorization that gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket\n                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms."@en .
 <https://w3id.org/won/ext/buddy#BuddySocket> <http://www.w3.org/2000/01/rdf-schema#label> "BuddySocket" .
 <https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/auth#localAuth> _:genid1 .
 _:genid1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .

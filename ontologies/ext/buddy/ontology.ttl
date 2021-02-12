@@ -133,7 +133,9 @@
                       <https://w3id.org/won/core#SocketDefinition> ;
              <https://w3id.org/won/core#compatibleSocketDefinition> :BuddySocket ;
              <https://w3id.org/won/core#derivesAtomProperty> :buddy ;
-             rdfs:comment "Compatible with other BuddySockets, derives the buddy relationship. Installs a local authorization that gives buddies access to atoms on the wx-hold:HolderSocket."@en ;
+             rdfs:comment """Compatible with other BuddySockets, derives the buddy relationship. Installs a local
+                                   authorization that gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket
+                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms."""@en ;
              rdfs:label "BuddySocket" ;
              <https://w3id.org/won/auth#localAuth> _:genid1 .
 

@@ -167,7 +167,7 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#SocketDefinition" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Compatible with other BuddySockets, derives the buddy relationship. Installs a local authorization that gives buddies access to atoms on the wx-hold:HolderSocket."
+    "@value" : "Compatible with other BuddySockets, derives the buddy relationship. Installs a local\n                                   authorization that gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket\n                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "BuddySocket"
