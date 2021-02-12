@@ -80,6 +80,10 @@ rdfs:labels rdf:type owl:AnnotationProperty .
 <https://w3id.org/won/auth#issuer> rdf:type owl:AnnotationProperty .
 
 
+###  https://w3id.org/won/auth#localAuth
+<https://w3id.org/won/auth#localAuth> rdf:type owl:AnnotationProperty .
+
+
 ###  https://w3id.org/won/auth#operation
 <https://w3id.org/won/auth#operation> rdf:type owl:AnnotationProperty .
 
@@ -94,10 +98,6 @@ rdfs:labels rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/auth#targetAtom
 <https://w3id.org/won/auth#targetAtom> rdf:type owl:AnnotationProperty .
-
-
-###  https://w3id.org/won/auth#targetAuth
-<https://w3id.org/won/auth#targetAuth> rdf:type owl:AnnotationProperty .
 
 
 ###  https://w3id.org/won/auth#tokenScope
@@ -146,27 +146,7 @@ rdfs:labels rdf:type owl:AnnotationProperty .
                 <https://w3id.org/won/core#socketCapacity> 1 ;
                 rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
                 rdfs:label "HoldableSocket" ;
-                <https://w3id.org/won/auth#targetAuth> _:genid1 .
-
-_:genid1 rdf:type <https://w3id.org/won/auth#Authorization> ;
-          <https://w3id.org/won/auth#bearer> _:genid2 ;
-          <https://w3id.org/won/auth#grant> [ <https://w3id.org/won/auth#graph> _:genid8
-                                            ] .
-
-_:genid2 <https://w3id.org/won/auth#issuer> [ <https://w3id.org/won/auth#socket> _:genid4
-                                             ] ;
-          <https://w3id.org/won/auth#tokenScope> :ScopeReadHeldAtoms .
-
-_:genid8 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ,
-                                                <https://w3id.org/won/auth#keyGraph> ,
-                                                <https://w3id.org/won/auth#sysinfoGraph> ;
-          <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
-
-_:genid4 <https://w3id.org/won/auth#connection> _:genid5 ;
-          <https://w3id.org/won/auth#socketType> :HoldableSocket .
-
-_:genid5 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
-          <https://w3id.org/won/auth#targetAtom> [ ] .
+                <https://w3id.org/won/auth#localAuth> :grantReadViaHolderAuth .
 
 
 ###  https://w3id.org/won/ext/hold#HolderSocket
@@ -185,6 +165,29 @@ _:genid5 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#
                     rdfs:comment """Tokens with this scope, signed by the holder of an atom, provide read/connect
                access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."""@en ;
                     rdfs:label "ScopeReadHeldAtoms" .
+
+
+###  https://w3id.org/won/ext/hold#grantReadViaHolderAuth
+:grantReadViaHolderAuth rdf:type owl:NamedIndividual ,
+                                 <https://w3id.org/won/auth#Authorization> ;
+                        <https://w3id.org/won/auth#bearer> _:genid1 ;
+                        <https://w3id.org/won/auth#grant> [ <https://w3id.org/won/auth#graph> _:genid7
+                                                          ] .
+
+_:genid1 <https://w3id.org/won/auth#issuer> [ <https://w3id.org/won/auth#socket> _:genid3
+                                             ] ;
+          <https://w3id.org/won/auth#tokenScope> :ScopeReadHeldAtoms .
+
+_:genid7 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ,
+                                                <https://w3id.org/won/auth#keyGraph> ,
+                                                <https://w3id.org/won/auth#sysinfoGraph> ;
+          <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+
+_:genid3 <https://w3id.org/won/auth#connection> _:genid4 ;
+          <https://w3id.org/won/auth#socketType> :HoldableSocket .
+
+_:genid4 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+          <https://w3id.org/won/auth#targetAtom> [ ] .
 
 
 ###  https://w3id.org/won/ext/hold#heldBy
