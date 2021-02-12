@@ -73,8 +73,8 @@ public class Shacl2JavaInstanceFactory {
     }
 
     /**
-     * Instantiates everything found in data.
-     * Returns an {@link Accessor} object for obtaining the instances.
+     * Instantiates everything found in data. Returns an {@link Accessor} object for
+     * obtaining the instances.
      *
      * @param data the data to load
      */
@@ -85,7 +85,8 @@ public class Shacl2JavaInstanceFactory {
     }
 
     /**
-     * Returns an {@link Accessor} object for obtaining the instances found in the base data.
+     * Returns an {@link Accessor} object for obtaining the instances found in the
+     * base data.
      *
      * @return
      */
@@ -314,8 +315,8 @@ public class Shacl2JavaInstanceFactory {
     /**
      * Creates all instances for the given node / shape combination.
      *
-     * @param node  may be null, in which case all target nodes of the shape are
-     *              chosen.
+     * @param node may be null, in which case all target nodes of the shape are
+     * chosen.
      * @param shape
      * @return the set of nodes reached during instantiation that have not been
      * instantiated yet
