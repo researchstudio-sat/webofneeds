@@ -23,9 +23,9 @@ public class WonAclEvaluatorTestFactory extends WonAclEvaluatorFactory {
         accessor = instanceFactory.accessor(aclGraph);
     }
 
-    public synchronized Set<Authorization> getAuthorizations() {
+    public synchronized Set<Authorization> getAuthorizations(boolean includeDefaultAuths) {
         checkLoaded();
-        return this.accessor.getInstancesOfType(Authorization.class, true);
+        return this.accessor.getInstancesOfType(Authorization.class, includeDefaultAuths);
     }
 
     public synchronized Set<OperationRequest> getOperationRequests() {
@@ -33,10 +33,10 @@ public class WonAclEvaluatorTestFactory extends WonAclEvaluatorFactory {
         return this.accessor.getInstancesOfType(OperationRequest.class);
     }
 
-    public synchronized WonAclEvaluator create() {
+    public synchronized WonAclEvaluator create(boolean includeDefaultAuths) {
         checkLoaded();
         return new WonAclEvaluator(
-                        getAuthorizations(),
+                        getAuthorizations(includeDefaultAuths),
                         targetAtomCheckEvaluator,
                         atomNodeChecker,
                         webIdKeyLoader);

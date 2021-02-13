@@ -258,13 +258,13 @@ public class WonAclEvaluatorTest {
 
     private void checkExpectedAuthDecision(WonAclEvaluatorTestFactory loadedEvaluator, DecisionValue expected,
                     String testIdentifier) {
-        for (Authorization auth : loadedEvaluator.getAuthorizations()) {
+        for (Authorization auth : loadedEvaluator.getAuthorizations(false)) {
             for (OperationRequest opReq : loadedEvaluator.getOperationRequests()) {
                 logger.debug("checking OpRequest {} against Authorization {} ", opReq.getNode(), auth.getNode());
                 String message = makeWrongAuthDecisionMessage(testIdentifier, expected, auth, opReq);
                 AclEvalResult decision = null;
                 long start = System.currentTimeMillis();
-                decision = loadedEvaluator.create().decide(opReq);
+                decision = loadedEvaluator.create(false).decide(opReq);
                 logDuration("making authorization decision", start);
                 Assert.assertEquals(message, expected, decision.getDecision());
             }
@@ -289,7 +289,7 @@ public class WonAclEvaluatorTest {
                 cal.add(Calendar.MINUTE, 30);
                 opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
                 long start = System.currentTimeMillis();
-                AclEvalResult actualResult = loadedEvaluator.create().decide(opReq);
+                AclEvalResult actualResult = loadedEvaluator.create(false).decide(opReq);
                 logDuration("making authorization decision", start);
                 logger.debug("checking OpRequest {} against Authorizations ", opReq.getNode());
                 DecisionValue expected = spec.getDecision();
@@ -339,13 +339,13 @@ public class WonAclEvaluatorTest {
                                 actualResult.getProvideAuthInfo() != null
                                                 ? actualResult.getProvideAuthInfo().toStringAllFields()
                                                 : "null");
+                logger.debug("sub test case passed {} : {}", testIdentifier, spec.getNode());
             } catch (Exception e) {
                 throw new RuntimeException(String.format("Caught exception in %s, Spec %s",
                                 testIdentifier,
                                 spec.getNode()), e);
             }
         }
-        logger.debug("test case {} passed", testIdentifier);
     }
 
     private void setImplicitValues(OperationRequest opReq, Shacl2JavaInstanceFactory.Accessor instanceFactory) {

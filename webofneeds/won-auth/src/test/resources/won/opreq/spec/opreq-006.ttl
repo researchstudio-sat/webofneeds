@@ -41,7 +41,7 @@ ex:expectedResult2-1
 
 ex:expectedResult3
     a                       auth:ExpectedAclEvalResult ;
-    auth:decision           auth:accessGranted ;
+    auth:decision           auth:accessDenied ;
     auth:requestedOperation <#request3> .
 
 ex:expectedResult4
@@ -125,7 +125,7 @@ ex:expectedResult7
 
 <#request5>
     a                  auth:OperationRequest ;
-    auth:reqConnection atom1:buddyConnection1 ;
+    auth:reqConnection atom2:holdsConnection ;
     auth:operation     auth:opRead ;
     auth:requestor     ex:atom1 ;
     auth:reqAtom       ex:atom2 ;
@@ -142,7 +142,7 @@ ex:expectedResult7
 
 <#request7>
     a                  auth:OperationRequest ;
-    auth:reqConnection atom1:buddyConnection1 ;
+    auth:reqConnection atom2:holdsConnection ;
     auth:operation     auth:opRead ;
     auth:requestor     ex:atom1 ;
     auth:reqAtom       ex:atom2 ;

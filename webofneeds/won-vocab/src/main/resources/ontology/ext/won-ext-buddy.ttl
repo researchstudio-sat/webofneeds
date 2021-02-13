@@ -11,6 +11,7 @@
 @prefix vann:    <http://purl.org/vocab/vann/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix auth:    <https://w3id.org/won/auth#> .
+@prefix wx-hold: <https://w3id.org/won/ext/hold#> .
 @base            <https://w3id.org/won/ext/buddy> .
 
 <https://w3id.org/won/ext/buddy>
@@ -95,8 +96,9 @@ s:knows
     rdfs:subPropertyOf s:knows ;
     rdfs:domain        won:Atom ;
     rdfs:range         won:Atom ;
-    rdfs:comment
-                       "Links a buddy Atom to one of its buddies. This should generally imply natural persons on both ends. We interpret buddies are people who like to do things together; such as engaging in sports or other social activities."@en ;
+    rdfs:comment       """Links a buddy Atom to one of its buddies. This should generally imply natural
+                       persons on both ends. We interpret buddies are people who like to do things
+                       together; such as engaging in sports or other social activities."""@en ;
     rdfs:label         "buddy" .
 
 
@@ -110,16 +112,55 @@ s:knows
     rdf:type                       owl:NamedIndividual, won:SocketDefinition ;
     won:compatibleSocketDefinition :BuddySocket ;
     won:derivesAtomProperty        :buddy ;
-    rdfs:comment                   "Compatible with other BuddySockets, derives the buddy relationship."@en ;
+    rdfs:comment                   """Compatible with other BuddySockets, derives the buddy relationship. Installs local
+                                   authorizations that
+                                   <ol>
+                                   <li>
+                                   Gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket
+                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms.
+                                   </li>
+                                   <li>
+                                   Gives buddies access to the connections to other buddies using
+                                   https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy
+                                   </li>
+                                   </ol>"""@en ;
     rdfs:label                     "BuddySocket" ;
-    auth:localAuth                 [ a            auth:Authorization ;
-                                     auth:grantee [ auth:socket [ auth:socketType :BuddySocket ;
-                                                                  auth:connection [ auth:connectionState won:Connected ;
-                                                                                    auth:targetAtom      [ ] ] ] ] ;
-                                     auth:grant
-                                                  [ auth:operation
-                                                          [ auth:requestToken [ auth:tokenScope   "readHeldAtoms" ;
-                                                                                auth:expiresAfter 3600 ; ] ] ] ] .
+    auth:localAuth                 :grantAccessToBuddies, :grantReadConnectToBuddyOfBuddy .
 
+:ScopeReadConnectToBuddyOfBuddy
+    a            auth:TokenScope ;
+    rdfs:comment """Scope for tokens that a) atoms grant their buddies, b) give access to the atom's
+    content and the list of buddies if signed by a buddy."""@en ;
+    rdfs:label   "ScopeReadConnectToBuddyOfBuddy" .
+
+:grantAccessToBuddies
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType :BuddySocket ;
+                                 auth:connection [ auth:connectionState won:Connected ;
+                                                   auth:targetAtom      [ ] ] ] ] ;
+    auth:grant   _:readBuddyConnections ;
+    auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   wx-hold:ScopeReadHeldAtoms ;
+                                                        auth:expiresAfter 3600 ] ] ;
+                   auth:operation [ auth:requestToken [ auth:tokenScope   :ScopeReadConnectToBuddyOfBuddy ;
+                                                        auth:expiresAfter 3600 ] ] ] .
+
+:grantReadConnectToBuddyOfBuddy
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope :ScopeReadConnectToBuddyOfBuddy ;
+                  auth:issuer     [ auth:socket [ auth:socketType :BuddySocket ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph [ auth:graphType auth:sysinfoGraph, auth:contentGraph ;
+                               auth:operation auth:opRead ] ] ;
+    auth:grant  [ auth:socket [ auth:socketType :BuddySocket ;
+                                auth:operation  auth:opConnectClose ] ] .
+
+_:readBuddyConnections
+    auth:socket [ auth:socketType  :BuddySocket ;
+                  auth:connections [ auth:operation  auth:opRead ;
+                                     auth:connection [ auth:inherit false ] ;
+                                     auth:connection [ auth:connectionState    won:Connected ;
+                                                       auth:operation          auth:opRead ;
+                                                       auth:connectionMessages [ auth:inherit false ] ] ] ] .
 
 ###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi

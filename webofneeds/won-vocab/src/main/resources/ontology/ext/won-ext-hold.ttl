@@ -100,6 +100,12 @@ rdfs:labels
 #    Individuals
 #################################################################
 
+:ScopeReadHeldAtoms
+    a            owl:NamedIndividual, auth:TokenScope ;
+    rdfs:comment """Tokens with this scope, signed by the holder of an atom, provide read/connect
+               access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."""@en ;
+    rdfs:label   "ScopeReadHeldAtoms" .
+
 ###  https://w3id.org/won/ext/hold#HoldableSocket
 
 :HoldableSocket
@@ -111,20 +117,16 @@ rdfs:labels
     rdfs:comment
                                    "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
     rdfs:label                     "HoldableSocket" ;
-    auth:targetAuth                [ a           auth:Authorization ;
-                                     auth:bearer [ auth:tokenScope "readHeldAtoms" ;
-                                                   auth:issuer     [ auth:socket [ auth:socketType :HoldableSocket ;
-                                                                                   auth:connection
-                                                                                                   [ auth:targetAtom
-                                                                                                           [ ] ;
-                                                                                                     auth:connectionState
-                                                                                                           won:Connected ] ] ] ] ;
-                                     auth:grant
-                                                 [ auth:graph
-                                                         [ auth:graphType
-                                                                          auth:contentGraph, auth:sysinfoGraph,
-                                                                          auth:keyGraph ;
-                                                           auth:operation auth:opRead ] ] ] .
+    auth:localAuth                 :grantReadViaHolderAuth .
+
+:grantReadViaHolderAuth
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope :ScopeReadHeldAtoms ;
+                  auth:issuer     [ auth:socket [ auth:socketType :HoldableSocket ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                               auth:operation auth:opRead ] ] .
 
 
 ###  https://w3id.org/won/ext/hold#HolderSocket

@@ -21,6 +21,22 @@
 # Friends of friends can see that, too. Guests who are personally invited can see the time/location details.
 # Friends who ask to come can see the details once the request has been accepted by Shrek.
 
+# Implicit authorizations for all atoms (identical ones contained in the auth shapes):
+
+ex:grantsForOwnerTokenBearer
+    a           auth:Authorization ;
+    auth:grant  [ auth:operation auth:anyOperation ] ;
+    auth:bearer [ auth:tokenScope auth:OwnerToken ;
+                  auth:nodeSigned true ;
+                  auth:issuer     [ auth:atom auth:self ] ] .
+
+ex:grantOwnerTokenToOwner
+    a            auth:Authorization ;
+    auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   auth:OwnerToken ;
+                                                        auth:nodeSigned   true ;
+                                                        auth:expiresAfter 3600 ] ] ] ;
+    auth:grantee [ auth:atom auth:self ] .
+
 
 # Grants a wx-buddy:BuddySocket token to buddies
 

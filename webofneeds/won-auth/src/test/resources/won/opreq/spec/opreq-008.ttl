@@ -78,7 +78,7 @@ ex:expectedResult6
 
 <#request3>
     a                  auth:OperationRequest ;
-    auth:reqConnection atom1:memberOfConnection1 ;
+    auth:reqConnection atom0:memberConnection1 ;
     auth:operation     auth:opRead ;
     auth:requestor     ex:atom1 ;
     auth:reqAtom       ex:atom0 ;

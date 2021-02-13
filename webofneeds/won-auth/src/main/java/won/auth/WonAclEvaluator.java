@@ -160,7 +160,12 @@ public class WonAclEvaluator {
         Optional<AclEvalResult> result = authorizations.stream()
                         .map(auth -> {
                             try {
-                                return decide(auth, request, grantAuthInfo, requestorIsGranteeOf);
+                                AclEvalResult aer = decide(auth, request, grantAuthInfo, requestorIsGranteeOf);
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("authorization {} yields result with decision value {}",
+                                                    auth.getNode(), aer.getDecision().getValue());
+                                }
+                                return aer;
                             } catch (Exception e) {
                                 throw new WonAclEvaluationException(
                                                 String.format("Evaluating the following authorzation (node %s) causes exception\n%s",

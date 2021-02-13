@@ -752,6 +752,11 @@ auth:AuthToken
 auth:ExpectedAclEvalResult
     a owl:Class .
 
+auth:TokenScope
+    a owl:Class ;
+    rdfs:comment
+      "Class of all well-known token scopes. Using such scopes allows coordination across different domain ontologies." .
+
 auth:self
     a owl:NamedIndividual .
 
@@ -922,7 +927,7 @@ auth:tokenScope
     a owl:ObjectProperty .
 
 auth:OwnerToken
-    a            owl:NamedIndividual ;
+    a            owl:NamedIndividual, auth:TokenScope ;
     rdfs:comment "URI reserved for the value of the scope claim of owner tokens" .
 
 # Implicit authorizations for all atoms:

@@ -17,7 +17,7 @@
 #granted because of implicit grants because of the established connection
 ex:expectedResult1
     a                       auth:ExpectedAclEvalResult ;
-    auth:decision           auth:accessGranted ;
+    auth:decision           auth:accessDenied ;
     auth:requestedOperation <#request1> .
 
 ex:expectedResult2
@@ -77,11 +77,12 @@ ex:expectedResult10
                                      auth:connectionMessages [ auth:inherit false ] ] ] .
 
 <#request1>
-    a                auth:OperationRequest ;
-    auth:operation   auth:opRead ;
-    auth:requestor   ex:atom2 ;
-    auth:reqAtom     ex:atom1 ;
-    auth:reqPosition auth:positionAtomGraph .
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:reqConnection atom1:bsConn12 ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqPosition   auth:positionAtomGraph .
 
 <#request2>
     a                auth:OperationRequest ;
@@ -92,7 +93,7 @@ ex:expectedResult10
 
 <#request3>
     a                  auth:OperationRequest ;
-    auth:operation     auth:opCommunicate ;
+    auth:operation     [ auth:messageTo msg:ConnectionMessage ] ;
     auth:reqConnection atom1:bsConn12 ;
     auth:requestor     ex:atom2 ;
     auth:reqAtom       ex:atom1 ;

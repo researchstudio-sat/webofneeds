@@ -44,35 +44,39 @@ ex:expectedResult4
                                  auth:connectionMessages [ auth:inherit false ] ] ] .
 
 <#request>
-    a                auth:OperationRequest ;
-    auth:operation   auth:opRead ;
-    auth:requestor   ex:atom2 ;
-    auth:reqAtom     ex:atom1 ;
-    auth:reqPosition auth:positionAtomGraph ;
-    auth:reqGraph    atom1:acl .
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqConnection atom1:bsConn1 ;
+    auth:reqPosition   auth:positionAtomGraph ;
+    auth:reqGraph      atom1:acl .
 
 <#request2>
-    a                auth:OperationRequest ;
-    auth:operation   auth:opRead ;
-    auth:requestor   ex:atom2 ;
-    auth:reqAtom     ex:atom1 ;
-    auth:reqPosition auth:positionAtomGraph ;
-    auth:reqGraph    atom1:sysinfo .
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqConnection atom1:bsConn1 ;
+    auth:reqPosition   auth:positionAtomGraph ;
+    auth:reqGraph      atom1:sysinfo .
 
 <#request3>
-    a                auth:OperationRequest ;
-    auth:operation   auth:opRead ;
-    auth:requestor   ex:atom2 ;
-    auth:reqAtom     ex:atom1 ;
-    auth:reqPosition auth:positionConnections ;
-    auth:reqSocket   atom1:chatSocket .
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqConnection atom1:bsConn1 ;
+    auth:reqPosition   auth:positionConnections ;
+    auth:reqSocket     atom1:chatSocket .
 
 <#request4>
-    a                auth:OperationRequest ;
-    auth:operation   auth:opRead ;
-    auth:requestor   ex:atom2 ;
-    auth:reqAtom     ex:atom1 ;
-    auth:reqPosition auth:positionAtomMessages .
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:requestor     ex:atom2 ;
+    auth:reqAtom       ex:atom1 ;
+    auth:reqConnection atom1:bsConn1 ;
+    auth:reqPosition   auth:positionAtomMessages .
 
 ex:atom1
     a                    won:Atom ;

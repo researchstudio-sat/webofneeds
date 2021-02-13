@@ -53,12 +53,6 @@ public class AclTests extends AbstractBotBasedTest {
             final String atomUriString = atomUri.toString();
             final AtomContent atomContent = new AtomContent(atomUriString);
             atomContent.addTitle("Unit Test Atom ACL Test 1");
-            final Socket holderSocket = new Socket(atomUriString + "#holderSocket");
-            holderSocket.setSocketDefinition(WXHOLD.HolderSocket.asURI());
-            final Socket buddySocket = new Socket(atomUriString + "#buddySocket");
-            buddySocket.setSocketDefinition(WXBUDDY.BuddySocket.asURI());
-            atomContent.addSocket(holderSocket);
-            atomContent.addSocket(buddySocket);
             atomContent.addType(URI.create(WON.Atom.getURI()));
             WonMessage createMessage = WonMessageBuilder.createAtom()
                             .atom(atomUri)
@@ -88,6 +82,50 @@ public class AclTests extends AbstractBotBasedTest {
     }
 
     @Test(timeout = 60 * 1000)
+    public void testCreateAtomWithEmptyACLButSocketAuths_isNotPubliclyReadable() throws Exception {
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final String atomUriString = atomUri.toString();
+            final AtomContent atomContent = new AtomContent(atomUriString);
+            atomContent.addTitle("Unit Test Atom ACL Test 1");
+            final Socket holderSocket = new Socket(atomUriString + "#holderSocket");
+            holderSocket.setSocketDefinition(WXHOLD.HolderSocket.asURI());
+            final Socket buddySocket = new Socket(atomUriString + "#buddySocket");
+            buddySocket.setSocketDefinition(WXBUDDY.BuddySocket.asURI());
+            atomContent.addSocket(holderSocket);
+            atomContent.addSocket(buddySocket);
+            atomContent.addType(URI.create(WON.Atom.getURI()));
+            WonMessage createMessage = WonMessageBuilder.createAtom()
+                            .atom(atomUri)
+                            .content()
+                            /**/.graph(RdfOutput.toGraph(atomContent))
+                            .content()
+                            /**/.aclGraph(GraphFactory.createGraphMem()) // add an empty acl graph
+                            .build();
+            createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+            ctx.getBotContextWrapper().rememberAtomUri(atomUri);
+            final String action = "Create Atom action";
+            EventListener successCallback = event -> {
+                ((CachingLinkedDataSource) ctx.getLinkedDataSource()).clear();
+                boolean passed = true;
+                passed = passed && testLinkedDataRequestOk(ctx, bus, "withWebid", atomUri, atomUri);
+                passed = passed && testLinkedDataRequestFailsNoWebId(ctx, bus, "withoutWebId",
+                                LinkedDataFetchingException.Forbidden.class);
+                if (passed) {
+                    passTest(bus);
+                }
+            };
+            EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                            action);
+            EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                            failureCallback, ctx);
+            ctx.getWonMessageSender().sendMessage(createMessage);
+        });
+    }
+
+    @Test(timeout = 60 * 1000)
     public void testAtomWithoutACL_fallbackToLegacyImpl() throws Exception {
         runTest(ctx -> {
             EventBus bus = ctx.getEventBus();
@@ -96,12 +134,6 @@ public class AclTests extends AbstractBotBasedTest {
             final String atomUriString = atomUri.toString();
             final AtomContent atomContent = AtomContent.builder(atomUri)
                             .addTitle("Unit Test Atom ACL Test 2")
-                            .addSocket(Socket.builder(atomUriString + "#holderSocket")
-                                            .setSocketDefinition(WXHOLD.HolderSocket.asURI())
-                                            .build())
-                            .addSocket(Socket.builder(atomUriString + "#buddySocket")
-                                            .setSocketDefinition(WXBUDDY.BuddySocket.asURI())
-                                            .build())
                             .addType(URI.create(WON.Atom.getURI()))
                             .build();
             WonMessage createMessage = WonMessageBuilder.createAtom()
@@ -600,6 +632,7 @@ public class AclTests extends AbstractBotBasedTest {
                     Dataset atomData = ctx.getLinkedDataSource().getDataForResource(atomUri1, atomUri1);
                     Set<String> expectedGraphNames = Set.of(atomUri1 + "#acl",
                                     atomUri1 + "#acl-sig",
+                                    atomUri1 + "#socket-acl",
                                     atomUri1 + "#content",
                                     atomUri1 + "#content-sig",
                                     atomUri1 + "#key",
@@ -1016,7 +1049,7 @@ public class AclTests extends AbstractBotBasedTest {
         });
     }
 
-    @Test(timeout = 60 * 1000)
+    @Test(timeout = 600 * 1000)
     public void testTokenExchange() throws Exception {
         final AtomicReference<URI> createMessageUri1 = new AtomicReference();
         final AtomicReference<URI> createMessageUri2 = new AtomicReference();
@@ -1257,33 +1290,36 @@ public class AclTests extends AbstractBotBasedTest {
                                     atomUri1,
                                     atomUri2,
                                     // createMessageUri1.get(),
+                                    connContainerUri1,
                                     connectionUri12.get(),
                                     connectMessageUri12.get(),
                                     connectMessageUri21.get(),
-                                    connContainerUri1);
+                                    connectionUri21.get(),
+                                    connContainerUri2
+                    );
                     passed = passed && testLinkedDataRequestFails(ctx, bus, "test2.", atomUri1,
                                     LinkedDataFetchingException.class,
                                     // createMessageUri2.get(),
-                                    connectionUri21.get(),
-                                    connContainerUri2,
                                     atomUri3,
                                     connContainerUri3);
                     passed = passed && testLinkedDataRequestOk(ctx, bus, "test3.", atomUri2,
                                     atomUri2,
                                     atomUri1,
                                     // createMessageUri2.get(),
+                                    connContainerUri2,
                                     connectionUri21.get(),
                                     connectMessageUri21.get(),
                                     connectMessageUri12.get(),
-                                    connContainerUri2,
+                                    connectionUri12.get(),
+                                    connContainerUri3,
+                                    connContainerUri1,
+                                    connectionUri32.get(),
                                     atomUri3);
                     passed = passed && testLinkedDataRequestFails(ctx, bus, "test4.", atomUri2,
                                     LinkedDataFetchingException.class,
-                                    // createMessageUri1.get(),
-                                    connectionUri12.get(),
-                                    connContainerUri1,
-                                    connContainerUri3,
-                                    connectionUri32.get());
+                                    createMessageUri1.get(),
+                                    createMessageUri3.get()
+                    );
                     deactivate();
                 }
             };

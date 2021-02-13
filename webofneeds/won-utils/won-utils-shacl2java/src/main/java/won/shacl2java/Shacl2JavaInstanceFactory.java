@@ -387,7 +387,7 @@ public class Shacl2JavaInstanceFactory {
                             "No class found to instantiate for shape %s, more information is logged on loglevel debug",
                             shape.getShapeNode().getLocalName()));
         }
-        Set ret = classesForShape.parallelStream().map(classForShape -> {
+        Set ret = classesForShape.stream().map(classForShape -> {
             // our shape might reference other shapes via sh:node (maybe through other
             // operators such as sh:or)
             // * we remember them for wiring

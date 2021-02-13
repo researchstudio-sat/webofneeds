@@ -15,45 +15,108 @@ import static won.auth.model.Individuals.ANY_OPERATION;
 import static won.auth.model.MessageWildcard.ANY_MESSAGE_TYPE;
 
 class OperationRequestChecker extends DefaultTreeExpressionVisitor {
+    private enum MaybeBoolean {
+        TRUE(true), FALSE(false), NULL(null);
+        private Boolean value;
+
+        private MaybeBoolean(Boolean value) {
+            this.value = value;
+        }
+
+        public static MaybeBoolean forValue(Boolean value) {
+            if (value == null) {
+                return NULL;
+            } else if (value.equals(Boolean.TRUE)) {
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
+
+        private boolean getBoolean(boolean defaultValue) {
+            if (isNull()) {
+                return defaultValue;
+            }
+            return value;
+        }
+
+        public MaybeBoolean and(MaybeBoolean other) {
+            if (isNull()) {
+                if (other.isNull()) {
+                    return NULL;
+                } else {
+                    return other;
+                }
+            } else {
+                if (other.isNull()) {
+                    return this;
+                } else {
+                    return forValue(this.value && other.value);
+                }
+            }
+        }
+
+        public MaybeBoolean or(MaybeBoolean other) {
+            if (isNull()) {
+                if (other.isNull()) {
+                    return NULL;
+                } else {
+                    return other;
+                }
+            } else {
+                if (other.isNull()) {
+                    return this;
+                } else {
+                    return forValue(this.value || other.value);
+                }
+            }
+        }
+
+        public boolean isTrue() {
+            return this.value != null && this.value;
+        }
+
+        public boolean isFalse() {
+            return this.value != null && !this.value;
+        }
+
+        public boolean isNull() {
+            return this.value == null;
+        }
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private Deque<Set<OperationExpression>> grantedOperations = new ArrayDeque<>();
-    // if the requested position is lower than the end of its branch in the ASE
-    // tree,
-    // the decision is made at that point.
-    private DecisionAtHigherLevel decisionAtHigherLevel = new DecisionAtHigherLevel();
+    private Deque<MaybeBoolean> decision = new ArrayDeque<>();
     private OperationRequest operationRequest;
-    private Boolean finalDecision = null;
-    private Set<OperationExpression> NOTHING_GRANTED = Collections.unmodifiableSet(new HashSet<>());
 
     public OperationRequestChecker(OperationRequest operationRequest) {
         this.operationRequest = operationRequest;
+        this.grantedOperations.push(new HashSet<>());
+        this.decision.push(MaybeBoolean.NULL);
     }
 
-    private static boolean isLowerThan(AsePosition lower, AsePosition higher) {
-        return lowerBy(lower, higher, new HashSet()) > -1;
+    private static boolean isAncestorPosition(AsePosition ancestorCandidate, AsePosition pos) {
+        return isAncestorPosition(ancestorCandidate, pos, new HashSet<>());
     }
 
-    /**
-     * Returns the level difference if <code>lower</code> is lower, otherwise -1;
-     *
-     * @param lower
-     * @param higher
-     * @param visited
-     * @return
-     */
-    private static int lowerBy(AsePosition lower, AsePosition higher, Set visited) {
-        if (visited.contains(lower)) {
-            return -1;
+    private static boolean isAncestorPosition(AsePosition ancestorCandidate, AsePosition pos,
+                    Set<AsePosition> visited) {
+        visited.add(pos);
+        if (pos.equals(ancestorCandidate)) {
+            return false;
         }
-        visited.add(lower);
-        AsePosition parent = lower.getParentPosition();
-        if (parent != null) {
-            if (parent.equals(higher)) {
-                return visited.size();
-            }
-            return lowerBy(parent, higher, visited);
+        AsePosition parent = pos.getParentPosition();
+        if (parent == null) {
+            return false;
         }
-        return -1;
+        if (parent.equals(ancestorCandidate)) {
+            return true;
+        }
+        if (visited.contains(parent)) {
+            throw new IllegalStateException(String.format("ASE ancestor cycle detected via %s and %s", pos, parent));
+        }
+        return isAncestorPosition(ancestorCandidate, parent, visited);
     }
 
     private static Set<MessageType> collectMessageTypes(Set<MessageTypeSpecification> msgTypeSpecs) {
@@ -80,30 +143,7 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
     }
 
     public Boolean getFinalDecision() {
-        if (finalDecision != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Decision at requested level {} is {}", operationRequest.getReqPosition(),
-                                finalDecision ? "positive" : "negative");
-            }
-            return finalDecision;
-        }
-        if (decisionAtHigherLevel.hasDecision()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Decision at requested level {} made at higher-than-requested level {} is {}",
-                                new Object[] { operationRequest.getReqPosition(),
-                                                decisionAtHigherLevel.getPosition(),
-                                                decisionAtHigherLevel.getDecision() ? "positive" : "negative" });
-            }
-            return decisionAtHigherLevel.getDecision();
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("No decision was made during analysis, defaulting to negative");
-        }
-        return false;
-    }
-
-    private boolean isFinalDecisionMade() {
-        return this.finalDecision != null;
+        return this.decision.pop().getBoolean(false);
     }
 
     private boolean isOperationGranted(OperationExpression operation) {
@@ -112,48 +152,53 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         return granted.stream().anyMatch(grantedOperation -> grantedOperation.when(check));
     }
 
-    private void decideForPosition(AsePosition decisionPosition) {
+    private boolean isOperationGrantedAtPosition(AsePosition decisionPosition) {
         Objects.requireNonNull(decisionPosition);
-        AsePosition requestedPos = operationRequest.getReqPosition();
-        if (!isFinalDecisionMade()) {
-            if (!isBranchMarkedNothingGranted()) {
-                if (requestedPos.equals(decisionPosition)) {
-                    // TODO: implement sh:xone handling to get just one operation here
-                    finalDecision = isOperationGranted(
-                                    operationRequest.getOperationsUnion().stream().findFirst().get());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Making final decision at position {}: {}", decisionPosition, finalDecision);
-                    }
-                } else if (isLowerThan(requestedPos, decisionPosition)) {
-                    boolean decisionAtCurrentPosition = isOperationGranted(
-                                    operationRequest.getOperationsUnion().stream().findFirst().get());
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Recording decision at higher-than-requested position {}: {}",
-                                        decisionPosition, decisionAtCurrentPosition);
-                    }
-                    this.decisionAtHigherLevel.updateIfLower(decisionPosition, decisionAtCurrentPosition);
-                }
+        return isOperationGranted(operationRequest.getOperationsUnion().stream().findFirst().get());
+    }
+
+    private void checkOperationForCurrentPosition(TreeExpression currentExpression) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("checking operation for expression {}", currentExpression, currentExpression.getAsePosition());
+        }
+        if (currentExpression instanceof OperationContainer) {
+            collectOperations((OperationContainer) currentExpression);
+        }
+        AsePosition currentPosition = currentExpression.getAsePosition();
+        boolean allowed = isOperationGrantedAtPosition(currentPosition);
+        if (currentPosition.equals(operationRequest.getReqPosition())) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("decision at requested position {}: {}", currentExpression.getAsePosition(), allowed);
+            }
+            if (allowed) {
+                grant();
+                preventRecursion(); // will not recurse any deeper from this node
+                abort(); // will return from any subsequent visit() immediately
+            } else {
+                deny();
+                // we've found a negative result on the way to the child
+                // nothing we can find there will change that result, so don't recurse
+                preventNextRecursion();
+            }
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("decision at other than requested position {}: {}", currentExpression.getAsePosition(),
+                                allowed);
+            }
+            if (allowed) {
+                grant();
+            } else {
+                deny();
             }
         }
     }
 
-    private void markBranchNothingGranted() {
-        grantedOperations.pop();
-        grantedOperations.push(NOTHING_GRANTED);
-    }
-
-    private boolean isBranchMarkedNothingGranted() {
-        return grantedOperations.peek() == NOTHING_GRANTED;
-    }
-
     private void collectOperations(OperationContainer node) {
         Set<OperationExpression> granted = grantedOperations.peek();
-        if (granted != NOTHING_GRANTED) {
-            granted.addAll(node.getOperationsUnion());
-        }
+        granted.addAll(node.getOperationsUnion());
     }
 
-    private void inherit(TreeExpression node) {
+    private void inheritAllowedOperations(TreeExpression node) {
         if (node instanceof Inheriting) {
             if (((Inheriting) node).getInherit() != null && ((Inheriting) node).getInherit() == false) {
                 grantedOperations.push(new HashSet<>());
@@ -169,198 +214,193 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
 
     @Override
     protected void onBeforeRecursion(TreeExpression parent, TreeExpression child) {
-        // check if we are omitting ASEs. if so, check if they are the decision position
-        // and if so, decide.
-        AsePosition childPosition = ((TreeExpression) child).getAsePosition();
-        AsePosition candidate = childPosition.getParentPosition();
-        int iterations = 0;
-        while (candidate != null && !candidate.equals(((TreeExpression) parent).getAsePosition())
-                        && !isFinalDecisionMade()) {
-            decideForPosition(candidate);
-            candidate = candidate.getParentPosition();
-            iterations++;
-            if (iterations > 10) {
-                throw new IllegalStateException(
-                                String.format("Infinite loop detected while trying to interpolate between parent %s and child %s",
-                                                parent, child));
+        if (logger.isDebugEnabled()) {
+            logger.debug("before recursion into {}", child);
+        }
+        inheritDecision();
+        inheritAllowedOperations(child);
+        if (!(child.getAsePosition().equals(operationRequest.getReqPosition())
+                        || isAncestorPosition(child.getAsePosition(),
+                                        operationRequest.getReqPosition()))) {
+            // we don't recurse into subtrees that cannot contain the operation request's
+            // position
+            // don't decide here, just omit the branch
+            if (logger.isDebugEnabled()) {
+                logger.debug("preventing recursion into {}", child);
             }
+            preventNextRecursion();
+            return;
         }
     }
 
     @Override
     protected void onAfterRecursion(TreeExpression parent, TreeExpression child) {
         if (logger.isDebugEnabled()) {
+            logger.debug("returning from {}", child);
             logger.debug("allowed ops in {}: {}", child, Arrays.asList(grantedOperations.peek().toArray()));
         }
         // coming back from the recursion, we pop the stack
         // now, the top element is the one we pushed onto it at this level
         grantedOperations.pop();
+        MaybeBoolean decisionFromLowerLevel = decision.pop();
+        decision.pop(); // supersede this one by the one from the lower level
+        decision.push(decisionFromLowerLevel);
     }
 
     @Override
     protected void onBeginVisit(ConnectionMessagesExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
+        checkOperationForCurrentPosition(other);
+    }
+
+    /**
+     * Takes the decision from the parent recursion level, defaulting to unknown at
+     * the root.
+     */
+    private void inheritDecision() {
+        MaybeBoolean inherited = this.decision.peek();
+        this.decision.push(inherited);
     }
 
     @Override
     protected void onBeginVisit(GraphExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
-        collectOperations(other);
         if (!other.getGraphIris().isEmpty()) {
             if (!other.getGraphIris().containsAll(operationRequest.getReqGraphs())) {
-                markBranchNothingGranted();
+                preventRecursion();
+                return;
             }
         }
         if (!other.getGraphTypes().isEmpty()) {
             if (!other.getGraphTypes().containsAll(operationRequest.getReqGraphTypes())) {
-                markBranchNothingGranted();
+                preventRecursion();
+                return;
             }
         }
-        decideForPosition(other.getAsePosition());
+        checkOperationForCurrentPosition(other);
+    }
+
+    private void deny() {
+        this.decision.pop();
+        this.decision.push(MaybeBoolean.FALSE);
+    }
+
+    private void grant() {
+        this.decision.pop();
+        this.decision.push(MaybeBoolean.TRUE);
+    }
+
+    private boolean isGranted() {
+        return this.decision.peek().isTrue();
+    }
+
+    private boolean isDenied() {
+        return this.decision.peek().isFalse();
     }
 
     @Override
     protected void onBeginVisit(ConnectionMessageExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
+        checkOperationForCurrentPosition(other);
     }
 
     @Override
     protected void onBeginVisit(AseRoot other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
+        if (!other.getAtomStates().isEmpty()) {
+            if (!other.getAtomStates().contains(operationRequest.getReqAtomState())) {
+                preventRecursion();
+                return;
+            }
         }
-        filterByAtomState(other);
         if (other.getTargetAtom() != null) {
             if (other.getTargetAtom().getAtomsRelativeAtomExpression()
                             .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
                 if (!operationRequest.getRequestor().equals(operationRequest.getReqConnectionTargetAtom())) {
-                    markBranchNothingGranted();
+                    preventRecursion();
+                    return;
                 }
             }
         }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
-    }
-
-    private void filterByAtomState(AseRoot other) {
-        if (!other.getAtomStates().isEmpty()) {
-            if (!other.getAtomStates().contains(operationRequest.getReqAtomState())) {
-                markBranchNothingGranted();
-            }
-        }
+        checkOperationForCurrentPosition(other);
     }
 
     @Override
     protected void onBeginVisit(AtomMessagesExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
+        checkOperationForCurrentPosition(other);
     }
 
     @Override
     protected void onBeginVisit(AtomMessageExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
+        checkOperationForCurrentPosition(other);
     }
 
     @Override
     protected void onBeginVisit(ConnectionsExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
         if (!other.getConnectionStates().isEmpty()) {
             if (!other.getConnectionStates().contains(operationRequest.getReqConnectionState())) {
-                markBranchNothingGranted();
+                preventRecursion();
+                return;
             }
         }
         if (other.getTargetAtom() != null) {
             if (other.getTargetAtom().getAtomsRelativeAtomExpression()
                             .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
                 if (!operationRequest.getRequestor().equals(operationRequest.getReqConnectionTargetAtom())) {
-                    markBranchNothingGranted();
+                    preventRecursion();
+                    return;
                 }
             }
         }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
+        checkOperationForCurrentPosition(other);
     }
 
     @Override
     protected void onBeginVisit(SocketExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
         if (!other.getSocketIris().isEmpty()) {
             if (!other.getSocketIris().contains(operationRequest.getReqSocket())) {
-                markBranchNothingGranted();
+                preventRecursion();
+                return;
             }
         }
         if (!other.getSocketTypes().isEmpty()) {
             if (!other.getSocketTypes().contains(operationRequest.getReqSocketType())) {
-                markBranchNothingGranted();
+                preventRecursion();
+                return;
             }
         }
         if (other.getTargetAtom() != null) {
             if (other.getTargetAtom().getAtomsRelativeAtomExpression()
                             .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
                 if (!operationRequest.getRequestor().equals(operationRequest.getReqConnectionTargetAtom())) {
-                    markBranchNothingGranted();
+                    preventRecursion();
+                    return;
                 }
             }
         }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
+        checkOperationForCurrentPosition(other);
     }
 
     @Override
     protected void onBeginVisit(ConnectionExpression other) {
-        inherit(other);
-        if (isBranchMarkedNothingGranted() || isFinalDecisionMade()) {
-            return;
-        }
         if (!other.getConnectionStates().isEmpty()) {
             if (!other.getConnectionStates().contains(operationRequest.getReqConnectionState())) {
-                markBranchNothingGranted();
+                preventRecursion();
+                return;
             }
         }
         if (other.getTargetAtom() != null) {
             if (other.getTargetAtom().getAtomsRelativeAtomExpression()
                             .contains(RelativeAtomExpression.OPERATION_REQUESTOR)) {
                 // if the connection filters by requestor and we cannot be sure of the
-                // requestore
+                // requestor
                 // (which is the case if we process a token-based auth), we must abort.
                 if (operationRequest.getRequestor() == null
                                 || !operationRequest.getRequestor()
                                                 .equals(operationRequest.getReqConnectionTargetAtom())) {
-                    markBranchNothingGranted();
+                    deny();
+                    preventRecursion();
+                    return;
                 }
             }
         }
-        collectOperations(other);
-        decideForPosition(other.getAsePosition());
+        checkOperationForCurrentPosition(other);
     }
 
     private static class FalseUnless implements OperationExpression.Cases<Boolean> {
@@ -475,36 +515,6 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
                     return false;
                 }
             });
-        }
-    }
-
-    private class DecisionAtHigherLevel {
-        private Boolean decision = null;
-        private AsePosition position = null;
-
-        public DecisionAtHigherLevel() {
-        }
-
-        public void updateIfLower(AsePosition position, boolean decision) {
-            if (this.position == null) {
-                this.position = position;
-                this.decision = decision;
-            } else if (isLowerThan(position, this.position)) {
-                this.position = position;
-                this.decision = decision;
-            }
-        }
-
-        public Boolean getDecision() {
-            return decision;
-        }
-
-        public AsePosition getPosition() {
-            return position;
-        }
-
-        public boolean hasDecision() {
-            return decision != null && position != null;
         }
     }
 }

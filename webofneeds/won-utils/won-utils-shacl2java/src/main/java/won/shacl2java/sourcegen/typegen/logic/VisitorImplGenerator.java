@@ -132,6 +132,43 @@ public class VisitorImplGenerator implements TypesGenerator {
                         .classBuilder(visitorImplName)
                         .addModifiers(PUBLIC);
         vImplBuilder.addSuperinterface(visitorInterface);
+        vImplBuilder.addField(FieldSpec.builder(TypeName.BOOLEAN, "aborted", PRIVATE)
+                        .initializer("false")
+                        .build());
+        vImplBuilder.addMethod(MethodSpec.methodBuilder("isAborted")
+                        .addModifiers(PROTECTED)
+                        .returns(TypeName.BOOLEAN)
+                        .addStatement("return this.aborted").build());
+        vImplBuilder.addMethod(MethodSpec.methodBuilder("abort")
+                        .addModifiers(PROTECTED)
+                        .addStatement("this.aborted = true").build());
+        vImplBuilder.addField(FieldSpec.builder(TypeName.BOOLEAN, "preventRecursion", PRIVATE)
+                        .initializer("false")
+                        .build());
+        vImplBuilder.addMethod(MethodSpec.methodBuilder("isRecursionAllowed")
+                        .addModifiers(PROTECTED)
+                        .returns(TypeName.BOOLEAN)
+                        .addStatement("return ! ( this.aborted || this.preventRecursion ) ").build());
+        vImplBuilder.addMethod(MethodSpec.methodBuilder("resetPreventRecursion")
+                        .addModifiers(PROTECTED)
+                        .addStatement("this.preventRecursion = false").build());
+        vImplBuilder.addMethod(MethodSpec.methodBuilder("preventRecursion")
+                        .addModifiers(PROTECTED)
+                        .addStatement("this.preventRecursion = true").build());
+        vImplBuilder.addField(FieldSpec.builder(TypeName.BOOLEAN, "preventNextRecursion", PRIVATE)
+                        .initializer("false")
+                        .build());
+        vImplBuilder.addMethod(MethodSpec.methodBuilder("isNextRecursionAllowed")
+                        .addModifiers(PROTECTED)
+                        .returns(TypeName.BOOLEAN)
+                        .addStatement("return ! (this.aborted || this.preventNextRecursion || this.preventRecursion)")
+                        .build());
+        vImplBuilder.addMethod(MethodSpec.methodBuilder("resetPreventNextRecursion")
+                        .addModifiers(PROTECTED)
+                        .addStatement("this.preventNextRecursion = false").build());
+        vImplBuilder.addMethod(MethodSpec.methodBuilder("preventNextRecursion")
+                        .addModifiers(PROTECTED)
+                        .addStatement("this.preventNextRecursion = true").build());
         vImplBuilder.addMethod(MethodSpec.methodBuilder("onBeforeRecursion")
                         .addModifiers(PROTECTED)
                         .addParameter(hostInterfaceClassName, "host")
@@ -160,7 +197,11 @@ public class VisitorImplGenerator implements TypesGenerator {
             MethodSpec.Builder visitRecursivelyBuilder = MethodSpec.methodBuilder("visit")
                             .addModifiers(PUBLIC, FINAL)
                             .addParameter(childClassName, "host");
+            visitRecursivelyBuilder.beginControlFlow("if (isAborted())")
+                            .addStatement("return")
+                            .endControlFlow();
             visitRecursivelyBuilder.addStatement("onBeginVisit(host)");
+            visitRecursivelyBuilder.beginControlFlow("if (isRecursionAllowed())");
             for (FieldSpec fieldSpec : typeSpec.fieldSpecs) {
                 // let's allow the visitor to visit the subelement, too.
                 TypeName fieldType = fieldSpec.type;
@@ -178,7 +219,10 @@ public class VisitorImplGenerator implements TypesGenerator {
                         visitRecursivelyBuilder
                                         .beginControlFlow("host.$N().forEach(child -> ", getter)
                                         .addStatement("onBeforeRecursion(host, child)")
+                                        .beginControlFlow("if ( isNextRecursionAllowed() )")
                                         .addStatement("child.accept(this)")
+                                        .endControlFlow()
+                                        .addStatement("resetPreventNextRecursion()")
                                         .addStatement("onAfterRecursion(host, child)")
                                         .endControlFlow(")");
                     } else {
@@ -187,14 +231,20 @@ public class VisitorImplGenerator implements TypesGenerator {
                                         .addStatement("$T child = host.$N()", fieldType, getter)
                                         .beginControlFlow("if (child != null)")
                                         .addStatement("onBeforeRecursion(host, child)")
+                                        .beginControlFlow("if ( isNextRecursionAllowed() ) ")
                                         .addStatement("child.accept(this)")
+                                        .endControlFlow()
+                                        .addStatement("resetPreventNextRecursion()")
                                         .addStatement("onAfterRecursion(host, child)")
                                         .endControlFlow()
                                         .endControlFlow();
                     }
                 }
             }
-            visitRecursivelyBuilder.addStatement("onEndVisit(host)");
+            visitRecursivelyBuilder
+                            .endControlFlow()
+                            .addStatement("onEndVisit(host)")
+                            .addStatement("resetPreventRecursion()");
             vImplBuilder.addMethod(visitRecursivelyBuilder.build());
         }
         TypeSpec visitorImpl = vImplBuilder.build();
