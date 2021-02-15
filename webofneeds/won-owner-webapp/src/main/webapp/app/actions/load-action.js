@@ -22,11 +22,11 @@ export const pageLoadAction = () => (dispatch, getState) => {
     .then(() => dispatch({ type: actionTypes.initialLoadFinished }));
 };
 
-function loadingWhileSignedIn(dispatch, getState) {
+const loadingWhileSignedIn = (dispatch, getState) => {
   // reset websocket to make sure it's using the logged-in session
   dispatch(actionCreators.reconnect__start());
   return stateStore.fetchOwnedMetaData(dispatch, getState);
-}
+};
 
 export const fetchWhatsNew = createdAfterDate => (dispatch, getState) => {
   dispatch({
@@ -60,7 +60,7 @@ export const fetchWhatsAround = (createdAfterDate, location, maxDistance) => (
 /*
  Simply prints a logline and resolves the promise so we can go on in the chain
 */
-function handleNotLoggedIn() {
+const handleNotLoggedIn = () => {
   console.debug("No User Logged in yet, continuing with the initialLoad");
   return Promise.resolve();
-}
+};

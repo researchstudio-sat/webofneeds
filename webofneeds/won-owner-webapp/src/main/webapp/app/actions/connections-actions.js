@@ -32,107 +32,105 @@ import {
   buildConnectMessage,
 } from "../won-message-utils.js";
 
-export function connectionsChatMessageClaimOnSuccess(
+export const connectionsChatMessageClaimOnSuccess = (
   chatMessage,
   additionalContent,
   senderSocketUri,
   targetSocketUri,
   connectionUri
-) {
-  return dispatch => {
-    const ownedAtomUri = extractAtomUriBySocketUri(senderSocketUri);
+) => dispatch => {
+  const ownedAtomUri = extractAtomUriBySocketUri(senderSocketUri);
 
-    let referencedContentUris = undefined;
-    let messageUriToClaim = undefined;
+  let referencedContentUris = undefined;
+  let messageUriToClaim = undefined;
 
-    buildChatMessage({
-      chatMessage: chatMessage,
-      additionalContent: additionalContent,
-      referencedContentUris: undefined,
-      socketUri: senderSocketUri,
-      targetSocketUri: targetSocketUri,
-      isTTL: false,
-    })
-      .then(message => ownerApi.sendMessage(message))
-      .then(jsonResp => {
-        return won
-          .wonMessageFromJsonLd(
-            jsonResp.message,
-            vocab.WONMSG.uriPlaceholder.event
-          )
-          .then(wonMessage => {
-            dispatch({
-              type: actionTypes.connections.sendChatMessage,
-              payload: {
-                eventUri: jsonResp.messageUri,
-                message: jsonResp.message,
-                optimisticEvent: wonMessage,
-                senderSocketUri: senderSocketUri,
-                targetSocketUri: targetSocketUri,
-                connectionUri,
-                atomUri: ownedAtomUri,
-                claimed: true, // message needs to be marked as claimed directly
-              },
-            });
-
-            // Send claim message
-            let contentUris = [];
-            messageUriToClaim = jsonResp.messageUri;
-            if (messageUriToClaim)
-              contentUris.push({
-                "@id": messageUriToClaim,
-              });
-            referencedContentUris = new Map();
-            referencedContentUris.set("claims", contentUris);
-            return buildChatMessage({
-              chatMessage: undefined,
-              additionalContent: undefined,
-              referencedContentUris: referencedContentUris,
+  buildChatMessage({
+    chatMessage: chatMessage,
+    additionalContent: additionalContent,
+    referencedContentUris: undefined,
+    socketUri: senderSocketUri,
+    targetSocketUri: targetSocketUri,
+    isTTL: false,
+  })
+    .then(message => ownerApi.sendMessage(message))
+    .then(jsonResp => {
+      return won
+        .wonMessageFromJsonLd(
+          jsonResp.message,
+          vocab.WONMSG.uriPlaceholder.event
+        )
+        .then(wonMessage => {
+          dispatch({
+            type: actionTypes.connections.sendChatMessage,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
               optimisticEvent: wonMessage,
-              socketUri: senderSocketUri,
+              senderSocketUri: senderSocketUri,
               targetSocketUri: targetSocketUri,
-              isTTL: false,
-            })
-              .then(message => ownerApi.sendMessage(message))
-              .then(jsonResp =>
-                won
-                  .wonMessageFromJsonLd(
-                    jsonResp.message,
-                    vocab.WONMSG.uriPlaceholder.event
-                  )
-                  .then(wonMessage =>
-                    dispatch({
-                      type: referencedContentUris
-                        ? actionTypes.connections
-                            .sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
-                        : actionTypes.connections.sendChatMessage,
-                      payload: {
-                        eventUri: jsonResp.messageUri,
-                        message: jsonResp.message,
-                        wonMessage,
-                        senderSocketUri: senderSocketUri,
-                        targetSocketUri: targetSocketUri,
-                        connectionUri,
-                      },
-                    })
-                  )
-              );
+              connectionUri,
+              atomUri: ownedAtomUri,
+              claimed: true, // message needs to be marked as claimed directly
+            },
           });
-      })
-      .catch(e => {
-        console.error("Error while processing chat message: ", e);
-        dispatch({
-          type: actionTypes.connections.sendChatMessageFailed,
-          payload: {
-            error: e,
-            message: e.message,
-          },
-        });
-      });
-  };
-}
 
-export function connectionsChatMessage(
+          // Send claim message
+          let contentUris = [];
+          messageUriToClaim = jsonResp.messageUri;
+          if (messageUriToClaim)
+            contentUris.push({
+              "@id": messageUriToClaim,
+            });
+          referencedContentUris = new Map();
+          referencedContentUris.set("claims", contentUris);
+          return buildChatMessage({
+            chatMessage: undefined,
+            additionalContent: undefined,
+            referencedContentUris: referencedContentUris,
+            optimisticEvent: wonMessage,
+            socketUri: senderSocketUri,
+            targetSocketUri: targetSocketUri,
+            isTTL: false,
+          })
+            .then(message => ownerApi.sendMessage(message))
+            .then(jsonResp =>
+              won
+                .wonMessageFromJsonLd(
+                  jsonResp.message,
+                  vocab.WONMSG.uriPlaceholder.event
+                )
+                .then(wonMessage =>
+                  dispatch({
+                    type: referencedContentUris
+                      ? actionTypes.connections
+                          .sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
+                      : actionTypes.connections.sendChatMessage,
+                    payload: {
+                      eventUri: jsonResp.messageUri,
+                      message: jsonResp.message,
+                      wonMessage,
+                      senderSocketUri: senderSocketUri,
+                      targetSocketUri: targetSocketUri,
+                      connectionUri,
+                    },
+                  })
+                )
+            );
+        });
+    })
+    .catch(e => {
+      console.error("Error while processing chat message: ", e);
+      dispatch({
+        type: actionTypes.connections.sendChatMessageFailed,
+        payload: {
+          error: e,
+          message: e.message,
+        },
+      });
+    });
+};
+
+export const connectionsChatMessage = (
   chatMessage,
   additionalContent,
   referencedContent,
@@ -140,165 +138,160 @@ export function connectionsChatMessage(
   targetSocketUri,
   connectionUri,
   isRDF = false
-) {
-  return (dispatch, getState) => {
-    const senderAtomUri = extractAtomUriBySocketUri(senderSocketUri);
-    const ownedAtom = getIn(getState(), ["atoms", senderAtomUri]);
+) => (dispatch, getState) => {
+  const senderAtomUri = extractAtomUriBySocketUri(senderSocketUri);
+  const ownedAtom = getIn(getState(), ["atoms", senderAtomUri]);
 
-    let referencedContentUris = undefined;
-    if (referencedContent) {
-      referencedContentUris = new Map();
-      referencedContent.forEach((referencedMessages, key) => {
-        let contentUris = [];
+  let referencedContentUris = undefined;
+  if (referencedContent) {
+    referencedContentUris = new Map();
+    referencedContent.forEach((referencedMessages, key) => {
+      let contentUris = [];
 
-        referencedMessages.map(msg => {
-          const correctUri = getUri(msg);
-          if (correctUri)
-            contentUris.push({
-              "@id": correctUri,
-            });
-          //THE PARTS BELOW SHOULD NOT BE CALLED WITHIN THIS DISPATCH
-          switch (key) {
-            case "retracts":
-              dispatch({
-                type: actionTypes.connections.agreementData.markAsRetracted,
-                payload: {
-                  messageUri: getUri(msg),
-                  connectionUri: connectionUri,
-                  atomUri: getUri(ownedAtom),
-                  retracted: true,
-                },
-              });
-              break;
-            case "rejects":
-              dispatch({
-                type: actionTypes.connections.agreementData.markAsRejected,
-                payload: {
-                  messageUri: getUri(msg),
-                  connectionUri: connectionUri,
-                  atomUri: getUri(ownedAtom),
-                  rejected: true,
-                },
-              });
-              break;
-            case "proposesToCancel":
-              dispatch({
-                type:
-                  actionTypes.connections.agreementData
-                    .markAsCancellationPending,
-                payload: {
-                  messageUri: getUri(msg),
-                  connectionUri: connectionUri,
-                  atomUri: getUri(ownedAtom),
-                  cancellationPending: true,
-                },
-              });
-              break;
-            case "accepts":
-              dispatch({
-                type: actionTypes.connections.agreementData.markAsAccepted,
-                payload: {
-                  messageUri: getUri(msg),
-                  connectionUri: connectionUri,
-                  atomUri: getUri(ownedAtom),
-                  accepted: true,
-                },
-              });
-              break;
-            case "claims":
-              dispatch({
-                type: actionTypes.connections.agreementData.markAsClaimed,
-                payload: {
-                  messageUri: getUri(msg),
-                  connectionUri: connectionUri,
-                  atomUri: getUri(ownedAtom),
-                  claimed: true,
-                },
-              });
-              break;
-            case "proposes":
-              dispatch({
-                type: actionTypes.connections.agreementData.markAsProposed,
-                payload: {
-                  messageUri: getUri(msg),
-                  connectionUri: connectionUri,
-                  atomUri: getUri(ownedAtom),
-                  proposed: true,
-                },
-              });
-              break;
-            default:
-              console.error("referenced key/type is not valid: ", key);
-              break;
-          }
-        });
-        referencedContentUris.set(key, contentUris);
-      });
-    }
-
-    buildChatMessage({
-      chatMessage: chatMessage,
-      additionalContent: additionalContent,
-      referencedContentUris: referencedContentUris,
-      socketUri: senderSocketUri,
-      targetSocketUri: targetSocketUri,
-      isRDF,
-    })
-      .then(message => ownerApi.sendMessage(message))
-      .then(jsonResp =>
-        won
-          .wonMessageFromJsonLd(
-            jsonResp.message,
-            vocab.WONMSG.uriPlaceholder.event
-          )
-          .then(wonMessage =>
+      referencedMessages.map(msg => {
+        const correctUri = getUri(msg);
+        if (correctUri)
+          contentUris.push({
+            "@id": correctUri,
+          });
+        //THE PARTS BELOW SHOULD NOT BE CALLED WITHIN THIS DISPATCH
+        switch (key) {
+          case "retracts":
             dispatch({
-              type: referencedContentUris
-                ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
-                : actionTypes.connections.sendChatMessage,
+              type: actionTypes.connections.agreementData.markAsRetracted,
               payload: {
-                eventUri: jsonResp.messageUri,
-                message: jsonResp.message,
-                optimisticEvent: wonMessage,
-                senderSocketUri: senderSocketUri,
-                targetSocketUri: targetSocketUri,
+                messageUri: getUri(msg),
+                connectionUri: connectionUri,
+                atomUri: getUri(ownedAtom),
+                retracted: true,
               },
-            })
-          )
-      )
-      .catch(e => {
-        console.error("Error while processing chat message: ", e);
-        dispatch({
-          type: actionTypes.connections.sendChatMessageFailed,
-          payload: {
-            error: e,
-            message: e.message,
-          },
-        });
+            });
+            break;
+          case "rejects":
+            dispatch({
+              type: actionTypes.connections.agreementData.markAsRejected,
+              payload: {
+                messageUri: getUri(msg),
+                connectionUri: connectionUri,
+                atomUri: getUri(ownedAtom),
+                rejected: true,
+              },
+            });
+            break;
+          case "proposesToCancel":
+            dispatch({
+              type:
+                actionTypes.connections.agreementData.markAsCancellationPending,
+              payload: {
+                messageUri: getUri(msg),
+                connectionUri: connectionUri,
+                atomUri: getUri(ownedAtom),
+                cancellationPending: true,
+              },
+            });
+            break;
+          case "accepts":
+            dispatch({
+              type: actionTypes.connections.agreementData.markAsAccepted,
+              payload: {
+                messageUri: getUri(msg),
+                connectionUri: connectionUri,
+                atomUri: getUri(ownedAtom),
+                accepted: true,
+              },
+            });
+            break;
+          case "claims":
+            dispatch({
+              type: actionTypes.connections.agreementData.markAsClaimed,
+              payload: {
+                messageUri: getUri(msg),
+                connectionUri: connectionUri,
+                atomUri: getUri(ownedAtom),
+                claimed: true,
+              },
+            });
+            break;
+          case "proposes":
+            dispatch({
+              type: actionTypes.connections.agreementData.markAsProposed,
+              payload: {
+                messageUri: getUri(msg),
+                connectionUri: connectionUri,
+                atomUri: getUri(ownedAtom),
+                proposed: true,
+              },
+            });
+            break;
+          default:
+            console.error("referenced key/type is not valid: ", key);
+            break;
+        }
       });
-  };
-}
+      referencedContentUris.set(key, contentUris);
+    });
+  }
 
-export function connectionsConnectReactionAtom(
+  buildChatMessage({
+    chatMessage: chatMessage,
+    additionalContent: additionalContent,
+    referencedContentUris: referencedContentUris,
+    socketUri: senderSocketUri,
+    targetSocketUri: targetSocketUri,
+    isRDF,
+  })
+    .then(message => ownerApi.sendMessage(message))
+    .then(jsonResp =>
+      won
+        .wonMessageFromJsonLd(
+          jsonResp.message,
+          vocab.WONMSG.uriPlaceholder.event
+        )
+        .then(wonMessage =>
+          dispatch({
+            type: referencedContentUris
+              ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
+              : actionTypes.connections.sendChatMessage,
+            payload: {
+              eventUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              optimisticEvent: wonMessage,
+              senderSocketUri: senderSocketUri,
+              targetSocketUri: targetSocketUri,
+            },
+          })
+        )
+    )
+    .catch(e => {
+      console.error("Error while processing chat message: ", e);
+      dispatch({
+        type: actionTypes.connections.sendChatMessageFailed,
+        payload: {
+          error: e,
+          message: e.message,
+        },
+      });
+    });
+};
+
+export const connectionsConnectReactionAtom = (
   connectToAtomUri,
   atomDraft,
   persona,
   connectToSocketType,
   atomDraftSocketType
-) {
-  return (dispatch, getState) =>
-    connectReactionAtom(
-      connectToAtomUri,
-      atomDraft,
-      persona,
-      connectToSocketType,
-      atomDraftSocketType,
-      dispatch,
-      getState
-    ); // moved to separate function to make transpilation work properly
-}
+) => (dispatch, getState) =>
+  connectReactionAtom(
+    connectToAtomUri,
+    atomDraft,
+    persona,
+    connectToSocketType,
+    atomDraftSocketType,
+    dispatch,
+    getState
+  ); // moved to separate function to make transpilation work properly
 
-function connectReactionAtom(
+const connectReactionAtom = (
   connectToAtomUri,
   atomDraft,
   personaUri,
@@ -306,7 +299,7 @@ function connectReactionAtom(
   atomDraftSocketType,
   dispatch,
   getState
-) {
+) =>
   ensureLoggedIn(dispatch, getState).then(async () => {
     const state = getState();
     const connectToAtom = generalSelectors.getAtom(connectToAtomUri)(state);
@@ -421,28 +414,25 @@ function connectReactionAtom(
         }
       });
   });
-}
 
-export function connectionsConnectAdHoc(
+export const connectionsConnectAdHoc = (
   targetSocketUri,
   connectMessage,
   adHocUseCaseIdentifier,
   targetAtom,
   personaUriForAdHocAtom
-) {
-  return (dispatch, getState) =>
-    connectAdHoc(
-      targetSocketUri,
-      connectMessage,
-      adHocUseCaseIdentifier,
-      targetAtom,
-      personaUriForAdHocAtom,
-      dispatch,
-      getState
-    ); // moved to separate function to make transpilation work properly
-}
+) => (dispatch, getState) =>
+  connectAdHoc(
+    targetSocketUri,
+    connectMessage,
+    adHocUseCaseIdentifier,
+    targetAtom,
+    personaUriForAdHocAtom,
+    dispatch,
+    getState
+  ); // moved to separate function to make transpilation work properly
 
-function connectAdHoc(
+const connectAdHoc = (
   targetSocketUri,
   connectMessage,
   adHocUseCaseIdentifier,
@@ -450,7 +440,7 @@ function connectAdHoc(
   personaUriForAdHocAtom,
   dispatch,
   getState
-) {
+) =>
   ensureLoggedIn(dispatch, getState).then(async () => {
     const theirAtomUri = extractAtomUriBySocketUri(targetSocketUri);
 
@@ -564,36 +554,33 @@ function connectAdHoc(
         }
       });
   });
-}
 
-export function connectionsClose(connectionUri) {
-  return (dispatch, getState) => {
-    const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
-      getState()
-    );
+export const connectionsClose = connectionUri => (dispatch, getState) => {
+  const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
+    getState()
+  );
 
-    const connection = atomUtils.getConnection(ownedAtom, connectionUri);
-    const socketUri = connectionUtils.getSocketUri(connection);
-    const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
+  const connection = atomUtils.getConnection(ownedAtom, connectionUri);
+  const socketUri = connectionUtils.getSocketUri(connection);
+  const targetSocketUri = connectionUtils.getTargetSocketUri(connection);
 
-    buildCloseMessage(socketUri, targetSocketUri)
-      .then(message => ownerApi.sendMessage(message))
-      .then(jsonResp => {
-        dispatch({
-          type: actionTypes.connections.close,
-          payload: {
-            connectionUri: connectionUri,
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-          },
-        });
+  buildCloseMessage(socketUri, targetSocketUri)
+    .then(message => ownerApi.sendMessage(message))
+    .then(jsonResp => {
+      dispatch({
+        type: actionTypes.connections.close,
+        payload: {
+          connectionUri: connectionUri,
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+        },
       });
-  };
-}
+    });
+};
 
-export function connectionsCloseRemote(message) {
+export const connectionsCloseRemote = message =>
   //Closes the 'targetConnection' again, if closeConnections(...) only closes the 'own' connection
-  return dispatch => {
+  dispatch => {
     const socketUri = message.getSenderSocket();
     const targetSocketUri = message.getTargetSocket();
 
@@ -608,56 +595,54 @@ export function connectionsCloseRemote(message) {
         );
       });
   };
-}
 
-export function connectionsRate(connectionUri, rating) {
-  return (dispatch, getState) => {
-    const state = getState();
+export const connectionsRate = (connectionUri, rating) => (
+  dispatch,
+  getState
+) => {
+  const state = getState();
 
-    const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
-      state
-    );
-    const connection = atomUtils.getConnection(ownedAtom, connectionUri);
+  const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
+    state
+  );
+  const connection = atomUtils.getConnection(ownedAtom, connectionUri);
 
-    const theirAtomUri = connectionUtils.getTargetAtomUri(connection);
-    const theirConnectionUri = connectionUtils.getTargetConnectionUri(
-      connection
-    );
-    const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
+  const theirAtomUri = connectionUtils.getTargetAtomUri(connection);
+  const theirConnectionUri = connectionUtils.getTargetConnectionUri(connection);
+  const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
 
-    won
-      .fetchConnection(connectionUri, {
-        requesterWebId: getUri(ownedAtom),
-      })
-      .then(connection => {
-        let msgToRateFor = {
-          connection: connection,
-        };
+  won
+    .fetchConnection(connectionUri, {
+      requesterWebId: getUri(ownedAtom),
+    })
+    .then(connection => {
+      let msgToRateFor = {
+        connection: connection,
+      };
 
-        return buildRateMessage(
-          msgToRateFor,
-          getUri(ownedAtom),
-          theirAtomUri,
-          get(ownedAtom, "nodeUri"),
-          get(theirAtom, "nodeUri"),
-          theirConnectionUri,
-          rating
-        );
-      })
-      .then(message => ownerApi.sendMessage(message))
-      .then(jsonResp =>
-        dispatch({
-          type: actionTypes.connections.rate,
-          payload: {
-            connectionUri: connectionUri,
-            rating: rating,
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-          },
-        })
+      return buildRateMessage(
+        msgToRateFor,
+        getUri(ownedAtom),
+        theirAtomUri,
+        get(ownedAtom, "nodeUri"),
+        get(theirAtom, "nodeUri"),
+        theirConnectionUri,
+        rating
       );
-  };
-}
+    })
+    .then(message => ownerApi.sendMessage(message))
+    .then(jsonResp =>
+      dispatch({
+        type: actionTypes.connections.rate,
+        payload: {
+          connectionUri: connectionUri,
+          rating: rating,
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+        },
+      })
+    );
+};
 
 /**
  * @param connectionUri
@@ -670,33 +655,34 @@ export function connectionsRate(connectionUri, rating) {
  *   events that include the latter.
  * @return {Function}
  */
-export function showLatestMessages(connectionUri, numberOfEvents) {
-  return (dispatch, getState) => {
-    const state = getState();
-    const atom =
-      connectionUri &&
-      generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
-    const atomUri = getUri(atom);
-    const connection = atomUtils.getConnection(atom, connectionUri);
-    const processState = generalSelectors.getProcessState(state);
-    if (
-      !connectionUri ||
-      !connection ||
-      processUtils.isConnectionLoading(processState, connectionUri) ||
-      processUtils.isConnectionLoadingMessages(processState, connectionUri)
-    ) {
-      return Promise.resolve(); //only load if not already started and connection itself not loading
-    }
+export const showLatestMessages = (connectionUri, numberOfEvents) => (
+  dispatch,
+  getState
+) => {
+  const state = getState();
+  const atom =
+    connectionUri &&
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
+  const atomUri = getUri(atom);
+  const connection = atomUtils.getConnection(atom, connectionUri);
+  const processState = generalSelectors.getProcessState(state);
+  if (
+    !connectionUri ||
+    !connection ||
+    processUtils.isConnectionLoading(processState, connectionUri) ||
+    processUtils.isConnectionLoadingMessages(processState, connectionUri)
+  ) {
+    return Promise.resolve(); //only load if not already started and connection itself not loading
+  }
 
-    return stateStore.fetchMessages(
-      dispatch,
-      state,
-      connectionUri,
-      atomUri,
-      numberOfEvents
-    );
-  };
-}
+  return stateStore.fetchMessages(
+    dispatch,
+    state,
+    connectionUri,
+    atomUri,
+    numberOfEvents
+  );
+};
 
 /**
  * @param connectionUri
@@ -709,160 +695,147 @@ export function showLatestMessages(connectionUri, numberOfEvents) {
  *   events that include the latter.
  * @return {Function}
  */
-export function showMoreMessages(connectionUri, numberOfEvents) {
-  return (dispatch, getState) => {
-    const state = getState();
-    const atom =
-      connectionUri &&
-      generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
-    const atomUri = getUri(atom);
-    const connection = atomUtils.getConnection(atom, connectionUri);
-    const processState = generalSelectors.getProcessState(state);
-    if (
-      !connection ||
-      processUtils.isConnectionLoading(processState, connectionUri) ||
-      processUtils.isConnectionLoadingMessages(processState, connectionUri)
-    ) {
-      return; //only load if not already started and connection itself not loading
-    }
-    const resumeAfterUri = processUtils.getResumeAfterUriForConnection(
-      processState,
-      connectionUri
-    );
+export const showMoreMessages = (connectionUri, numberOfEvents) => (
+  dispatch,
+  getState
+) => {
+  const state = getState();
+  const atom =
+    connectionUri &&
+    generalSelectors.getOwnedAtomByConnectionUri(connectionUri)(state);
+  const atomUri = getUri(atom);
+  const connection = atomUtils.getConnection(atom, connectionUri);
+  const processState = generalSelectors.getProcessState(state);
+  if (
+    !connection ||
+    processUtils.isConnectionLoading(processState, connectionUri) ||
+    processUtils.isConnectionLoadingMessages(processState, connectionUri)
+  ) {
+    return; //only load if not already started and connection itself not loading
+  }
+  const resumeAfterUri = processUtils.getResumeAfterUriForConnection(
+    processState,
+    connectionUri
+  );
 
-    return stateStore.fetchMessages(
-      dispatch,
-      state,
-      connectionUri,
-      atomUri,
-      numberOfEvents,
-      resumeAfterUri
-    );
+  return stateStore.fetchMessages(
+    dispatch,
+    state,
+    connectionUri,
+    atomUri,
+    numberOfEvents,
+    resumeAfterUri
+  );
+};
+
+export const markAsRetracted = wonMessage => dispatch => {
+  const payload = {
+    messageUri: wonMessage.messageUri,
+    connectionUri: wonMessage.connectionUri,
+    atomUri: wonMessage.atomUri,
+    retracted: wonMessage.retracted,
   };
-}
-export function markAsRetracted(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      retracted: event.retracted,
-    };
 
-    dispatch({
-      type: actionTypes.connections.agreementData.markAsRetracted,
-      payload: payload,
-    });
+  dispatch({
+    type: actionTypes.connections.agreementData.markAsRetracted,
+    payload: payload,
+  });
+};
+
+export const markAsRejected = wonMessage => dispatch => {
+  const payload = {
+    messageUri: wonMessage.messageUri,
+    connectionUri: wonMessage.connectionUri,
+    atomUri: wonMessage.atomUri,
+    rejected: wonMessage.rejected,
   };
-}
-export function markAsRejected(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      rejected: event.rejected,
-    };
 
-    dispatch({
-      type: actionTypes.connections.agreementData.markAsRejected,
-      payload: payload,
-    });
+  dispatch({
+    type: actionTypes.connections.agreementData.markAsRejected,
+    payload: payload,
+  });
+};
+
+export const markAsProposed = wonMessage => dispatch => {
+  const payload = {
+    messageUri: wonMessage.messageUri,
+    connectionUri: wonMessage.connectionUri,
+    atomUri: wonMessage.atomUri,
+    proposed: wonMessage.proposed,
   };
-}
 
-export function markAsProposed(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      proposed: event.proposed,
-    };
+  dispatch({
+    type: actionTypes.connections.agreementData.markAsProposed,
+    payload: payload,
+  });
+};
 
-    dispatch({
-      type: actionTypes.connections.agreementData.markAsProposed,
-      payload: payload,
-    });
+export const markAsClaimed = wonMessage => dispatch => {
+  const payload = {
+    messageUri: wonMessage.messageUri,
+    connectionUri: wonMessage.connectionUri,
+    atomUri: wonMessage.atomUri,
+    claimed: wonMessage.claimed,
   };
-}
 
-export function markAsClaimed(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      claimed: event.claimed,
-    };
+  dispatch({
+    type: actionTypes.connections.agreementData.markAsClaimed,
+    payload: payload,
+  });
+};
 
-    dispatch({
-      type: actionTypes.connections.agreementData.markAsClaimed,
-      payload: payload,
-    });
+export const markAsAccepted = wonMessage => dispatch => {
+  const payload = {
+    messageUri: wonMessage.messageUri,
+    connectionUri: wonMessage.connectionUri,
+    atomUri: wonMessage.atomUri,
+    accepted: wonMessage.accepted,
   };
-}
 
-export function markAsAccepted(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      accepted: event.accepted,
-    };
+  dispatch({
+    type: actionTypes.connections.agreementData.markAsAccepted,
+    payload: payload,
+  });
+};
 
-    dispatch({
-      type: actionTypes.connections.agreementData.markAsAccepted,
-      payload: payload,
-    });
+export const markAsAgreed = wonMessage => dispatch => {
+  const payload = {
+    messageUri: wonMessage.messageUri,
+    connectionUri: wonMessage.connectionUri,
+    atomUri: wonMessage.atomUri,
+    agreed: wonMessage.agreed,
   };
-}
 
-export function markAsAgreed(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      agreed: event.agreed,
-    };
+  dispatch({
+    type: actionTypes.connections.agreementData.markAsAgreed,
+    payload: payload,
+  });
+};
 
-    dispatch({
-      type: actionTypes.connections.agreementData.markAsAgreed,
-      payload: payload,
-    });
+export const markAsCancelled = wonMessage => dispatch => {
+  const payload = {
+    messageUri: wonMessage.messageUri,
+    connectionUri: wonMessage.connectionUri,
+    atomUri: wonMessage.atomUri,
+    cancelled: wonMessage.cancelled,
   };
-}
 
-export function markAsCancelled(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      cancelled: event.cancelled,
-    };
+  dispatch({
+    type: actionTypes.connections.agreementData.markAsCancelled,
+    payload: payload,
+  });
+};
 
-    dispatch({
-      type: actionTypes.connections.agreementData.markAsCancelled,
-      payload: payload,
-    });
+export const markAsCancellationPending = wonMessage => dispatch => {
+  const payload = {
+    messageUri: wonMessage.messageUri,
+    connectionUri: wonMessage.connectionUri,
+    atomUri: wonMessage.atomUri,
+    cancellationPending: wonMessage.cancellationPending,
   };
-}
 
-export function markAsCancellationPending(event) {
-  return dispatch => {
-    const payload = {
-      messageUri: event.messageUri,
-      connectionUri: event.connectionUri,
-      atomUri: event.atomUri,
-      cancellationPending: event.cancellationPending,
-    };
-
-    dispatch({
-      type: actionTypes.connections.agreementData.markAsCancellationPending,
-      payload: payload,
-    });
-  };
-}
+  dispatch({
+    type: actionTypes.connections.agreementData.markAsCancellationPending,
+    payload: payload,
+  });
+};
