@@ -107,21 +107,15 @@ export function fetchUnloadedConnectionsContainer(atomUri) {
           payload: Immutable.fromJS({ uri: atomUri }),
         });
       } else {
-        if (error.status && error.status === 403) {
-          console.debug(
-            "ConnectionContainer/Connection Access denied for atom",
-            generalSelectors.getAtom(atomUri)(state),
-            "atomUri: ",
-            atomUri,
-            "-->",
-            error
-          );
-        }
         dispatch({
           type: actionTypes.atoms.storeConnectionContainerFailed,
           payload: Immutable.fromJS({
             uri: atomUri,
-            status: { code: error.status, message: error.message },
+            status: {
+              code: error.status,
+              message: error.message,
+              requesterWebId: requesterWebId,
+            },
           }),
         });
       }

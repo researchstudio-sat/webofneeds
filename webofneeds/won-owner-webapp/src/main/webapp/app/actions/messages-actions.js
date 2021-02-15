@@ -162,7 +162,11 @@ export function successfulCreate(event) {
             type: actionTypes.atoms.storeUriFailed,
             payload: Immutable.fromJS({
               uri: atomUri,
-              status: { code: error.status, message: error.message },
+              status: {
+                code: error.status,
+                message: error.message,
+                requesterWebId: requesterWebId,
+              },
             }),
           });
         }

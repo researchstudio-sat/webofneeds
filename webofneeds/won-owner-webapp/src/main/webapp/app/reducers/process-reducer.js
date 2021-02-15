@@ -346,7 +346,6 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.storeConnectionContainerFailed: {
-      console.debug("storeConnectionContainerFailed: ", action.payload);
       return updateConnectionContainerProcess(
         processState,
         getUri(action.payload),
@@ -639,6 +638,7 @@ export default function(processState = initialState, action = {}) {
           processState = updateConnectionProcess(processState, connUri, {
             toLoad: false,
             loading: true,
+            status: undefined,
           });
         });
       return processState;
@@ -656,6 +656,7 @@ export default function(processState = initialState, action = {}) {
               url: get(conn, "messageContainer"),
               params: {},
             },
+            status: undefined,
           });
 
           const targetAtomUri = get(conn, "targetAtom");

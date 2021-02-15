@@ -36,8 +36,10 @@ export function fetchOwnedMetaData(dispatch) {
 }
 
 export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
+  const requesterWebId = atomUri;
+
   return won
-    .fetchConnection(connUri, { requesterWebId: atomUri })
+    .fetchConnection(connUri, { requesterWebId: requesterWebId })
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -50,7 +52,11 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
         type: actionTypes.connections.storeUriFailed,
         payload: Immutable.fromJS({
           uri: connUri,
-          status: { code: error.status, message: error.message },
+          status: {
+            code: error.status,
+            message: error.message,
+            requesterWebId: requesterWebId,
+          },
         }),
       });
     });
@@ -94,10 +100,6 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
       return conn;
     })
     .catch(() => {
-      /*dispatch({
-        type: actionTypes.connections.storeUriFailed,
-        payload: Immutable.fromJS({ uri: connUri }),
-      });*/
       console.error(
         "Store Connection of sockets",
         senderSocketUri,
@@ -241,7 +243,11 @@ export function fetchAtomAndDispatch(
           type: actionTypes.atoms.storeUriFailed,
           payload: Immutable.fromJS({
             uri: atomUri,
-            status: { code: error.status, message: error.message },
+            status: {
+              code: error.status,
+              message: error.message,
+              requesterWebId: requesterWebId,
+            },
           }),
         });
       }
