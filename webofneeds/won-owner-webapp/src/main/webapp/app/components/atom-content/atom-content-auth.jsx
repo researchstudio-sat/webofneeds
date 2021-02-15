@@ -4,6 +4,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
+import vocab from "~/app/service/vocab.js";
+
+import "~/style/_atom-content-auth.scss";
 
 export default function WonAtomContentAuth({ atom }) {
   const authImm = atomUtils.getAuth(atom);
@@ -15,14 +18,25 @@ export default function WonAtomContentAuth({ atom }) {
       {authorizations && authorizations.length > 0 ? (
         authorizations.map((auth, index) => {
           return (
-            <div key={"key_" + index} className="acg__item">
-              <div className="acg__item__label">{"Auth_" + index++}</div>
-              <div className="acg__item__value">{JSON.stringify(auth)}</div>
+            <div key={"key_" + index} className="acauth__item">
+              <div className="acauth__item__label">{"Auth_" + index++}</div>
+              <div className="acauth__item__granteelabel">Grantee</div>
+              <pre className="acauth__item__grantee">
+                {JSON.stringify(
+                  auth[vocab.AUTH.granteeCompacted],
+                  undefined,
+                  2
+                )}
+              </pre>
+              <div className="acauth__item__grantlabel">Grant</div>
+              <pre className="acauth__item__grant">
+                {JSON.stringify(auth[vocab.AUTH.grantCompacted], undefined, 2)}
+              </pre>
             </div>
           );
         })
       ) : (
-        <div>No Authorization Data available</div>
+        <div className="acauth__nodata">No Authorization Data available</div>
       )}
     </won-atom-content-auth>
   );

@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import vocab from "~/app/service/vocab.js";
 import * as connectionUtils from "~/app/redux/utils/connection-utils";
 import * as wonLabelUtils from "~/app/won-label-utils";
 import WonAtomContentTagSocket from "~/app/components/atom-content/atom-content-tag-socket";
@@ -35,30 +36,36 @@ export default function WonAtomContentTagSockets({
       return cssClassNames.join(" ");
     }
 
-    tagViewSocketElements.push(
-      <div key={socketType} className="actsockets__item">
-        <div className={generateAtomItemCssClasses(unread)}>
-          <span className="actsockets__item__header__unread" />
-          <span className="actsockets__item__header__label">
-            {wonLabelUtils.getSocketTabLabel(socketType)}
-          </span>
-          {countLabel ? (
-            <span className="actsockets__item__header__count">
-              {countLabel}
+    if (
+      isOwned ||
+      activeConnections.size > 0 ||
+      !vocab.refuseAddToNonOwned[socketType]
+    ) {
+      tagViewSocketElements.push(
+        <div key={socketType} className="actsockets__item">
+          <div className={generateAtomItemCssClasses(unread)}>
+            <span className="actsockets__item__header__unread" />
+            <span className="actsockets__item__header__label">
+              {wonLabelUtils.getSocketTabLabel(socketType)}
             </span>
-          ) : (
-            undefined
-          )}
+            {countLabel ? (
+              <span className="actsockets__item__header__count">
+                {countLabel}
+              </span>
+            ) : (
+              undefined
+            )}
+          </div>
+          <WonAtomContentTagSocket
+            atom={atom}
+            isOwned={isOwned}
+            socketType={socketType}
+            relevantConnections={connections}
+            storedAtoms={storedAtoms}
+          />
         </div>
-        <WonAtomContentTagSocket
-          atom={atom}
-          isOwned={isOwned}
-          socketType={socketType}
-          relevantConnections={connections}
-          storedAtoms={storedAtoms}
-        />
-      </div>
-    );
+      );
+    }
   });
 
   return (
