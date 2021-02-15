@@ -249,24 +249,32 @@ export const getOwnedPinnedAtomsUnreads = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
     ownedAtoms &&
-    ownedAtoms.filter(atomUtils.isPinnedAtom).map(
-      atom =>
-        atomUtils.hasUnreadConnections(atom) ||
-        !!atomUtils.getConnections(atom).find(conn => {
-          //TODO: THIS DOES NOT DO WHAT ITS SUPPOSED TO DO
-          for (let holdableSocketType in vocab.holderSockets) {
-            if (
+    ownedAtoms.filter(atomUtils.isPinnedAtom).map(atom => {
+      if (atomUtils.hasUnreadConnections(atom)) {
+        return true;
+      } else {
+        for (let holdableSocketType in vocab.holderSockets) {
+          const targetAtomUris = atomUtils
+            .getConnections(atom, vocab.holderSockets[holdableSocketType])
+            .map(connectionUtils.getTargetAtomUri)
+            .valueSeq()
+            .toSet();
+
+          if (
+            targetAtomUris.find(atomUri =>
               atomUtils.hasUnreadConnections(
-                get(ownedAtoms, connectionUtils.getTargetAtomUri(conn)),
-                vocab.holderSockets[holdableSocketType]
+                get(ownedAtoms, atomUri),
+                holdableSocketType,
+                true
               )
-            ) {
-              return true;
-            }
+            )
+          ) {
+            return true;
           }
-          return false;
-        })
-    )
+        }
+        return false;
+      }
+    })
 );
 
 /**
