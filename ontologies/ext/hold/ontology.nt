@@ -200,6 +200,7 @@
 # https://w3id.org/won/ext/hold#grantAccessToHolder
 <https://w3id.org/won/ext/hold#grantAccessToHolder> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/hold#grantAccessToHolder> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
+<https://w3id.org/won/ext/hold#grantAccessToHolder> <http://www.w3.org/2000/01/rdf-schema#label> "GrantAccessToHolder" .
 <https://w3id.org/won/ext/hold#grantAccessToHolder> <https://w3id.org/won/auth#grant> _:genid1 .
 _:genid1 <https://w3id.org/won/auth#operation> _:genid2 .
 _:genid2 <https://w3id.org/won/auth#requestToken> _:genid3 .
@@ -221,6 +222,7 @@ _:genid9 <https://w3id.org/won/auth#targetAtom> _:genid10 .
 # https://w3id.org/won/ext/hold#grantReadViaHeldAuth
 <https://w3id.org/won/ext/hold#grantReadViaHeldAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/hold#grantReadViaHeldAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
+<https://w3id.org/won/ext/hold#grantReadViaHeldAuth> <http://www.w3.org/2000/01/rdf-schema#label> "GrantReadViaHeldAuth" .
 <https://w3id.org/won/ext/hold#grantReadViaHeldAuth> <https://w3id.org/won/auth#bearer> _:genid11 .
 _:genid11 <https://w3id.org/won/auth#issuer> _:genid12 .
 _:genid12 <https://w3id.org/won/auth#socket> _:genid13 .
@@ -239,6 +241,7 @@ _:genid17 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRea
 # https://w3id.org/won/ext/hold#grantReadViaHolderAuth
 <https://w3id.org/won/ext/hold#grantReadViaHolderAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/hold#grantReadViaHolderAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
+<https://w3id.org/won/ext/hold#grantReadViaHolderAuth> <http://www.w3.org/2000/01/rdf-schema#label> "GrantReadViaHolderAuth" .
 <https://w3id.org/won/ext/hold#grantReadViaHolderAuth> <https://w3id.org/won/auth#bearer> _:genid18 .
 _:genid18 <https://w3id.org/won/auth#issuer> _:genid19 .
 _:genid19 <https://w3id.org/won/auth#socket> _:genid20 .

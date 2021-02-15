@@ -232,6 +232,7 @@ rdfs:labels rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/won/ext/hold#grantAccessToHolder
 :grantAccessToHolder rdf:type owl:NamedIndividual ,
                               <https://w3id.org/won/auth#Authorization> ;
+                     rdfs:label "GrantAccessToHolder" ;
                      <https://w3id.org/won/auth#grant> _:genid1 ;
                      <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> [ <https://w3id.org/won/auth#connection> _:genid9
                                                                                               ]
@@ -259,6 +260,7 @@ _:genid5 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/
 ###  https://w3id.org/won/ext/hold#grantReadViaHeldAuth
 :grantReadViaHeldAuth rdf:type owl:NamedIndividual ,
                                <https://w3id.org/won/auth#Authorization> ;
+                      rdfs:label "GrantReadViaHeldAuth" ;
                       <https://w3id.org/won/auth#bearer> _:genid11 ;
                       <https://w3id.org/won/auth#grant> [ <https://w3id.org/won/auth#graph> _:genid17
                                                         ] .
@@ -282,6 +284,7 @@ _:genid14 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core
 ###  https://w3id.org/won/ext/hold#grantReadViaHolderAuth
 :grantReadViaHolderAuth rdf:type owl:NamedIndividual ,
                                  <https://w3id.org/won/auth#Authorization> ;
+                        rdfs:label "GrantReadViaHolderAuth" ;
                         <https://w3id.org/won/auth#bearer> _:genid18 ;
                         <https://w3id.org/won/auth#grant> [ <https://w3id.org/won/auth#graph> _:genid24
                                                           ] .

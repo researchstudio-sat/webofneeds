@@ -95,7 +95,8 @@
         } ]
       },
       "labels" : {
-        "IRI-based" : "grantAccessToHolder"
+        "IRI-based" : "grantAccessToHolder",
+        "undefined" : "GrantAccessToHolder"
       }
     }, {
       "iri" : "https://w3id.org/won/ext/hold#grantReadViaHeldAuth",
@@ -104,18 +105,19 @@
         "bearer" : [ {
           "identifier" : "bearer",
           "language" : "undefined",
-          "value" : "_:genid2147483663",
+          "value" : "_:genid2147483658",
           "type" : "label"
         } ],
         "grant" : [ {
           "identifier" : "grant",
           "language" : "undefined",
-          "value" : "_:genid2147483668",
+          "value" : "_:genid2147483654",
           "type" : "label"
         } ]
       },
       "labels" : {
-        "IRI-based" : "grantReadViaHeldAuth"
+        "IRI-based" : "grantReadViaHeldAuth",
+        "undefined" : "GrantReadViaHeldAuth"
       }
     }, {
       "iri" : "https://w3id.org/won/ext/hold#grantReadViaHolderAuth",
@@ -124,22 +126,53 @@
         "bearer" : [ {
           "identifier" : "bearer",
           "language" : "undefined",
-          "value" : "_:genid2147483664",
+          "value" : "_:genid2147483655",
           "type" : "label"
         } ],
         "grant" : [ {
           "identifier" : "grant",
           "language" : "undefined",
-          "value" : "_:genid2147483655",
+          "value" : "_:genid2147483656",
           "type" : "label"
         } ]
       },
       "labels" : {
-        "IRI-based" : "grantReadViaHolderAuth"
+        "IRI-based" : "grantReadViaHolderAuth",
+        "undefined" : "GrantReadViaHolderAuth"
       }
     } ],
     "attributes" : [ "external" ],
     "id" : "1"
+  }, {
+    "iri" : "https://w3id.org/won/auth#TokenScope",
+    "baseIri" : "https://w3id.org/won/auth",
+    "instances" : 0,
+    "label" : {
+      "IRI-based" : "TokenScope"
+    },
+    "individuals" : [ {
+      "iri" : "https://w3id.org/won/ext/hold#ScopeReadHolderAtom",
+      "baseIri" : "https://w3id.org/won/ext/hold",
+      "comment" : {
+        "en" : "Tokens with this scope, provide read/connect\n               access to the holder of an atom (see https://w3id.org/won/ext/hold#HolderSocket)."
+      },
+      "labels" : {
+        "IRI-based" : "ScopeReadHolderAtom",
+        "undefined" : "ScopeReadHolderAtom"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/ext/hold#ScopeReadHeldAtoms",
+      "baseIri" : "https://w3id.org/won/ext/hold",
+      "comment" : {
+        "en" : "Tokens with this scope, signed by the holder of an atom, provide read/connect\n               access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."
+      },
+      "labels" : {
+        "IRI-based" : "ScopeReadHeldAtoms",
+        "undefined" : "ScopeReadHeldAtoms"
+      }
+    } ],
+    "attributes" : [ "external" ],
+    "id" : "2"
   }, {
     "iri" : "https://w3id.org/won/core#SocketDefinition",
     "baseIri" : "https://w3id.org/won/core",
@@ -162,17 +195,17 @@
           "value" : "https://w3id.org/won/ext/hold#grantReadViaHolderAuth",
           "type" : "iri"
         } ],
-        "autoOpen" : [ {
-          "identifier" : "autoOpen",
-          "language" : "undefined",
-          "value" : "false",
-          "type" : "label"
-        } ],
         "derivesAtomProperty" : [ {
           "identifier" : "derivesAtomProperty",
           "language" : "undefined",
           "value" : "https://w3id.org/won/ext/hold#heldBy",
           "type" : "iri"
+        } ],
+        "autoOpen" : [ {
+          "identifier" : "autoOpen",
+          "language" : "undefined",
+          "value" : "false",
+          "type" : "label"
         } ],
         "socketCapacity" : [ {
           "identifier" : "socketCapacity",
@@ -204,17 +237,17 @@
           "value" : "https://w3id.org/won/ext/hold#grantReadViaHeldAuth",
           "type" : "iri"
         } ],
-        "derivesAtomProperty" : [ {
-          "identifier" : "derivesAtomProperty",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/ext/hold#holds",
-          "type" : "iri"
-        } ],
         "autoOpen" : [ {
           "identifier" : "autoOpen",
           "language" : "undefined",
           "value" : "false",
           "type" : "label"
+        } ],
+        "derivesAtomProperty" : [ {
+          "identifier" : "derivesAtomProperty",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/ext/hold#holds",
+          "type" : "iri"
         } ],
         "compatibleSocketDefinition" : [ {
           "identifier" : "compatibleSocketDefinition",
@@ -229,36 +262,6 @@
       "labels" : {
         "IRI-based" : "HolderSocket",
         "undefined" : "HolderSocket"
-      }
-    } ],
-    "attributes" : [ "external" ],
-    "id" : "2"
-  }, {
-    "iri" : "https://w3id.org/won/auth#TokenScope",
-    "baseIri" : "https://w3id.org/won/auth",
-    "instances" : 0,
-    "label" : {
-      "IRI-based" : "TokenScope"
-    },
-    "individuals" : [ {
-      "iri" : "https://w3id.org/won/ext/hold#ScopeReadHeldAtoms",
-      "baseIri" : "https://w3id.org/won/ext/hold",
-      "comment" : {
-        "en" : "Tokens with this scope, signed by the holder of an atom, provide read/connect\n               access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."
-      },
-      "labels" : {
-        "IRI-based" : "ScopeReadHeldAtoms",
-        "undefined" : "ScopeReadHeldAtoms"
-      }
-    }, {
-      "iri" : "https://w3id.org/won/ext/hold#ScopeReadHolderAtom",
-      "baseIri" : "https://w3id.org/won/ext/hold",
-      "comment" : {
-        "en" : "Tokens with this scope, provide read/connect\n               access to the holder of an atom (see https://w3id.org/won/ext/hold#HolderSocket)."
-      },
-      "labels" : {
-        "IRI-based" : "ScopeReadHolderAtom",
-        "undefined" : "ScopeReadHolderAtom"
       }
     } ],
     "attributes" : [ "external" ],

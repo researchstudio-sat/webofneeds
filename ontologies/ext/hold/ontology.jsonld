@@ -373,6 +373,9 @@
 }, {
   "@id" : "https://w3id.org/won/ext/hold#grantAccessToHolder",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "GrantAccessToHolder"
+  } ],
   "https://w3id.org/won/auth#grant" : [ {
     "@id" : "_:genid1"
   } ],
@@ -382,6 +385,9 @@
 }, {
   "@id" : "https://w3id.org/won/ext/hold#grantReadViaHeldAuth",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "GrantReadViaHeldAuth"
+  } ],
   "https://w3id.org/won/auth#bearer" : [ {
     "@id" : "_:genid11"
   } ],
@@ -391,6 +397,9 @@
 }, {
   "@id" : "https://w3id.org/won/ext/hold#grantReadViaHolderAuth",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "GrantReadViaHolderAuth"
+  } ],
   "https://w3id.org/won/auth#bearer" : [ {
     "@id" : "_:genid18"
   } ],

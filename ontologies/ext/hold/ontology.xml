@@ -403,6 +403,7 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#grantAccessToHolder">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantAccessToHolder</rdfs:label>
         <auth:grant rdf:nodeID="genid1"/>
         <auth:grantee>
             <rdf:Description>
@@ -453,6 +454,7 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#grantReadViaHeldAuth">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantReadViaHeldAuth</rdfs:label>
         <auth:bearer rdf:nodeID="genid11"/>
         <auth:grant>
             <rdf:Description>
@@ -492,6 +494,7 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#grantReadViaHolderAuth">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantReadViaHolderAuth</rdfs:label>
         <auth:bearer rdf:nodeID="genid18"/>
         <auth:grant>
             <rdf:Description>
