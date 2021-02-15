@@ -30,7 +30,7 @@ export const goodsTransportSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["goodsTransportOffer"],
+        useCaseIdentifiers: ["goodsTransportOffer", "persona"],
         refuseOwned: true,
       },
     },

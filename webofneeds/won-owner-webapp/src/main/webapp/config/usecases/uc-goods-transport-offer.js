@@ -26,7 +26,7 @@ export const goodsTransportOffer = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["goodsTransportSearch"],
+        useCaseIdentifiers: ["goodsTransportSearch", "persona"],
         refuseOwned: true,
       },
     },

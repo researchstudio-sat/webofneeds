@@ -28,7 +28,7 @@ export const booksOffer = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["booksSearch"],
+        useCaseIdentifiers: ["booksSearch", "persona"],
         refuseOwned: true,
       },
     },
