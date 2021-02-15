@@ -1,4 +1,3 @@
-import { getToKnow } from "./uc-get-to-know.js";
 import { complain } from "./uc-complain";
 import { handleComplaint } from "./uc-handle-complaint";
 
@@ -10,7 +9,6 @@ export const socialGroup = {
   icon: ico36_uc_find_people,
   subItems: {
     complain: complain,
-    getToKnow: getToKnow,
     handleComplaint: handleComplaint,
   },
 };
