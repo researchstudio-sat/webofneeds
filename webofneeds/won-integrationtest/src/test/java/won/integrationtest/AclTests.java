@@ -54,6 +54,8 @@ public class AclTests extends AbstractBotBasedTest {
             final AtomContent atomContent = new AtomContent(atomUriString);
             atomContent.addTitle("Unit Test Atom ACL Test 1");
             atomContent.addType(URI.create(WON.Atom.getURI()));
+            atomContent.addSocket(Socket.builder(atomUri.toString() + "#chatSocket")
+                            .setSocketDefinition(WXCHAT.ChatSocket.asURI()).build());
             WonMessage createMessage = WonMessageBuilder.createAtom()
                             .atom(atomUri)
                             .content()
@@ -134,6 +136,8 @@ public class AclTests extends AbstractBotBasedTest {
             final String atomUriString = atomUri.toString();
             final AtomContent atomContent = AtomContent.builder(atomUri)
                             .addTitle("Unit Test Atom ACL Test 2")
+                            .addSocket(Socket.builder(atomUri.toString() + "#chatSocket")
+                                            .setSocketDefinition(WXCHAT.ChatSocket.asURI()).build())
                             .addType(URI.create(WON.Atom.getURI()))
                             .build();
             WonMessage createMessage = WonMessageBuilder.createAtom()
@@ -1049,7 +1053,7 @@ public class AclTests extends AbstractBotBasedTest {
         });
     }
 
-    @Test(timeout = 600 * 1000)
+    @Test(timeout = 60 * 1000)
     public void testTokenExchange() throws Exception {
         final AtomicReference<URI> createMessageUri1 = new AtomicReference();
         final AtomicReference<URI> createMessageUri2 = new AtomicReference();
@@ -1503,6 +1507,427 @@ public class AclTests extends AbstractBotBasedTest {
             bbCreateAtom2.activate();
             bbWaitForConnectFromAtom1.activate();
         });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testSocketCapacity_nonConcurrentAccepts() throws Exception {
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri1 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri3 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final BotBehaviour bbCreateAtom1 = new BotBehaviour(ctx, "bbCreateAtom1") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri1.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri1)
+                                    .addTitle("Holdable atom (1/3)")
+                                    .addSocket(Socket.builder(atomUriString + "#holdableSocket")
+                                                    .setSocketDefinition(WXHOLD.HoldableSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri1)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
+                    EventListener successCallback = event -> {
+                        logger.debug("holdable atom created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create holdable atom");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom2 = new BotBehaviour(ctx, "bbCreateAtom2") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri2.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri2)
+                                    .addTitle("holder atom A (2/3)")
+                                    .addSocket(Socket.builder(atomUriString + "#holderSocket")
+                                                    .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri2)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
+                    EventListener successCallback = event -> {
+                        logger.debug("holder atom A created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create holder atom A");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom3 = new BotBehaviour(ctx, "bbCreateAtom3") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri3.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri3)
+                                    .addTitle("holder atom B (3/3)")
+                                    .addSocket(Socket.builder(atomUriString + "#holderSocket")
+                                                    .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri3)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri3);
+                    EventListener successCallback = event -> {
+                        logger.debug("holder atom B created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Creating holder atom B");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbSendConnect21 = new BotBehaviour(ctx, "bbSendConnect21") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri2.toString() + "#holderSocket"))
+                                    .recipient(URI.create(atomUri1.toString() + "#holdableSocket"))
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("holder A -> holdable connection requested");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection holder A -> holdable");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbAcceptConnect12 = new BotBehaviour(ctx, "bbAcceptConnect12") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri1.toString() + "#holdableSocket"))
+                                    .recipient(URI.create(atomUri2.toString() + "#holderSocket"))
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("Holder A <-> holdable connection accepted");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Accepting connection holder A <-> holdable");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbSendConnect31 = new BotBehaviour(ctx, "bbSendConnect31") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri3.toString() + "#holderSocket"))
+                                    .recipient(URI.create(atomUri1.toString() + "#holdableSocket"))
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("holder B -> holdable connection requested");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection holder B -> holdable");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbAcceptConnect13 = new BotBehaviour(ctx, "bbAcceptConnect") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri1.toString() + "#holdableSocket"))
+                                    .recipient(URI.create(atomUri3.toString() + "#holderSocket"))
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("Unexpected: Holder B <-> holdable connection accepted");
+                        failTest(bus, String.format("Unexpectedly, holdable %s accepted connection to another holder",
+                                        atomUri1.toString()));
+                    };
+                    EventListener failureCallback = event -> {
+                        logger.debug("As expected, accepting second holder conneciton failed");
+                        passTest(bus);
+                    };
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbPassTest = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    passTest(bus);
+                }
+            };
+            BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+            barrier.waitFor(bbCreateAtom1, bbCreateAtom2, bbCreateAtom3);
+            barrier.thenStart(bbSendConnect21);
+            barrier.activate();
+            bbSendConnect21.onDeactivateActivate(bbAcceptConnect12);
+            bbAcceptConnect12.onDeactivateActivate(bbSendConnect31);
+            bbSendConnect31.onDeactivateActivate(bbAcceptConnect13);
+            bbCreateAtom1.activate();
+            bbCreateAtom2.activate();
+            bbCreateAtom3.activate();
+        });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testSocketCapacity_concurrentAccepts() throws Exception {
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri1 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri3 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final BotBehaviour bbCreateAtom1 = new BotBehaviour(ctx, "bbCreateAtom1") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri1.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri1)
+                                    .addTitle("Holdable atom (1/3)")
+                                    .addSocket(Socket.builder(atomUriString + "#holdableSocket")
+                                                    .setSocketDefinition(WXHOLD.HoldableSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri1)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
+                    EventListener successCallback = event -> {
+                        logger.debug("holdable atom created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create holdable atom");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom2 = new BotBehaviour(ctx, "bbCreateAtom2") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri2.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri2)
+                                    .addTitle("holder atom A (2/3)")
+                                    .addSocket(Socket.builder(atomUriString + "#holderSocket")
+                                                    .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri2)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
+                    EventListener successCallback = event -> {
+                        logger.debug("holder atom A created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create holder atom A");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom3 = new BotBehaviour(ctx, "bbCreateAtom3") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri3.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri3)
+                                    .addTitle("holder atom B (3/3)")
+                                    .addSocket(Socket.builder(atomUriString + "#holderSocket")
+                                                    .setSocketDefinition(WXHOLD.HolderSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri3)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri3);
+                    EventListener successCallback = event -> {
+                        logger.debug("holder atom B created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Creating holder atom B");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbSendConnect21 = new BotBehaviour(ctx, "bbSendConnect21") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri2.toString() + "#holderSocket"))
+                                    .recipient(URI.create(atomUri1.toString() + "#holdableSocket"))
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("holder A -> holdable connection requested");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection holder A -> holdable");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbAcceptConnect12 = new BotBehaviour(ctx, "bbAcceptConnect12") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri1.toString() + "#holdableSocket"))
+                                    .recipient(URI.create(atomUri2.toString() + "#holderSocket"))
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("Holder A <-> holdable connection accepted");
+                        deactivate();
+                    };
+                    EventListener failureCallback = event -> {
+                        logger.debug("As expected, accepting one of the holder connections failed");
+                        passTest(bus);
+                    };
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbSendConnect31 = new BotBehaviour(ctx, "bbSendConnect31") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri3.toString() + "#holderSocket"))
+                                    .recipient(URI.create(atomUri1.toString() + "#holdableSocket"))
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("holder B -> holdable connection requested");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection holder B -> holdable");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbAcceptConnect13 = new BotBehaviour(ctx, "bbAcceptConnect") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri1.toString() + "#holdableSocket"))
+                                    .recipient(URI.create(atomUri3.toString() + "#holderSocket"))
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("Holder B <-> holdable connection accepted");
+                        deactivate();
+                    };
+                    EventListener failureCallback = event -> {
+                        logger.debug("As expected, accepting one of the holder connections failed");
+                        passTest(bus);
+                    };
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbFailTest = new BotBehaviour(ctx) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    failTest(bus, String.format("Unexpectedly, holdable %s accepted two holders.", atomUri1));
+                }
+            };
+            BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+            barrier.waitFor(bbCreateAtom1, bbCreateAtom2, bbCreateAtom3);
+            barrier.thenStart(bbSendConnect21, bbSendConnect31);
+            barrier.activate();
+            BehaviourBarrier barrier2 = new BehaviourBarrier(ctx);
+            barrier2.waitFor(bbSendConnect21, bbSendConnect31);
+            barrier2.thenStart(bbAcceptConnect12, bbAcceptConnect13);
+            barrier2.activate();
+            BehaviourBarrier barrier3 = new BehaviourBarrier(ctx);
+            barrier3.waitFor(bbAcceptConnect12, bbAcceptConnect13);
+            barrier3.thenStart(bbFailTest);
+            barrier3.activate();
+            bbCreateAtom1.activate();
+            bbCreateAtom2.activate();
+            bbCreateAtom3.activate();
+        });
+    }
+
+    private Authorization getAnyoneMayReadAnything() {
+        return Authorization.builder()
+                        .setGranteeGranteeWildcard(GranteeWildcard.ANYONE)
+                        .addGrant(AseRoot.builder().addOperationsSimpleOperationExpression(OP_READ).build())
+                        .build();
     }
 
     private Authorization getAnyoneMayConnectAuth() {

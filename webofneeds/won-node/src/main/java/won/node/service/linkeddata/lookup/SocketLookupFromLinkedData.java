@@ -1,17 +1,16 @@
 package won.node.service.linkeddata.lookup;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.protocol.model.SocketDefinition;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Optional;
 
 @Component
 public class SocketLookupFromLinkedData implements SocketLookup {
@@ -48,7 +47,7 @@ public class SocketLookupFromLinkedData implements SocketLookup {
     @Override
     public Optional<Integer> getCapacity(URI socket) {
         Optional<SocketDefinition> localConfig = getSocketConfig(socket);
-        if (!localConfig.isPresent() && localConfig.get().getCapacity().isPresent()) {
+        if (localConfig.isPresent() && localConfig.get().getCapacity().isPresent()) {
             return localConfig.get().getCapacity();
         }
         return Optional.empty();
@@ -57,7 +56,7 @@ public class SocketLookupFromLinkedData implements SocketLookup {
     @Override
     public Optional<Integer> getCapacityOfType(URI socketType) {
         Optional<SocketDefinition> localConfig = getSocketConfigOfType(socketType);
-        if (!localConfig.isPresent() && localConfig.get().getCapacity().isPresent()) {
+        if (localConfig.isPresent() && localConfig.get().getCapacity().isPresent()) {
             return localConfig.get().getCapacity();
         }
         return Optional.empty();
