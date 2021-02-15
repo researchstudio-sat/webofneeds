@@ -1,17 +1,13 @@
-<html><h2 id="crossreference" class="list">Cross reference for Web of Needs Hold Extension classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<h2 id="crossreference" class="list">Cross reference for Web of Needs Hold Extension classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
 This section provides details for each class and property defined by Web of Needs Hold Extension.
 <div id="objectproperties">
    <h3 id="properties" class="list">Object Properties</h3>
    <ul class="hlist">
       <li>
-         <a href="#heldBy" title="https://w3id.org/won/ext/hold#heldBy">
-            <span>heldBy</span>
-         </a>
+         <a href="#heldBy" title="https://w3id.org/won/ext/hold#heldBy">heldBy</a>
       </li>
       <li>
-         <a href="#holds" title="https://w3id.org/won/ext/hold#holds">
-            <span>holds</span>
-         </a>
+         <a href="#holds" title="https://w3id.org/won/ext/hold#holds">holds</a>
       </li>
    </ul>
    <div class="entity" id="heldBy">
@@ -21,18 +17,21 @@ This section provides details for each class and property defined by Web of Need
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/ext/hold#heldBy</p>
+      <div class="comment">
+         <span class="markdown">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</span>
+      </div>
       <div class="description">
          <dl>
             <dt>has domain</dt>
             <dd>
                <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
             </dd>
-            <dt>is also defined as</dt>
-            <dd>named individual</dd>
          </dl>
       </div>
    </div>
@@ -43,24 +42,39 @@ This section provides details for each class and property defined by Web of Need
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/ext/hold#holds</p>
+      <div class="comment">
+         <span class="markdown">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</span>
+      </div>
       <div class="description">
          <dl>
             <dt>has domain</dt>
             <dd>
                <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup>
             </dd>
-            <dt>is also defined as</dt>
-            <dd>named individual</dd>
          </dl>
       </div>
    </div>
 </div><div id="namedindividuals">
    <h3 id="namedindividuals" class="list">Named Individuals</h3>
    <ul class="hlist">
+      <li>
+         <a href="#grantAccessToHolder"
+            title="https://w3id.org/won/ext/hold#grantAccessToHolder">
+            <span>grant access to holder</span>
+         </a>
+      </li>
+      <li>
+         <a href="#grantReadViaHeldAuth"
+            title="https://w3id.org/won/ext/hold#grantReadViaHeldAuth">
+            <span>grant read via held auth</span>
+         </a>
+      </li>
       <li>
          <a href="#grantReadViaHolderAuth"
             title="https://w3id.org/won/ext/hold#grantReadViaHolderAuth">
@@ -76,7 +90,41 @@ This section provides details for each class and property defined by Web of Need
       <li>
          <a href="#ScopeReadHeldAtoms" title="https://w3id.org/won/ext/hold#ScopeReadHeldAtoms">ScopeReadHeldAtoms</a>
       </li>
+      <li>
+         <a href="#ScopeReadHolderAtom"
+            title="https://w3id.org/won/ext/hold#ScopeReadHolderAtom">ScopeReadHolderAtom</a>
+      </li>
    </ul>
+   <div class="entity" id="grantAccessToHolder">
+      <h3>grant access to holder<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/hold#grantAccessToHolder</p>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/auth#Authorization">authorization</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="grantReadViaHeldAuth">
+      <h3>grant read via held auth<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/hold#grantReadViaHeldAuth</p>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/auth#Authorization">authorization</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
    <div class="entity" id="grantReadViaHolderAuth">
       <h3>grant read via holder auth<sup class="type-ni" title="named individual">ni</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
@@ -106,6 +154,7 @@ This section provides details for each class and property defined by Web of Need
          <dt>belongs to</dt>
          <dd>
             <span class="dotted" title="https://w3id.org/won/core#SocketDefinition">socket definition</span>
+            <sup class="type-c" title="class">c</sup>
          </dd>
       </dl>
    </div>
@@ -123,6 +172,7 @@ This section provides details for each class and property defined by Web of Need
          <dt>belongs to</dt>
          <dd>
             <span class="dotted" title="https://w3id.org/won/core#SocketDefinition">socket definition</span>
+            <sup class="type-c" title="class">c</sup>
          </dd>
       </dl>
    </div>
@@ -145,6 +195,25 @@ This section provides details for each class and property defined by Web of Need
          </dd>
       </dl>
    </div>
+   <div class="entity" id="ScopeReadHolderAtom">
+      <h3>ScopeReadHolderAtom<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/ext/hold#ScopeReadHolderAtom</p>
+      <div class="comment">
+         <span class="markdown">Tokens with this scope, provide read/connect
+               access to the holder of an atom (see https://w3id.org/won/ext/hold#HolderSocket).</span>
+      </div>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="https://w3id.org/won/auth#TokenScope">token scope</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
 </div><div id="legend">
 <h2>Legend <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
 <div   class="entity">
@@ -154,4 +223,3 @@ This section provides details for each class and property defined by Web of Need
 <sup class="type-ni" title="Named Individuals">ni</sup>: Named Individuals
 </div>
 </div>
-</html>
