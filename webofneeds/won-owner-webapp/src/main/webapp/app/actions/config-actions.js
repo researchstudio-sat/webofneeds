@@ -10,7 +10,7 @@ import loadCSS from "loadcss";
  * should be baked-in/prerendered when shipping the code, in
  * future versions => TODO
  */
-export const configInit = (dispatch, getState) => {
+export const configInit = () => (dispatch, getState) => {
   const defaultTheme = generalSelectors.getTheme(getState());
   const defaultThemeName = get(defaultTheme, "name");
   Promise.all([
