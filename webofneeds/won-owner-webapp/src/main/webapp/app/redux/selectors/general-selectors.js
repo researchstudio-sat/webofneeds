@@ -186,7 +186,7 @@ export const getAllOwnedConnectionsWithTargetSocketUri = targetSocketUri =>
         )
   );
 
-export const getAllUnassigneUnpinnedChatConnections = createSelector(
+export const getAllUnassignedUnpinnedChatConnections = createSelector(
   getUnassignedUnpinnedAtoms,
   allOwnedAtoms =>
     allOwnedAtoms &&
@@ -311,7 +311,13 @@ export const getChatConnectionsOfActivePinnedAtom = atomUri =>
             });
         }
 
-        return chatConnections;
+        return chatConnections
+          .toOrderedMap()
+          .sortBy(conn => {
+            const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
+            return lastUpdateDate && lastUpdateDate.getTime();
+          })
+          .reverse();
       }
     }
   );

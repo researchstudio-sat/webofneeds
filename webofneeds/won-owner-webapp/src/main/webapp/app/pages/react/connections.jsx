@@ -97,7 +97,7 @@ export default function PageConnections() {
       ? generalSelectors.getChatConnectionsOfActivePinnedAtom(
           activePinnedAtomUri
         )
-      : generalSelectors.getAllUnassigneUnpinnedChatConnections
+      : generalSelectors.getAllUnassignedUnpinnedChatConnections
   );
   const storedAtoms = useSelector(generalSelectors.getAtoms);
 
