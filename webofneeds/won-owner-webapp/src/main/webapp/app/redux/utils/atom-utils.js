@@ -768,7 +768,7 @@ export function getAllConnectedChatAndGroupConnections(atomImm) {
   const chatSocketUri = getChatSocket(atomImm);
 
   return getConnections(atomImm)
-    .filter(connectionUtils.isUnread)
+    .filter(connectionUtils.isConnected)
     .filter(
       conn =>
         connectionUtils.hasSocketUri(conn, chatSocketUri) ||
