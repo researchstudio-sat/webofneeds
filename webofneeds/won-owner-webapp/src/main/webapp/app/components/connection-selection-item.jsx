@@ -119,7 +119,7 @@ export default function WonConnectionSelectionItem({
             false
           )}
         >
-          <WonAtomIcon atom={senderAtom} flipIcons={true} />
+          <WonAtomIcon atom={senderAtom} flipIcons={false} />
         </Link>
       ) : (
         <div />
