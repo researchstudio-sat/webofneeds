@@ -1295,8 +1295,7 @@ public class AclTests extends AbstractBotBasedTest {
                                     connectMessageUri12.get(),
                                     connectMessageUri21.get(),
                                     connectionUri21.get(),
-                                    connContainerUri2
-                    );
+                                    connContainerUri2);
                     passed = passed && testLinkedDataRequestFails(ctx, bus, "test2.", atomUri1,
                                     LinkedDataFetchingException.class,
                                     // createMessageUri2.get(),
@@ -1318,8 +1317,7 @@ public class AclTests extends AbstractBotBasedTest {
                     passed = passed && testLinkedDataRequestFails(ctx, bus, "test4.", atomUri2,
                                     LinkedDataFetchingException.class,
                                     createMessageUri1.get(),
-                                    createMessageUri3.get()
-                    );
+                                    createMessageUri3.get());
                     deactivate();
                 }
             };
