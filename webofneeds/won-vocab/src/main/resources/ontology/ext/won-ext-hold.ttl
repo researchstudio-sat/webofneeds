@@ -128,6 +128,7 @@ rdfs:labels
 
 :grantReadViaHolderAuth
     a           auth:Authorization ;
+    rdfs:label  "GrantReadViaHolderAuth" ;
     auth:bearer [ auth:tokenScope :ScopeReadHeldAtoms ;
                   auth:issuer     [ auth:socket [ auth:socketType :HoldableSocket ;
                                                   auth:connection [ auth:targetAtom      [ ] ;
@@ -137,6 +138,7 @@ rdfs:labels
 
 :grantAccessToHolder
     a            auth:Authorization ;
+    rdfs:label   "GrantAccessToHolder" ;
     auth:grantee [ auth:socket [ auth:connection [ auth:connectionState won:Connected, won:RequestSent ;
                                                    auth:targetAtom      [ ] ] ] ] ;
     auth:grant   [ auth:socket    [ auth:socketType  :HoldableSocket ;
@@ -159,6 +161,7 @@ rdfs:labels
 
 :grantReadViaHeldAuth
     a           auth:Authorization ;
+    rdfs:label  "GrantReadViaHeldAuth" ;
     auth:bearer [ auth:tokenScope :ScopeReadHolderAtom ;
                   auth:issuer     [ auth:socket [ auth:socketType :HolderSocket ;
                                                   auth:connection [ auth:targetAtom      [ ] ;
