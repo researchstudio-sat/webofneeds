@@ -69,7 +69,7 @@ export default function WonAtomContentMembers({
   );
 
   const activeRoles = connections
-    .filter(conn => connectionUtils.isConnected(conn))
+    .filter(connectionUtils.isConnected)
     .filter(conn => {
       const targetSocketType = atomUtils.getSocketType(
         get(storedAtoms, connectionUtils.getTargetAtomUri(conn)),
@@ -82,7 +82,7 @@ export default function WonAtomContentMembers({
     });
 
   const activeMembers = connections
-    .filter(conn => connectionUtils.isConnected(conn))
+    .filter(connectionUtils.isConnected)
     .filter(conn => {
       const targetSocketType = atomUtils.getSocketType(
         get(storedAtoms, connectionUtils.getTargetAtomUri(conn)),
@@ -95,21 +95,17 @@ export default function WonAtomContentMembers({
       );
     });
 
-  const requestSentConnections = connections.filter(conn =>
-    connectionUtils.isRequestSent(conn)
+  const requestSentConnections = connections.filter(
+    connectionUtils.isRequestSent
   );
 
-  const requestReceivedConnections = connections.filter(conn =>
-    connectionUtils.isRequestReceived(conn)
+  const requestReceivedConnections = connections.filter(
+    connectionUtils.isRequestReceived
   );
 
-  const suggestedConnections = connections.filter(conn =>
-    connectionUtils.isSuggested(conn)
-  );
+  const suggestedConnections = connections.filter(connectionUtils.isSuggested);
 
-  const closedConnections = connections.filter(conn =>
-    connectionUtils.isClosed(conn)
-  );
+  const closedConnections = connections.filter(connectionUtils.isClosed);
 
   function generateConnectionItems(connections) {
     const connectionElements = [];

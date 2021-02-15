@@ -103,8 +103,7 @@ export default function WonAtomMessages({
   //TODO Refactor End
 
   const unreadMessages =
-    chatMessages &&
-    chatMessages.filter(msg => messageUtils.isMessageUnread(msg));
+    chatMessages && chatMessages.filter(messageUtils.isMessageUnread);
 
   const showChatData =
     connection &&

@@ -480,13 +480,11 @@ export function getGroupSocket(atom) {
 }
 
 export function hasSuggestedConnections(atom) {
-  return !!getConnections(atom).find(conn => connectionUtils.isSuggested(conn));
+  return !!getConnections(atom).find(connectionUtils.isSuggested);
 }
 
 export function getSuggestedConnections(atom, socketType) {
-  return getConnections(atom, socketType).filter(conn =>
-    connectionUtils.isSuggested(conn)
-  );
+  return getConnections(atom, socketType).filter(connectionUtils.isSuggested);
 }
 
 export function getRequestReceivedConnections(atom, socketType) {
@@ -734,8 +732,8 @@ export function getConnections(atomImm, socketType, exclude = false) {
  * @param socketType compactedSocketType Uri (senderSocket)
  */
 export function getConnectedConnections(atomImm, socketType) {
-  return getConnections(atomImm, socketType).filter(conn =>
-    connectionUtils.isConnected(conn)
+  return getConnections(atomImm, socketType).filter(
+    connectionUtils.isConnected
   );
 }
 
@@ -770,7 +768,7 @@ export function getAllConnectedChatAndGroupConnections(atomImm) {
   const chatSocketUri = getChatSocket(atomImm);
 
   return getConnections(atomImm)
-    .filter(conn => connectionUtils.isConnected(conn))
+    .filter(connectionUtils.isUnread)
     .filter(
       conn =>
         connectionUtils.hasSocketUri(conn, chatSocketUri) ||

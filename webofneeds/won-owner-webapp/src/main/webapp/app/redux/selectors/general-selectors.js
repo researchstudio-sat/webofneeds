@@ -180,7 +180,7 @@ export const getAllOwnedConnectionsWithTargetSocketUri = targetSocketUri =>
     allOwnedAtoms =>
       allOwnedAtoms &&
       allOwnedAtoms
-        .filter(atom => atomUtils.isActive(atom))
+        .filter(atomUtils.isActive)
         .flatMap(atom =>
           atomUtils.getAllConnectionsWithTargetSocketUri(atom, targetSocketUri)
         )
@@ -191,11 +191,9 @@ export const getAllUnassignedUnpinnedChatConnections = createSelector(
   allOwnedAtoms =>
     allOwnedAtoms &&
     allOwnedAtoms
-      .filter(atom => atomUtils.isActive(atom))
-      .filter(atom => atomUtils.hasChatSocket(atom))
-      .flatMap(atom =>
-        atomUtils.getAllNonClosedNonSuggestedChatConnections(atom)
-      )
+      .filter(atomUtils.isActive)
+      .filter(atomUtils.hasChatSocket)
+      .flatMap(atomUtils.getAllNonClosedNonSuggestedChatConnections)
       .toOrderedMap()
       .sortBy(conn => {
         const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
@@ -209,11 +207,9 @@ export const getAllPartnerActivityConnections = createSelector(
   allOwnedAtoms =>
     allOwnedAtoms &&
     allOwnedAtoms
-      .filter(atom => atomUtils.isActive(atom))
-      .filter(atom => atomUtils.hasPartnerActivitySocket(atom))
-      .flatMap(atom =>
-        atomUtils.getAllNonClosedNonSuggestedPartnerActivityConnections(atom)
-      )
+      .filter(atomUtils.isActive)
+      .filter(atomUtils.hasPartnerActivitySocket)
+      .flatMap(atomUtils.getAllNonClosedNonSuggestedPartnerActivityConnections)
       .toOrderedMap()
       .sortBy(conn => {
         const lastUpdateDate = get(conn, "lastUpdateDate");
@@ -227,11 +223,11 @@ export const getAllConnectedChatAndGroupConnections = createSelector(
   allOwnedAtoms =>
     allOwnedAtoms &&
     allOwnedAtoms
-      .filter(atom => atomUtils.isActive(atom))
+      .filter(atomUtils.isActive)
       .filter(
         atom => atomUtils.hasChatSocket(atom) || atomUtils.hasGroupSocket(atom)
       )
-      .flatMap(atom => atomUtils.getAllConnectedChatAndGroupConnections(atom))
+      .flatMap(atomUtils.getAllConnectedChatAndGroupConnections)
 );
 
 /**
@@ -245,7 +241,7 @@ export const hasUnassignedUnpinnedAtomUnreads = createSelector(
   ownedAtoms =>
     ownedAtoms &&
     !!ownedAtoms
-      .filter(atom => atomUtils.isActive(atom))
+      .filter(atomUtils.isActive)
       .find(atom => atomUtils.hasUnreadConnections(atom))
 );
 
@@ -253,7 +249,7 @@ export const getOwnedPinnedAtomsUnreads = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
     ownedAtoms &&
-    ownedAtoms.filter(atom => atomUtils.isPinnedAtom(atom)).map(
+    ownedAtoms.filter(atomUtils.isPinnedAtom).map(
       atom =>
         atomUtils.hasUnreadConnections(atom) ||
         !!atomUtils.getConnections(atom).find(conn => {
@@ -327,7 +323,7 @@ export const hasUnassignedUnpinnedAtomChatUnreads = createSelector(
   ownedAtoms =>
     ownedAtoms &&
     !!ownedAtoms
-      .filter(atom => atomUtils.isActive(atom))
+      .filter(atomUtils.isActive)
       .find(atom =>
         atomUtils.hasUnreadConnections(atom, vocab.CHAT.ChatSocketCompacted)
       )
@@ -338,7 +334,7 @@ export const hasUnassignedUnpinnedAtomNonChatUnreads = createSelector(
   ownedAtoms =>
     ownedAtoms &&
     !!ownedAtoms
-      .filter(atom => atomUtils.isActive(atom))
+      .filter(atomUtils.isActive)
       .find(atom =>
         atomUtils.hasUnreadConnections(
           atom,
@@ -350,7 +346,7 @@ export const hasUnassignedUnpinnedAtomNonChatUnreads = createSelector(
 
 export const getActiveAtoms = createSelector(
   getAtoms,
-  allAtoms => allAtoms && allAtoms.filter(atom => atomUtils.isActive(atom))
+  allAtoms => allAtoms && allAtoms.filter(atomUtils.isActive)
 );
 
 export const selectIsConnected = createSelector(
@@ -386,20 +382,17 @@ export const getAtomByConnectionUri = connectionUri =>
 
 export const getOwnedPersonas = createSelector(
   getOwnedAtoms,
-  ownedAtoms =>
-    ownedAtoms && ownedAtoms.filter(atom => atomUtils.isPersona(atom))
+  ownedAtoms => ownedAtoms && ownedAtoms.filter(atomUtils.isPersona)
 );
 
 export const getOwnedPinnedAtoms = createSelector(
   getOwnedAtoms,
-  ownedAtoms =>
-    ownedAtoms && ownedAtoms.filter(atom => atomUtils.isPinnedAtom(atom))
+  ownedAtoms => ownedAtoms && ownedAtoms.filter(atomUtils.isPinnedAtom)
 );
 
 export const getOwnedAtomsWithBuddySocket = createSelector(
   getOwnedAtoms,
-  ownedAtoms =>
-    ownedAtoms && ownedAtoms.filter(atom => atomUtils.hasBuddySocket(atom))
+  ownedAtoms => ownedAtoms && ownedAtoms.filter(atomUtils.hasBuddySocket)
 );
 
 /**

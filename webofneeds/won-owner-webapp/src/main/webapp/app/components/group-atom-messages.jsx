@@ -72,8 +72,7 @@ export default function WonGroupAtomMessages({
   );
 
   const unreadMessages =
-    chatMessages &&
-    chatMessages.filter(msg => messageUtils.isMessageUnread(msg));
+    chatMessages && chatMessages.filter(messageUtils.isMessageUnread);
 
   const isConnected = connectionUtils.isConnected(connection);
   const unreadMessageCount = unreadMessages && unreadMessages.size;

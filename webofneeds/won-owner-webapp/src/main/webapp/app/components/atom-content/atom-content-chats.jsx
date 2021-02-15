@@ -65,11 +65,11 @@ export default function AtomContentChats({
     conn =>
       !(connectionUtils.isSuggested(conn) || connectionUtils.isClosed(conn))
   );
-  const suggestedChatConnections = chatConnections.filter(conn =>
-    connectionUtils.isSuggested(conn)
+  const suggestedChatConnections = chatConnections.filter(
+    connectionUtils.isSuggested
   );
-  const closedChatConnections = chatConnections.filter(conn =>
-    connectionUtils.isClosed(conn)
+  const closedChatConnections = chatConnections.filter(
+    connectionUtils.isClosed
   );
 
   function generateConnectionItems(connections) {

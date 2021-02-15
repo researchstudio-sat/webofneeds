@@ -62,12 +62,12 @@ export default function PageMap() {
   const whatsAroundMetaAtoms = useSelector(state =>
     generalSelectors
       .getWhatsAroundAtoms(state)
-      .filter(metaAtom => atomUtils.isActive(metaAtom))
+      .filter(atomUtils.isActive)
       .filter(
         metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
       )
       .filter(metaAtom => !accountUtils.isAtomOwned(metaAtom))
-      .filter(metaAtom => atomUtils.hasLocation(metaAtom))
+      .filter(atomUtils.hasLocation)
       .filter(metaAtom => {
         const distanceFrom = atomUtils.getDistanceFrom(
           metaAtom,

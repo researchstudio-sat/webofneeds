@@ -38,7 +38,7 @@ export default function PageOverview() {
   );
 
   const whatsNewAtoms = whatsNewAtomsUnfiltered
-    .filter(metaAtom => atomUtils.isActive(metaAtom))
+    .filter(atomUtils.isActive)
     .filter(
       metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
     )
@@ -50,7 +50,7 @@ export default function PageOverview() {
   const whatsNewAtomsGroupedByUseCaseIdentifier =
     whatsNewAtoms &&
     whatsNewAtoms
-      .groupBy(atom => atomUtils.getMatchedUseCaseIdentifier(atom))
+      .groupBy(atomUtils.getMatchedUseCaseIdentifier)
       .toOrderedMap()
       .sortBy(
         (_, ucIdentifier) => useCaseUtils.getUseCaseLabel(ucIdentifier) || "zzz"
@@ -94,7 +94,7 @@ export default function PageOverview() {
       visibleAtoms &&
       visibleAtoms
         .toOrderedMap()
-        .sortBy(atom => atomUtils.getLastUpdateDate(atom))
+        .sortBy(atomUtils.getLastUpdateDate)
         .reverse();
     const visibleAtomsSize = visibleAtoms ? visibleAtoms.size : 0;
 

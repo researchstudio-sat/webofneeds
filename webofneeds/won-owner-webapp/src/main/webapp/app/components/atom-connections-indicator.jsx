@@ -30,22 +30,18 @@ export default function WonAtomConnectionsIndicator({ atom, socketType }) {
     atom,
     socketType
   );
-  const receivedRequestsUnread = receivedRequests.filter(conn =>
-    connectionUtils.isUnread(conn)
+  const receivedRequestsUnread = receivedRequests.filter(
+    connectionUtils.isUnread
   );
 
   const connected =
     !socketType || socketType === vocab.CHAT.ChatSocketCompacted
       ? atomUtils.getConnectedConnections(atom, vocab.CHAT.ChatSocketCompacted)
       : Immutable.Map();
-  const connectedUnread = connected.filter(conn =>
-    connectionUtils.isUnread(conn)
-  );
+  const connectedUnread = connected.filter(connectionUtils.isUnread);
 
   const suggested = atomUtils.getSuggestedConnections(atom, socketType);
-  const suggestedUnread = suggested.filter(conn =>
-    connectionUtils.isUnread(conn)
-  );
+  const suggestedUnread = suggested.filter(connectionUtils.isUnread);
 
   function linkToConnectionSocketTab(connection) {
     const socketType = atomUtils.getSocketType(

@@ -147,9 +147,7 @@ export default function(viewState = initialState, action = {}) {
           parseMetaAtom(metaAtom)
         );
         const firstPinnedAtomUri = getUri(
-          parsedMetaAtoms
-            .filter(metaAtom => atomUtils.isPinnedAtom(metaAtom))
-            .first()
+          parsedMetaAtoms.filter(atomUtils.isPinnedAtom).first()
         );
         if (firstPinnedAtomUri) {
           return viewState

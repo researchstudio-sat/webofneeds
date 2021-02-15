@@ -278,8 +278,8 @@ export default function WonAtomContent({
             socketType={visibleTab}
             ItemComponent={WonHeldItem}
             //Holdercontent should only display connected items
-            relevantConnections={relevantConnections.filter(conn =>
-              connectionUtils.isConnected(conn)
+            relevantConnections={relevantConnections.filter(
+              connectionUtils.isConnected
             )}
             showAddPicker={showAddPicker}
             toggleAddPicker={toggleAddPicker}

@@ -54,7 +54,7 @@ export default function ActivityActionsfield({
   const messages = get(connection, "messages");
 
   const selectedMessages =
-    messages && messages.filter(msg => messageUtils.isMessageSelected(msg));
+    messages && messages.filter(messageUtils.isMessageSelected);
   const rejectableMessages =
     messages &&
     messages.filter(msg => messageUtils.isMessageRejectable(connection, msg));

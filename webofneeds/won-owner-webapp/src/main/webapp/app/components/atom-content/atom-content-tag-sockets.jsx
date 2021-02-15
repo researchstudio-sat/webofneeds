@@ -25,8 +25,7 @@ export default function WonAtomContentTagSockets({
         : undefined;
 
     const unread =
-      activeConnections &&
-      !!activeConnections.find(conn => connectionUtils.isUnread(conn));
+      activeConnections && !!activeConnections.find(connectionUtils.isUnread);
 
     function generateAtomItemCssClasses(unread = false) {
       const cssClassNames = ["actsockets__item__header"];

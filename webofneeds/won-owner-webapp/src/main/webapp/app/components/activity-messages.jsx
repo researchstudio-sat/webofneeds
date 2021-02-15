@@ -115,8 +115,7 @@ export default function WonActivityMessages({
     : [];
 
   const unreadMessages =
-    chatMessages &&
-    chatMessages.filter(msg => messageUtils.isMessageUnread(msg));
+    chatMessages && chatMessages.filter(messageUtils.isMessageUnread);
 
   const showChatData =
     connection &&

@@ -68,7 +68,7 @@ export default function WonSocketAddAtom({
     : undefined;
 
   const sortedPossibleAtoms = storedAtoms
-    .filter(atom => atomUtils.isActive(atom))
+    .filter(atomUtils.isActive)
     .filter((atom, atomUri) => {
       const isOwned = accountUtils.isAtomOwned(accountState, atomUri);
 

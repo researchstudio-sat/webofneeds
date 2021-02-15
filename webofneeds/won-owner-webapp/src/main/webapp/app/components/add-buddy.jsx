@@ -29,7 +29,7 @@ export default function WonAddBuddy({ atom, className }) {
   const ownedBuddyOptions =
     ownedAtomsWithBuddySocket &&
     ownedAtomsWithBuddySocket
-      .filter(buddyAtom => atomUtils.isActive(buddyAtom))
+      .filter(atomUtils.isActive)
       .filter(buddyAtom => getUri(buddyAtom) !== getUri(atom));
 
   const immediateConnectBuddy =

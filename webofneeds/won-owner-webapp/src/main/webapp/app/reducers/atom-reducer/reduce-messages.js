@@ -303,7 +303,7 @@ export function addMessage(
           allAtomsInState.flatMap(atom => atomUtils.getConnections(atom));
 
         return allConnections
-          .filter(conn => connectionUtils.isConnected(conn))
+          .filter(connectionUtils.isConnected)
           .filter(conn =>
             connectionUtils.hasTargetSocketUri(conn, targetSocketUri)
           )
@@ -680,7 +680,7 @@ export function markMessageAsRead(
     )
   );
 
-  if (!messages.find(msg => messageUtils.isMessageUnread(msg))) {
+  if (!messages.find(messageUtils.isMessageUnread)) {
     allAtomsInState = markConnectionAsRead(
       allAtomsInState,
       connectionUri,

@@ -67,25 +67,19 @@ export default function WonAtomContentSocket({
   );
 
   // If an atom is owned we display all connStates, if the atom is not owned we only display connected states
-  const activeConnections = connections.filter(conn =>
-    connectionUtils.isConnected(conn)
+  const activeConnections = connections.filter(connectionUtils.isConnected);
+
+  const requestSentConnections = connections.filter(
+    connectionUtils.isRequestSent
   );
 
-  const requestSentConnections = connections.filter(conn =>
-    connectionUtils.isRequestSent(conn)
+  const requestReceivedConnections = connections.filter(
+    connectionUtils.isRequestReceived
   );
 
-  const requestReceivedConnections = connections.filter(conn =>
-    connectionUtils.isRequestReceived(conn)
-  );
+  const suggestedConnections = connections.filter(connectionUtils.isSuggested);
 
-  const suggestedConnections = connections.filter(conn =>
-    connectionUtils.isSuggested(conn)
-  );
-
-  const closedConnections = connections.filter(conn =>
-    connectionUtils.isClosed(conn)
-  );
+  const closedConnections = connections.filter(connectionUtils.isClosed);
 
   function generateConnectionItems(connections) {
     const connectionElements = [];

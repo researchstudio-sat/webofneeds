@@ -188,7 +188,7 @@ export default function WonAtomHeaderBig({
     const hasOwnedAtomsWithBuddySocket =
       ownedAtomsWithBuddySocket &&
       ownedAtomsWithBuddySocket
-        .filter(atom => atomUtils.isActive(atom))
+        .filter(atomUtils.isActive)
         .filter(atom => getUri(atom) !== atomUri).size > 0;
 
     const showAddBuddyElement =

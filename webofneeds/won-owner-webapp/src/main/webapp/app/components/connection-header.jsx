@@ -199,8 +199,7 @@ export default function WonConnectionHeader({
       if (!hideMessageIndicator) {
         const allMessages = connectionUtils.getMessages(connection);
         const unreadMessages =
-          allMessages &&
-          allMessages.filter(msg => messageUtils.isMessageUnread(msg));
+          allMessages && allMessages.filter(messageUtils.isMessageUnread);
 
         const unreadMessageCount =
           unreadMessages && unreadMessages.size > 0
@@ -316,8 +315,8 @@ export default function WonConnectionHeader({
       );
 
       if (groupConnectionRequests && groupConnectionRequests.size > 0) {
-        const hasNewGroupRequests = !!groupConnectionRequests.find(con =>
-          connectionUtils.isUnread(con)
+        const hasNewGroupRequests = !!groupConnectionRequests.find(
+          connectionUtils.isUnread
         );
 
         incomingRequestsIcon = (

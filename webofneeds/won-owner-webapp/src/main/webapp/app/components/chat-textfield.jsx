@@ -56,7 +56,7 @@ export default function ChatTextfield({
   const messages = connectionUtils.getMessages(connection);
 
   const selectedMessages =
-    messages && messages.filter(msg => messageUtils.isMessageSelected(msg));
+    messages && messages.filter(messageUtils.isMessageSelected);
   const rejectableMessages =
     messages &&
     messages.filter(msg => messageUtils.isMessageRejectable(connection, msg));
