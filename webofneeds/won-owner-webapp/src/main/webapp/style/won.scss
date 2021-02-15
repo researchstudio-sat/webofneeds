@@ -132,7 +132,9 @@ body {
 
     > main.overview__nochats {
       grid-area: content;
-      grid-column: 2 / -1;
+      @media (min-width: $responsivenessBreakPoint) {
+        grid-column: 2 / -1;
+      }
 
       > .overview__nochats__empty {
         box-sizing: border-box;
