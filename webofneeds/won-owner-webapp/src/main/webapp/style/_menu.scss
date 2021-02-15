@@ -41,6 +41,24 @@
     }
 
     &--anon {
+      &:not(.pinnedatoms__pinnedatom--active) {
+        transition: all linear 0.2s;
+        transform: scale(0.75);
+
+        .pinnedatoms__pinnedatom__anonicon {
+          opacity: 0.75;
+        }
+
+        &:hover {
+          transition: all linear 0.2s;
+          transform: scale(0.9);
+
+          .pinnedatoms__pinnedatom__anonicon {
+            opacity: 0.9;
+          }
+        }
+      }
+
       --local-primary: #{$won-line-gray};
 
       .pinnedatoms__pinnedatom__anonicon {
@@ -55,7 +73,26 @@
 
     @include square-image($feedIconSize);
 
+    &:not(.pinnedatoms__pinnedatom--active):not(.pinnedatoms__pinnedatom--anon) {
+      transition: all linear 0.2s;
+      transform: scale(0.75);
+
+      won-atom-icon {
+        opacity: 0.75;
+      }
+
+      &:hover {
+        transition: all linear 0.2s;
+        transform: scale(0.9);
+
+        won-atom-icon {
+          opacity: 0.9;
+        }
+      }
+    }
+
     &--active {
+      transition: all linear 0.2s;
       .pinnedatoms__pinnedatom__anonicon,
       .image {
         box-shadow: 0 0 5px 5px var(--won-secondary-text-color);
