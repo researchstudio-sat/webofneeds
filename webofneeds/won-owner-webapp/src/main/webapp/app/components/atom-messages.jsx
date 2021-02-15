@@ -15,7 +15,6 @@ import {
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
-import vocab from "../service/vocab.js";
 
 import "~/style/_atom-messages.scss";
 import "~/style/_rdflink.scss";
@@ -309,13 +308,6 @@ export default function WonAtomMessages({
   }
 
   function sendRequest(message) {
-    dispatch(
-      actionCreators.connections__rate(
-        connectionUri,
-        vocab.WONCON.binaryRatingGood
-      )
-    );
-
     dispatch(
       actionCreators.atoms__connectSockets(
         connectionUtils.getSocketUri(connection),

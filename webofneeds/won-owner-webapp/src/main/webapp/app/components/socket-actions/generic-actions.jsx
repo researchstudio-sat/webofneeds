@@ -114,13 +114,6 @@ export default function WonGenericSocketActions({
             }
 
             dispatch(
-              actionCreators.connections__rate(
-                connectionUri,
-                vocab.WONCON.binaryRatingGood
-              )
-            );
-
-            dispatch(
               actionCreators.atoms__connectSockets(
                 senderSocketUri,
                 targetSocketUri,

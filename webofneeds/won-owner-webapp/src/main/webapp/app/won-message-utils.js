@@ -27,43 +27,6 @@ export function isFetchMessageEffectsNeeded(wonMsg) {
   );
 }
 
-export function buildRateMessage(
-  msgToRateFor,
-  ownedAtomUri,
-  theirAtomUri,
-  ownNodeUri,
-  theirNodeUri,
-  theirConnectionUri,
-  rating,
-  socketUri,
-  targetSocketUri
-) {
-  return new Promise(resolve => {
-    const buildMessage = function() {
-      const message = new won.MessageBuilder(vocab.WONMSG.feedbackMessage) //TODO: Looks like a copy-paste-leftover from connect
-        .protocolVersion("1.0")
-        .eventURI(vocab.WONMSG.uriPlaceholder.event)
-        .ownerDirection()
-        .senderSocket(socketUri)
-        .targetSocket(targetSocketUri)
-        .timestamp(new Date().getTime().toString())
-        .addRating(rating, msgToRateFor.connection.uri)
-        .build();
-
-      return message;
-    };
-
-    //fetch all datan needed
-    won
-      .validateEnvelopeDataForConnection(socketUri, targetSocketUri)
-      .then(function() {
-        resolve(buildMessage(msgToRateFor.event));
-      }, won.reportError(
-        "cannot open connection " + msgToRateFor.connection.uri
-      ));
-  });
-}
-
 export function buildCloseMessage(socketUri, targetSocketUri) {
   const buildMessage = function() {
     const message = new won.MessageBuilder(vocab.WONMSG.closeMessage)

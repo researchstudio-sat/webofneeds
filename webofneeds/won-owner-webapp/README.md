@@ -168,7 +168,6 @@ $ngRedux.getState();
                showPetriNetData: true|false // defautl is false, whether or not the petriNetDataPanel is active
                multiSelectType: String // default is undefined, indicates which action is supposed to happen for the multiselect messages
                unread: true|false, //whether or not this connection is new (or already seen if you will)
-               isRated: true|false, //whether or not this connection has been rated yet
                targetAtomUri: string, //corresponding remote Atom identifier
                targetConnectionUri: string, //corresponding remote Connection uri
                state: string, //state of the connection

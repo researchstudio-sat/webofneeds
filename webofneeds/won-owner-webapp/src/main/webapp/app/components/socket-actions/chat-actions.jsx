@@ -111,13 +111,6 @@ export default function WonChatSocketActions({ connection, goBackOnAction }) {
             }
 
             dispatch(
-              actionCreators.connections__rate(
-                connectionUri,
-                vocab.WONCON.binaryRatingGood
-              )
-            );
-
-            dispatch(
               actionCreators.atoms__connectSockets(
                 senderSocketUri,
                 targetSocketUri,

@@ -93,10 +93,7 @@ vocab.WONCON.text = vocab.WONCON.baseUri + "text";
 vocab.WONCON.textCompacted = vocab.WONCON.prefix + ":text";
 vocab.WONCON.tag = vocab.WONCON.baseUri + "tag";
 vocab.WONCON.tagCompacted = vocab.WONCON.prefix + ":tag";
-vocab.WONCON.binaryRatingGood = vocab.WONCON.baseUri + "Good";
-vocab.WONCON.binaryRatingBad = vocab.WONCON.baseUri + "Bad";
 vocab.WONCON.feedback = vocab.WONCON.baseUri + "feedback";
-vocab.WONCON.binaryRating = vocab.WONCON.baseUri + "binaryRating";
 vocab.WONCON.feedbackTarget = vocab.WON.baseUri + "feedbackTarget";
 
 vocab.WONMATCH = {};

@@ -103,28 +103,6 @@ export function markConnectionAsRead(allAtomsInState, connectionUri) {
   return allAtomsInState;
 }
 
-export function markConnectionAsRated(allAtomsInState, connectionUri) {
-  let atom =
-    connectionUri && getAtomByConnectionUri(allAtomsInState, connectionUri);
-  let connection = atomUtils.getConnection(atom, connectionUri);
-
-  if (!connection) {
-    console.error(
-      "No connection with connectionUri: <",
-      connectionUri,
-      "> found within atomUri: <",
-      getUri(atom),
-      ">"
-    );
-    return allAtomsInState;
-  }
-
-  return allAtomsInState.setIn(
-    [getUri(atom), "connections", connectionUri, "isRated"],
-    true
-  );
-}
-
 /**
  * Get the atom for a given connectionUri
  *

@@ -18,7 +18,6 @@ export function messagesReducer(messages = initialState, action = {}) {
       return initialState;
 
     case actionTypes.connections.sendChatMessage:
-    case actionTypes.connections.rate:
     case actionTypes.connections.close:
     case actionTypes.messages.send:
     case actionTypes.atoms.edit:

@@ -79,7 +79,6 @@ const actionHierarchy = {
     connectReactionAtom: cnct.connectionsConnectReactionAtom,
     close: cnct.connectionsClose,
     closeRemote: cnct.connectionsCloseRemote,
-    rate: cnct.connectionsRate,
     sendChatMessage: cnct.connectionsChatMessage,
     sendChatMessageClaimOnSuccess: cnct.connectionsChatMessageClaimOnSuccess,
     sendChatMessageRefreshDataOnSuccess: INJ_DEFAULT, //will be dispatched solely within sendChatMessage (only if chatMessage that is sent contains References)

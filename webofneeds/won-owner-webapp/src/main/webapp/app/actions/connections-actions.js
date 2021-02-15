@@ -12,13 +12,7 @@ import * as useCaseUtils from "../usecase-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
-import {
-  get,
-  getIn,
-  getUri,
-  extractAtomUriBySocketUri,
-  delay,
-} from "../utils.js";
+import { getIn, getUri, extractAtomUriBySocketUri, delay } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -28,7 +22,6 @@ import {
   buildCreateMessage,
   buildCloseMessage,
   buildChatMessage,
-  buildRateMessage,
   buildConnectMessage,
 } from "../won-message-utils.js";
 
@@ -595,54 +588,6 @@ export const connectionsCloseRemote = message =>
         );
       });
   };
-
-export const connectionsRate = (connectionUri, rating) => (
-  dispatch,
-  getState
-) => {
-  const state = getState();
-
-  const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(
-    state
-  );
-  const connection = atomUtils.getConnection(ownedAtom, connectionUri);
-
-  const theirAtomUri = connectionUtils.getTargetAtomUri(connection);
-  const theirConnectionUri = connectionUtils.getTargetConnectionUri(connection);
-  const theirAtom = generalSelectors.getAtom(theirAtomUri)(state);
-
-  won
-    .fetchConnection(connectionUri, {
-      requesterWebId: getUri(ownedAtom),
-    })
-    .then(connection => {
-      let msgToRateFor = {
-        connection: connection,
-      };
-
-      return buildRateMessage(
-        msgToRateFor,
-        getUri(ownedAtom),
-        theirAtomUri,
-        get(ownedAtom, "nodeUri"),
-        get(theirAtom, "nodeUri"),
-        theirConnectionUri,
-        rating
-      );
-    })
-    .then(message => ownerApi.sendMessage(message))
-    .then(jsonResp =>
-      dispatch({
-        type: actionTypes.connections.rate,
-        payload: {
-          connectionUri: connectionUri,
-          rating: rating,
-          eventUri: jsonResp.messageUri,
-          message: jsonResp.message,
-        },
-      })
-    );
-};
 
 /**
  * @param connectionUri

@@ -41,7 +41,6 @@ import {
   changeConnectionState,
   changeConnectionStateByFun,
   getAtomByConnectionUri,
-  markConnectionAsRated,
   markConnectionAsRead,
   setMultiSelectType,
   setShowAgreementData,
@@ -256,7 +255,6 @@ export default function(allAtomsInState = initialState, action = {}) {
           petriNetData: Immutable.Map(),
           creationDate: undefined,
           lastUpdateDate: undefined,
-          isRated: false,
           showAgreementData: false,
           showPetriNetData: false,
           multiSelectType: undefined,
@@ -632,11 +630,6 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.connections.markAsRead:
       return markConnectionAsRead(
-        allAtomsInState,
-        action.payload.connectionUri
-      );
-    case actionTypes.connections.rate:
-      return markConnectionAsRated(
         allAtomsInState,
         action.payload.connectionUri
       );

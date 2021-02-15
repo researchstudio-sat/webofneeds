@@ -15,7 +15,6 @@ import {
 import * as processUtils from "../redux/utils/process-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import won from "../won-es6.js";
-import vocab from "../service/vocab.js";
 
 import "~/style/_atom-messages.scss";
 import "~/style/_rdflink.scss";
@@ -322,13 +321,6 @@ export default function WonActivityMessages({
 
   function sendRequest(message) {
     dispatch(
-      actionCreators.connections__rate(
-        connectionUri,
-        vocab.WONCON.binaryRatingGood
-      )
-    );
-
-    dispatch(
       actionCreators.atoms__connectSockets(
         get(connection, "socketUri"),
         get(connection, "targetSocketUri"),
@@ -342,15 +334,7 @@ export default function WonActivityMessages({
     );
   }
 
-  function closeConnection(rateBad = false) {
-    if (rateBad) {
-      dispatch(
-        actionCreators.connections__rate(
-          connectionUri,
-          vocab.WONCON.binaryRatingBad
-        )
-      );
-    }
+  function closeConnection() {
     dispatch(actionCreators.connections__close(connectionUri));
     if (backToChats) {
       history.replace(
@@ -998,7 +982,7 @@ export default function WonActivityMessages({
             <WonLabelledHr className="am__footer__labelledhr" label="Or" />
             <button
               className="am__footer__button won-button--filled black"
-              onClick={() => closeConnection()}
+              onClick={closeConnection}
             >
               Decline
             </button>
@@ -1019,7 +1003,7 @@ export default function WonActivityMessages({
             <WonLabelledHr className="am__footer__labelledhr" label="Or" />
             <button
               className="am__footer__button won-button--filled black"
-              onClick={() => closeConnection(true)}
+              onClick={closeConnection}
             >
               Bad match - remove!
             </button>

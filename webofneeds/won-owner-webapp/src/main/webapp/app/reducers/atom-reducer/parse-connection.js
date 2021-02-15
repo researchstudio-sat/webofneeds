@@ -35,7 +35,6 @@ export function parseConnection(jsonldConnection) {
       creationDate: undefined,
       lastUpdateDate: undefined,
       unread: undefined,
-      isRated: false,
       showAgreementData: false,
       showPetriNetData: false,
       multiSelectType: undefined,
