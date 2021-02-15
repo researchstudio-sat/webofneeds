@@ -16,6 +16,7 @@ import org.apache.jena.shacl.lib.ShLib;
 import org.apache.jena.shacl.parser.Shape;
 import org.apache.jena.shacl.validation.VLib;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -161,7 +162,15 @@ public class AuthShapeTest {
         });
     }
 
+    /**
+     * This test demonstrates a minimal case for which the SHACL parser warns about
+     * a cycle. This happens when a shape is a normal target (e.g. through
+     * sh:targetClass) and explicitly referenced through sh:node.
+     *
+     * @throws IOException
+     */
     @Test
+    @Ignore
     public void testCycles() throws IOException {
         Shapes shapes = loadShapes(loader.getResource("classpath:/won/exp/cycletest.ttl"));
     }

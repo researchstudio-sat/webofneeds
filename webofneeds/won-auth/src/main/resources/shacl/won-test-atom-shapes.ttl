@@ -39,50 +39,44 @@ won:atomShape
 won:messageContainerShape
     a           sh:NodeShape ;
     sh:property [ sh:path     rdfs:member ;
-                  sh:nodeKind sh:IRI ;
-                  sh:node     won:messageShape ] .
+                  sh:nodeKind sh:IRI ] .
 
 won:socketShape
-    a           sh:NodeShape ;
-    sh:property [ sh:path     won:socketDefinition ;
-                  sh:nodeKind sh:IRI ;
-                  sh:minCount 1 ;
-                  sh:maxCount 1 ] ;
-    sh:property [ sh:path     won:connections ;
-                  sh:node     won:connectionContainerShape ;
-                  sh:maxCount 1 ; ] .
+    a                  sh:NodeShape ;
+    sh:targetObjectsOf won:socket, won:targetSocket ;
+    sh:property        [ sh:path     won:socketDefinition ;
+                         sh:nodeKind sh:IRI ;
+                         sh:minCount 1 ;
+                         sh:maxCount 1 ] ;
+    sh:property        [ sh:path     won:connections ;
+                         sh:node     won:connectionContainerShape ;
+                         sh:maxCount 1 ; ] .
 
 won:connectionContainerShape
     a           sh:NodeShape ;
-    sh:property [ sh:path rdfs:member ;
-                  sh:node won:connectionShape ] .
+    sh:property [ sh:path  rdfs:member ;
+                  sh:class won:Connection ] .
 
 won:connectionShape
     a              sh:NodeShape ;
     sh:targetClass won:Connection ;
     sh:property    [ sh:path     won:connectionState ;
-                     sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
                      sh:minCount 1 ;
                      sh:in       ( won:Suggested won:RequestSent won:RequestReceived won:Connected
                                    won:Closed ) ] ;
     sh:property    [ sh:path     won:targetAtom ;
                      sh:maxCount 1 ;
-                     sh:node     won:atomShape ] ;
+                     sh:class    won:Atom ] ;
     sh:property    [ sh:path     won:targetConnection ;
-                     sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
-                     sh:node     won:connectionShape ] ;
+                     sh:class    won:Connection ] ;
     sh:property    [ sh:path     won:targetSocket ;
-                     sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
                      sh:node     won:socketShape ] ;
     sh:property    [ sh:path     won:atom ;
-                     sh:nodeKind sh:IRI ;
-                     sh:maxCount 1 ;
-                     sh:node     won:atomShape ] ;
+                     sh:maxCount 1 ; ] ;
     sh:property    [ sh:path     won:socket ;
-                     sh:nodeKind sh:IRI ;
                      sh:maxCount 1 ;
                      sh:minCount 1 ;
                      sh:node     won:socketShape ] ;
