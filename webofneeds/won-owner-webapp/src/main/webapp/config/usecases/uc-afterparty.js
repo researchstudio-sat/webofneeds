@@ -37,7 +37,7 @@ export const afterpartyPlan = {
     ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["afterpartyInterest"],
+        useCaseIdentifiers: ["afterpartyInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["afterpartyPlan"],

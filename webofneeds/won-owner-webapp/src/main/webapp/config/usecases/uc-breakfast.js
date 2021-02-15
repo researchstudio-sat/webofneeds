@@ -37,7 +37,7 @@ export const breakfastPlan = {
     ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["breakfastInterest"],
+        useCaseIdentifiers: ["breakfastInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["breakfastPlan"],

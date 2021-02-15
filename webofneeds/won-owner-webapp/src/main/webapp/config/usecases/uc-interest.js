@@ -36,7 +36,7 @@ export const genericPlan = {
     ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["genericInterest"],
+        useCaseIdentifiers: ["genericInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["genericPlan"],

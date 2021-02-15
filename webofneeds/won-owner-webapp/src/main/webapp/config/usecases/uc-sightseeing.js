@@ -37,7 +37,7 @@ export const sightseeingPlan = {
     ...defaultReactions,
     [vocab.GROUP.GroupSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["sightseeingInterest"],
+        useCaseIdentifiers: ["sightseeingInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["sightseeingPlan"],
