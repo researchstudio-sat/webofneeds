@@ -2,6 +2,7 @@
 @import "button";
 @import "icon";
 @import "positioning-utils";
+@import "square-image";
 
 won-topnav {
   border-bottom: $thinBorderWidth solid $won-line-gray;
@@ -41,6 +42,8 @@ won-topnav {
       grid-area: nav_logo;
       margin-right: 0.5rem;
       position: relative;
+
+      @include square-image($bigiconSize);
 
       &__image {
         @include fixed-square($bigiconSize);

@@ -17,6 +17,7 @@ import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import { Link, useHistory } from "react-router-dom";
+import WonAtomIcon from "~/app/components/atom-icon";
 
 export default function WonTopnav({ pageTitle }) {
   const history = useHistory();
@@ -49,6 +50,11 @@ export default function WonTopnav({ pageTitle }) {
       !!generalSelectors
         .getOwnedPinnedAtomsUnreads(state)
         .find(unread => unread)
+  );
+
+  const pinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
+  const pinnedAtom = useSelector(
+    generalSelectors.getActivePinnedAtom(pinnedAtomUri)
   );
 
   useEffect(
@@ -142,12 +148,20 @@ export default function WonTopnav({ pageTitle }) {
             onClick={goDefault}
             alt="logo"
           />
-          <img
-            src={"skin/" + themeName + "/images/logo.svg"}
-            className="topnav__logo__image show-in-responsive"
-            onClick={menuAction}
-            alt="logo"
-          />
+          {pinnedAtom ? (
+            <WonAtomIcon
+              atom={pinnedAtom}
+              className="show-in-responsive"
+              onClick={menuAction}
+            />
+          ) : (
+            <img
+              src={"skin/" + themeName + "/images/logo.svg"}
+              className="topnav__logo__image show-in-responsive"
+              onClick={menuAction}
+              alt="logo"
+            />
+          )}
           {hasUnreads &&
             !isMenuVisible && (
               <span className="topnav__logo__unreads show-in-responsive" />
