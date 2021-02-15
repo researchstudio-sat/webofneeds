@@ -568,8 +568,11 @@ vocab.tagViewSockets = {
 /* This constant is to prevent connections to non owned atoms for specific sockets */
 vocab.refuseAddToNonOwned = {
   [vocab.HOLD.HoldableSocketCompacted]: true,
+  [vocab.HOLD.HolderSocketCompacted]: true,
   [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: true,
   [vocab.WXPERSONA.InterestOfSocketCompacted]: true,
+  [vocab.WXPERSONA.ExpertiseSocketCompacted]: true,
+  [vocab.WXPERSONA.InterestSocketCompacted]: true,
 };
 
 export default vocab;
