@@ -29,7 +29,7 @@ export const consortiumOffer = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["consortiumSearch"],
+        useCaseIdentifiers: ["consortiumSearch", "persona"],
         refuseOwned: true,
       },
     },

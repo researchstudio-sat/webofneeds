@@ -32,7 +32,7 @@ export const phdSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["phdOffer"],
+        useCaseIdentifiers: ["phdOffer", "persona"],
         refuseOwned: true,
       },
     },
@@ -40,7 +40,6 @@ export const phdSearch = {
   details: {
     title: { ...details.title },
     description: { ...details.description },
-    person: { ...details.person },
     skills: { ...skillsDetail, placeholder: "" }, // TODO: find good placeholders
     interests: { ...interestsDetail, placeholder: "" },
   },

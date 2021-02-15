@@ -1,4 +1,3 @@
-import * as personDetails from "./details/person.js";
 import * as locationDetails from "./details/location.js";
 import * as timeDetails from "./details/datetime.js";
 import * as fileDetails from "./details/files.js";
@@ -258,8 +257,6 @@ export const details = {
 
   location: locationDetails.location,
   travelAction: locationDetails.travelAction,
-
-  person: personDetails.person,
 
   files: fileDetails.files,
   images: fileDetails.images,

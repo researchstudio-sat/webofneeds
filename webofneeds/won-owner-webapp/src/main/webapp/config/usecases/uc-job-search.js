@@ -43,7 +43,7 @@ export const jobSearch = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.CHAT.ChatSocketCompacted]: {
-        useCaseIdentifiers: ["jobOffer"],
+        useCaseIdentifiers: ["jobOffer", "persona"],
         refuseOwned: true,
       },
     },
@@ -51,8 +51,6 @@ export const jobSearch = {
   details: {
     title: { ...details.title },
     description: { ...details.description },
-    // location: { ...details.location }, // why would your current location of residency matter?
-    // person: { ...details.person }, // has current company fields, that are weird for a search
     skills: { ...skillsDetail },
     interests: { ...interestsDetail },
   },
