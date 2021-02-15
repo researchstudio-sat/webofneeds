@@ -4,13 +4,13 @@
 
 .ti {
   border-radius: 0.5rem;
-  background: $won-secondary-color;
-  color: $won-secondary-text-color;
+  background: $won-light-gray;
+  color: $won-primary-text-color;
   margin: 0.25rem 0.25rem 0.25rem 0;
   padding: 0.25rem 0.5rem;
 
   &.status--closed {
-    background: $won-light-gray;
+    background: $won-lighter-gray;
     color: $won-primary-text-color;
 
     .headerElement {
@@ -60,7 +60,7 @@
   }
 
   won-atom-context-layout > .cl__trigger {
-    --local-primary: #{$won-secondary-text-color};
+    --local-primary: #{$won-primary-text-color};
     padding: 0;
   }
 
