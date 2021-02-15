@@ -50,6 +50,10 @@ export function getSeeks(atom) {
   return get(atom, "seeks");
 }
 
+export function getAuth(atom) {
+  return get(atom, "auth");
+}
+
 export function isPinnedAtom(atom) {
   return isOrganization(atom) || isPersona(atom);
 }

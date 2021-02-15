@@ -201,6 +201,18 @@ export default function WonAtomMenu({
       >
         <span className="atom-menu__item__label">RDF</span>
       </div>
+    ) &&
+    buttons.push(
+      <div
+        key="acl"
+        className={generateAtomItemCssClasses(visibleTab === "ACL")}
+        onClick={() => {
+          setVisibleTab("ACL");
+          toggleAddPicker(false);
+        }}
+      >
+        <span className="atom-menu__item__label">ACL</span>
+      </div>
     );
 
   return (

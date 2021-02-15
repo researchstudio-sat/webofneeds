@@ -26,6 +26,7 @@ import WonAtomContentGeneral from "./atom-content/atom-content-general.jsx";
 import WonSocketAddButton from "./socket-add-button.jsx";
 import WonAtomConnectionsIndicator from "./atom-connections-indicator.jsx";
 import WonAtomContentDetails from "./atom-content/atom-content-details.jsx";
+import WonAtomContentAuth from "./atom-content/atom-content-auth.jsx";
 import WonBuddyItem from "./socket-items/buddy-item.jsx";
 import WonParticipantItem from "./socket-items/participant-item.jsx";
 import WonHeldItem from "./socket-items/held-item.jsx";
@@ -375,6 +376,9 @@ export default function WonAtomContent({
             )}
           </div>
         );
+        break;
+      case "ACL":
+        visibleTabFragment = <WonAtomContentAuth atom={atom} />;
         break;
 
       default: {
