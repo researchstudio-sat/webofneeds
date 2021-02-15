@@ -106,6 +106,13 @@ rdfs:labels
                access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."""@en ;
     rdfs:label   "ScopeReadHeldAtoms" .
 
+:ScopeReadHolderAtom
+    a            owl:NamedIndividual, auth:TokenScope ;
+    rdfs:comment """Tokens with this scope, provide read/connect
+               access to the holder of an atom (see https://w3id.org/won/ext/hold#HolderSocket)."""@en ;
+    rdfs:label   "ScopeReadHolderAtom" .
+
+
 ###  https://w3id.org/won/ext/hold#HoldableSocket
 
 :HoldableSocket
@@ -117,7 +124,7 @@ rdfs:labels
     rdfs:comment
                                    "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
     rdfs:label                     "HoldableSocket" ;
-    auth:localAuth                 :grantReadViaHolderAuth .
+    auth:localAuth                 :grantReadViaHolderAuth, :grantAccessToHolder .
 
 :grantReadViaHolderAuth
     a           auth:Authorization ;
@@ -128,6 +135,15 @@ rdfs:labels
     auth:grant  [ auth:graph [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
                                auth:operation auth:opRead ] ] .
 
+:grantAccessToHolder
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:connection [ auth:connectionState won:Connected, won:RequestSent ;
+                                                   auth:targetAtom      [ ] ] ] ] ;
+    auth:grant   [ auth:socket    [ auth:socketType  :HoldableSocket ;
+                                    auth:connections [ auth:operation          auth:opRead ;
+                                                       auth:connectionMessages [ auth:inherit false ] ] ] ;
+                   auth:operation [ auth:requestToken [ auth:tokenScope   :ScopeReadHolderAtom ;
+                                                        auth:expiresAfter 3600 ; ] ] ] .
 
 ###  https://w3id.org/won/ext/hold#HolderSocket
 
@@ -138,8 +154,17 @@ rdfs:labels
     won:autoOpen                   "false"^^xsd:boolean ;
     rdfs:comment
                                    "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en ;
-    rdfs:label                     "HolderSocket" .
+    rdfs:label                     "HolderSocket" ;
+    auth:localAuth                 :grantReadViaHeldAuth .
 
+:grantReadViaHeldAuth
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope :ScopeReadHolderAtom ;
+                  auth:issuer     [ auth:socket [ auth:socketType :HolderSocket ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                               auth:operation auth:opRead ] ] .
 
 #################################################################
 #    Annotations

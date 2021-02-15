@@ -23,7 +23,7 @@ ex:expectedResult
 
 <#authorization>
     a           auth:Authorization ;
-    auth:bearer [ auth:tokenScope "readHeldAtoms" ;
+    auth:bearer [ auth:tokenScope wx-hold:ScopeReadHeldAtoms ;
                   auth:issuer     [ auth:socket [ auth:socketType wx-hold:HoldableSocket ;
                                                   auth:connection [ auth:targetAtom      [ ] ;
                                                                     auth:connectionState won:Connected ] ] ] ] ;
@@ -32,14 +32,13 @@ ex:expectedResult
 <#request>
     a                auth:OperationRequest ;
     auth:operation   auth:opRead ;
-    auth:requestor   ex:atom2 ;
     auth:reqAtom     ex:atom3 ;
     auth:reqPosition auth:positionAtomGraph ;
     auth:bearsToken  ex:token1 .
 
 ex:token1
     a               auth:AuthToken ;
-    auth:tokenScope "readHeldAtoms" ;
+    auth:tokenScope wx-hold:ScopeReadHeldAtoms ;
     auth:tokenIss   ex:atom1 ;
     auth:tokenSub   ex:atom2 ;
     auth:tokenSig   ex:node ;
