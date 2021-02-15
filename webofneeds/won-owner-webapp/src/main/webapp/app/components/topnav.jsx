@@ -38,6 +38,11 @@ export default function WonTopnav({ pageTitle }) {
   const connectionsToCrawl = useSelector(
     generalSelectors.getConnectionsToCrawl
   );
+
+  const connectionContainersToCrawl = useSelector(
+    generalSelectors.getConnectionContainersToCrawl
+  );
+
   const hasUnreads = useSelector(
     state =>
       generalSelectors.hasUnassignedUnpinnedAtomUnreads(state) ||
@@ -46,28 +51,50 @@ export default function WonTopnav({ pageTitle }) {
         .find(unread => unread)
   );
 
-  useEffect(() => {
-    const MESSAGECOUNT = 3;
+  useEffect(
+    () => {
+      const MESSAGECOUNT = 3;
 
-    if (connectionsToCrawl && connectionsToCrawl.size > 0) {
+      if (connectionsToCrawl && connectionsToCrawl.size > 0) {
+        console.debug(
+          "connectionsToCrawl: ",
+          connectionsToCrawl,
+          " Size: ",
+          connectionsToCrawl.size
+        );
+        connectionsToCrawl
+          .filter(conn => connectionUtils.getMessagesSize(conn) === 0)
+          .map(conn => {
+            dispatch(
+              actionCreators.connections__showLatestMessages(
+                getUri(conn),
+                MESSAGECOUNT
+              )
+            );
+          });
+      }
+    },
+    [connectionsToCrawl]
+  );
+
+  useEffect(
+    () => {
       console.debug(
-        "connectionsToCrawl: ",
-        connectionsToCrawl,
-        " Size: ",
-        connectionsToCrawl.size
+        "connectionContainersToCrawl: ",
+        connectionContainersToCrawl ? connectionContainersToCrawl.toJS() : {}
       );
-      connectionsToCrawl
-        .filter(conn => connectionUtils.getMessagesSize(conn) === 0)
-        .map(conn => {
+
+      if (connectionContainersToCrawl && connectionContainersToCrawl.size > 0) {
+        connectionContainersToCrawl.map((connectionContainerState, atomUri) => {
+          console.debug("connectionContainerState: ", connectionContainerState);
           dispatch(
-            actionCreators.connections__showLatestMessages(
-              getUri(conn),
-              MESSAGECOUNT
-            )
+            actionCreators.atoms__fetchUnloadedConnectionsContainer(atomUri)
           );
         });
-    }
-  });
+      }
+    },
+    [connectionContainersToCrawl]
+  );
 
   function toggleSlideIns() {
     hideMenu();

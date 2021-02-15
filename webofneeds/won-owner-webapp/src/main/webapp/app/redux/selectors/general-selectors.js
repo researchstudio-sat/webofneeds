@@ -491,14 +491,105 @@ export const getConnectionsToCrawl = createSelector(
       : Immutable.Map()
 );
 
-// TODO: MAKE A PRIORITY LIST OF CONNECTION CONTAINERS TO CRAWL AND FETCH
-// export const getConnectionContainersToCrawl = createSelector(
-//   getProcessState,
-//   getActivePinnedAtom,
-//   getOwnedPinnedAtoms,
-//   getOwnedAtoms,
-//   getAtoms,
-//   (processState, activePinnedAtom, ownedPinnedAtoms, ownedAtoms, atoms) => {
-//     processUtils.isConnectionContainerToLoad(processState, getUri(activePinnedAtom))
-//   }
-// );
+/**
+ * Get a prioritized List of ConnectionContainers To Crawl
+ * The priority is as follows (ignore Atoms that aren't loaded yet):
+ *  1. Connection Container of activePinnedAtom
+ *  2. Connection Containers of pinnedAtoms
+ *  3. Connection Containers of ownedAtoms
+ *  4. Connection Containers of otherAtoms
+ *
+ */
+export const getConnectionContainersToCrawl = createSelector(
+  getProcessState,
+  getViewState,
+  getOwnedPinnedAtoms,
+  getOwnedAtoms,
+  getAtoms,
+  (processState, viewState, ownedPinnedAtoms, ownedAtoms, atoms) => {
+    const activePinnedAtomUri = viewUtils.getActivePinnedAtomUri(viewState);
+
+    if (
+      !processUtils.isAtomToLoad(processState, activePinnedAtomUri) &&
+      processUtils.isConnectionContainerToLoad(
+        processState,
+        activePinnedAtomUri
+      )
+    ) {
+      console.debug("Fetch connectionContainer of activePinnedAtom");
+      return (
+        ownedPinnedAtoms &&
+        ownedPinnedAtoms
+          .filter(atom => getUri(atom) === activePinnedAtomUri)
+          .filter(
+            atom => !processUtils.isAtomToLoad(processState, getUri(atom))
+          )
+          .map(atom =>
+            processUtils.getConnectionContainerStatus(
+              processState,
+              getUri(atom)
+            )
+          )
+      );
+    }
+
+    const ownedPinnedAtomsConnectionContainersToCrawl =
+      ownedPinnedAtoms &&
+      ownedPinnedAtoms
+        .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
+        .filter(atom =>
+          processUtils.isConnectionContainerToLoad(processState, getUri(atom))
+        )
+        .map(atom =>
+          processUtils.getConnectionContainerStatus(processState, getUri(atom))
+        );
+
+    if (
+      ownedPinnedAtomsConnectionContainersToCrawl &&
+      ownedPinnedAtomsConnectionContainersToCrawl.size > 0
+    ) {
+      console.debug("Fetch connectionContainers of ownedPinnedAtoms");
+      return ownedPinnedAtomsConnectionContainersToCrawl;
+    }
+
+    const ownedAtomsConnectionContainersToCrawl =
+      ownedAtoms &&
+      ownedAtoms
+        .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
+        .filter(atom =>
+          processUtils.isConnectionContainerToLoad(processState, getUri(atom))
+        )
+        .map(atom =>
+          processUtils.getConnectionContainerStatus(processState, getUri(atom))
+        );
+
+    if (
+      ownedAtomsConnectionContainersToCrawl &&
+      ownedAtomsConnectionContainersToCrawl.size > 0
+    ) {
+      console.debug("Fetch connectionContainers of ownedAtoms");
+      return ownedAtomsConnectionContainersToCrawl;
+    }
+
+    const atomsConnectionContainersToCrawl =
+      atoms &&
+      atoms
+        .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
+        .filter(atom =>
+          processUtils.isConnectionContainerToLoad(processState, getUri(atom))
+        )
+        .map(atom =>
+          processUtils.getConnectionContainerStatus(processState, getUri(atom))
+        );
+
+    if (
+      atomsConnectionContainersToCrawl &&
+      atomsConnectionContainersToCrawl.size > 0
+    ) {
+      console.debug("Fetch connectionContainers of atoms");
+      return atomsConnectionContainersToCrawl;
+    }
+
+    return undefined;
+  }
+);

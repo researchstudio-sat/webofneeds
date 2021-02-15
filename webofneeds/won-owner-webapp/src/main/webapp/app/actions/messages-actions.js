@@ -160,7 +160,10 @@ export function successfulCreate(event) {
         } else {
           dispatch({
             type: actionTypes.atoms.storeUriFailed,
-            payload: Immutable.fromJS({ uri: atomUri, status: error }),
+            payload: Immutable.fromJS({
+              uri: atomUri,
+              status: { code: error.status, message: error.message },
+            }),
           });
         }
       });

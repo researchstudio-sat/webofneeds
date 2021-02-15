@@ -48,7 +48,10 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
     .catch(error => {
       dispatch({
         type: actionTypes.connections.storeUriFailed,
-        payload: Immutable.fromJS({ uri: connUri, status: error }),
+        payload: Immutable.fromJS({
+          uri: connUri,
+          status: { code: error.status, message: error.message },
+        }),
       });
     });
 }
@@ -104,6 +107,50 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
       );
     });
 }
+
+export const determineRequesterWebId = (state, atomUri, isOwned) => {
+  console.debug("## Determine requesterWebId for", atomUri);
+  if (isOwned) {
+    console.debug(
+      "## atom is owned, using atomUri as requesterWebId:",
+      atomUri
+    );
+    return atomUri;
+  }
+
+  const allOwnedConnections = generalSelectors.getOwnedConnections(state);
+  const filteredConnections = allOwnedConnections.filter(
+    conn => connectionUtils.getTargetAtomUri(conn) === atomUri
+  );
+
+  let requesterWebId = atomUri;
+
+  if (filteredConnections.size > 0) {
+    requesterWebId = extractAtomUriFromConnectionUri(
+      getUri(filteredConnections.first())
+    );
+
+    if (filteredConnections.size > 1) {
+      console.debug(
+        "## more than one connection found for this non owned Atom, using first one as requesterWebId: ",
+        requesterWebId,
+        filteredConnections
+      );
+    } else {
+      console.debug(
+        "## one connection found for this non owned Atom, using first one as requesterWebId: ",
+        requesterWebId
+      );
+    }
+
+    return requesterWebId;
+  } else {
+    console.debug(
+      "## no connections found for this non owned atom, using nothing as requesterWebId maybe we are lucky..."
+    );
+    return undefined;
+  }
+};
 
 /**
  * Fetches an atom (incl. the persona that holds it), the fetch is omitted if:
@@ -168,51 +215,7 @@ export function fetchAtomAndDispatch(
     payload: Immutable.fromJS({ uri: atomUri }),
   });
 
-  const determineRequesterWebId = (atomUri, isOwned) => {
-    console.debug("## Determine requesterWebId for", atomUri);
-    if (isOwned) {
-      console.debug(
-        "## atom is owned, using atomUri as requesterWebId:",
-        atomUri
-      );
-      return atomUri;
-    }
-
-    const allOwnedConnections = generalSelectors.getOwnedConnections(state);
-    const filteredConnections = allOwnedConnections.filter(
-      conn => connectionUtils.getTargetAtomUri(conn) === atomUri
-    );
-
-    let requesterWebId = atomUri;
-
-    if (filteredConnections.size > 0) {
-      requesterWebId = extractAtomUriFromConnectionUri(
-        getUri(filteredConnections.first())
-      );
-
-      if (filteredConnections.size > 1) {
-        console.debug(
-          "## more than one connection found for this non owned Atom, using first one as requesterWebId: ",
-          requesterWebId,
-          filteredConnections
-        );
-      } else {
-        console.debug(
-          "## one connection found for this non owned Atom, using first one as requesterWebId: ",
-          requesterWebId
-        );
-      }
-
-      return requesterWebId;
-    } else {
-      console.debug(
-        "## no connections found for this non owned atom, using nothing as requesterWebId maybe we are lucky..."
-      );
-      return undefined;
-    }
-  };
-
-  const requesterWebId = determineRequesterWebId(atomUri, isOwned);
+  const requesterWebId = determineRequesterWebId(state, atomUri, isOwned);
   //TODO: retrieve tokens
 
   return won
@@ -227,79 +230,6 @@ export function fetchAtomAndDispatch(
       }
       return parsedAtom;
     })
-    .then(parsedAtom => {
-      if (parsedAtom) {
-        //Fetch All MetaConnections Of NonOwnedAtomAndDispatch //TODO: ENHANCE LOADING PROCESS BY LOADING CONNECTIONS ONLY ON POST VIEW
-        if (isOwned) {
-          dispatch({
-            type: actionTypes.atoms.storeConnectionContainerInLoading,
-            payload: Immutable.fromJS({ uri: atomUri }),
-          });
-          fetchConnectionsOfOwnedAtomAndDispatch(
-            atomUri,
-            requesterWebId,
-            dispatch
-          ).catch(error => {
-            if (error.status && error.status === 410) {
-              dispatch({
-                type: actionTypes.atoms.delete,
-                payload: Immutable.fromJS({ uri: atomUri }),
-              });
-            } else {
-              if (error.status && error.status === 403) {
-                console.debug(
-                  "ConnectionContainer/Connection Access denied for atom",
-                  parsedAtom,
-                  "atomUri: ",
-                  atomUri,
-                  "-->",
-                  error
-                );
-              }
-              dispatch({
-                type: actionTypes.atoms.storeConnectionContainerFailed,
-                payload: Immutable.fromJS({ uri: atomUri, status: error }),
-              });
-            }
-          });
-        } else {
-          dispatch({
-            type: actionTypes.atoms.storeConnectionContainerInLoading,
-            payload: Immutable.fromJS({ uri: atomUri }),
-          });
-          // We only fetch the connections for non owned atoms if we have a requesterWebId, if we do not have one we won't fetch by default
-          // since we will probably not get a result anyway (FIXME: change this behaviour once we figure out how to reload connections)
-          fetchConnectionsOfNonOwnedAtomAndDispatch(
-            atomUri,
-            requesterWebId,
-            dispatch
-          ).catch(error => {
-            if (error.status && error.status === 410) {
-              dispatch({
-                type: actionTypes.atoms.delete,
-                payload: Immutable.fromJS({ uri: atomUri }),
-              });
-            } else {
-              if (error.status && error.status === 403) {
-                console.debug(
-                  "ConnectionContainer/Connection Access denied for atom",
-                  parsedAtom,
-                  "atomUri: ",
-                  atomUri,
-                  "-->",
-                  error
-                );
-              }
-              dispatch({
-                type: actionTypes.atoms.storeConnectionContainerFailed,
-                payload: Immutable.fromJS({ uri: atomUri, status: error }),
-              });
-            }
-          });
-        }
-      }
-      return parsedAtom;
-    })
     .catch(error => {
       if (error.status && error.status === 410) {
         dispatch({
@@ -309,7 +239,10 @@ export function fetchAtomAndDispatch(
       } else {
         dispatch({
           type: actionTypes.atoms.storeUriFailed,
-          payload: Immutable.fromJS({ uri: atomUri, status: error }),
+          payload: Immutable.fromJS({
+            uri: atomUri,
+            status: { code: error.status, message: error.message },
+          }),
         });
       }
     });
@@ -463,7 +396,7 @@ export function fetchMessages(
     });
 }
 
-function fetchConnectionsOfOwnedAtomAndDispatch(
+export function fetchConnectionsOfOwnedAtomAndDispatch(
   atomUri,
   requesterWebId,
   dispatch
@@ -503,7 +436,7 @@ function fetchConnectionsOfOwnedAtomAndDispatch(
     );
 }
 
-function fetchConnectionsOfNonOwnedAtomAndDispatch(
+export function fetchConnectionsOfNonOwnedAtomAndDispatch(
   atomUri,
   requesterWebId,
   dispatch

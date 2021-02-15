@@ -137,6 +137,8 @@ const actionHierarchy = {
     failed: INJ_DEFAULT,
     connectSockets: atomActions.connectSockets,
     fetchUnloadedAtom: atomActions.fetchUnloadedAtom,
+    fetchUnloadedConnectionsContainer:
+      atomActions.fetchUnloadedConnectionsContainer,
 
     fetchMetaAtoms: INJ_DEFAULT,
     fetchWhatsNew: fetchWhatsNew,
@@ -158,6 +160,7 @@ const actionHierarchy = {
     storeUriFailed: INJ_DEFAULT,
     removeDeleted: INJ_DEFAULT,
     markAsLoaded: INJ_DEFAULT,
+    markConnectionContainerAsLoaded: INJ_DEFAULT,
   },
   externalData: {
     fetchWikiData: uri => (dispatch, getState) =>

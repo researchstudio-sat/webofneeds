@@ -160,23 +160,27 @@ export function isAtomToLoad(process, atomUri) {
 }
 
 export function isConnectionContainerToLoad(process, atomUri) {
-  return atomUri && getIn(process, ["atoms", atomUri, "toLoad"]);
+  return atomUri && getIn(process, ["connectionContainers", atomUri, "toLoad"]);
 }
 
 export function hasConnectionContainerFailedToLoad(process, atomUri) {
-  return atomUri && getIn(process, ["atoms", atomUri, "failedToLoad"]);
+  return (
+    atomUri && getIn(process, ["connectionContainers", atomUri, "failedToLoad"])
+  );
 }
 
 export function getConnectionContainerStatus(process, atomUri) {
-  return atomUri && getIn(process, ["atoms", atomUri]);
+  return atomUri && getIn(process, ["connectionContainers", atomUri]);
 }
 
 export function isConnectionContainerLoading(process, atomUri) {
-  return atomUri && getIn(process, ["atoms", atomUri, "loading"]);
+  return (
+    atomUri && getIn(process, ["connectionContainers", atomUri, "loading"])
+  );
 }
 
 export function isConnectionContainerLoaded(process, atomUri) {
-  return atomUri && getIn(process, ["atoms", atomUri, "loaded"]);
+  return atomUri && getIn(process, ["connectionContainers", atomUri, "loaded"]);
 }
 
 /**

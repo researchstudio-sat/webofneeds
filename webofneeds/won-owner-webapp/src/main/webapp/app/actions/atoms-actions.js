@@ -23,10 +23,110 @@ import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
 import { getUri, extractAtomUriBySocketUri } from "../utils.js";
 import { ensureLoggedIn } from "./account-actions.js";
+import * as processUtils from "~/app/redux/utils/process-utils";
 
 export function fetchUnloadedAtom(atomUri) {
   return (dispatch, getState) =>
     stateStore.fetchAtomAndDispatch(atomUri, dispatch, getState);
+}
+
+export function fetchUnloadedConnectionsContainer(atomUri) {
+  return (dispatch, getState) => {
+    const state = getState();
+    const processState = generalSelectors.getProcessState(state);
+
+    if (processUtils.isConnectionContainerLoaded(processState, atomUri)) {
+      console.debug(
+        "Omit Fetch of ConnectionContainer<",
+        atomUri,
+        ">, it is already loaded..."
+      );
+      if (processUtils.isConnectionContainerToLoad(processState, atomUri)) {
+        dispatch({
+          type: actionTypes.atoms.markConnectionContainerAsLoaded,
+          payload: Immutable.fromJS({ uri: atomUri }),
+        });
+      }
+      return Promise.resolve();
+    } else if (
+      processUtils.isConnectionContainerLoading(processState, atomUri)
+    ) {
+      console.debug(
+        "Omit Fetch of ConnectionContainer<",
+        atomUri,
+        ">, it is currently loading..."
+      );
+      return Promise.resolve();
+    } else if (processUtils.isProcessingInitialLoad(processState)) {
+      console.debug(
+        "Omit Fetch of ConnectionContainer<",
+        atomUri,
+        ">, initial Load still in progress..."
+      );
+      return Promise.resolve();
+    }
+
+    const isOwned = generalSelectors.isAtomOwned(atomUri)(state);
+    console.debug(
+      "Proceed Fetch of",
+      isOwned ? "Owned" : "",
+      "ConnectionContainer<",
+      atomUri,
+      ">"
+    );
+
+    const requesterWebId = stateStore.determineRequesterWebId(
+      state,
+      atomUri,
+      isOwned
+    );
+
+    //Fetch All MetaConnections Of NonOwnedAtomAndDispatch
+
+    dispatch({
+      type: actionTypes.atoms.storeConnectionContainerInLoading,
+      payload: Immutable.fromJS({ uri: atomUri }),
+    });
+
+    const connectionContainerPromise = isOwned
+      ? stateStore.fetchConnectionsOfOwnedAtomAndDispatch(
+          atomUri,
+          requesterWebId,
+          dispatch
+        )
+      : stateStore.fetchConnectionsOfNonOwnedAtomAndDispatch(
+          atomUri,
+          requesterWebId,
+          dispatch
+        );
+
+    return connectionContainerPromise.catch(error => {
+      if (error.status && error.status === 410) {
+        dispatch({
+          type: actionTypes.atoms.delete,
+          payload: Immutable.fromJS({ uri: atomUri }),
+        });
+      } else {
+        if (error.status && error.status === 403) {
+          console.debug(
+            "ConnectionContainer/Connection Access denied for atom",
+            generalSelectors.getAtom(atomUri)(state),
+            "atomUri: ",
+            atomUri,
+            "-->",
+            error
+          );
+        }
+        dispatch({
+          type: actionTypes.atoms.storeConnectionContainerFailed,
+          payload: Immutable.fromJS({
+            uri: atomUri,
+            status: { code: error.status, message: error.message },
+          }),
+        });
+      }
+    });
+  };
 }
 
 export function connectSockets(
