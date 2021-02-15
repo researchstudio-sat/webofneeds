@@ -110,7 +110,7 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
     });
 }
 
-export const determineRequesterWebId = (state, atomUri, isOwned) => {
+const determineRequesterWebId = (state, atomUri, isOwned) => {
   console.debug("## Determine requesterWebId for", atomUri);
   if (isOwned) {
     console.debug(
@@ -153,6 +153,126 @@ export const determineRequesterWebId = (state, atomUri, isOwned) => {
     return undefined;
   }
 };
+
+export function fetchConnectionsContainerAndDispatch(
+  atomUri,
+  dispatch,
+  getState
+) {
+  const state = getState();
+  const processState = generalSelectors.getProcessState(state);
+
+  if (processUtils.isConnectionContainerLoaded(processState, atomUri)) {
+    console.debug(
+      "Omit Fetch of ConnectionContainer<",
+      atomUri,
+      ">, it is already loaded..."
+    );
+    if (processUtils.isConnectionContainerToLoad(processState, atomUri)) {
+      dispatch({
+        type: actionTypes.atoms.markConnectionContainerAsLoaded,
+        payload: Immutable.fromJS({ uri: atomUri }),
+      });
+    }
+    return Promise.resolve();
+  } else if (processUtils.isConnectionContainerLoading(processState, atomUri)) {
+    console.debug(
+      "Omit Fetch of ConnectionContainer<",
+      atomUri,
+      ">, it is currently loading..."
+    );
+    return Promise.resolve();
+  } else if (processUtils.isProcessingInitialLoad(processState)) {
+    console.debug(
+      "Omit Fetch of ConnectionContainer<",
+      atomUri,
+      ">, initial Load still in progress..."
+    );
+    return Promise.resolve();
+  }
+
+  const isOwned = generalSelectors.isAtomOwned(atomUri)(state);
+  console.debug(
+    "Proceed Fetch of",
+    isOwned ? "Owned" : "",
+    "ConnectionContainer<",
+    atomUri,
+    ">"
+  );
+
+  const requesterWebId = determineRequesterWebId(state, atomUri, isOwned);
+
+  //Fetch All MetaConnections Of NonOwnedAtomAndDispatch
+
+  dispatch({
+    type: actionTypes.atoms.storeConnectionContainerInLoading,
+    payload: Immutable.fromJS({ uri: atomUri }),
+  });
+
+  return won
+    .fetchConnectionUrisWithStateByAtomUri(atomUri, requesterWebId, !isOwned)
+    .then(connectionsWithStateAndSocket => {
+      const connections = isOwned
+        ? connectionsWithStateAndSocket
+        : connectionsWithStateAndSocket.filter(
+            metaConn => metaConn.connectionState === vocab.WON.Connected
+          );
+
+      dispatch({
+        type: actionTypes.connections.storeMetaConnections,
+        payload: Immutable.fromJS({
+          atomUri: atomUri,
+          connections: connections,
+        }),
+      });
+      if (isOwned) {
+        const activeConnectionUris = connections
+          .filter(
+            conn =>
+              conn.connectionState !== vocab.WON.Closed &&
+              conn.connectionState !== vocab.WON.Suggested
+          )
+          .map(conn => conn.uri);
+
+        dispatch({
+          type: actionTypes.connections.storeActiveUrisInLoading,
+          payload: Immutable.fromJS({
+            atomUri: atomUri,
+            connUris: activeConnectionUris,
+          }),
+        });
+        return activeConnectionUris;
+      }
+      return undefined;
+    })
+    .then(
+      activeConnectionUris =>
+        activeConnectionUris &&
+        urisToLookupMap(activeConnectionUris, connUri =>
+          fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
+        )
+    )
+    .catch(error => {
+      if (error.status && error.status === 410) {
+        dispatch({
+          type: actionTypes.atoms.delete,
+          payload: Immutable.fromJS({ uri: atomUri }),
+        });
+      } else {
+        dispatch({
+          type: actionTypes.atoms.storeConnectionContainerFailed,
+          payload: Immutable.fromJS({
+            uri: atomUri,
+            status: {
+              code: error.status,
+              message: error.message,
+              requesterWebId: requesterWebId,
+            },
+          }),
+        });
+      }
+    });
+}
 
 /**
  * Fetches an atom (incl. the persona that holds it), the fetch is omitted if:
@@ -399,68 +519,6 @@ export function fetchMessages(
           });
         }
       }
-    });
-}
-
-export function fetchConnectionsOfOwnedAtomAndDispatch(
-  atomUri,
-  requesterWebId,
-  dispatch
-) {
-  return won
-    .fetchConnectionUrisWithStateByAtomUri(atomUri, requesterWebId)
-    .then(connectionsWithStateAndSocket => {
-      dispatch({
-        type: actionTypes.connections.storeMetaConnections,
-        payload: Immutable.fromJS({
-          atomUri: atomUri,
-          connections: connectionsWithStateAndSocket,
-        }),
-      });
-      const activeConnectionUris = connectionsWithStateAndSocket
-        .filter(
-          conn =>
-            conn.connectionState !== vocab.WON.Closed &&
-            conn.connectionState !== vocab.WON.Suggested
-        )
-        .map(conn => conn.uri);
-
-      dispatch({
-        type: actionTypes.connections.storeActiveUrisInLoading,
-        payload: Immutable.fromJS({
-          atomUri: atomUri,
-          connUris: activeConnectionUris,
-        }),
-      });
-
-      return activeConnectionUris;
-    })
-    .then(activeConnectionUris =>
-      urisToLookupMap(activeConnectionUris, connUri =>
-        fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
-      )
-    );
-}
-
-export function fetchConnectionsOfNonOwnedAtomAndDispatch(
-  atomUri,
-  requesterWebId,
-  dispatch
-) {
-  return won
-    .fetchConnectionUrisWithStateByAtomUri(atomUri, requesterWebId, true)
-    .then(connectionsWithStateAndSocket => {
-      const connectedConnections = connectionsWithStateAndSocket.filter(
-        conn => conn.connectionState === vocab.WON.Connected
-      );
-
-      dispatch({
-        type: actionTypes.connections.storeMetaConnections,
-        payload: Immutable.fromJS({
-          atomUri: atomUri,
-          connections: connectedConnections,
-        }),
-      });
     });
 }
 
