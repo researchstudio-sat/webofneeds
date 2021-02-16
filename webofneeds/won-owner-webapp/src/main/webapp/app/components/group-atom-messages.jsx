@@ -25,6 +25,7 @@ import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
 import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
+import WonChatSocketActions from "~/app/components/socket-actions/chat-actions";
 import { actionCreators } from "../actions/actions.js";
 import * as viewSelectors from "../redux/selectors/view-selectors";
 import { useHistory } from "react-router-dom";
@@ -256,6 +257,12 @@ export default function WonGroupAtomMessages({
     </div>
   );
 
+  const actionElement = (
+    <div className="am__content__actions">
+      <WonChatSocketActions connection={connection} />
+    </div>
+  );
+
   const headerElement = (
     <div className="am__header">
       <div className="am__header__back">
@@ -427,6 +434,7 @@ export default function WonGroupAtomMessages({
         {unreadIndicatorElement}
         {(isConnectionLoading || isProcessingLoadingMessages) &&
           loadSpinnerElement}
+        {!connectionUtils.isConnected(connection) && actionElement}
         {!isSuggested &&
           !isConnectionLoading &&
           !isProcessingLoadingMessages &&
