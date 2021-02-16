@@ -23,7 +23,6 @@ import WonConnectionHeader from "./connection-header.jsx";
 import WonShareDropdown from "./share-dropdown.jsx";
 import WonConnectionContextDropdown from "./connection-context-dropdown.jsx";
 import ChatTextfield from "./chat-textfield.jsx";
-import WonLabelledHr from "./labelled-hr.jsx";
 import WonConnectionMessage from "./messages/connection-message.jsx";
 import WonChatSocketActions from "~/app/components/socket-actions/chat-actions";
 import { actionCreators } from "../actions/actions.js";
@@ -80,6 +79,7 @@ export default function WonGroupAtomMessages({
     connection &&
     processUtils.isConnectionLoadingMessages(processState, connectionUri);
   const isSentRequest = connection && connectionUtils.isRequestSent(connection);
+  const isClosed = connection && connectionUtils.isClosed(connection);
   const isReceivedRequest =
     connection && connectionUtils.isRequestReceived(connection);
 
@@ -169,31 +169,6 @@ export default function WonGroupAtomMessages({
         connectionUri: connectionUri,
       })
     );
-  }
-
-  function closeConnection() {
-    dispatch(actionCreators.connections__close(connectionUri));
-    if (backToChats) {
-      history.replace(
-        generateLink(
-          history.location,
-          {
-            connectionUri: undefined,
-          },
-          "/connections",
-          false
-        )
-      );
-    } else {
-      history.replace(
-        generateLink(
-          history.location,
-          { postUri: extractAtomUriFromConnectionUri(connectionUri) },
-          "/post",
-          false
-        )
-      );
-    }
   }
 
   function ensureMessagesAreLoaded() {
@@ -366,6 +341,10 @@ export default function WonGroupAtomMessages({
         Waiting for the Group Administrator to accept your request.
       </div>
     );
+  } else if (isClosed) {
+    footerElement = (
+      <div className="am__footer">Connection has been closed.</div>
+    );
   } else if (isReceivedRequest) {
     footerElement = (
       <div className="am__footer">
@@ -390,13 +369,6 @@ export default function WonGroupAtomMessages({
             );
           }}
         />
-        <WonLabelledHr className="am__footer__labelledhr" label="Or" />
-        <button
-          className="am__footer__button won-button--filled black"
-          onClick={closeConnection}
-        >
-          Decline
-        </button>
       </div>
     );
   } else if (isSuggested) {
@@ -412,13 +384,6 @@ export default function WonGroupAtomMessages({
           showPersonas={!connection}
           onSubmit={({ value }) => sendRequest(value)}
         />
-        <WonLabelledHr className="am__footer__labelledhr" label="Or" />
-        <button
-          className="am__footer__button won-button--filled black"
-          onClick={closeConnection}
-        >
-          Bad match - remove!
-        </button>
       </div>
     );
   }
