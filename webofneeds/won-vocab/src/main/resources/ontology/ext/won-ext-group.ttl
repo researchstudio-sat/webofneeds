@@ -92,11 +92,12 @@ vann:preferredNamespacePrefix
     won:compatibleSocketDefinition chat:ChatSocket ;
     won:derivesAtomProperty        :groupMember ;
     rdfs:comment                   "Socket for connecting to the Atom as a group member."@en ;
-    rdfs:label                     "GroupSocket" .
+    rdfs:label                     "GroupSocket" ;
+    auth:localAuth                 :grantAccessToGraphAndGroupMemberAuth, :grantReadGroupMemberViaGroupSocketAuth .
 
 :grantAccessToGraphAndGroupMemberAuth
     a            auth:Authorization ;
-    rdfs:label  "grantAccessToGraphAndGroupMemberAuth" ;
+    rdfs:label  "GrantAccessToGraphAndGroupMemberAuth" ;
     auth:grantee [ auth:socket [ auth:socketType :GroupSocket ;
                                  auth:connection [ auth:connectionState won:Connected, won:RequestSent ;
                                                    auth:targetAtom      [ ] ] ] ] ;
@@ -110,7 +111,7 @@ vann:preferredNamespacePrefix
 
 :grantReadGroupMemberViaGroupSocketAuth
     a           auth:Authorization ;
-    rdfs:label  "grantReadGroupMemberViaGroupSocketAuth" ;
+    rdfs:label  "GrantReadGroupMemberViaGroupSocketAuth" ;
     auth:bearer [ auth:tokenScope :GroupSocket ;
                   auth:issuer      [ auth:socket [ auth:socketType :GroupSocket ;
                                                    auth:connection [ auth:targetAtom      [ ] ;
