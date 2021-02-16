@@ -1,0 +1,50 @@
+<https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth>
+    a                                       <https://w3id.org/won/auth#Authorization> ;
+    <https://w3id.org/won/auth#grant>       [ <https://w3id.org/won/auth#graph>     [ <https://w3id.org/won/auth#graphType>
+        <https://w3id.org/won/auth#sysinfoGraph>, <https://w3id.org/won/auth#keyGraph>,
+        <https://w3id.org/won/auth#contentGraph> ;
+                                                                                      <https://w3id.org/won/auth#operation>
+        <https://w3id.org/won/auth#opRead> ] ;
+                                              <https://w3id.org/won/auth#operation>
+                                                                                    [ <https://w3id.org/won/auth#requestToken>
+                                                                                            [ <https://w3id.org/won/auth#expiresAfter>
+                                                                                                    3600 ;
+                                                                                              <https://w3id.org/won/auth#tokenScope>
+                                                                                                    <https://w3id.org/won/ext/group#GroupSocket> ] ] ;
+                                              <https://w3id.org/won/auth#socket>
+                                                                                    [ <https://w3id.org/won/auth#connectionMessages>
+                                                                                            [ <https://w3id.org/won/auth#inherit>
+                                                                                                    false ] ;
+                                                                                      <https://w3id.org/won/auth#operation>
+                                                                                            <https://w3id.org/won/auth#opRead> ;
+                                                                                      <https://w3id.org/won/auth#socketType>
+                                                                                            <https://w3id.org/won/ext/group#GroupSocket> ] ] ;
+    <https://w3id.org/won/auth#grantee>
+                                            [ <https://w3id.org/won/auth#socket>
+                                                    [ <https://w3id.org/won/auth#connection>
+                                                            [ <https://w3id.org/won/auth#connectionState>
+                                                                                                     <https://w3id.org/won/core#RequestSent>,
+                                                                                                     <https://w3id.org/won/core#Connected> ;
+                                                              <https://w3id.org/won/auth#targetAtom> [ ] ] ;
+                                                      <https://w3id.org/won/auth#socketType>
+                                                            <https://w3id.org/won/ext/group#GroupSocket> ] ] ;
+    <https://w3id.org/won/auth#requestedBy> <https://example.com/won/resource/atom/own-atom#socket1> .
+
+<https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth>
+    a                                       <https://w3id.org/won/auth#Authorization> ;
+    <https://w3id.org/won/auth#bearer>
+                                            [ <https://w3id.org/won/auth#issuer>
+                                                    [ <https://w3id.org/won/auth#socket>
+                                                            [ <https://w3id.org/won/auth#connection>
+                                                                    [ <https://w3id.org/won/auth#connectionState>
+                                                                                                             <https://w3id.org/won/core#Connected> ;
+                                                                      <https://w3id.org/won/auth#targetAtom> [ ] ] ;
+                                                              <https://w3id.org/won/auth#socketType>
+                                                                    <https://w3id.org/won/ext/group#GroupSocket> ] ] ;
+                                              <https://w3id.org/won/auth#tokenScope>
+                                                    <https://w3id.org/won/ext/group#GroupSocket> ] ;
+    <https://w3id.org/won/auth#grant>       [ <https://w3id.org/won/auth#graph> [ <https://w3id.org/won/auth#graphType>
+        <https://w3id.org/won/auth#contentGraph> ;
+                                                                                  <https://w3id.org/won/auth#operation>
+        <https://w3id.org/won/auth#opRead> ] ] ;
+    <https://w3id.org/won/auth#requestedBy> <https://example.com/won/resource/atom/own-atom#socket1> .

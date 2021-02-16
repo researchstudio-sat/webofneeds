@@ -486,7 +486,7 @@ auth:authorizationShape
     sh:class             auth:Authorization ;
     sh:closed            true ;
     sh:ignoredProperties ( rdf:type auth:grantee auth:grant auth:grantToken auth:provideAuthInfo
-                           auth:bearer ) ;
+                           auth:bearer rdfs:label rdfs:comment ) ;
     sh:or                ( [ sh:property [ sh:path     auth:grantee ;
                                            sh:minCount 1 ;
                                            sh:node     auth:atomExpressionShape ] ]

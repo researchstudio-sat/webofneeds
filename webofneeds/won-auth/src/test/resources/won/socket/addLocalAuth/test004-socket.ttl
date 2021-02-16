@@ -1,0 +1,94 @@
+<https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth>
+    a                                            <https://w3id.org/won/auth#Authorization>,
+                                                 <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+    <http://www.w3.org/2000/01/rdf-schema#label> "GrantReadGroupMemberViaGroupSocketAuth" ;
+    <https://w3id.org/won/auth#bearer>
+                                                 [ <https://w3id.org/won/auth#issuer>
+                                                         [ <https://w3id.org/won/auth#socket>
+                                                                 [ <https://w3id.org/won/auth#connection>
+                                                                         [ <https://w3id.org/won/auth#connectionState>
+                                                                                                                  <https://w3id.org/won/core#Connected> ;
+                                                                           <https://w3id.org/won/auth#targetAtom>
+                                                                                                                  [ ] ] ;
+                                                                   <https://w3id.org/won/auth#socketType>
+                                                                         <https://w3id.org/won/ext/group#GroupSocket> ] ] ;
+                                                   <https://w3id.org/won/auth#tokenScope>
+                                                         <https://w3id.org/won/ext/group#GroupSocket> ] ;
+    <https://w3id.org/won/auth#grant>
+                                                 [ <https://w3id.org/won/auth#graph>
+                                                         [ <https://w3id.org/won/auth#graphType>
+                                                                 <https://w3id.org/won/auth#contentGraph> ;
+                                                           <https://w3id.org/won/auth#operation>
+                                                                 <https://w3id.org/won/auth#opRead> ] ] .
+
+
+<https://w3id.org/won/ext/group#groupMember>
+    a                                              <http://www.w3.org/2002/07/owl#NamedIndividual>,
+                                                   <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Links a group Atom to one of its group members."@en ;
+    <http://www.w3.org/2000/01/rdf-schema#domain>  <https://w3id.org/won/core#Atom> ;
+    <http://www.w3.org/2000/01/rdf-schema#label>   "groupMember" ;
+    <http://www.w3.org/2000/01/rdf-schema#range>   <https://w3id.org/won/core#Atom> .
+
+
+<https://w3id.org/won/ext/group>
+    a                                                     <http://www.w3.org/2002/07/owl#Ontology> ;
+    <http://purl.org/dc/elements/1.1/abstract>
+                                                          "This ontology contains the definition of the *GroupSocket*, which, when used to establish a connection, puts all connectd Atoms in a group, expressed by the *groupMember* relationship between the Atoms and the Atom representing the group. Moreover, messages are broadcast to all group members."@en ;
+    <http://purl.org/dc/elements/1.1/creator>             "Florian Kleedorfer" ;
+    <http://purl.org/dc/elements/1.1/date>                "2019-04-15"^^<http://www.w3.org/2001/XMLSchema#date> ;
+    <http://purl.org/dc/elements/1.1/title>               "Web of Needs Group Extension" ;
+    <http://purl.org/dc/terms/license>                    <https://creativecommons.org/licenses/by/4.0/> ;
+    <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-group" ;
+    <http://www.w3.org/2002/07/owl#imports>               <https://w3id.org/won/core>, <https://w3id.org/won/ext/chat> ;
+    <http://www.w3.org/2002/07/owl#versionIRI>            <https://w3id.org/won/ext/group/1.0> .
+
+
+<https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth>
+    a                                            <https://w3id.org/won/auth#Authorization>,
+                                                 <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+    <http://www.w3.org/2000/01/rdf-schema#label> "GrantAccessToGraphAndGroupMemberAuth" ;
+    <https://w3id.org/won/auth#grant>
+                                                 [ <https://w3id.org/won/auth#graph>
+                                                                                         [ <https://w3id.org/won/auth#graphType>
+                                                                                                 <https://w3id.org/won/auth#sysinfoGraph>,
+                                                                                                 <https://w3id.org/won/auth#keyGraph>,
+                                                                                                 <https://w3id.org/won/auth#contentGraph> ;
+                                                                                           <https://w3id.org/won/auth#operation>
+                                                                                                 <https://w3id.org/won/auth#opRead> ] ;
+                                                   <https://w3id.org/won/auth#operation>
+                                                                                         [ <https://w3id.org/won/auth#requestToken>
+                                                                                                 [ <https://w3id.org/won/auth#expiresAfter>
+                                                                                                         3600 ;
+                                                                                                   <https://w3id.org/won/auth#tokenScope>
+                                                                                                         <https://w3id.org/won/ext/group#GroupSocket> ] ] ;
+                                                   <https://w3id.org/won/auth#socket>
+                                                                                         [ <https://w3id.org/won/auth#connectionMessages>
+                                                                                                 [ <https://w3id.org/won/auth#inherit>
+                                                                                                         false ] ;
+                                                                                           <https://w3id.org/won/auth#operation>
+                                                                                                 <https://w3id.org/won/auth#opRead> ;
+                                                                                           <https://w3id.org/won/auth#socketType>
+                                                                                                 <https://w3id.org/won/ext/group#GroupSocket> ] ] ;
+    <https://w3id.org/won/auth#grantee>
+                                                 [ <https://w3id.org/won/auth#socket>
+                                                         [ <https://w3id.org/won/auth#connection>
+                                                                 [ <https://w3id.org/won/auth#connectionState>
+                                                                                                          <https://w3id.org/won/core#RequestSent>,
+                                                                                                          <https://w3id.org/won/core#Connected> ;
+                                                                   <https://w3id.org/won/auth#targetAtom> [ ] ] ;
+                                                           <https://w3id.org/won/auth#socketType>
+                                                                 <https://w3id.org/won/ext/group#GroupSocket> ] ] .
+
+
+<https://w3id.org/won/ext/group#GroupSocket>
+    a                                                      <https://w3id.org/won/core#SocketDefinition>,
+                                                           <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+    <http://www.w3.org/2000/01/rdf-schema#comment>         "Socket for connecting to the Atom as a group member."@en ;
+    <http://www.w3.org/2000/01/rdf-schema#label>           "GroupSocket" ;
+    <https://w3id.org/won/auth#localAuth>
+                                                           <https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth>,
+                                                           <https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth> ;
+    <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/chat#ChatSocket> ;
+    <https://w3id.org/won/core#derivesAtomProperty>        <https://w3id.org/won/ext/group#groupMember> .
+
