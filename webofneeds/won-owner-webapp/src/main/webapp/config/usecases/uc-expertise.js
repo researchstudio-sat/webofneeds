@@ -21,7 +21,7 @@ export const genericExpertise = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["wx-persona:Expertise"],
+        type: [vocab.WXPERSONA.ExpertiseCompacted],
         sockets: {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,
           "#expertiseOfSocket": vocab.WXPERSONA.ExpertiseOfSocketCompacted,

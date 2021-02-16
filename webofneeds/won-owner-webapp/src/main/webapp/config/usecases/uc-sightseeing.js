@@ -110,7 +110,7 @@ export const sightseeingInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["wx-persona:Interest"],
+        type: [vocab.WXPERSONA.InterestCompacted],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q1542314",
         sockets: {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,

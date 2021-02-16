@@ -450,7 +450,8 @@ const connectAdHoc = (
 
       if (
         contentTypes.includes("s:PlanAction") ||
-        contentTypes.includes("wx-persona:Interest")
+        contentTypes.includes(vocab.WXPERSONA.InterestCompacted) ||
+        contentTypes.includes(vocab.WXPERSONA.ExpertiseCompacted)
       ) {
         const eventObjectAboutUris = getIn(targetAtom, [
           "content",

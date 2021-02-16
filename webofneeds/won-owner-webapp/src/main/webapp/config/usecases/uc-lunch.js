@@ -108,7 +108,7 @@ export const lunchInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["wx-persona:Interest"],
+        type: [vocab.WXPERSONA.InterestCompacted],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
         sockets: {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,

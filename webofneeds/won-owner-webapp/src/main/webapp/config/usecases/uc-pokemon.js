@@ -54,7 +54,7 @@ export const pokemonInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["wx-persona:Interest"],
+        type: [vocab.WXPERSONA.InterestCompacted],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q20966579",
         sockets: {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,

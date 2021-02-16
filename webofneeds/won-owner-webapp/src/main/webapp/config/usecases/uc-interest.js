@@ -110,7 +110,7 @@ export const genericInterest = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["wx-persona:Interest"],
+        type: [vocab.WXPERSONA.InterestCompacted],
         sockets: {
           "#chatSocket": vocab.CHAT.ChatSocketCompacted,
           "#interestOfSocket": vocab.WXPERSONA.InterestOfSocketCompacted,

@@ -281,6 +281,10 @@ vocab.DEMO.prefix = "demo";
 vocab.WXPERSONA = {};
 vocab.WXPERSONA.baseUri = "https://w3id.org/won/ext/persona#";
 vocab.WXPERSONA.prefix = "wx-persona";
+vocab.WXPERSONA.Interest = vocab.WXPERSONA.baseUri + "Interest";
+vocab.WXPERSONA.InterestCompacted = vocab.WXPERSONA.prefix + ":Interest";
+vocab.WXPERSONA.Expertise = vocab.WXPERSONA.baseUri + "Expertise";
+vocab.WXPERSONA.ExpertiseCompacted = vocab.WXPERSONA.prefix + ":Expertise";
 vocab.WXPERSONA.InterestSocket = vocab.WXPERSONA.baseUri + "InterestSocket";
 vocab.WXPERSONA.InterestSocketCompacted =
   vocab.WXPERSONA.prefix + ":InterestSocket";
