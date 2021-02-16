@@ -193,7 +193,9 @@ export const getAllUnassignedUnpinnedChatConnections = createSelector(
     allOwnedAtoms
       .filter(atomUtils.isActive)
       .filter(atomUtils.hasChatSocket)
-      .flatMap(atomUtils.getAllNonClosedNonSuggestedChatConnections)
+      .flatMap(atom =>
+        atomUtils.getConnections(atom, vocab.CHAT.ChatSocketCompacted)
+      )
       .toOrderedMap()
       .sortBy(conn => {
         const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);

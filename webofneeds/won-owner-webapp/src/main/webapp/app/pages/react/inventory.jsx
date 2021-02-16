@@ -110,7 +110,7 @@ export default function PageInventory() {
             <React.Fragment>
               <div className="ownerinventory__header">
                 <div className="ownerinventory__header__title">
-                  Unassigned Postings
+                  Unassigned Atoms
                   {hasOwnedUnassignedAtomUris && (
                     <span className="ownerinventory__header__title__count">
                       {"(" + unassignedAtomSize + ")"}

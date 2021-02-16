@@ -357,7 +357,7 @@ export default function WonMenu({ className }) {
               to="/inventory"
             >
               <span className="menu__tab__unread" />
-              <span className="menu__tab__label">Inventory</span>
+              <span className="menu__tab__label">Unassigned Atoms</span>
             </NavLink>
             <NavLink
               className={generateTabClasses(

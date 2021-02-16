@@ -737,22 +737,12 @@ export function getConnectedConnections(atomImm, socketType) {
   );
 }
 
-export function getAllNonClosedNonSuggestedChatConnections(atomImm) {
-  const chatSocketUri = getChatSocket(atomImm);
-
-  return getConnections(atomImm).filter(
-    conn =>
-      connectionUtils.hasSocketUri(conn, chatSocketUri) &&
-      !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
-  );
-}
-
 export function getAllNonClosedNonSuggestedPartnerActivityConnections(atomImm) {
-  const partnerActivitySocketUri = getPartnerActivitySocket(atomImm);
-
-  return getConnections(atomImm).filter(
+  return getConnections(
+    atomImm,
+    vocab.VALUEFLOWS.PartnerActivitySocketCompacted
+  ).filter(
     conn =>
-      connectionUtils.hasSocketUri(conn, partnerActivitySocketUri) &&
       !(connectionUtils.isClosed(conn) || connectionUtils.isSuggested(conn))
   );
 }
