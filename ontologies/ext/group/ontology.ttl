@@ -93,6 +93,10 @@
 <https://w3id.org/won/auth#issuer> rdf:type owl:AnnotationProperty .
 
 
+###  https://w3id.org/won/auth#localAuth
+<https://w3id.org/won/auth#localAuth> rdf:type owl:AnnotationProperty .
+
+
 ###  https://w3id.org/won/auth#operation
 <https://w3id.org/won/auth#operation> rdf:type owl:AnnotationProperty .
 
@@ -145,13 +149,15 @@
              <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/chat#ChatSocket> ;
              <https://w3id.org/won/core#derivesAtomProperty> :groupMember ;
              rdfs:comment "Socket for connecting to the Atom as a group member."@en ;
-             rdfs:label "GroupSocket" .
+             rdfs:label "GroupSocket" ;
+             <https://w3id.org/won/auth#localAuth> :grantAccessToGraphAndGroupMemberAuth ,
+                                                   :grantReadGroupMemberViaGroupSocketAuth .
 
 
 ###  https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth
 :grantAccessToGraphAndGroupMemberAuth rdf:type owl:NamedIndividual ,
                                                <https://w3id.org/won/auth#Authorization> ;
-                                      rdfs:label "grantAccessToGraphAndGroupMemberAuth" ;
+                                      rdfs:label "GrantAccessToGraphAndGroupMemberAuth" ;
                                       <https://w3id.org/won/auth#grant> _:genid1 ;
                                       <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> _:genid8
                                                                           ] .
@@ -185,7 +191,7 @@ _:genid9 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#
 ###  https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth
 :grantReadGroupMemberViaGroupSocketAuth rdf:type owl:NamedIndividual ,
                                                  <https://w3id.org/won/auth#Authorization> ;
-                                        rdfs:label "grantReadGroupMemberViaGroupSocketAuth" ;
+                                        rdfs:label "GrantReadGroupMemberViaGroupSocketAuth" ;
                                         <https://w3id.org/won/auth#bearer> _:genid11 ;
                                         <https://w3id.org/won/auth#grant> [ <https://w3id.org/won/auth#graph> _:genid17
                                                                           ] .

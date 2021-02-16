@@ -71,6 +71,9 @@
 # https://w3id.org/won/auth#issuer
 <https://w3id.org/won/auth#issuer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
+# https://w3id.org/won/auth#localAuth
+<https://w3id.org/won/auth#localAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
 # https://w3id.org/won/auth#operation
 <https://w3id.org/won/auth#operation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
@@ -131,11 +134,13 @@
 <https://w3id.org/won/ext/group#GroupSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/group#groupMember> .
 <https://w3id.org/won/ext/group#GroupSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "Socket for connecting to the Atom as a group member."@en .
 <https://w3id.org/won/ext/group#GroupSocket> <http://www.w3.org/2000/01/rdf-schema#label> "GroupSocket" .
+<https://w3id.org/won/ext/group#GroupSocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth> .
+<https://w3id.org/won/ext/group#GroupSocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth> .
 # 
 # https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth
 <https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth> <http://www.w3.org/2000/01/rdf-schema#label> "grantAccessToGraphAndGroupMemberAuth" .
+<https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth> <http://www.w3.org/2000/01/rdf-schema#label> "GrantAccessToGraphAndGroupMemberAuth" .
 <https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth> <https://w3id.org/won/auth#grant> _:genid1 .
 _:genid1 <https://w3id.org/won/auth#graph> _:genid2 .
 _:genid2 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
@@ -162,7 +167,7 @@ _:genid8 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/group#
 # https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth
 <https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth> <http://www.w3.org/2000/01/rdf-schema#label> "grantReadGroupMemberViaGroupSocketAuth" .
+<https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth> <http://www.w3.org/2000/01/rdf-schema#label> "GrantReadGroupMemberViaGroupSocketAuth" .
 <https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth> <https://w3id.org/won/auth#bearer> _:genid11 .
 _:genid11 <https://w3id.org/won/auth#issuer> _:genid12 .
 _:genid12 <https://w3id.org/won/auth#socket> _:genid13 .

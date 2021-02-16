@@ -164,6 +164,13 @@
     
 
 
+    <!-- https://w3id.org/won/auth#localAuth -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#localAuth"/>
+    
+
+
     <!-- https://w3id.org/won/auth#operation -->
 
 
@@ -268,6 +275,8 @@
         <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/group#groupMember"/>
         <rdfs:comment xml:lang="en">Socket for connecting to the Atom as a group member.</rdfs:comment>
         <rdfs:label>GroupSocket</rdfs:label>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth"/>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth"/>
     </owl:NamedIndividual>
     
 
@@ -277,7 +286,7 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
-        <rdfs:label>grantAccessToGraphAndGroupMemberAuth</rdfs:label>
+        <rdfs:label>GrantAccessToGraphAndGroupMemberAuth</rdfs:label>
         <auth:grant rdf:nodeID="genid1"/>
         <auth:grantee>
             <rdf:Description>
@@ -332,7 +341,7 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
-        <rdfs:label>grantReadGroupMemberViaGroupSocketAuth</rdfs:label>
+        <rdfs:label>GrantReadGroupMemberViaGroupSocketAuth</rdfs:label>
         <auth:bearer rdf:nodeID="genid11"/>
         <auth:grant>
             <rdf:Description>

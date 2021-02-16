@@ -175,6 +175,9 @@
   "@id" : "https://w3id.org/won/auth#issuer",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
+  "@id" : "https://w3id.org/won/auth#localAuth",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
   "@id" : "https://w3id.org/won/auth#operation",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
@@ -233,6 +236,11 @@
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "GroupSocket"
   } ],
+  "https://w3id.org/won/auth#localAuth" : [ {
+    "@id" : "https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth"
+  }, {
+    "@id" : "https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth"
+  } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/chat#ChatSocket"
   } ],
@@ -243,7 +251,7 @@
   "@id" : "https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "grantAccessToGraphAndGroupMemberAuth"
+    "@value" : "GrantAccessToGraphAndGroupMemberAuth"
   } ],
   "https://w3id.org/won/auth#grant" : [ {
     "@id" : "_:genid1"
@@ -255,7 +263,7 @@
   "@id" : "https://w3id.org/won/ext/group#grantReadGroupMemberViaGroupSocketAuth",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "grantReadGroupMemberViaGroupSocketAuth"
+    "@value" : "GrantReadGroupMemberViaGroupSocketAuth"
   } ],
   "https://w3id.org/won/auth#bearer" : [ {
     "@id" : "_:genid11"
