@@ -425,6 +425,7 @@ export const fetchJsonLdDataset = (
     headers: {
       // cachePolicy: "network-only",
       Accept: "application/ld+json",
+      Authorization: params.token, //TOKEN in Header Authorization -> "Bearer\\s+([a-zA-Z0-9-._~+/]+=*)"
       Prefer: params.pagingSize
         ? `return=representation; max-member-count="${params.pagingSize}"`
         : undefined,

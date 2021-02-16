@@ -30,9 +30,9 @@ import vocab from "./vocab.js";
    * with a request for the connection-container
    * to get the connection-uris. Thus it's faster.
    */
-  won.fetchAtom = (atomUri, requesterWebId) =>
+  won.fetchAtom = (atomUri, requestCredentials) =>
     ownerApi
-      .fetchJsonLdDataset(atomUri, { requesterWebId: requesterWebId })
+      .fetchJsonLdDataset(atomUri, requestCredentials)
       .then(jsonLdData =>
         Promise.all([
           jsonld.frame(jsonLdData, {
@@ -115,11 +115,11 @@ import vocab from "./vocab.js";
    */
   won.fetchConnectionUrisWithStateByAtomUri = (
     atomUri,
-    requesterWebId,
+    requestCredentials,
     connectedOnly = false
   ) =>
     won
-      .fetchJsonLdNode(atomUri, { requesterWebId: requesterWebId })
+      .fetchJsonLdNode(atomUri, requestCredentials)
       .then(jsonLdAtom => jsonld.expand(jsonLdAtom))
       .then(jsonLdAtom => {
         const jsonLdContentGraph = jsonLdAtom[0];
@@ -130,8 +130,11 @@ import vocab from "./vocab.js";
         won.fetchJsonLdNode(
           connectionContainerUri,
           connectedOnly
-            ? { state: "Connected", requesterWebId: requesterWebId }
-            : { requesterWebId: requesterWebId }
+            ? {
+                state: "Connected",
+                ...requestCredentials,
+              }
+            : requestCredentials
         )
       )
       .then(
@@ -335,7 +338,7 @@ import vocab from "./vocab.js";
    * @param requesterWebId
    * @param scope
    */
-  won.fetchTokenForAtom = (atomUri, requesterWebId, scopes) =>
+  won.fetchTokenForAtom = (atomUri, requesterWebId, scopes) => {
     ownerApi
       .fetchTokenForAtom(atomUri + "/token", {
         requesterWebId: requesterWebId,
@@ -350,6 +353,7 @@ import vocab from "./vocab.js";
         );
         return response;
       });
+  };
 
   /**
    * @param senderSocketUri

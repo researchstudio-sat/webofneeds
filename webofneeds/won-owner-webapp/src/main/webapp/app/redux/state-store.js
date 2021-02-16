@@ -154,6 +154,34 @@ const determineRequesterWebId = (state, atomUri, isOwned) => {
   }
 };
 
+const determineRequesterTokenScopes = (atomUri, getState, requesterWebId) => {
+  console.debug("## Determine requesterTokenScopes for", atomUri);
+  const state = getState();
+  //we have a Connection to an atom, that is connected
+  if (requesterWebId) {
+    const atoms = get(state, "atoms");
+    const atom = atoms && get(atoms, requesterWebId);
+    const acl = atom && get(atom, "acl");
+    //crawl for scopes in acl part
+    console.debug("## ACL part: ", acl);
+    const scopesArray = [];
+    //TODO
+    return scopesArray;
+  }
+  return undefined;
+
+  //REQUEST AuthGraph for atom
+  /*
+  return won.fetchAtom(atomUri, requesterWebId).then(atom => {
+    const parsedAtom = parseAtom(atom);
+    if (parsedAtom && parsedAtom.auth) {
+      const scopes = parsedAtom.auth;
+      return [...scopes];
+    }
+    return undefined;
+  });*/
+};
+
 export function fetchConnectionsContainerAndDispatch(
   atomUri,
   dispatch,
@@ -200,8 +228,22 @@ export function fetchConnectionsContainerAndDispatch(
     ">"
   );
 
+  const requestCredentials = { requesterWebId: undefined, token: undefined };
   const requesterWebId = determineRequesterWebId(state, atomUri, isOwned);
-
+  requestCredentials.requesterWebId = requesterWebId;
+  // TOKEN!
+  const requesterTokenScopes = determineRequesterTokenScopes(
+    atomUri,
+    requesterWebId,
+    state
+  );
+  if (requesterTokenScopes) {
+    requestCredentials.token = won.fetchTokenForAtom(
+      atomUri,
+      requesterWebId,
+      requesterTokenScopes
+    );
+  }
   //Fetch All MetaConnections Of NonOwnedAtomAndDispatch
 
   dispatch({
@@ -210,7 +252,11 @@ export function fetchConnectionsContainerAndDispatch(
   });
 
   return won
-    .fetchConnectionUrisWithStateByAtomUri(atomUri, requesterWebId, !isOwned)
+    .fetchConnectionUrisWithStateByAtomUri(
+      atomUri,
+      requestCredentials,
+      !isOwned
+    )
     .then(connectionsWithStateAndSocket => {
       const connections = isOwned
         ? connectionsWithStateAndSocket
