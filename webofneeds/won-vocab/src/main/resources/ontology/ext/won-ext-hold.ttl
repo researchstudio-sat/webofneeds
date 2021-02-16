@@ -136,9 +136,9 @@ rdfs:labels
     auth:grant  [ auth:graph [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
                                auth:operation auth:opRead ] ] .
 
-:grantAccessToHolder
+:grantAccessToHolderAuth
     a            auth:Authorization ;
-    rdfs:label   "GrantAccessToHolder" ;
+    rdfs:label   "grantAccessToHolderAuth" ;
     auth:grantee [ auth:socket [ auth:connection [ auth:connectionState won:Connected, won:RequestSent ;
                                                    auth:targetAtom      [ ] ] ] ] ;
     auth:grant   [ auth:socket    [ auth:socketType  :HoldableSocket ;

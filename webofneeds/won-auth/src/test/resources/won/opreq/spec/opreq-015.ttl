@@ -1,0 +1,183 @@
+@base             <https://example.com/test/atom1> .
+@prefix ex:       <https://example.com/test/> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix chat:     <https://w3id.org/won/ext/chat#> .
+@prefix wx-group: <https://w3id.org/won/ext/group#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix atom1:    <http://example.org/test/atom1#> .
+@prefix atom2:    <http://example.org/test/atom2#> .
+@prefix atom3:    <http://example.org/test/atom3#> .
+@prefix atom4:    <http://example.org/test/atom4#> .
+@prefix msg:      <https://w3id.org/won/message#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg:     <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+ex:expectedResult1
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request1> .
+
+ex:expectedResult2
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request2> .
+
+
+# Group Members can see each other with GroupSocketToken from Group
+<#authorization>
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope wx-group:GroupSocket ;
+                  auth:issuer      [ auth:socket [ auth:socketType wx-group:GroupSocket ;
+                                                   auth:connection [ auth:targetAtom      [ ] ;
+                                                                     auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph [ auth:graphType auth:contentGraph ;
+                               auth:operation auth:opRead ] ] .
+
+<#request1>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:reqAtom     ex:atom3 ;
+    auth:reqPosition auth:positionAtomGraph ;
+    auth:bearsToken  ex:token1 .
+
+ex:token1
+    a               auth:AuthToken ;
+    auth:tokenScope wx-group:GroupSocket ;
+    auth:tokenIss   ex:atom1 ;
+    auth:tokenSub   ex:atom2 ;
+    auth:tokenSig   ex:node ;
+    auth:tokenIat   "2020-12-03T22:30:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T23:30:00"^^xsd:dateTime .
+
+<#request2>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:reqAtom     ex:atom2 ;
+    auth:reqPosition auth:positionAtomGraph ;
+    auth:bearsToken  ex:token2 .
+
+ex:token2
+    a               auth:AuthToken ;
+    auth:tokenScope wx-group:GroupSocket ;
+    auth:tokenIss   ex:atom1 ;
+    auth:tokenSub   ex:atom3 ;
+    auth:tokenSig   ex:node ;
+    auth:tokenIat   "2020-12-03T22:30:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T23:30:00"^^xsd:dateTime .
+
+# Group 1
+
+ex:atom1
+    a                    won:Atom ;
+    won:socket           atom1:groupSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
+
+
+atom1:groupSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-group:GroupSocket ;
+    won:connections      atom1:groupSocketConnections .
+
+atom1:groupSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom1:conn12, atom1:conn13, atom1:conn14 .
+
+atom1:conn12
+    a                   won:Connection ;
+    won:socket          atom1:groupSocket ;
+    won:targetAtom      ex:atom2 ;
+    won:connectionState won:Connected .
+
+atom1:conn13
+    a                   won:Connection ;
+    won:socket          atom1:groupSocket ;
+    won:targetAtom      ex:atom3 ;
+    won:connectionState won:Connected .
+
+atom1:conn14
+    a                   won:Connection ;
+    won:socket          atom1:groupSocket ;
+    won:targetAtom      ex:atom4 ;
+    won:connectionState won:Closed .
+
+
+
+# Atom 2 - Connected to Group
+
+ex:atom2
+    a                    won:Atom ;
+    won:socket           atom2:groupSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom2:msg ;
+    won:wonNode          ex:node .
+
+atom2:groupSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-group:GroupSocket ;
+    won:connections      atom2:groupSocketConnections .
+
+atom2:groupSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom2:conn21 .
+
+
+atom2:conn21
+    a                   won:Connection ;
+    won:socket          atom2:groupSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+
+# Atom 3 - In Group
+
+ex:atom3
+    a                    won:Atom ;
+    won:socket           atom3:groupSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom3:msg ;
+    won:wonNode          ex:node .
+
+atom3:groupSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-group:GroupSocket ;
+    won:connections      atom3:groupSocketConnections .
+
+
+atom3:groupSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom3:conn31 .
+
+atom3:conn31
+    a                   won:Connection ;
+    won:socket          atom3:groupSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+# Not in Group
+
+ex:atom4
+    a                    won:Atom ;
+    won:socket           atom4:groupSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom4:msg ;
+    won:wonNode          ex:node .
+
+atom4:groupSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-group:GroupSocket .
+
+atom4:chatSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom4:conn41 .
+
+atom4:conn41
+    a                   won:Connection ;
+    won:socket          atom4:groupSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Closed .
+

@@ -30,7 +30,7 @@ ex:expectedResult2
     auth:decision           auth:accessDenied ;
     auth:requestedOperation <#request2> .
 
-# Token for readHolAtom
+# Request Token for readHolderAtom
 
 <#authorization>
     a            auth:Authorization ;
