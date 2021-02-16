@@ -119,7 +119,7 @@ import vocab from "./vocab.js";
     connectedOnly = false
   ) =>
     won
-      .fetchJsonLdNode(atomUri)
+      .fetchJsonLdNode(atomUri, { requesterWebId: requesterWebId })
       .then(jsonLdAtom => jsonld.expand(jsonLdAtom))
       .then(jsonLdAtom => {
         const jsonLdContentGraph = jsonLdAtom[0];
