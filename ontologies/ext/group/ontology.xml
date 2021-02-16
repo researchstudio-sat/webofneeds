@@ -272,12 +272,12 @@
     
 
 
-    <!-- https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMember -->
+    <!-- https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth -->
 
 
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMember">
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
-        <rdfs:label>grantReadGraphAndMembers</rdfs:label>
+        <rdfs:label>grantAccessToGraphAndGroupMemberAuth</rdfs:label>
         <auth:grant rdf:nodeID="genid1"/>
         <auth:grantee>
             <rdf:Description>

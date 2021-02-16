@@ -240,10 +240,10 @@
     "@id" : "https://w3id.org/won/ext/group#groupMember"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMember",
+  "@id" : "https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "grantReadGraphAndMembers"
+    "@value" : "grantAccessToGraphAndGroupMemberAuth"
   } ],
   "https://w3id.org/won/auth#grant" : [ {
     "@id" : "_:genid1"

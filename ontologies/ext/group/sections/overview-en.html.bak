@@ -9,8 +9,8 @@ This ontology has the following classes and properties.</span>
    </li>
 </ul><h4>Named Individuals</h4><ul class="hlist">
    <li>
-      <a href="#grantAccessToGraphAndGroupMember"
-         title="https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMember">grantReadGraphAndMembers</a>
+      <a href="#grantAccessToGraphAndGroupMemberAuth"
+         title="https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth">grantAccessToGraphAndGroupMemberAuth</a>
    </li>
    <li>
       <a href="#grantReadGroupMemberViaGroupSocketAuth"

@@ -252,24 +252,6 @@
   "@id" : "https://w3id.org/won/auth#tokenScope",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
-  "@id" : "https://w3id.org/won/core#Atom",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
-}, {
-  "@id" : "https://w3id.org/won/core#SocketDefinition",
-  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
-}, {
-  "@id" : "https://w3id.org/won/core#autoOpen",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
-}, {
-  "@id" : "https://w3id.org/won/core#compatibleSocketDefinition",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
-}, {
-  "@id" : "https://w3id.org/won/core#derivesAtomProperty",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
-}, {
-  "@id" : "https://w3id.org/won/core#socketCapacity",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
-}, {
   "@id" : "https://w3id.org/won/ext/hold",
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
   "http://purl.org/dc/elements/1.1/abstract" : [ {
@@ -355,7 +337,7 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#TokenScope" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Tokens with this scope, signed by the holder of an atom, provide read/connect\n               access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."
+    "@value" : "Tokens with this scope, signed by the holder of an atom, provide read/connect\r\n               access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "ScopeReadHeldAtoms"
@@ -365,16 +347,16 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#TokenScope" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
-    "@value" : "Tokens with this scope, provide read/connect\n               access to the holder of an atom (see https://w3id.org/won/ext/hold#HolderSocket)."
+    "@value" : "Tokens with this scope, provide read/connect\r\n               access to the holder of an atom (see https://w3id.org/won/ext/hold#HolderSocket)."
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "ScopeReadHolderAtom"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/ext/hold#grantAccessToHolder",
+  "@id" : "https://w3id.org/won/ext/hold#grantAccessToHolderAuth",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "GrantAccessToHolder"
+    "@value" : "grantAccessToHolderAuth"
   } ],
   "https://w3id.org/won/auth#grant" : [ {
     "@id" : "_:genid1"
@@ -408,7 +390,7 @@
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/hold#heldBy",
-  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."
@@ -427,7 +409,7 @@
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/hold#holds",
-  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."

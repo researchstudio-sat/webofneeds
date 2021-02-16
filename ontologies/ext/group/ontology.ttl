@@ -148,13 +148,13 @@
              rdfs:label "GroupSocket" .
 
 
-###  https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMember
-:grantAccessToGraphAndGroupMember rdf:type owl:NamedIndividual ,
-                                           <https://w3id.org/won/auth#Authorization> ;
-                                  rdfs:label "grantReadGraphAndMembers" ;
-                                  <https://w3id.org/won/auth#grant> _:genid1 ;
-                                  <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> _:genid8
-                                                                      ] .
+###  https://w3id.org/won/ext/group#grantAccessToGraphAndGroupMemberAuth
+:grantAccessToGraphAndGroupMemberAuth rdf:type owl:NamedIndividual ,
+                                               <https://w3id.org/won/auth#Authorization> ;
+                                      rdfs:label "grantAccessToGraphAndGroupMemberAuth" ;
+                                      <https://w3id.org/won/auth#grant> _:genid1 ;
+                                      <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> _:genid8
+                                                                          ] .
 
 _:genid1 <https://w3id.org/won/auth#graph> _:genid2 ;
           <https://w3id.org/won/auth#operation> [ <https://w3id.org/won/auth#requestToken> _:genid4

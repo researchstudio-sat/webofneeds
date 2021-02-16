@@ -128,22 +128,6 @@ rdfs:labels rdf:type owl:AnnotationProperty .
 <https://w3id.org/won/auth#tokenScope> rdf:type owl:AnnotationProperty .
 
 
-###  https://w3id.org/won/core#autoOpen
-<https://w3id.org/won/core#autoOpen> rdf:type owl:AnnotationProperty .
-
-
-###  https://w3id.org/won/core#compatibleSocketDefinition
-<https://w3id.org/won/core#compatibleSocketDefinition> rdf:type owl:AnnotationProperty .
-
-
-###  https://w3id.org/won/core#derivesAtomProperty
-<https://w3id.org/won/core#derivesAtomProperty> rdf:type owl:AnnotationProperty .
-
-
-###  https://w3id.org/won/core#socketCapacity
-<https://w3id.org/won/core#socketCapacity> rdf:type owl:AnnotationProperty .
-
-
 #################################################################
 #    Object Properties
 #################################################################
@@ -152,17 +136,13 @@ rdfs:labels rdf:type owl:AnnotationProperty .
 :heldBy rdf:type owl:ObjectProperty ;
         rdfs:domain <https://w3id.org/won/core#Atom> ;
         rdfs:range <https://w3id.org/won/core#Atom> ;
-        owl:propertyDisjointWith :holds ;
-        rdfs:comment "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en ;
-        rdfs:label "heldBy" .
+        owl:propertyDisjointWith :holds .
 
 
 ###  https://w3id.org/won/ext/hold#holds
 :holds rdf:type owl:ObjectProperty ;
        rdfs:domain <https://w3id.org/won/core#Atom> ;
-       rdfs:range <https://w3id.org/won/core#Atom> ;
-       rdfs:comment "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en ;
-       rdfs:label "holds" .
+       rdfs:range <https://w3id.org/won/core#Atom> .
 
 
 #################################################################
@@ -177,14 +157,6 @@ rdfs:labels rdf:type owl:AnnotationProperty .
 <https://w3id.org/won/auth#TokenScope> rdf:type owl:Class .
 
 
-###  https://w3id.org/won/core#Atom
-<https://w3id.org/won/core#Atom> rdf:type owl:Class .
-
-
-###  https://w3id.org/won/core#SocketDefinition
-<https://w3id.org/won/core#SocketDefinition> rdf:type owl:Class .
-
-
 #################################################################
 #    Individuals
 #################################################################
@@ -192,25 +164,25 @@ rdfs:labels rdf:type owl:AnnotationProperty .
 ###  https://w3id.org/won/ext/hold#HoldableSocket
 :HoldableSocket rdf:type owl:NamedIndividual ,
                          <https://w3id.org/won/core#SocketDefinition> ;
+                <https://w3id.org/won/core#compatibleSocketDefinition> :HolderSocket ;
+                <https://w3id.org/won/core#derivesAtomProperty> :heldBy ;
+                <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
+                <https://w3id.org/won/core#socketCapacity> 1 ;
                 rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
                 rdfs:label "HoldableSocket" ;
                 <https://w3id.org/won/auth#localAuth> :grantAccessToHolder ,
-                                                      :grantReadViaHolderAuth ;
-                <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
-                <https://w3id.org/won/core#compatibleSocketDefinition> :HolderSocket ;
-                <https://w3id.org/won/core#derivesAtomProperty> :heldBy ;
-                <https://w3id.org/won/core#socketCapacity> 1 .
+                                                      :grantReadViaHolderAuth .
 
 
 ###  https://w3id.org/won/ext/hold#HolderSocket
 :HolderSocket rdf:type owl:NamedIndividual ,
                        <https://w3id.org/won/core#SocketDefinition> ;
+              <https://w3id.org/won/core#compatibleSocketDefinition> :HoldableSocket ;
+              <https://w3id.org/won/core#derivesAtomProperty> :holds ;
+              <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
               rdfs:comment "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en ;
               rdfs:label "HolderSocket" ;
-              <https://w3id.org/won/auth#localAuth> :grantReadViaHeldAuth ;
-              <https://w3id.org/won/core#autoOpen> "false"^^xsd:boolean ;
-              <https://w3id.org/won/core#compatibleSocketDefinition> :HoldableSocket ;
-              <https://w3id.org/won/core#derivesAtomProperty> :holds .
+              <https://w3id.org/won/auth#localAuth> :grantReadViaHeldAuth .
 
 
 ###  https://w3id.org/won/ext/hold#ScopeReadHeldAtoms
@@ -229,14 +201,14 @@ rdfs:labels rdf:type owl:AnnotationProperty .
                      rdfs:label "ScopeReadHolderAtom" .
 
 
-###  https://w3id.org/won/ext/hold#grantAccessToHolder
-:grantAccessToHolder rdf:type owl:NamedIndividual ,
-                              <https://w3id.org/won/auth#Authorization> ;
-                     rdfs:label "GrantAccessToHolder" ;
-                     <https://w3id.org/won/auth#grant> _:genid1 ;
-                     <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> [ <https://w3id.org/won/auth#connection> _:genid9
-                                                                                              ]
-                                                         ] .
+###  https://w3id.org/won/ext/hold#grantAccessToHolderAuth
+:grantAccessToHolderAuth rdf:type owl:NamedIndividual ,
+                                  <https://w3id.org/won/auth#Authorization> ;
+                         rdfs:label "grantAccessToHolderAuth" ;
+                         <https://w3id.org/won/auth#grant> _:genid1 ;
+                         <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> [ <https://w3id.org/won/auth#connection> _:genid9
+                                                                                                  ]
+                                                             ] .
 
 _:genid1 <https://w3id.org/won/auth#operation> [ <https://w3id.org/won/auth#requestToken> _:genid3
                                                 ] ;
@@ -303,6 +275,26 @@ _:genid20 <https://w3id.org/won/auth#connection> _:genid21 ;
 
 _:genid21 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
            <https://w3id.org/won/auth#targetAtom> [ ] .
+
+
+###  https://w3id.org/won/ext/hold#heldBy
+:heldBy rdf:type owl:NamedIndividual .
+
+
+###  https://w3id.org/won/ext/hold#holds
+:holds rdf:type owl:NamedIndividual .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+:heldBy rdfs:comment "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en ;
+        rdfs:label "heldBy" .
+
+
+:holds rdfs:comment "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en ;
+       rdfs:label "holds" .
 
 
 #################################################################
