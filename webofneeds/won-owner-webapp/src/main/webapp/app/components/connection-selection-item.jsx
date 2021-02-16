@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useHistory, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -38,13 +38,18 @@ export default function WonConnectionSelectionItem({
   );
   const isUnread = connectionUtils.isUnread(connection);
 
-  if (isUnread && openConnectionUri === connectionUri) {
-    dispatch(
-      actionCreators.connections__markAsRead({
-        connectionUri: connectionUri,
-      })
-    );
-  }
+  useEffect(
+    () => {
+      if (isUnread && openConnectionUri === connectionUri) {
+        dispatch(
+          actionCreators.connections__markAsRead({
+            connectionUri: connectionUri,
+          })
+        );
+      }
+    },
+    [connection, openConnectionUri]
+  );
 
   const closeButton = targetAtomFailedToLoad ? (
     <button
