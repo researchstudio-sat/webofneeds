@@ -267,6 +267,9 @@ vocab.HOLD.HolderSocket = vocab.HOLD.baseUri + "HolderSocket";
 vocab.HOLD.HolderSocketCompacted = vocab.HOLD.prefix + ":HolderSocket";
 vocab.HOLD.heldByCompacted = vocab.HOLD.prefix + ":heldBy";
 vocab.HOLD.holdsCompacted = vocab.HOLD.prefix + ":holds";
+vocab.HOLD.ScopeReadHeldAtoms = vocab.HOLD.baseUri + "ScopeReadHeldAtoms";
+vocab.HOLD.ScopeReadHeldAtomsCompacted =
+  vocab.HOLD.prefix + ":ScopeReadHeldAtoms";
 
 vocab.BOT = {};
 vocab.BOT.baseUri = "https://w3id.org/won/ext/bot#";
