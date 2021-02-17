@@ -25,7 +25,6 @@ public class RDFMediaType {
     public static final MediaType APPLICATION_RDF_XML = new MediaType("application", "rdf+xml");
     public static final MediaType APPLICATION_X_TURTLE = new MediaType("application", "x-turtle");
     public static final MediaType TEXT_RDF_N3 = new MediaType("text", "rdf+n3");
-    public static final MediaType APPLICATION_JSON = new MediaType("application", "json");
     public static final MediaType APPLICATION_TRIG = new MediaType("application", "trig");
     public static final MediaType APPLICATION_JSONLD = new MediaType("application", "ld+json");
     public static final MediaType APPLICATION_NQUADS = new MediaType("application", "n-quads");
@@ -33,7 +32,7 @@ public class RDFMediaType {
     static {
         HashSet<MediaType> types = new HashSet<>(Arrays
                         .asList(TEXT_TURTLE, APPLICATION_RDF_XML, APPLICATION_X_TURTLE, TEXT_RDF_N3,
-                                        APPLICATION_JSON, APPLICATION_TRIG, APPLICATION_JSONLD, APPLICATION_NQUADS));
+                                        APPLICATION_TRIG, APPLICATION_JSONLD, APPLICATION_NQUADS));
         rdfMediaTypes = Collections.unmodifiableSet(types);
     }
 

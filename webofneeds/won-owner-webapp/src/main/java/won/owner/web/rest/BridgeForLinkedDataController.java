@@ -177,7 +177,8 @@ public class BridgeForLinkedDataController implements InitializingBean {
             response.setStatus(originalResponse.getRawStatusCode());
         } else {
             if (RDFMediaType.isRDFMediaType(originalResponseMediaType)
-                            || originalResponseMediaType.isCompatibleWith(MediaType.TEXT_HTML)) {
+                            || originalResponseMediaType.isCompatibleWith(MediaType.TEXT_HTML)
+                            || originalResponseMediaType.isCompatibleWith(MediaType.APPLICATION_JSON)) {
                 copyLinkedDataResponseRelevantHeaders(originalResponse.getHeaders(), response);
                 response.setStatus(originalResponse.getRawStatusCode());
                 // create response body
@@ -192,7 +193,8 @@ public class BridgeForLinkedDataController implements InitializingBean {
                 response.getOutputStream().print("The target server's response was of type " +
                                 originalResponseMediaType +
                                 ". We only forward responses of the following types "
-                                + RDFMediaType.rdfMediaTypes.toString() + " and " + MediaType.TEXT_HTML_VALUE);
+                                + RDFMediaType.rdfMediaTypes.toString() + ", " + MediaType.TEXT_HTML_VALUE + " and "
+                                + MediaType.APPLICATION_JSON);
             }
         }
         response.getOutputStream().flush();
