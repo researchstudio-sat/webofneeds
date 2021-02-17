@@ -110,77 +110,77 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
     });
 }
 
-const determineRequesterWebId = (state, atomUri, isOwned) => {
-  console.debug("## Determine requesterWebId for", atomUri);
-  if (isOwned) {
-    console.debug(
-      "## atom is owned, using atomUri as requesterWebId:",
-      atomUri
-    );
-    return atomUri;
-  }
-
-  const allOwnedConnections = generalSelectors.getOwnedConnections(state);
-  const filteredConnections = allOwnedConnections.filter(
-    conn => connectionUtils.getTargetAtomUri(conn) === atomUri
-  );
-
-  let requesterWebId = atomUri;
-
-  if (filteredConnections.size > 0) {
-    requesterWebId = extractAtomUriFromConnectionUri(
-      getUri(filteredConnections.first())
-    );
-
-    if (filteredConnections.size > 1) {
+const determineRequestCredentials = (state, atomUri, isOwned) =>
+  new Promise(() => {
+    console.debug("## Determine requesterWebId for", atomUri);
+    if (isOwned) {
       console.debug(
-        "## more than one connection found for this non owned Atom, using first one as requesterWebId: ",
-        requesterWebId,
-        filteredConnections
+        "## atom is owned, using atomUri as requesterWebId:",
+        atomUri
       );
+      return { requesterWebId: atomUri };
+    }
+
+    const allOwnedConnections = generalSelectors.getOwnedConnections(state);
+    const filteredConnections = allOwnedConnections.filter(
+      conn => connectionUtils.getTargetAtomUri(conn) === atomUri
+    );
+
+    let requesterWebId = atomUri;
+
+    if (filteredConnections.size > 0) {
+      requesterWebId = extractAtomUriFromConnectionUri(
+        getUri(filteredConnections.first())
+      );
+
+      if (filteredConnections.size > 1) {
+        console.debug(
+          "## more than one connection found for this non owned Atom, using first one as requesterWebId: ",
+          requesterWebId,
+          filteredConnections
+        );
+      } else {
+        console.debug(
+          "## one connection found for this non owned Atom, using first one as requesterWebId: ",
+          requesterWebId
+        );
+      }
+
+      return { requesterWebId: requesterWebId };
     } else {
+      //TODO IMPL TOKEN;
+      // console.debug("## Determine requesterTokenScopes for", atomUri);
+      // //we have a Connection to an atom, that is connected
+      // if (requesterWebId) {
+      //   const atoms = get(state, "atoms");
+      //   const atom = atoms && get(atoms, requesterWebId);
+      //   const acl = atom && get(atom, "acl");
+      //   //crawl for scopes in acl part
+      //   console.debug("## ACL part: ", acl);
+      //   //const scopesArray = [];
+      //   //TODO
+      //   //return scopesArray;
+      // }
+      //
+      // // const requesterTokenScopes = determineRequesterTokenScopes(
+      // //   state,
+      // //   atomUri,
+      // //   requesterWebId
+      // // );
+      // // if (requesterTokenScopes) {
+      // //   requestCredentials.token = won.fetchTokenForAtom(
+      // //     atomUri,
+      // //     requesterWebId,
+      // //     requesterTokenScopes
+      // //   );
+      // // }
+
       console.debug(
-        "## one connection found for this non owned Atom, using first one as requesterWebId: ",
-        requesterWebId
+        "## no connections found for this non owned atom, using nothing as requesterWebId maybe we are lucky..."
       );
+      return { requesterWebId: undefined, token: undefined };
     }
-
-    return requesterWebId;
-  } else {
-    console.debug(
-      "## no connections found for this non owned atom, using nothing as requesterWebId maybe we are lucky..."
-    );
-    return undefined;
-  }
-};
-
-const determineRequesterTokenScopes = (atomUri, getState, requesterWebId) => {
-  console.debug("## Determine requesterTokenScopes for", atomUri);
-  const state = getState();
-  //we have a Connection to an atom, that is connected
-  if (requesterWebId) {
-    const atoms = get(state, "atoms");
-    const atom = atoms && get(atoms, requesterWebId);
-    const acl = atom && get(atom, "acl");
-    //crawl for scopes in acl part
-    console.debug("## ACL part: ", acl);
-    const scopesArray = [];
-    //TODO
-    return scopesArray;
-  }
-  return undefined;
-
-  //REQUEST AuthGraph for atom
-  /*
-  return won.fetchAtom(atomUri, requesterWebId).then(atom => {
-    const parsedAtom = parseAtom(atom);
-    if (parsedAtom && parsedAtom.auth) {
-      const scopes = parsedAtom.auth;
-      return [...scopes];
-    }
-    return undefined;
-  });*/
-};
+  });
 
 export function fetchConnectionsContainerAndDispatch(
   atomUri,
@@ -228,96 +228,81 @@ export function fetchConnectionsContainerAndDispatch(
     ">"
   );
 
-  const requestCredentials = { requesterWebId: undefined, token: undefined };
-  const requesterWebId = determineRequesterWebId(state, atomUri, isOwned);
-  requestCredentials.requesterWebId = requesterWebId;
-  // TOKEN!
-  const requesterTokenScopes = determineRequesterTokenScopes(
-    atomUri,
-    requesterWebId,
-    state
-  );
-  if (requesterTokenScopes) {
-    requestCredentials.token = won.fetchTokenForAtom(
-      atomUri,
-      requesterWebId,
-      requesterTokenScopes
-    );
-  }
-  //Fetch All MetaConnections Of NonOwnedAtomAndDispatch
-
   dispatch({
     type: actionTypes.atoms.storeConnectionContainerInLoading,
     payload: Immutable.fromJS({ uri: atomUri }),
   });
 
-  return won
-    .fetchConnectionUrisWithStateByAtomUri(
-      atomUri,
-      requestCredentials,
-      !isOwned
-    )
-    .then(connectionsWithStateAndSocket => {
-      const connections = isOwned
-        ? connectionsWithStateAndSocket
-        : connectionsWithStateAndSocket.filter(
-            metaConn => metaConn.connectionState === vocab.WON.Connected
-          );
-
-      dispatch({
-        type: actionTypes.connections.storeMetaConnections,
-        payload: Immutable.fromJS({
-          atomUri: atomUri,
-          connections: connections,
-        }),
-      });
-      if (isOwned) {
-        const activeConnectionUris = connections
-          .filter(
-            conn =>
-              conn.connectionState !== vocab.WON.Closed &&
-              conn.connectionState !== vocab.WON.Suggested
-          )
-          .map(conn => conn.uri);
-
-        dispatch({
-          type: actionTypes.connections.storeActiveUrisInLoading,
-          payload: Immutable.fromJS({
-            atomUri: atomUri,
-            connUris: activeConnectionUris,
-          }),
-        });
-        return activeConnectionUris;
-      }
-      return undefined;
-    })
-    .then(
-      activeConnectionUris =>
-        activeConnectionUris &&
-        urisToLookupMap(activeConnectionUris, connUri =>
-          fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
+  return determineRequestCredentials(state, atomUri, isOwned).then(
+    requestCredentials =>
+      won
+        .fetchConnectionUrisWithStateByAtomUri(
+          atomUri,
+          requestCredentials,
+          !isOwned
         )
-    )
-    .catch(error => {
-      if (error.status && error.status === 410) {
-        dispatch({
-          type: actionTypes.atoms.delete,
-          payload: Immutable.fromJS({ uri: atomUri }),
-        });
-      } else {
-        dispatch({
-          type: actionTypes.atoms.storeConnectionContainerFailed,
-          payload: Immutable.fromJS({
-            uri: atomUri,
-            status: {
-              code: error.status,
-              message: error.message,
-              requesterWebId: requesterWebId,
-            },
-          }),
-        });
-      }
-    });
+        .then(connectionsWithStateAndSocket => {
+          const connections = isOwned
+            ? connectionsWithStateAndSocket
+            : connectionsWithStateAndSocket.filter(
+                metaConn => metaConn.connectionState === vocab.WON.Connected
+              );
+
+          dispatch({
+            type: actionTypes.connections.storeMetaConnections,
+            payload: Immutable.fromJS({
+              atomUri: atomUri,
+              connections: connections,
+            }),
+          });
+          if (isOwned) {
+            const activeConnectionUris = connections
+              .filter(
+                conn =>
+                  conn.connectionState !== vocab.WON.Closed &&
+                  conn.connectionState !== vocab.WON.Suggested
+              )
+              .map(conn => conn.uri);
+
+            dispatch({
+              type: actionTypes.connections.storeActiveUrisInLoading,
+              payload: Immutable.fromJS({
+                atomUri: atomUri,
+                connUris: activeConnectionUris,
+              }),
+            });
+            return activeConnectionUris;
+          }
+          return undefined;
+        })
+        .then(
+          activeConnectionUris =>
+            activeConnectionUris &&
+            urisToLookupMap(activeConnectionUris, connUri =>
+              fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
+            )
+        )
+        .catch(error => {
+          if (error.status && error.status === 410) {
+            dispatch({
+              type: actionTypes.atoms.delete,
+              payload: Immutable.fromJS({ uri: atomUri }),
+            });
+          } else {
+            dispatch({
+              type: actionTypes.atoms.storeConnectionContainerFailed,
+              payload: Immutable.fromJS({
+                uri: atomUri,
+                status: {
+                  code: error.status,
+                  message: error.message,
+                  requesterWebId: requestCredentials,
+                },
+              }),
+            });
+          }
+        })
+  );
 }
 
 /**
@@ -383,41 +368,41 @@ export function fetchAtomAndDispatch(
     payload: Immutable.fromJS({ uri: atomUri }),
   });
 
-  const requesterWebId = determineRequesterWebId(state, atomUri, isOwned);
-  //TODO: retrieve tokens
-
-  return won
-    .fetchAtom(atomUri, requesterWebId)
-    .then(atom => {
-      const parsedAtom = parseAtom(atom);
-      if (parsedAtom) {
-        dispatch({
-          type: actionTypes.atoms.store,
-          payload: Immutable.fromJS({ atoms: { [atomUri]: parsedAtom } }),
-        });
-      }
-      return parsedAtom;
-    })
-    .catch(error => {
-      if (error.status && error.status === 410) {
-        dispatch({
-          type: actionTypes.atoms.delete,
-          payload: Immutable.fromJS({ uri: atomUri }),
-        });
-      } else {
-        dispatch({
-          type: actionTypes.atoms.storeUriFailed,
-          payload: Immutable.fromJS({
-            uri: atomUri,
-            status: {
-              code: error.status,
-              message: error.message,
-              requesterWebId: requesterWebId,
-            },
-          }),
-        });
-      }
-    });
+  return determineRequestCredentials(state, atomUri, isOwned).then(
+    requestCredentials =>
+      won
+        .fetchAtom(atomUri, requestCredentials)
+        .then(atom => {
+          const parsedAtom = parseAtom(atom);
+          if (parsedAtom) {
+            dispatch({
+              type: actionTypes.atoms.store,
+              payload: Immutable.fromJS({ atoms: { [atomUri]: parsedAtom } }),
+            });
+          }
+          return parsedAtom;
+        })
+        .catch(error => {
+          if (error.status && error.status === 410) {
+            dispatch({
+              type: actionTypes.atoms.delete,
+              payload: Immutable.fromJS({ uri: atomUri }),
+            });
+          } else {
+            dispatch({
+              type: actionTypes.atoms.storeUriFailed,
+              payload: Immutable.fromJS({
+                uri: atomUri,
+                status: {
+                  code: error.status,
+                  message: error.message,
+                  requesterWebId: requestCredentials,
+                },
+              }),
+            });
+          }
+        })
+  );
 }
 
 export function fetchPersonas(dispatch /*, getState,*/) {

@@ -108,7 +108,7 @@ export const successfulCreate = wonMessage => dispatch => {
   const requesterWebId = atomUri;
 
   won
-    .fetchAtom(atomUri, requesterWebId)
+    .fetchAtom(atomUri, { requesterWebId: requesterWebId })
     .then(atom => {
       const parsedAtom = parseAtom(atom);
       if (parsedAtom) {
