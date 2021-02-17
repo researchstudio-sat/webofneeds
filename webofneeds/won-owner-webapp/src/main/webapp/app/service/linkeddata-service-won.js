@@ -336,24 +336,13 @@ import vocab from "./vocab.js";
    *
    * @param atomUri
    * @param requesterWebId
-   * @param scope
+   * @param scopes
    */
-  won.fetchTokenForAtom = (atomUri, requesterWebId, scopes) => {
-    ownerApi
-      .fetchTokenForAtom(atomUri + "/token", {
-        requesterWebId: requesterWebId,
-        scopes: scopes,
-      })
-      .then(response => {
-        console.debug(
-          "Result when retrieving token for atom(",
-          atomUri,
-          ") => ",
-          response
-        );
-        return response;
-      });
-  };
+  won.fetchTokenForAtom = (atomUri, requesterWebId, scopes) =>
+    ownerApi.fetchTokenForAtom(atomUri + "/token", {
+      requesterWebId: requesterWebId,
+      scopes: scopes,
+    });
 
   /**
    * @param senderSocketUri
