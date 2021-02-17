@@ -425,7 +425,7 @@ export const fetchJsonLdDataset = (
     headers: {
       // cachePolicy: "network-only",
       Accept: "application/ld+json",
-      Authorization: params.token, //TOKEN in Header Authorization -> "Bearer\\s+([a-zA-Z0-9-._~+/]+=*)"
+      Authorization: params.token ? "Bearer " + params.token : undefined,
       Prefer: params.pagingSize
         ? `return=representation; max-member-count="${params.pagingSize}"`
         : undefined,
@@ -719,6 +719,7 @@ function generateLinkedDataQueryString(dataUri, queryParams) {
   const paramsString = generateQueryParamsString({
     ...queryParams,
     requesterWebId: undefined,
+    token: undefined,
   });
   let query = (
     queryOnOwner +

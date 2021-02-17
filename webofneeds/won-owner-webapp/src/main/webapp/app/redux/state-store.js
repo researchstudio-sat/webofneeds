@@ -3,13 +3,20 @@ import Immutable from "immutable";
 import { actionTypes } from "../actions/actions.js";
 import * as generalSelectors from "./selectors/general-selectors.js";
 import * as atomUtils from "./utils/atom-utils.js";
-import * as processUtils from "./utils/process-utils.js";
 import * as connectionUtils from "./utils/connection-utils.js";
+import * as accountUtils from "./utils/account-utils.js";
+import * as processUtils from "./utils/process-utils.js";
 import {
   parseMetaAtom,
   parseAtom,
 } from "../reducers/atom-reducer/parse-atom.js";
-import { extractAtomUriFromConnectionUri, get, is, getUri } from "../utils.js";
+import {
+  extractAtomUriFromConnectionUri,
+  get,
+  is,
+  getUri,
+  getIn,
+} from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
 import { fetchWikiData } from "~/app/api/wikidata-api";
@@ -110,44 +117,148 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
     });
 }
 
-const determineRequestCredentials = (state, atomUri, isOwned) =>
-  new Promise(() => {
-    console.debug("## Determine requesterWebId for", atomUri);
-    if (isOwned) {
-      console.debug(
-        "## atom is owned, using atomUri as requesterWebId:",
-        atomUri
-      );
-      return { requesterWebId: atomUri };
-    }
+const determineRequestCredentials = (state, atomUri, isOwned) => {
+  console.debug("## Determine requesterWebId for", atomUri);
+  if (isOwned) {
+    console.debug(
+      "## atom is owned, using atomUri as requesterWebId:",
+      atomUri
+    );
+    return Promise.resolve({ requesterWebId: atomUri });
+  }
 
-    const allOwnedConnections = generalSelectors.getOwnedConnections(state);
-    const filteredConnections = allOwnedConnections.filter(
-      conn => connectionUtils.getTargetAtomUri(conn) === atomUri
+  const accountState = generalSelectors.getAccountState(state);
+  const connectionsToTargetAtom = generalSelectors.getConnectionsWithTargetAtomUri(
+    atomUri
+  )(state);
+
+  const ownedConnectionsToTargetAtom = connectionsToTargetAtom.filter(
+    (_, connUri) =>
+      accountUtils.isAtomOwned(
+        accountState,
+        extractAtomUriFromConnectionUri(connUri)
+      )
+  );
+
+  let requesterWebId = atomUri;
+
+  if (ownedConnectionsToTargetAtom.size > 0) {
+    requesterWebId = extractAtomUriFromConnectionUri(
+      getUri(ownedConnectionsToTargetAtom.first())
     );
 
-    let requesterWebId = atomUri;
-
-    if (filteredConnections.size > 0) {
-      requesterWebId = extractAtomUriFromConnectionUri(
-        getUri(filteredConnections.first())
+    if (ownedConnectionsToTargetAtom.size > 1) {
+      console.debug(
+        "## more than one connection found for this non owned Atom, using first one as requesterWebId: ",
+        requesterWebId,
+        ownedConnectionsToTargetAtom
       );
+    } else {
+      console.debug(
+        "## one connection found for this non owned Atom, using first one as requesterWebId: ",
+        requesterWebId
+      );
+    }
 
-      if (filteredConnections.size > 1) {
+    return Promise.resolve({ requesterWebId: requesterWebId });
+  } else {
+    const nonOwnedConnectionsToTargetAtom = connectionsToTargetAtom.filterNot(
+      (_, connUri) =>
+        accountUtils.isAtomOwned(
+          accountState,
+          extractAtomUriFromConnectionUri(connUri)
+        )
+    );
+
+    if (nonOwnedConnectionsToTargetAtom.size > 0) {
+      const consideredAtom = generalSelectors.getAtom(
+        extractAtomUriFromConnectionUri(
+          getUri(nonOwnedConnectionsToTargetAtom.first())
+        )
+      )(state);
+
+      if (nonOwnedConnectionsToTargetAtom.size > 1) {
         console.debug(
-          "## more than one connection found for this non owned Atom, using first one as requesterWebId: ",
-          requesterWebId,
-          filteredConnections
+          "## more than one connection found for this non owned Atom, using first one for token-access consideration: ",
+          consideredAtom,
+          nonOwnedConnectionsToTargetAtom
         );
       } else {
         console.debug(
-          "## one connection found for this non owned Atom, using first one as requesterWebId: ",
-          requesterWebId
+          "## one connection found for this non owned Atom, using first one as token-access consideration: ",
+          consideredAtom
         );
       }
 
-      return { requesterWebId: requesterWebId };
-    } else {
+      const tokenAuths = atomUtils.getTokenAuth(consideredAtom);
+
+      for (const tokenAuth of tokenAuths) {
+        console.debug("tokenAuth: ", tokenAuth);
+        const authTokenOperations = tokenAuth
+          .get("auth:grant")
+          .flatMap(grant => get(grant, "auth:operation"))
+          .map(op => get(op, "auth:requestToken"))
+          .filter(op => !!op);
+        console.debug("authOperations: ", authTokenOperations);
+
+        for (const authTokenOperation of authTokenOperations) {
+          const tokenScopeUri = getIn(authTokenOperation, [
+            "auth:tokenScope",
+            "@id",
+          ]);
+          console.debug("### ", tokenScopeUri);
+
+          //TODO: THIS IS NEXT PART PRETTY HARDCODED (which isnt great but works for now):
+          if (tokenScopeUri === vocab.HOLD.ScopeReadHeldAtomsCompacted) {
+            const ownedBuddyUrisOfConsideredAtom = atomUtils
+              .getConnectedConnections(
+                consideredAtom,
+                vocab.BUDDY.BuddySocketCompacted
+              )
+              .filter(conn =>
+                accountUtils.isAtomOwned(
+                  accountState,
+                  connectionUtils.getTargetAtomUri(conn)
+                )
+              )
+              .map(connectionUtils.getTargetAtomUri)
+              .valueSeq()
+              .toSet();
+            console.debug(
+              "ownedBuddyUrisOfConsideredAtom: ",
+              ownedBuddyUrisOfConsideredAtom
+            );
+
+            if (ownedBuddyUrisOfConsideredAtom.size > 0) {
+              const fetchTokenRequesterId = ownedBuddyUrisOfConsideredAtom.first();
+
+              if (ownedBuddyUrisOfConsideredAtom.size > 1) {
+                console.debug(
+                  "## more than one connection found for this non owned Atom, using first one as the tokenRequester: ",
+                  fetchTokenRequesterId,
+                  ownedBuddyUrisOfConsideredAtom
+                );
+              }
+
+              return won
+                .fetchTokenForAtom(
+                  getUri(consideredAtom),
+                  fetchTokenRequesterId,
+                  vocab.HOLD.ScopeReadHeldAtoms
+                )
+                .then(tokens => {
+                  console.debug("tokens: ", tokens);
+                  return { token: tokens[0] };
+                })
+                .catch(error => console.debug("error: ", error)); //TODO: FIX ERROR
+            }
+          }
+
+          //******************************************************************************
+        }
+      }
+
+      //TODO: FIGURE OUT HOW TO REQUEST A TOKEN
       //TODO IMPL TOKEN;
       // console.debug("## Determine requesterTokenScopes for", atomUri);
       // //we have a Connection to an atom, that is connected
@@ -175,13 +286,15 @@ const determineRequestCredentials = (state, atomUri, isOwned) =>
       // //   );
       // // }
 
+      return Promise.resolve({ requesterWebId: undefined, token: undefined });
+    } else {
       console.debug(
-        "## no connections found for this non owned atom, using nothing as requesterWebId maybe we are lucky..."
+        "## no connections found for this non owned atom, using nothing as requesterWebId/token maybe we are lucky..."
       );
-      return { requesterWebId: undefined, token: undefined };
+      return Promise.resolve({ requesterWebId: undefined, token: undefined });
     }
-  });
-
+  }
+};
 export function fetchConnectionsContainerAndDispatch(
   atomUri,
   dispatch,

@@ -3,7 +3,7 @@
  */
 
 import vocab from "../../service/vocab.js";
-import { get, getIn, getUri } from "../../utils.js";
+import { get, getIn, getUri, is } from "../../utils.js";
 import * as wonLabelUtils from "../../won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
@@ -52,6 +52,32 @@ export function getSeeks(atom) {
 
 export function getAuth(atom) {
   return get(atom, "auth");
+}
+
+/**
+ * Returns all the auths that are visible that will grant a token -> not necessarily tokens that can be fetched
+ * @param atom
+ */
+export function getTokenAuth(atom) {
+  const auths = getAuth(atom);
+  return (
+    auths &&
+    auths.filter(auth => {
+      const grants = get(auth, vocab.AUTH.grantCompacted);
+      return !!grants.find(grant => {
+        const operations = get(grant, vocab.AUTH.operationCompacted);
+        return (
+          !!operations &&
+          !is("String", operations) &&
+          operations.find(op => {
+            const isRequestToken =
+              !is("String", op) && !!get(op, vocab.AUTH.requestTokenCompacted);
+            return isRequestToken;
+          })
+        );
+      });
+    })
+  );
 }
 
 export function isPinnedAtom(atom) {
