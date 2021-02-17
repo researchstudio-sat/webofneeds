@@ -124,7 +124,7 @@ rdfs:labels
     rdfs:comment
                                    "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
     rdfs:label                     "HoldableSocket" ;
-    auth:localAuth                 :grantReadViaHolderAuth, :grantAccessToHolder .
+    auth:localAuth                 :grantReadViaHolderAuth, :grantAccessToHolderAuth .
 
 :grantReadViaHolderAuth
     a           auth:Authorization ;
@@ -133,8 +133,11 @@ rdfs:labels
                   auth:issuer     [ auth:socket [ auth:socketType :HoldableSocket ;
                                                   auth:connection [ auth:targetAtom      [ ] ;
                                                                     auth:connectionState won:Connected ] ] ] ] ;
-    auth:grant  [ auth:graph [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
-                               auth:operation auth:opRead ] ] .
+    auth:grant  [ auth:socket    [ auth:socketType  :HoldableSocket ;
+                                                    auth:connections [ auth:operation          auth:opRead ;
+                                                                       auth:connectionMessages [ auth:inherit false ] ] ] ;
+                  auth:graph [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                           auth:operation auth:opRead ] ] .
 
 :grantAccessToHolderAuth
     a            auth:Authorization ;
