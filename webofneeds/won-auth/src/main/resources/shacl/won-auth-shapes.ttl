@@ -565,14 +565,11 @@ auth:operationRequestShape
                                                sh:minCount 1 ] ) ;
     sh:property          [ sh:path     auth:requestor ;
                            sh:nodeKind sh:IRI ;
-                           sh:minCount 0 ;
                            sh:maxCount 1 ; ] ;
     sh:property          [ sh:path     auth:reqPosition ;
-                           sh:minCount 1 ;
                            sh:maxCount 1 ;
                            sh:node     auth:asePositionShape ] ;
     sh:property          [ sh:path     auth:operation ;
-                           sh:minCount 1 ;
                            sh:maxCount 1 ;
                            sh:or       ( [ sh:node auth:simpleOperationExpressionShape ]
                                          [ sh:node auth:messageOperationExpressionShape ]

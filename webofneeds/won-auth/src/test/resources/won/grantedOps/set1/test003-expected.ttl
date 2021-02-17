@@ -1,0 +1,6 @@
+@prefix auth: <https://w3id.org/won/auth#> .
+
+[ auth:graph     [ auth:operation auth:opRead ] ;
+  auth:operation auth:opRead ;
+  auth:socket    [ auth:operation  auth:opRead ;
+                   auth:socketType <https://w3id.org/won/ext/hold#HolderSocket> ] ] .

@@ -8,6 +8,9 @@ import won.auth.check.TargetAtomCheck;
 import won.auth.check.TargetAtomCheckEvaluator;
 import won.auth.check.WonAclEvaluationException;
 import won.auth.model.*;
+import won.auth.support.AseMerger;
+import won.auth.support.OperationRequestChecker;
+import won.auth.support.TargetAtomCheckGenerator;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 
 import java.lang.invoke.MethodHandles;
@@ -123,7 +126,7 @@ public class WonAclEvaluator {
     }
 
     private static boolean isOperationGranted(Authorization authorization, OperationRequest request) {
-        if (request.getReqAtom() != null && request.getReqAtom().equals(request.getRequestor())) {
+        if (isRequestorIsOwner(request)) {
             // requestor is owner - allow anything
             return true;
         }
@@ -147,6 +150,40 @@ public class WonAclEvaluator {
             System.arraycopy(params, 0, logParams, 0, params.length);
             logger.debug("AuthCheck: " + message + " ({} against {})", logParams);
         }
+    }
+
+    public Optional<AseRoot> getGrants(OperationRequest operationRequest) {
+        return getGrants(authorizations, operationRequest);
+    }
+
+    private Optional<AseRoot> getGrants(Set<Authorization> authorizations, OperationRequest request) {
+        return authorizations.stream()
+                        .map(auth -> getGrants(auth, request))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .reduce((left, right) -> mergeAseRoots(left, right));
+    }
+
+    private Optional<AseRoot> getGrants(Authorization auth, OperationRequest request) {
+        if (isRequestorIsOwner(request)
+                        || ANYONE.equals(auth.getGranteeGranteeWildcard())
+                        || isRequestorAGrantee(auth, request)
+                        || isBearerOfAcceptedToken(auth, request)) {
+            return auth.getGrants().stream().reduce((left, right) -> mergeAseRoots(left, right));
+        }
+        return Optional.empty();
+    }
+
+    private AseRoot mergeAseRoots(AseRoot left, AseRoot right) {
+        if (left == null) {
+            return right;
+        }
+        if (right == null) {
+            return left;
+        }
+        AseMerger gc = new AseMerger(left);
+        gc.visit(right);
+        return gc.getMerged();
     }
 
     public AclEvalResult decide(OperationRequest request) {
@@ -193,7 +230,8 @@ public class WonAclEvaluator {
                     Set<Authorization> requestorIsGranteeOf) {
         return authorizations.stream()
                         .filter(authorization -> authorization.getProvideAuthInfo() != null)
-                        .filter(authorization -> ANYONE.equals(authorization.getGranteeGranteeWildcard())
+                        .filter(authorization -> isRequestorIsOwner(request)
+                                        || ANYONE.equals(authorization.getGranteeGranteeWildcard())
                                         || isRequestorAGrantee(authorization, request)
                                         || isBearerOfAcceptedToken(authorization, request))
                         .map(authorization -> {
@@ -221,7 +259,7 @@ public class WonAclEvaluator {
                     boolean provideAuthInfo, Set<Authorization> requestorIsGranteeOf) {
         // determine if the requestor is in the set of grantees
         boolean decisionSoFar = false;
-        if (request.getReqAtom() != null && request.getReqAtom().equals(request.getRequestor())) {
+        if (isRequestorIsOwner(request)) {
             // owner of atom is requestor - allow anything
             decisionSoFar = true;
         } else if (ANYONE.equals(authorization.getGranteeGranteeWildcard())) {
@@ -264,6 +302,10 @@ public class WonAclEvaluator {
             }
         }
         return accessControlDecision(decisionSoFar, authorization, request, authInfo);
+    }
+
+    private static boolean isRequestorIsOwner(OperationRequest request) {
+        return request.getReqAtom() != null && request.getReqAtom().equals(request.getRequestor());
     }
 
     private AclEvalResult accessControlDecision(boolean accessGranted, Authorization authorization,

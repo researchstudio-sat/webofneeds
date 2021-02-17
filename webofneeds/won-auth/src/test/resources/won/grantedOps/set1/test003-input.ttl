@@ -1,0 +1,68 @@
+@base             <https://example.com/test/atom1> .
+@prefix ex:       <https://example.com/test/> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix wx-buddy: <https://w3id.org/won/ext/buddy#> .
+@prefix wx-hold:  <https://w3id.org/won/ext/hold#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix atom1:    <http://example.org/test/atom1#> .
+@prefix msg:      <https://w3id.org/won/message#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg:     <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<#authorization1>
+    a            auth:Authorization ;
+    auth:grantee auth:anyone ;
+    auth:grant   [ auth:graph [ auth:operation auth:opRead ] ] ;
+    auth:grant   [ auth:socket [ auth:socketType wx-hold:HolderSocket ;
+                                 auth:operation  auth:opRead ] ] .
+
+<#authorization2>
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                                  auth:connection [ auth:connectionState won:Connected ;
+                                                                    auth:targetAtom      [ ] ] ] ] ] ;
+    auth:grant  [ auth:operation auth:opRead ] .
+
+<#request>
+    a               auth:OperationRequest ;
+    auth:reqAtom    ex:atom1 ;
+    auth:bearsToken ex:token1 .
+
+ex:token1
+    a               auth:AuthToken ;
+    auth:tokenScope wx-buddy:BuddySocket ;
+    auth:tokenIss   ex:atom3 ;
+    auth:tokenSub   ex:atom2 ;
+    auth:tokenSig   ex:node ;
+    auth:tokenIat   "2020-12-03T22:30:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T23:30:00"^^xsd:dateTime .
+
+ex:atom1
+    a                    won:Atom ;
+    won:socket           atom1:buddySocket ;
+    won:state            won:Active ;
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
+
+atom1:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom1:buddySocketConnections .
+
+atom1:buddySocketConnections
+    rdfs:member atom1:bsConn1 .
+
+atom1:bsConn1
+    a                   won:Connection ;
+    won:socket          atom1:buddySocket ;
+    won:targetAtom      ex:atom3 ;
+    won:connectionState won:Connected .
+
+ex:atom3
+    a           won:Atom ;
+    won:state   won:Active ;
+    won:wonNode ex:node .

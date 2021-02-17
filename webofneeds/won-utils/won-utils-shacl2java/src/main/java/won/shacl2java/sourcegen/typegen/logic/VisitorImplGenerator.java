@@ -85,7 +85,31 @@ public class VisitorImplGenerator implements TypesGenerator {
                                                         config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
                                                         "startingNode")
                                         .addStatement("Graph graph = $T.createGraphMem()", GraphFactory.class)
-                                        .addStatement("populateGraph(startingNode, graph)")
+                                        .addStatement("populateGraph(startingNode, graph, true)")
+                                        .addStatement("return graph")
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("toGraph")
+                                        .addModifiers(PUBLIC, STATIC)
+                                        .returns(ClassName.get(Graph.class))
+                                        .addParameter(ClassName.get(config.getPackageName(),
+                                                        config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
+                                                        "startingNode")
+                                        .addParameter(ClassName.BOOLEAN, "includeIndividuals")
+                                        .addStatement("Graph graph = $T.createGraphMem()", GraphFactory.class)
+                                        .addStatement("populateGraph(startingNode, graph, includeIndividuals)")
+                                        .addStatement("return graph")
+                                        .build())
+                        .addMethod(MethodSpec.methodBuilder("toGraph")
+                                        .addModifiers(PUBLIC, STATIC)
+                                        .returns(ClassName.get(Graph.class))
+                                        .addParameter(ParameterizedTypeName.get(ClassName.get(Collection.class),
+                                                        WildcardTypeName.subtypeOf(
+                                                                        ClassName.get(config.getPackageName(),
+                                                                                        config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME))),
+                                                        "startingNodes")
+                                        .addParameter(ClassName.BOOLEAN, "includeIndividuals")
+                                        .addStatement("Graph graph = $T.createGraphMem()", GraphFactory.class)
+                                        .addStatement("startingNodes.forEach(n -> populateGraph(n, graph, includeIndividuals))")
                                         .addStatement("return graph")
                                         .build())
                         .addMethod(MethodSpec.methodBuilder("toGraph")
@@ -97,7 +121,7 @@ public class VisitorImplGenerator implements TypesGenerator {
                                                                                         config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME))),
                                                         "startingNodes")
                                         .addStatement("Graph graph = $T.createGraphMem()", GraphFactory.class)
-                                        .addStatement("startingNodes.forEach(n -> populateGraph(n, graph))")
+                                        .addStatement("startingNodes.forEach(n -> populateGraph(n, graph, true))")
                                         .addStatement("return graph")
                                         .build())
                         .addMethod(MethodSpec.methodBuilder("populateGraph")
@@ -106,6 +130,7 @@ public class VisitorImplGenerator implements TypesGenerator {
                                                         config.DEFAULT_VISITOR_HOST_FOR_ALL_CLASSES_NAME),
                                                         "startingNode")
                                         .addParameter(ClassName.get(Graph.class), "graph")
+                                        .addParameter(ClassName.BOOLEAN, "includeIndividuals")
                                         .addStatement("$T graphEntityVisitor = $L",
                                                         GraphEntityVisitor.class,
                                                         TypeSpec.anonymousClassBuilder("")
@@ -114,7 +139,7 @@ public class VisitorImplGenerator implements TypesGenerator {
                                                                                         .addModifiers(PUBLIC)
                                                                                         .addParameter(GraphEntity.class,
                                                                                                         "graphEntity")
-                                                                                        .addStatement("graphEntity.toRdf ( triple -> graph.add(triple) )")
+                                                                                        .addStatement("graphEntity.toRdf ( triple -> graph.add(triple), includeIndividuals )")
                                                                                         .build())
                                                                         .build())
                                         .addStatement("startingNode.accept(new $T(graphEntityVisitor))",

@@ -10,9 +10,12 @@
  */
 package won.node.web;
 
+import org.apache.jena.graph.Graph;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.vocabulary.RDFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +58,7 @@ import won.protocol.model.ConnectionState;
 import won.protocol.model.DataWithEtag;
 import won.protocol.rest.WonEtagHelper;
 import won.protocol.util.RdfUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.CNT;
 import won.protocol.vocabulary.HTTP;
 import won.protocol.vocabulary.WONMSG;
@@ -202,6 +206,26 @@ public class LinkedDataWebController implements InitializingBean {
         model.addAttribute("rdfDataset", rdfDataset);
         model.addAttribute("resourceURI", atomURI.toString());
         model.addAttribute("dataURI", uriService.toDataURIIfPossible(atomURI).toString());
+        return "rdfDatasetView";
+    }
+
+    @RequestMapping(value = "${uri.path.page}/atom/{identifier}/grants", method = RequestMethod.GET)
+    public String showGrantsPage(@PathVariable String identifier,
+                    Model model,
+                    HttpServletRequest request) {
+        WonAclEvalContext ctx = WonAclRequestHelper.getWonAclEvaluationContext(request);
+        Graph result = ctx.getGrants();
+        URI resourceUri = WonRelativeUriHelper
+                        .createGrantsRequestURIForAtomURI(uriService.createAtomURIForId(identifier));
+        Dataset rdfDataset = null;
+        if (result != null) {
+            rdfDataset = DatasetFactory.wrap(DatasetGraphFactory.create(result));
+        } else {
+            rdfDataset = DatasetFactory.createGeneral();
+        }
+        model.addAttribute("rdfDataset", rdfDataset);
+        model.addAttribute("resourceURI", resourceUri.toString());
+        model.addAttribute("dataURI", uriService.toDataURIIfPossible(resourceUri).toString());
         return "rdfDatasetView";
     }
 
@@ -934,6 +958,19 @@ public class LinkedDataWebController implements InitializingBean {
             return new ResponseEntity<Collection<String>>(tokens, HttpStatus.OK);
         }
         return new ResponseEntity<Collection<String>>(Collections.emptySet(), HttpStatus.NO_CONTENT);
+    }
+
+    @RequestMapping(value = "${uri.path.resource}/atom/{identifier}/grants", method = RequestMethod.GET, produces = {
+                    "application/ld+json",
+                    "application/trig", "application/n-quads" })
+    public ResponseEntity<Dataset> readGrants(
+                    HttpServletRequest request) {
+        WonAclEvalContext ctx = WonAclRequestHelper.getWonAclEvaluationContext(request);
+        Graph result = ctx.getGrants();
+        if (result != null) {
+            return new ResponseEntity<Dataset>(DatasetFactory.wrap(DatasetGraphFactory.create(result)), HttpStatus.OK);
+        }
+        return new ResponseEntity<Dataset>(DatasetFactory.createGeneral(), HttpStatus.NO_CONTENT);
     }
 
     @RequestMapping(value = "${uri.path.data}", method = RequestMethod.GET, produces = { "application/ld+json",

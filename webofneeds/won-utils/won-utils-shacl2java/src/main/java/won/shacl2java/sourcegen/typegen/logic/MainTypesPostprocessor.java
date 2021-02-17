@@ -276,10 +276,16 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                     Shacl2JavaConfig config) {
         // first,prepare a methodbuilder for the toRdf method
         // we will add statements to it while processing the relevant shapes
-        MethodSpec.Builder toRdfBuilder = MethodSpec.methodBuilder("toRdf")
+        MethodSpec.Builder toRdfBuilderDelegating = MethodSpec.methodBuilder("toRdf")
                         .addModifiers(PUBLIC)
                         .addAnnotation(Override.class)
                         .addParameter(ParameterizedTypeName.get(Consumer.class, Triple.class), "tripleConsumer")
+                        .addStatement("toRdf(tripleConsumer, true)");
+        typeBuilder.addMethod(toRdfBuilderDelegating.build());
+        MethodSpec.Builder toRdfBuilder = MethodSpec.methodBuilder("toRdf")
+                        .addModifiers(PUBLIC)
+                        .addParameter(ParameterizedTypeName.get(Consumer.class, Triple.class), "tripleConsumer")
+                        .addParameter(ClassName.BOOLEAN, "includeIndividuals")
                         .addStatement("$T obj = null", Node.class)
                         .addStatement("$T entityNode = getNodeCreateIfNecessary()", Node.class)
                         .beginControlFlow("if (getGraph() == null)")
@@ -290,6 +296,13 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         TypeName typeName = ClassName.get(config.getPackageName(), name);
         ClassName builderTypeName = ClassName.get(config.getPackageName(), name + ".Builder");
         TypeSpec.Builder builderBuilder = generateBuilderBuilder(typeBuilder, typeName, builderTypeName);
+        // for the clone() method, we prepare another builder
+        // we will add statements to it while processing the relevant shapes
+        MethodSpec.Builder cloneBuilder = MethodSpec.methodBuilder("clone")
+                        .addModifiers(PUBLIC)
+                        .returns(ClassName.OBJECT)
+                        .addAnnotation(Override.class)
+                        .addStatement("$T clone = ($T) super.clone()", typeName, typeName);
         for (Shape relevantShape : relevantShapes) {
             Set<PropertyShape> propertyShapes = new HashSet();
             propertyShapes.addAll(relevantShape.getPropertyShapes());
@@ -322,7 +335,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 boolean addTypeSuffix = propertySpecs.size() > 1;
                 for (PropertySpec propertySpec : propertySpecs) {
                     addFieldWithPropertySpec(shapes, propertyName.get(), path, propertySpec, typeBuilder,
-                                    builderBuilder, builderTypeName, toRdfBuilder,
+                                    builderBuilder, builderTypeName, toRdfBuilder, cloneBuilder,
                                     fieldsPerPath,
                                     config,
                                     addTypeSuffix);
@@ -351,13 +364,17 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                                         (left, right) -> IndividualPropertySpec.merge(left, right)))
                         .values()
                         .stream()
-                        .forEach(spec -> addFieldWithIndividualPropertySpec(spec, typeBuilder, toRdfBuilder, config));
+                        .forEach(spec -> addFieldWithIndividualPropertySpec(spec, typeBuilder, toRdfBuilder,
+                                        cloneBuilder, config));
         // finish toRdf method
         toRdfBuilder.nextControlFlow("else")
                         .addStatement("super.toRdf(tripleConsumer)")
                         .endControlFlow();
+        // finish clone method
+        cloneBuilder.addStatement("return clone");
         typeBuilder.addType(builderBuilder.build());
         typeBuilder.addMethod(toRdfBuilder.build());
+        typeBuilder.addMethod(cloneBuilder.build());
     }
 
     private TypeSpec.Builder generateBuilderBuilder(TypeSpec.Builder typeBuilder,
@@ -529,7 +546,7 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
 
     private void addFieldWithPropertySpec(Shapes shapes, String propertyName, Path path, PropertySpec propertySpec,
                     TypeSpec.Builder typeBuilder, TypeSpec.Builder builderBuilder,
-                    ClassName builderTypeName, MethodSpec.Builder toRdfMethodBuilder,
+                    ClassName builderTypeName, MethodSpec.Builder toRdfMethodBuilder, MethodSpec.Builder cloneBuilder,
                     Map<Path, Set<FieldSpec>> fieldsPerPath, Shacl2JavaConfig config,
                     boolean addTypeSuffix) {
         logger.debug("adding field {} for propertySpec: {}", propertyName, propertySpec);
@@ -566,21 +583,25 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         MethodSpec setterForBuilder = generateSetterForBuilder(field, builderTypeName, "product");
         builderBuilder
                         .addMethod(setterForBuilder);
+        boolean isCloneableAndBuildable = this.buildableClassNames.containsValue(helper.getBaseType());
         if (propertySpec.isSingletonProperty()) {
-            if (buildableClassNames.containsValue(field.type)) {
+            if (isCloneableAndBuildable) {
                 builderBuilder.addMethod(generateSetterByBuilderForBuilder(field, builderTypeName, "product", config));
             }
+            generateToRdfForField(path, toRdfMethodBuilder, getter, true);
+            generateCloneForSingletonField(cloneBuilder, helper.getBaseType(), getter, setter, isCloneableAndBuildable);
         } else {
-            typeBuilder.addMethod(generateAdder(field));
+            MethodSpec adder = generateAdder(field);
+            typeBuilder.addMethod(adder);
             builderBuilder.addMethod(generateAdderForBuilder(field, builderTypeName, "product"));
-            TypeName baseType = ((ParameterizedTypeName) field.type).typeArguments.get(0);
-            if (buildableClassNames.containsValue(baseType)) {
+            if (isCloneableAndBuildable) {
                 builderBuilder.addMethod(generateAdderByBuilderForBuilder(field,
                                 builderTypeName, "product", config));
             }
+            generateToRdfForField(path, toRdfMethodBuilder, getter, false);
+            generateCloneForNonSingletonField(cloneBuilder, helper.getBaseType(), getter, adder,
+                            isCloneableAndBuildable);
         }
-        boolean singleton = propertySpec.isSingletonProperty();
-        generateToRdfForField(path, toRdfMethodBuilder, getter, singleton);
     }
 
     private void generateToRdfForField(Path path, MethodSpec.Builder toRdfMethodBuilder, MethodSpec getter,
@@ -605,8 +626,38 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
         }
     }
 
+    private void generateCloneForSingletonField(MethodSpec.Builder cloneMethodBuilder, ClassName baseType,
+                    MethodSpec getter,
+                    MethodSpec setter, boolean isCloneable) {
+        if (isCloneable) {
+            cloneMethodBuilder
+                            .addStatement("clone.$N( ($T) $T.ofNullable($N()).map(x -> x.clone()) .orElse(null) )",
+                                            setter.name, baseType, Optional.class, getter.name);
+        } else {
+            cloneMethodBuilder
+                            .addStatement("clone.$N($N())", setter.name, getter.name);
+        }
+    }
+
+    private void generateCloneForNonSingletonField(MethodSpec.Builder cloneMethodBuilder, ClassName baseType,
+                    MethodSpec getter,
+                    MethodSpec adder, boolean isCloneable) {
+        cloneMethodBuilder
+                        .beginControlFlow("$T.ofNullable($N()).orElse($T.emptySet()).forEach(val ->",
+                                        Optional.class,
+                                        getter.name,
+                                        Collections.class);
+        if (isCloneable) {
+            cloneMethodBuilder.addStatement("clone.$N(($T) val.clone())", adder.name, baseType);
+        } else {
+            cloneMethodBuilder.addStatement("clone.$N(val)", adder.name);
+        }
+        cloneMethodBuilder.endControlFlow(")");
+    }
+
     private void addFieldWithIndividualPropertySpec(IndividualPropertySpec propertySpec,
-                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfBuilder, Shacl2JavaConfig config) {
+                    TypeSpec.Builder typeBuilder, MethodSpec.Builder toRdfBuilder, MethodSpec.Builder cloneBuilder,
+                    Shacl2JavaConfig config) {
         logger.debug("adding field {} for individual property spec: {}", propertySpec.getPredicate().getLocalName(),
                         propertySpec);
         IndividualPropertyHelper helper = new IndividualPropertyHelper(propertySpec, config, false);
@@ -624,11 +675,18 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                         .addField(field)
                         .addMethod(setter)
                         .addMethod(getter);
-        if (!propertySpec.isSingletonProperty()) {
-            typeBuilder.addMethod(generateAdder(field));
+        boolean isCloneable = this.buildableClassNames.containsValue(helper.getBaseType());
+        if (propertySpec.isSingletonProperty()) {
+            generateCloneForSingletonField(cloneBuilder, helper.getBaseType(), getter, setter, isCloneable);
+        } else {
+            MethodSpec adder = generateAdder(field);
+            typeBuilder.addMethod(adder);
+            generateCloneForNonSingletonField(cloneBuilder, helper.getBaseType(), getter, adder, isCloneable);
         }
+        toRdfBuilder.beginControlFlow("if (includeIndividuals)");
         generateToRdfForField(new P_Link(propertySpec.getPredicate()), toRdfBuilder, getter,
                         propertySpec.isSingletonProperty());
+        toRdfBuilder.endControlFlow();
     }
 
     private static class IndividualPropertyHelper {
@@ -649,6 +707,11 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
             this.typeSuffix = (config.isAlwaysAddTypeIndicator() || addTypeIndicator) ? getTypeIndicator() : "";
         }
 
+        /**
+         * The type of the field, either the baseType or Set<(baseType)>.
+         *
+         * @return
+         */
         public TypeName getTypeName() {
             return typeName;
         }
@@ -659,6 +722,15 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 name = plural(name);
             }
             return name + typeSuffix;
+        }
+
+        /**
+         * The dependency class.
+         *
+         * @return
+         */
+        public ClassName getBaseType() {
+            return baseType;
         }
 
         public String getFieldNameSingular() {
@@ -720,6 +792,10 @@ public class MainTypesPostprocessor implements TypesPostprocessor {
                 name = plural(name);
             }
             return name + propertyKindSuffix + typeSuffix;
+        }
+
+        public ClassName getBaseType() {
+            return baseType;
         }
 
         public String getFieldNameSingular() {

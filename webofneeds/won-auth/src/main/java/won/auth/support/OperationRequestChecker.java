@@ -1,7 +1,8 @@
-package won.auth;
+package won.auth.support;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import won.auth.AuthUtils;
 import won.auth.model.*;
 
 import java.lang.invoke.MethodHandles;
@@ -13,8 +14,9 @@ import java.util.stream.Stream;
 import static won.auth.WonAclEvaluator.DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS;
 import static won.auth.model.Individuals.ANY_OPERATION;
 import static won.auth.model.MessageWildcard.ANY_MESSAGE_TYPE;
+import static won.auth.support.TreeExpressionVisitorUtils.isAncestorPosition;
 
-class OperationRequestChecker extends DefaultTreeExpressionVisitor {
+public class OperationRequestChecker extends DefaultTreeExpressionVisitor {
     private enum MaybeBoolean {
         TRUE(true), FALSE(false), NULL(null);
         private Boolean value;
@@ -94,29 +96,6 @@ class OperationRequestChecker extends DefaultTreeExpressionVisitor {
         this.operationRequest = operationRequest;
         this.grantedOperations.push(new HashSet<>());
         this.decision.push(MaybeBoolean.NULL);
-    }
-
-    private static boolean isAncestorPosition(AsePosition ancestorCandidate, AsePosition pos) {
-        return isAncestorPosition(ancestorCandidate, pos, new HashSet<>());
-    }
-
-    private static boolean isAncestorPosition(AsePosition ancestorCandidate, AsePosition pos,
-                    Set<AsePosition> visited) {
-        visited.add(pos);
-        if (pos.equals(ancestorCandidate)) {
-            return false;
-        }
-        AsePosition parent = pos.getParentPosition();
-        if (parent == null) {
-            return false;
-        }
-        if (parent.equals(ancestorCandidate)) {
-            return true;
-        }
-        if (visited.contains(parent)) {
-            throw new IllegalStateException(String.format("ASE ancestor cycle detected via %s and %s", pos, parent));
-        }
-        return isAncestorPosition(ancestorCandidate, parent, visited);
     }
 
     private static Set<MessageType> collectMessageTypes(Set<MessageTypeSpecification> msgTypeSpecs) {

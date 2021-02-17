@@ -1,0 +1,3 @@
+@prefix auth: <https://w3id.org/won/auth#> .
+
+[ auth:operation auth:opRead ] .

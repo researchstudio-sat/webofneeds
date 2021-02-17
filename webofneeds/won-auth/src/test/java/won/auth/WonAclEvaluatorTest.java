@@ -284,10 +284,7 @@ public class WonAclEvaluatorTest {
                 logger.debug("{}: using spec {} for testing...", testIdentifier, spec.toStringAllFields());
                 OperationRequest opReq = spec.getRequestedOperation();
                 setImplicitValues(opReq, atomTestData);
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
-                cal.add(Calendar.MINUTE, 30);
-                opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
+                setValidTokenExpiryDate(opReq);
                 long start = System.currentTimeMillis();
                 AclEvalResult actualResult = loadedEvaluator.create(false).decide(opReq);
                 logDuration("making authorization decision", start);
@@ -346,6 +343,13 @@ public class WonAclEvaluatorTest {
                                 spec.getNode()), e);
             }
         }
+    }
+
+    private void setValidTokenExpiryDate(OperationRequest opReq) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.MINUTE, 30);
+        opReq.getBearsTokens().forEach(token -> token.setTokenExp(new XSDDateTime(cal)));
     }
 
     private void setImplicitValues(OperationRequest opReq, Shacl2JavaInstanceFactory.Accessor instanceFactory) {

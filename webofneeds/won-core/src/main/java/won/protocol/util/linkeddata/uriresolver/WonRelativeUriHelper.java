@@ -50,6 +50,10 @@ public class WonRelativeUriHelper {
         return URI.create(atomURI.toString() + "/token" + (query == null ? "" : "?" + query));
     }
 
+    public static URI createGrantsRequestURIForAtomURI(URI atomURI) {
+        return URI.create(atomURI.toString() + "/grants");
+    }
+
     public static URI stripFragment(URI uriWithFragment) {
         URI uriWithoutFragment;
         Objects.requireNonNull(uriWithFragment);

@@ -389,6 +389,12 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                 setAuthInfoIfDenied(filterInvocation, finalResult);
                 return toAccessDecisionVote(finalResult);
             }
+        } else if (uriService.isGrantsEndpointURI(resourceUri)) {
+            // the LinkedDataWebController will return the grants
+            WonAclRequestHelper.setWonAclEvaluationContext(
+                            filterInvocation.getRequest(),
+                            WonAclEvalContext.contentFilter(request, wonAclEvaluator));
+            return ACCESS_GRANTED;
         } else {
             // default
             request.setReqPosition(POSITION_ROOT);

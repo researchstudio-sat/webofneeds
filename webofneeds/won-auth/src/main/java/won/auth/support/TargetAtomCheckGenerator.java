@@ -1,15 +1,12 @@
-package won.auth;
+package won.auth.support;
 
-import org.apache.thrift.TException;
 import won.auth.check.TargetAtomCheck;
-import won.auth.model.DefaultTreeExpressionVisitor;
 import won.auth.model.*;
 
 import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
 
-class TargetAtomCheckGenerator extends DefaultTreeExpressionVisitor {
+public class TargetAtomCheckGenerator extends DefaultTreeExpressionVisitor {
     private Deque<TargetAtomCheck> checks = new ArrayDeque<>();
     private Set<TargetAtomCheck> targetAtomChecks = new HashSet<>();
 

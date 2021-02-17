@@ -26,7 +26,7 @@
 
     <logger name="won.auth.WonAclEvaluatorTest" level="info"/>
     <logger name="won.auth.WonAclEvaluator" level="info"/>
-    <logger name="won.auth.OperationRequestChecker" level="info"/>
+    <logger name="won.auth.support.OperationRequestChecker" level="info"/>
     <logger name="won.auth" level="info"/>
     <logger name="won.shacl2java" level="warn"/>
 

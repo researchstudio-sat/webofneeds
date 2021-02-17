@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public abstract class GraphEntity {
+public abstract class GraphEntity implements Cloneable {
     private Node node;
     private Graph graph;
     private Set<EntityTriple> entityTriples = new HashSet<>();
@@ -81,6 +81,18 @@ public abstract class GraphEntity {
     public GraphEntity() {
     }
 
+    public Object clone() {
+        GraphEntity clone = null;
+        try {
+            clone = (GraphEntity) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // swallow
+        }
+        clone.node = node;
+        clone.graph = graph;
+        return clone;
+    }
+
     public void requireEntityNodeKind(Node node) {
         if (node != null) {
             if (!(node.isBlank() || node.isURI())) {
@@ -146,10 +158,12 @@ public abstract class GraphEntity {
         additionalTriplesToRdf(consumer);
     }
 
+    public abstract void toRdf(Consumer<Triple> consumer, boolean includeIndividuals);
+
     /**
      * Provides the triples to the consumer that have been added via
      * <code>addEntityRelation</code> or <code>addEntityTriple</code>.
-     * 
+     *
      * @param consumer
      */
     protected void additionalTriplesToRdf(Consumer<Triple> consumer) {

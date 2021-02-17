@@ -13,6 +13,8 @@ import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.protocol.message.WonMessageType;
 import won.shacl2java.Shacl2JavaInstanceFactory;
+import won.shacl2java.runtime.model.GraphEntity;
+import won.shacl2java.runtime.model.GraphEntityVisitor;
 
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
@@ -281,5 +283,23 @@ public class AuthUtils {
             }
             return null;
         }
+    }
+
+    public static void detach(AseRoot entity) {
+        new GraphEntityVisitorEngine(new GraphEntityVisitor() {
+            @Override
+            public void visit(GraphEntity host) {
+                host.detach();
+            }
+        }).visit(entity);
+    }
+
+    public static void detach(Authorization auth) {
+        new GraphEntityVisitorEngine(new GraphEntityVisitor() {
+            @Override
+            public void visit(GraphEntity host) {
+                host.detach();
+            }
+        }).visit(auth);
     }
 }

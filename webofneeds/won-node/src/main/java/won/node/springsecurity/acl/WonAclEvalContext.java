@@ -1,10 +1,10 @@
 package won.node.springsecurity.acl;
 
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.Difference;
 import won.auth.AuthUtils;
 import won.auth.WonAclEvaluator;
-import won.auth.model.AclEvalResult;
-import won.auth.model.DecisionValue;
-import won.auth.model.OperationRequest;
+import won.auth.model.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +57,25 @@ public class WonAclEvalContext {
         }
         this.aclEvalResults.put(request, result);
         return result;
+    }
+
+    /**
+     * Returns an rdf graph with an ASE containing all operations allowed for the
+     * presented credentials.
+     *
+     * @return null if none are allowed.
+     */
+    public Graph getGrants() {
+        if (isModeAllowAll()) {
+            throw new IllegalStateException("Did not expect this call in mode ALLOW_ALL");
+        }
+        Optional<AseRoot> grantedOperations = wonAclEvaluator.getGrants(getOperationRequest());
+        Graph actualResult = null;
+        if (grantedOperations.isPresent()) {
+            actualResult = RdfOutput.toGraph(grantedOperations.get(), false);
+            actualResult = new Difference(actualResult, AuthUtils.shapes().getGraph());
+        }
+        return actualResult;
     }
 
     public Optional<AclEvalResult> getCombinedResults() {

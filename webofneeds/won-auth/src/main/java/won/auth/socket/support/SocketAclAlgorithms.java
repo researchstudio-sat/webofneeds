@@ -1,6 +1,7 @@
 package won.auth.socket.support;
 
 import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.Difference;
 import won.auth.AuthUtils;
 import won.auth.model.*;
 import won.shacl2java.Shacl2JavaInstanceFactory;
@@ -107,7 +108,7 @@ public class SocketAclAlgorithms {
             }
         }
         existingAuths.forEach(a -> a.detach());
-        return RdfOutput.toGraph(existingAuths);
+        return new Difference(RdfOutput.toGraph(existingAuths), AuthUtils.shapes().getGraph());
     }
 
     /**
@@ -142,8 +143,8 @@ public class SocketAclAlgorithms {
                         })
                         .filter(existingAuth -> !existingAuth.getRequestedBys().isEmpty())
                         .collect(Collectors.toSet());
-        modifiedAuths.forEach(auth -> auth.detach());
-        return RdfOutput.toGraph(modifiedAuths);
+        modifiedAuths.forEach(a -> a.detach());
+        return new Difference(RdfOutput.toGraph(modifiedAuths), AuthUtils.shapes().getGraph());
     }
 
     private boolean mentionsAtom(Authorization authorization, URI atom) {

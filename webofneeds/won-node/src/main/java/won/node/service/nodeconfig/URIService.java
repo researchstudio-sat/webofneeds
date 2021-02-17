@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @Component
 public class URIService implements InitializingBean {
     private static final String TOKEN_ENDPOINT_SUFFIX = "/token";
+    private static final String GRANTS_ENDPOINT_SUFFIX = "/grants";
     // prefix of any URI
     private String generalURIPrefix;
     // prefix of an atom resource
@@ -55,6 +56,7 @@ public class URIService implements InitializingBean {
     private Pattern messageUriPattern;
     private Pattern connectionContainerUriPattern;
     private Pattern tokenEndpointUriPattern;
+    private Pattern grantsEndpointUriPattern;
     private Pattern connectionMessagesSubUriPattern;
     private Pattern messageSubUriPattern;
     private Pattern connectionSubUriPattern;
@@ -102,6 +104,9 @@ public class URIService implements InitializingBean {
         this.tokenEndpointUriPattern = Pattern
                         .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+" + TOKEN_ENDPOINT_SUFFIX
                                         + resourcePatternSuffix);
+        this.grantsEndpointUriPattern = Pattern
+                        .compile(atomResourceURIPrefix + "/[\\-\\._~\\+a-zA-Z0-9]+" + GRANTS_ENDPOINT_SUFFIX
+                                        + resourcePatternSuffix);
     }
 
     public boolean isMessageURI(URI toCheck) {
@@ -139,6 +144,14 @@ public class URIService implements InitializingBean {
             return false;
         }
         Matcher m = tokenEndpointUriPattern.matcher(toCheck.toString());
+        return m.matches();
+    }
+
+    public boolean isGrantsEndpointURI(URI toCheck) {
+        if (toCheck == null) {
+            return false;
+        }
+        Matcher m = grantsEndpointUriPattern.matcher(toCheck.toString());
         return m.matches();
     }
 
