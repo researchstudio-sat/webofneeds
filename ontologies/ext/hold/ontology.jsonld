@@ -90,6 +90,9 @@
   "@id" : "_:genid23",
   "https://w3id.org/won/auth#graph" : [ {
     "@id" : "_:genid24"
+  } ],
+  "https://w3id.org/won/auth#socket" : [ {
+    "@id" : "_:genid25"
   } ]
 }, {
   "@id" : "_:genid24",
@@ -105,6 +108,28 @@
   } ]
 }, {
   "@id" : "_:genid25",
+  "https://w3id.org/won/auth#connections" : [ {
+    "@id" : "_:genid26"
+  } ],
+  "https://w3id.org/won/auth#socketType" : [ {
+    "@id" : "https://w3id.org/won/ext/hold#HoldableSocket"
+  } ]
+}, {
+  "@id" : "_:genid26",
+  "https://w3id.org/won/auth#connectionMessages" : [ {
+    "@id" : "_:genid27"
+  } ],
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "https://w3id.org/won/auth#opRead"
+  } ]
+}, {
+  "@id" : "_:genid27",
+  "https://w3id.org/won/auth#inherit" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
+    "@value" : "false"
+  } ]
+}, {
+  "@id" : "_:genid28",
   "@type" : [ "http://www.w3.org/2002/07/owl#AllDifferent" ],
   "http://www.w3.org/2002/07/owl#distinctMembers" : [ {
     "@list" : [ {
@@ -291,7 +316,7 @@
     "@value" : "HoldableSocket"
   } ],
   "https://w3id.org/won/auth#localAuth" : [ {
-    "@id" : "https://w3id.org/won/ext/hold#grantAccessToHolder"
+    "@id" : "https://w3id.org/won/ext/hold#grantAccessToHolderAuth"
   }, {
     "@id" : "https://w3id.org/won/ext/hold#grantReadViaHolderAuth"
   } ],

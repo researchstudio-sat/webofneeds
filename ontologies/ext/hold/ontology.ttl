@@ -170,7 +170,7 @@ rdfs:labels rdf:type owl:AnnotationProperty .
                 <https://w3id.org/won/core#socketCapacity> 1 ;
                 rdfs:comment "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en ;
                 rdfs:label "HoldableSocket" ;
-                <https://w3id.org/won/auth#localAuth> :grantAccessToHolder ,
+                <https://w3id.org/won/auth#localAuth> :grantAccessToHolderAuth ,
                                                       :grantReadViaHolderAuth .
 
 
@@ -258,23 +258,32 @@ _:genid14 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core
                                  <https://w3id.org/won/auth#Authorization> ;
                         rdfs:label "GrantReadViaHolderAuth" ;
                         <https://w3id.org/won/auth#bearer> _:genid18 ;
-                        <https://w3id.org/won/auth#grant> [ <https://w3id.org/won/auth#graph> _:genid24
-                                                          ] .
+                        <https://w3id.org/won/auth#grant> _:genid23 .
 
 _:genid18 <https://w3id.org/won/auth#issuer> [ <https://w3id.org/won/auth#socket> _:genid20
                                               ] ;
            <https://w3id.org/won/auth#tokenScope> :ScopeReadHeldAtoms .
+
+_:genid23 <https://w3id.org/won/auth#graph> _:genid24 ;
+           <https://w3id.org/won/auth#socket> _:genid25 .
+
+_:genid20 <https://w3id.org/won/auth#connection> _:genid21 ;
+           <https://w3id.org/won/auth#socketType> :HoldableSocket .
 
 _:genid24 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ,
                                                  <https://w3id.org/won/auth#keyGraph> ,
                                                  <https://w3id.org/won/auth#sysinfoGraph> ;
            <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
-_:genid20 <https://w3id.org/won/auth#connection> _:genid21 ;
+_:genid25 <https://w3id.org/won/auth#connections> _:genid26 ;
            <https://w3id.org/won/auth#socketType> :HoldableSocket .
 
 _:genid21 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
            <https://w3id.org/won/auth#targetAtom> [ ] .
+
+_:genid26 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+                                                          ] ;
+           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
 
 ###  https://w3id.org/won/ext/hold#heldBy
