@@ -483,6 +483,21 @@ export const getOwnedConnections = createSelector(
     ownedAtoms && ownedAtoms.flatMap(atom => atomUtils.getConnections(atom))
 );
 
+export const getConnections = createSelector(
+  getAtoms,
+  atoms => atoms && atoms.flatMap(atom => atomUtils.getConnections(atom))
+);
+
+export const getConnectionsWithTargetAtomUri = targetAtomUri =>
+  createSelector(
+    getConnections,
+    connections =>
+      connections &&
+      connections.filter(
+        conn => connectionUtils.getTargetAtomUri(conn) === targetAtomUri
+      )
+  );
+
 export const getConnectionsToCrawl = createSelector(
   getProcessState,
   getAllConnectedChatAndGroupConnections,
