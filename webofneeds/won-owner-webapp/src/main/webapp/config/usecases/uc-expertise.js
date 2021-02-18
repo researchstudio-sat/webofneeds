@@ -25,7 +25,7 @@ export const genericExpertise = {
   reactions: {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.GROUP.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["genericExpertise", "persona"],
       },
     },
