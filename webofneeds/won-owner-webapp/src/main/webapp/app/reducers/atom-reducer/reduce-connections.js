@@ -45,7 +45,7 @@ function addConnectionFull(atomState, connection) {
         //If there is a new message for the connection we will set the connection to newConnection
         atomState = atomState.setIn(
           [atomUri, "lastUpdateDate"],
-          get(parsedConnectionData, "lastUpdateDate")
+          connectionUtils.getLastUpdateDate(parsedConnectionData)
         );
         atomState = atomState.setIn([atomUri, "unread"], true);
       }
@@ -368,7 +368,7 @@ function addMetaConnection(atomState, atomUri, conn) {
       //If there is a new message for the connection we will set the connection to newConnection
       atomState = atomState.setIn(
         [atomUri, "lastUpdateDate"],
-        get(parsedMetaConnectionData, "lastUpdateDate")
+        connectionUtils.getLastUpdateDate(parsedMetaConnectionData)
       );
       atomState = atomState.setIn([atomUri, "unread"], true);
     }
