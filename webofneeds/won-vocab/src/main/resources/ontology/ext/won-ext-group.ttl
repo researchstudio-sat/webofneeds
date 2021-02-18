@@ -97,7 +97,7 @@ vann:preferredNamespacePrefix
 
 :grantAccessToGraphAndGroupMemberAuth
     a            auth:Authorization ;
-    rdfs:label  "GrantAccessToGraphAndGroupMemberAuth" ;
+    rdfs:label   "GrantAccessToGraphAndGroupMemberAuth" ;
     auth:grantee [ auth:socket [ auth:socketType :GroupSocket ;
                                  auth:connection [ auth:connectionState won:Connected, won:RequestSent ;
                                                    auth:targetAtom      [ ] ] ] ] ;
@@ -113,9 +113,9 @@ vann:preferredNamespacePrefix
     a           auth:Authorization ;
     rdfs:label  "GrantReadGroupMemberViaGroupSocketAuth" ;
     auth:bearer [ auth:tokenScope :GroupSocket ;
-                  auth:issuer      [ auth:socket [ auth:socketType :GroupSocket ;
-                                                   auth:connection [ auth:targetAtom      [ ] ;
-                                                                     auth:connectionState won:Connected ] ] ] ] ;
+                  auth:issuer     [ auth:socket [ auth:socketType :GroupSocket ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
     auth:grant  [ auth:graph [ auth:graphType auth:contentGraph ;
                                auth:operation auth:opRead ] ] .
 
