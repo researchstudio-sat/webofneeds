@@ -1,4 +1,4 @@
-<html><h2 id="overv" class="list">Web of Needs Schema Extension: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<h2 id="overv" class="list">Web of Needs Schema Extension: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
 <span class="markdown">
 This ontology has the following classes and properties.</span>
 <h4>Named Individuals</h4><ul class="hlist">
@@ -1609,11 +1609,19 @@ This ontology has the following classes and properties.</span>
       <a href="#GeoWithinSocket" title="https://w3id.org/won/ext/schema#GeoWithinSocket">GeoWithinSocket</a>
    </li>
    <li>
+      <a href="#grantAccessToGraphAndMemberAuth"
+         title="https://w3id.org/won/ext/schema#grantAccessToGraphAndMemberAuth">grantAccessToGraphAndMemberAuth</a>
+   </li>
+   <li>
       <a href="#GranteeInverseSocket"
          title="https://w3id.org/won/ext/schema#GranteeInverseSocket">GranteeInverseSocket</a>
    </li>
    <li>
       <a href="#GranteeSocket" title="https://w3id.org/won/ext/schema#GranteeSocket">GranteeSocket</a>
+   </li>
+   <li>
+      <a href="#grantReadMemberViaMemberSocketAuth"
+         title="https://w3id.org/won/ext/schema#grantReadMemberViaMemberSocketAuth">grantReadMemberViaMemberSocketAuth</a>
    </li>
    <li>
       <a href="#GreaterInverseSocket"
@@ -2654,6 +2662,10 @@ This ontology has the following classes and properties.</span>
    <li>
       <a href="#OrderStatusSocket"
          title="https://w3id.org/won/ext/schema#OrderStatusSocket">OrderStatusSocket</a>
+   </li>
+   <li>
+      <a href="#OrganizationRoleOfSocket"
+         title="https://w3id.org/won/ext/schema#OrganizationRoleOfSocket">OrganizationRoleOfSocket</a>
    </li>
    <li>
       <a href="#OrganizerInverseSocket"
@@ -4146,4 +4158,4 @@ This ontology has the following classes and properties.</span>
       <a href="#WorkTranslationSocket"
          title="https://w3id.org/won/ext/schema#WorkTranslationSocket">WorkTranslationSocket</a>
    </li>
-</ul></html>
+</ul>
