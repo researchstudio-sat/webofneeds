@@ -599,6 +599,9 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
     state
   );
 
+  //FIXME: ProcessConnectMessage could fetch atoms/connections in a way that makes the atom unloadable
+  //e.g Atom is only accessible for Atoms with receivedRequests -> atom is fetched no connection is in the state yet so requesterWebId can't be found by a connection between the two
+
   const receiverConnectionUri = getUri(
     atomUtils.getConnectionBySocketUris(
       recipientAtom,
