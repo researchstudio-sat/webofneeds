@@ -585,12 +585,12 @@ export const fetchMessages = (
   dispatch,
   state,
   connectionUri,
-  atomUri,
+  requestCredentials,
   numberOfMessages,
   resumeAfter /*msgUri: load numberOfEvents before this msgUri*/
 ) => {
   const fetchParams = {
-    requesterWebId: atomUri,
+    ...requestCredentials,
     pagingSize: numberOfMessages * 3, // `*3*` to compensate for the *roughly* 2 additional success messages per chat message
     deep: true,
     resumeafter: resumeAfter,
