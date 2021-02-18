@@ -1952,8 +1952,7 @@ public class AclTests extends AbstractBotBasedTest {
                                     .addGrant(b -> b.addSocket(
                                                     s -> s.addSocketType(WXGROUP.GroupSocket.asURI())
                                                                     .addOperationsSimpleOperationExpression(
-                                                                                    OP_AUTO_CONNECT)
-                                    ))
+                                                                                    OP_AUTO_CONNECT)))
                                     .build();
                     WonMessage createMessage = WonMessageBuilder.createAtom()
                                     .atom(atomUri1)
@@ -2129,17 +2128,20 @@ public class AclTests extends AbstractBotBasedTest {
                 }
             };
             BotBehaviour bbWaitForAutoConnect = new BotBehaviour(ctx) {
-                @Override protected void onActivate(Optional<Object> message) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
                     bus.subscribe(ConnectFromOtherAtomEvent.class,
                                     new ActionOnceAfterNEventsListener(ctx, new EventFilter() {
-                                        @Override public boolean accept(Event event) {
+                                        @Override
+                                        public boolean accept(Event event) {
                                             boolean waitingForThis = ((ConnectFromOtherAtomEvent) event)
                                                             .getSenderSocket()
                                                             .equals(atom1GroupSocket);
                                             return waitingForThis;
                                         }
                                     }, 3, new EventBotAction() {
-                                        @Override public Runnable getActionTask(Event event,
+                                        @Override
+                                        public Runnable getActionTask(Event event,
                                                         EventListener eventListener) {
                                             return () -> deactivate();
                                         }
@@ -2170,17 +2172,20 @@ public class AclTests extends AbstractBotBasedTest {
                 }
             };
             BotBehaviour bbWaitForGroupMessage = new BotBehaviour(ctx) {
-                @Override protected void onActivate(Optional<Object> message) {
+                @Override
+                protected void onActivate(Optional<Object> message) {
                     bus.subscribe(MessageFromOtherAtomEvent.class,
                                     new ActionOnceAfterNEventsListener(ctx, new EventFilter() {
-                                        @Override public boolean accept(Event event) {
+                                        @Override
+                                        public boolean accept(Event event) {
                                             boolean interestedInThis = ((MessageFromOtherAtomEvent) event)
                                                             .getWonMessage().getSenderSocketURIRequired()
                                                             .equals(atom1GroupSocket);
                                             return interestedInThis;
                                         }
                                     }, 2, new EventBotAction() {
-                                        @Override public Runnable getActionTask(Event event,
+                                        @Override
+                                        public Runnable getActionTask(Event event,
                                                         EventListener eventListener) {
                                             return () -> passTest(bus);
                                         }
