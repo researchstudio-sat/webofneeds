@@ -240,12 +240,11 @@ const determineRequestCredentials = (state, atomUri, isOwned) => {
                 );
               }
 
-              return won
-                .fetchTokenForAtom(
-                  getUri(consideredAtom),
-                  { requesterWebId: fetchTokenRequesterId },
-                  vocab.HOLD.ScopeReadHeldAtoms
-                )
+              return ownerApi
+                .fetchTokenForAtom(getUri(consideredAtom), {
+                  requesterWebId: fetchTokenRequesterId,
+                  scopes: vocab.HOLD.ScopeReadHeldAtoms,
+                })
                 .then(tokens => {
                   console.debug("tokens: ", tokens);
                   return { token: tokens[0] };
@@ -480,7 +479,7 @@ export function fetchAtomAndDispatch(
     determineRequestCredentials(state, atomUri, isOwned)
       // TODO: INCLUDE GRANTS FETCH SOMEHOW
       // .then(requestCredentials => {
-      //   won
+      //   ownerApi
       //     .fetchGrantsForAtom(atomUri, requestCredentials)
       //     .then(response => {
       //       console.debug("fetchGrantsForAtom Response: ", response);

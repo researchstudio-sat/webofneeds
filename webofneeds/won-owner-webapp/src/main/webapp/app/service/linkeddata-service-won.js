@@ -313,17 +313,6 @@ import vocab from "./vocab.js";
       }));
   };
 
-  window.fetchToken4dbg = won.fetchTokenForAtom;
-
-  won.fetchTokenForAtom = (atomUri, requesterCredentials, scopes) =>
-    ownerApi.fetchTokenForAtom(atomUri, {
-      ...requesterCredentials,
-      scopes: scopes,
-    });
-
-  won.fetchGrantsForAtom = (atomUri, requesterCredentials) =>
-    ownerApi.fetchGrantsForAtom(atomUri, requesterCredentials);
-
   /**
    * @param senderSocketUri
    * @param targetSocketUri
