@@ -107,36 +107,18 @@ import vocab from "./vocab.js";
   };
 
   /**
-   * Fetches all MetaConnections of the given atomUri
-   * @param atomUri
+   * Fetches all MetaConnections of the given connectionContainerUri
+   * @param connectionContainerUri
    * @param requesterWebId -> usually unset or set to the atomUri itself, this needs to be adapted to include the correct requesterWebId that has credentials to view the connectionContainer of the given atom
    * @param connectedOnly -> if set to true, only connections with the state "Connected" will be returned
    * @returns {Promise<never>}
    */
   won.fetchConnectionUrisWithStateByAtomUri = (
-    atomUri,
-    requestCredentials,
-    connectedOnly = false
+    connectionContainerUri,
+    requestCredentials
   ) =>
     won
-      .fetchJsonLdNode(atomUri, requestCredentials)
-      .then(jsonLdAtom => jsonld.expand(jsonLdAtom))
-      .then(jsonLdAtom => {
-        const jsonLdContentGraph = jsonLdAtom[0];
-
-        return jsonLdContentGraph[vocab.WON.connections][0]["@id"];
-      })
-      .then(connectionContainerUri =>
-        won.fetchJsonLdNode(
-          connectionContainerUri,
-          connectedOnly
-            ? {
-                state: "Connected",
-                ...requestCredentials,
-              }
-            : requestCredentials
-        )
-      )
+      .fetchJsonLdNode(connectionContainerUri, requestCredentials)
       .then(
         connectionContainer =>
           connectionContainer && connectionContainer["@id"]

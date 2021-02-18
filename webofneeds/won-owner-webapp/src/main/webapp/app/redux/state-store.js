@@ -350,26 +350,21 @@ export function fetchConnectionsContainerAndDispatch(
     requestCredentials =>
       won
         .fetchConnectionUrisWithStateByAtomUri(
-          atomUri,
-          requestCredentials,
-          !isOwned
+          atomUtils.getConnectionContainerUri(
+            generalSelectors.getAtom(atomUri)(state)
+          ),
+          requestCredentials
         )
         .then(connectionsWithStateAndSocket => {
-          const connections = isOwned
-            ? connectionsWithStateAndSocket
-            : connectionsWithStateAndSocket.filter(
-                metaConn => metaConn.connectionState === vocab.WON.Connected
-              );
-
           dispatch({
             type: actionTypes.connections.storeMetaConnections,
             payload: Immutable.fromJS({
               atomUri: atomUri,
-              connections: connections,
+              connections: connectionsWithStateAndSocket,
             }),
           });
           if (isOwned) {
-            const activeConnectionUris = connections
+            const activeConnectionUris = connectionsWithStateAndSocket
               .filter(
                 conn =>
                   conn.connectionState !== vocab.WON.Closed &&
