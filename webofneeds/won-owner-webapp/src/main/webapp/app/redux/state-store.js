@@ -24,8 +24,8 @@ import cf from "clownface";
 import { actionCreators } from "../actions/actions";
 import * as useCaseUtils from "~/app/usecase-utils";
 
-export function fetchOwnedMetaData(dispatch) {
-  return ownerApi.fetchOwnedMetaAtoms().then(metaAtoms => {
+export const fetchOwnedMetaData = dispatch =>
+  ownerApi.fetchOwnedMetaAtoms().then(metaAtoms => {
     const atomsImm = Immutable.fromJS(metaAtoms);
     dispatch({
       type: actionTypes.atoms.storeOwnedMetaAtoms,
@@ -40,12 +40,13 @@ export function fetchOwnedMetaData(dispatch) {
 
     return [...activeAtomsImm.keys()];
   });
-}
 
-export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
-  const requesterWebId = atomUri;
-
-  return won
+export const fetchActiveConnectionAndDispatch = (
+  connUri,
+  requesterWebId,
+  dispatch
+) =>
+  won
     .fetchConnection(connUri, { requesterWebId: requesterWebId })
     .then(connection => {
       dispatch({
@@ -67,14 +68,13 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
         }),
       });
     });
-}
 
-export function fetchConnectionUriBySocketUris(
+export const fetchConnectionUriBySocketUris = (
   senderSocketUri,
   targetSocketUri,
   atomUri
-) {
-  return won
+) =>
+  won
     .fetchConnectionUrisBySocket(senderSocketUri, targetSocketUri, {
       requesterWebId: atomUri,
     })
@@ -87,15 +87,14 @@ export function fetchConnectionUriBySocketUris(
         "failed"
       );
     });
-}
 
-export function fetchActiveConnectionAndDispatchBySocketUris(
+export const fetchActiveConnectionAndDispatchBySocketUris = (
   senderSocketUri,
   targetSocketUri,
   atomUri,
   dispatch
-) {
-  return won
+) =>
+  won
     .fetchConnectionBySocket(senderSocketUri, targetSocketUri, {
       requesterWebId: atomUri,
     })
@@ -115,7 +114,6 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
         "failed"
       );
     });
-}
 
 const determineRequestCredentials = (state, atomUri, isOwned) => {
   console.debug("## Determine requesterWebId for", atomUri);
@@ -294,11 +292,11 @@ const determineRequestCredentials = (state, atomUri, isOwned) => {
     }
   }
 };
-export function fetchConnectionsContainerAndDispatch(
+export const fetchConnectionsContainerAndDispatch = (
   atomUri,
   dispatch,
   getState
-) {
+) => {
   const state = getState();
   const processState = generalSelectors.getProcessState(state);
 
@@ -410,7 +408,7 @@ export function fetchConnectionsContainerAndDispatch(
           }
         })
   );
-}
+};
 
 /**
  * Fetches an atom (incl. the persona that holds it), the fetch is omitted if:
@@ -428,12 +426,12 @@ export function fetchConnectionsContainerAndDispatch(
  * @param {boolean} update, defaults to false
  * @returns {*}
  */
-export function fetchAtomAndDispatch(
+export const fetchAtomAndDispatch = (
   atomUri,
   dispatch,
   getState,
   update = false
-) {
+) => {
   const state = getState();
   const processState = generalSelectors.getProcessState(state);
 
@@ -522,10 +520,10 @@ export function fetchAtomAndDispatch(
           })
       )
   );
-}
+};
 
-export function fetchPersonas(dispatch /*, getState,*/) {
-  return ownerApi.fetchAllActiveMetaPersonas().then(atoms => {
+export const fetchPersonas = (dispatch /*, getState,*/) =>
+  ownerApi.fetchAllActiveMetaPersonas().then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -536,14 +534,13 @@ export function fetchPersonas(dispatch /*, getState,*/) {
 
     return atomUris;
   });
-}
 
-export function fetchWhatsNew(
+export const fetchWhatsNew = (
   dispatch,
   getState,
   createdAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
-) {
-  return ownerApi.fetchAllMetaAtoms(createdAfterDate).then(atoms => {
+) =>
+  ownerApi.fetchAllMetaAtoms(createdAfterDate).then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -553,16 +550,15 @@ export function fetchWhatsNew(
     });
     return atomUris;
   });
-}
 
-export function fetchWhatsAround(
+export const fetchWhatsAround = (
   dispatch,
   getState,
   createdAfterDate,
   location,
   maxDistance
-) {
-  return ownerApi
+) =>
+  ownerApi
     .fetchAllMetaAtomsNear(createdAfterDate, location, maxDistance)
     .then(atoms => {
       const atomsImm = Immutable.fromJS(atoms);
@@ -578,16 +574,15 @@ export function fetchWhatsAround(
       });
       return atomUris;
     });
-}
 
-export function fetchMessages(
+export const fetchMessages = (
   dispatch,
   state,
   connectionUri,
   atomUri,
   numberOfMessages,
   resumeAfter /*msgUri: load numberOfEvents before this msgUri*/
-) {
+) => {
   const fetchParams = {
     requesterWebId: atomUri,
     pagingSize: numberOfMessages * 3, // `*3*` to compensate for the *roughly* 2 additional success messages per chat message
@@ -670,7 +665,7 @@ export function fetchMessages(
         }
       }
     });
-}
+};
 
 /**
  * Takes a single uri or an array of uris, performs the lookup function on each
@@ -684,12 +679,12 @@ export function fetchMessages(
  * @param abortOnError -> abort the whole crawl by breaking the promisechain instead of ignoring the failures
  * @return {*}
  */
-function urisToLookupMap(
+const urisToLookupMap = (
   uris,
   asyncLookupFunction,
   excludeUris = [],
   abortOnError = false
-) {
+) => {
   //make sure we have an array and not a single uri.
   const urisAsArray = is("Array", uris) ? uris : [uris];
   const excludeUrisAsArray = is("Array", excludeUris)
@@ -731,7 +726,7 @@ function urisToLookupMap(
     });
     return lookupMap;
   });
-}
+};
 
 export const storeWikiData = (uri, dispatch, getState) => {
   const processState = generalSelectors.getProcessState(getState());
