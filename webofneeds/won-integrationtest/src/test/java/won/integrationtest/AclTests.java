@@ -9,15 +9,18 @@ import org.slf4j.LoggerFactory;
 import won.auth.linkeddata.AuthEnabledLinkedDataSource;
 import won.auth.model.*;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
+import won.bot.framework.eventbot.action.EventBotAction;
 import won.bot.framework.eventbot.action.EventBotActionUtils;
 import won.bot.framework.eventbot.behaviour.BehaviourBarrier;
 import won.bot.framework.eventbot.behaviour.BotBehaviour;
 import won.bot.framework.eventbot.bus.EventBus;
 import won.bot.framework.eventbot.event.Event;
 import won.bot.framework.eventbot.event.impl.wonmessage.ConnectFromOtherAtomEvent;
+import won.bot.framework.eventbot.event.impl.wonmessage.MessageFromOtherAtomEvent;
 import won.bot.framework.eventbot.event.impl.wonmessage.SuccessResponseEvent;
 import won.bot.framework.eventbot.filter.EventFilter;
 import won.bot.framework.eventbot.listener.EventListener;
+import won.bot.framework.eventbot.listener.impl.ActionOnceAfterNEventsListener;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.rest.LinkedDataFetchingException;
@@ -1920,6 +1923,281 @@ public class AclTests extends AbstractBotBasedTest {
             bbCreateAtom1.activate();
             bbCreateAtom2.activate();
             bbCreateAtom3.activate();
+        });
+    }
+
+    @Test(timeout = 60 * 1000)
+    public void testGroupChat() throws Exception {
+        runTest(ctx -> {
+            EventBus bus = ctx.getEventBus();
+            final URI wonNodeUri = ctx.getNodeURISource().getNodeURI();
+            final URI atomUri1 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri2 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri3 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atomUri4 = ctx.getWonNodeInformationService().generateAtomURI(wonNodeUri);
+            final URI atom1GroupSocket = URI.create(atomUri1.toString() + "#groupSocket");
+            final BotBehaviour bbCreateAtom1 = new BotBehaviour(ctx, "bbCreateAtom1") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri1.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri1)
+                                    .addTitle("Group Chat Atom (1/4)")
+                                    .addSocket(Socket.builder(atom1GroupSocket)
+                                                    .setSocketDefinition(WXGROUP.GroupSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    Authorization autoConnectGroupSocket = Authorization.builder()
+                                    .setGranteeGranteeWildcard(GranteeWildcard.ANYONE)
+                                    .addGrant(b -> b.addSocket(
+                                                    s -> s.addSocketType(WXGROUP.GroupSocket.asURI())
+                                                                    .addOperationsSimpleOperationExpression(
+                                                                                    OP_AUTO_CONNECT)
+                                    ))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri1)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(autoConnectGroupSocket))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri1);
+                    EventListener successCallback = event -> {
+                        logger.debug("group chat atom created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create group chat atom");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom2 = new BotBehaviour(ctx, "bbCreateAtom2") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri2.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri2)
+                                    .addTitle("member atom A (2/4)")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri2)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri2);
+                    EventListener successCallback = event -> {
+                        logger.debug("member atom A created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Create member atom A");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom3 = new BotBehaviour(ctx, "bbCreateAtom3") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri3.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri3)
+                                    .addTitle("member atom B (3/4)")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri3)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri3);
+                    EventListener successCallback = event -> {
+                        logger.debug("member atom B created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Creating member atom B");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            final BotBehaviour bbCreateAtom4 = new BotBehaviour(ctx, "bbCreateAtom4") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    final String atomUriString = atomUri4.toString();
+                    AtomContent atomContent = AtomContent.builder(atomUri4)
+                                    .addTitle("member atom C (4/4)")
+                                    .addSocket(Socket.builder(atomUriString + "#chatSocket")
+                                                    .setSocketDefinition(WXCHAT.ChatSocket.asURI())
+                                                    .build())
+                                    .addType(URI.create(WON.Atom.getURI()))
+                                    .build();
+                    WonMessage createMessage = WonMessageBuilder.createAtom()
+                                    .atom(atomUri4)
+                                    .content().graph(RdfOutput.toGraph(atomContent))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayConnectAuth()))
+                                    .content().aclGraph(won.auth.model.RdfOutput.toGraph(getAnyoneMayReadAnything()))
+                                    .build();
+                    createMessage = ctx.getWonMessageSender().prepareMessage(createMessage);
+                    ctx.getBotContextWrapper().rememberAtomUri(atomUri4);
+                    EventListener successCallback = event -> {
+                        logger.debug("member atom C created");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Creating member atom C");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(createMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(createMessage);
+                }
+            };
+            BotBehaviour bbSendConnect21 = new BotBehaviour(ctx, "bbSendConnect21") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri2.toString() + "#chatSocket"))
+                                    .recipient(atom1GroupSocket)
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("member A -> group connection requested");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection member A -> group");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbSendConnect31 = new BotBehaviour(ctx, "bbSendConnect31") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri3.toString() + "#chatSocket"))
+                                    .recipient(atom1GroupSocket)
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("member B -> group connection requested");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection member B -> group");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbSendConnect41 = new BotBehaviour(ctx, "bbSendConnect41") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connect()
+                                    .sockets()
+                                    .sender(URI.create(atomUri4.toString() + "#chatSocket"))
+                                    .recipient(atom1GroupSocket)
+                                    .direction().fromOwner()
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("member C -> group connection requested");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "Requesting connection member C -> group");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbWaitForAutoConnect = new BotBehaviour(ctx) {
+                @Override protected void onActivate(Optional<Object> message) {
+                    bus.subscribe(ConnectFromOtherAtomEvent.class,
+                                    new ActionOnceAfterNEventsListener(ctx, new EventFilter() {
+                                        @Override public boolean accept(Event event) {
+                                            boolean waitingForThis = ((ConnectFromOtherAtomEvent) event)
+                                                            .getSenderSocket()
+                                                            .equals(atom1GroupSocket);
+                                            return waitingForThis;
+                                        }
+                                    }, 3, new EventBotAction() {
+                                        @Override public Runnable getActionTask(Event event,
+                                                        EventListener eventListener) {
+                                            return () -> deactivate();
+                                        }
+                                    }));
+                }
+            };
+            BotBehaviour bbSendMsg41 = new BotBehaviour(ctx, "bbSendMsg41") {
+                @Override
+                protected void onActivate(Optional<Object> message) {
+                    WonMessage connectMessage = WonMessageBuilder.connectionMessage()
+                                    .sockets()
+                                    .sender(URI.create(atomUri4.toString() + "#chatSocket"))
+                                    .recipient(URI.create(atomUri1.toString() + "#groupSocket"))
+                                    .direction().fromOwner()
+                                    .content()
+                                    .text("Hello, world!")
+                                    .build();
+                    connectMessage = ctx.getWonMessageSender().prepareMessage(connectMessage);
+                    EventListener successCallback = event -> {
+                        logger.debug("member C -> send message to group");
+                        deactivate();
+                    };
+                    EventListener failureCallback = makeFailureCallbackToFailTest(bot, ctx, bus,
+                                    "sending message member C -> group");
+                    EventBotActionUtils.makeAndSubscribeResponseListener(connectMessage, successCallback,
+                                    failureCallback, ctx);
+                    ctx.getWonMessageSender().sendMessage(connectMessage);
+                }
+            };
+            BotBehaviour bbWaitForGroupMessage = new BotBehaviour(ctx) {
+                @Override protected void onActivate(Optional<Object> message) {
+                    bus.subscribe(MessageFromOtherAtomEvent.class,
+                                    new ActionOnceAfterNEventsListener(ctx, new EventFilter() {
+                                        @Override public boolean accept(Event event) {
+                                            boolean interestedInThis = ((MessageFromOtherAtomEvent) event)
+                                                            .getWonMessage().getSenderSocketURIRequired()
+                                                            .equals(atom1GroupSocket);
+                                            return interestedInThis;
+                                        }
+                                    }, 2, new EventBotAction() {
+                                        @Override public Runnable getActionTask(Event event,
+                                                        EventListener eventListener) {
+                                            return () -> passTest(bus);
+                                        }
+                                    }));
+                }
+            };
+            BehaviourBarrier barrier = new BehaviourBarrier(ctx);
+            barrier.waitFor(bbCreateAtom1, bbCreateAtom2, bbCreateAtom3, bbCreateAtom4);
+            barrier.thenStart(bbSendConnect21, bbSendConnect31, bbSendConnect41);
+            barrier.activate();
+            bbWaitForAutoConnect.onDeactivateActivate(bbSendMsg41);
+            bbWaitForGroupMessage.activate();
+            bbWaitForAutoConnect.activate();
+            bbCreateAtom1.activate();
+            bbCreateAtom2.activate();
+            bbCreateAtom3.activate();
+            bbCreateAtom4.activate();
         });
     }
 
