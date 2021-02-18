@@ -243,7 +243,7 @@ const determineRequestCredentials = (state, atomUri, isOwned) => {
               return won
                 .fetchTokenForAtom(
                   getUri(consideredAtom),
-                  fetchTokenRequesterId,
+                  { requesterWebId: fetchTokenRequesterId },
                   vocab.HOLD.ScopeReadHeldAtoms
                 )
                 .then(tokens => {
@@ -481,40 +481,52 @@ export function fetchAtomAndDispatch(
     payload: Immutable.fromJS({ uri: atomUri }),
   });
 
-  return determineRequestCredentials(state, atomUri, isOwned).then(
-    requestCredentials =>
-      won
-        .fetchAtom(atomUri, requestCredentials)
-        .then(atom => {
-          const parsedAtom = parseAtom(atom);
-          if (parsedAtom) {
-            dispatch({
-              type: actionTypes.atoms.store,
-              payload: Immutable.fromJS({ atoms: { [atomUri]: parsedAtom } }),
-            });
-          }
-          return parsedAtom;
-        })
-        .catch(error => {
-          if (error.status && error.status === 410) {
-            dispatch({
-              type: actionTypes.atoms.delete,
-              payload: Immutable.fromJS({ uri: atomUri }),
-            });
-          } else {
-            dispatch({
-              type: actionTypes.atoms.storeUriFailed,
-              payload: Immutable.fromJS({
-                uri: atomUri,
-                status: {
-                  code: error.status,
-                  message: error.message,
-                  requesterWebId: requestCredentials,
-                },
-              }),
-            });
-          }
-        })
+  return (
+    determineRequestCredentials(state, atomUri, isOwned)
+      // TODO: INCLUDE GRANTS FETCH SOMEHOW
+      // .then(requestCredentials => {
+      //   won
+      //     .fetchGrantsForAtom(atomUri, requestCredentials)
+      //     .then(response => {
+      //       console.debug("fetchGrantsForAtom Response: ", response);
+      //     })
+      //     .catch(error => console.debug("fetchGrantsForAtom Error:", error));
+      //   return requestCredentials;
+      // })
+      .then(requestCredentials =>
+        won
+          .fetchAtom(atomUri, requestCredentials)
+          .then(atom => {
+            const parsedAtom = parseAtom(atom);
+            if (parsedAtom) {
+              dispatch({
+                type: actionTypes.atoms.store,
+                payload: Immutable.fromJS({ atoms: { [atomUri]: parsedAtom } }),
+              });
+            }
+            return parsedAtom;
+          })
+          .catch(error => {
+            if (error.status && error.status === 410) {
+              dispatch({
+                type: actionTypes.atoms.delete,
+                payload: Immutable.fromJS({ uri: atomUri }),
+              });
+            } else {
+              dispatch({
+                type: actionTypes.atoms.storeUriFailed,
+                payload: Immutable.fromJS({
+                  uri: atomUri,
+                  status: {
+                    code: error.status,
+                    message: error.message,
+                    requesterWebId: requestCredentials,
+                  },
+                }),
+              });
+            }
+          })
+      )
   );
 }
 

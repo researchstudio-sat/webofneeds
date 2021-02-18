@@ -332,17 +332,15 @@ import vocab from "./vocab.js";
   };
 
   window.fetchToken4dbg = won.fetchTokenForAtom;
-  /**
-   *
-   * @param atomUri
-   * @param requesterWebId
-   * @param scopes
-   */
-  won.fetchTokenForAtom = (atomUri, requesterWebId, scopes) =>
-    ownerApi.fetchTokenForAtom(atomUri + "/token", {
-      requesterWebId: requesterWebId,
+
+  won.fetchTokenForAtom = (atomUri, requesterCredentials, scopes) =>
+    ownerApi.fetchTokenForAtom(atomUri, {
+      ...requesterCredentials,
       scopes: scopes,
     });
+
+  won.fetchGrantsForAtom = (atomUri, requesterCredentials) =>
+    ownerApi.fetchGrantsForAtom(atomUri, requesterCredentials);
 
   /**
    * @param senderSocketUri
