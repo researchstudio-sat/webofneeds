@@ -64,21 +64,21 @@ import vocab from "./vocab.js";
             " for atom ",
             atomUri
           );
-          return { "@context": flattenedAtomJsonLd["@context"] };
+          return {
+            atom: { "@context": flattenedAtomJsonLd["@context"] },
+            auth: authsJsonLd,
+          };
         }
-
-        // console.timeEnd("Atom parseTime for: " + atomUri);
         return { atom: flattenedAtomJsonLd, auth: authsJsonLd };
       })
       .catch(e => {
         const msg = "Failed to get atom " + atomUri + ".";
         e.message += msg;
         console.error(e.message);
-        // console.timeEnd("Atom parseTime for: " + atomUri);
         throw e;
       });
 
-  won.validateEnvelopeDataForAtom = function(atomUri) {
+  won.validateEnvelopeDataForAtom = atomUri => {
     if (typeof atomUri === "undefined" || atomUri == null) {
       throw {
         message: "validateEnvelopeDataForAtom: atomUri must not be null",
@@ -88,10 +88,7 @@ import vocab from "./vocab.js";
     return Promise.resolve();
   };
 
-  won.validateEnvelopeDataForConnection = async function(
-    socketUri,
-    targetSocketUri
-  ) {
+  won.validateEnvelopeDataForConnection = (socketUri, targetSocketUri) => {
     if (
       typeof socketUri === "undefined" ||
       socketUri == null ||
@@ -178,7 +175,7 @@ import vocab from "./vocab.js";
    *            it will return the second page of size N)
    * @return {*} the connections predicates
    */
-  won.fetchConnection = function(connectionUri, fetchParams) {
+  won.fetchConnection = (connectionUri, fetchParams) => {
     if (!is("String", connectionUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -251,11 +248,11 @@ import vocab from "./vocab.js";
    *            it will return the second page of size N)
    * @return {nextPage: nextPageLink Object, messages: arrayOfMessages}
    */
-  won.fetchMessagesOfConnection = function(
+  won.fetchMessagesOfConnection = (
     connectionUri,
     connectionContainerUri,
     fetchParams
-  ) {
+  ) => {
     if (!is("String", connectionUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -339,11 +336,11 @@ import vocab from "./vocab.js";
    *            it will return the second page of size N)
    * @return {*} the connections predicates along with the uris of associated events
    */
-  won.fetchConnectionUrisBySocket = function(
+  won.fetchConnectionUrisBySocket = (
     senderSocketUri,
     targetSocketUri,
     fetchParams
-  ) {
+  ) => {
     if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -361,22 +358,13 @@ import vocab from "./vocab.js";
         extractAtomUriBySocketUri(senderSocketUri) + "/c",
         fetchParams
       )
-      .then(jsonLdData => {
-        console.debug(
-          "Result when retrieving connection for socket(",
-          senderSocketUri,
-          ") - targetSocket(",
-          targetSocketUri,
-          ") => ",
-          jsonLdData
-        );
-
-        return jsonld.frame(jsonLdData, {
+      .then(jsonLdData =>
+        jsonld.frame(jsonLdData, {
           "@type": vocab.WON.Connection,
           "@context": won.defaultContext,
           "@embed": "@always",
-        });
-      })
+        })
+      )
       .then(jsonResp => jsonResp && jsonResp["@id"]);
   };
 
@@ -392,11 +380,11 @@ import vocab from "./vocab.js";
    *            it will return the second page of size N)
    * @return {*} the connections predicates
    */
-  won.fetchConnectionBySocket = function(
+  won.fetchConnectionBySocket = (
     senderSocketUri,
     targetSocketUri,
     fetchParams
-  ) {
+  ) => {
     if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -415,22 +403,13 @@ import vocab from "./vocab.js";
           extractAtomUriBySocketUri(senderSocketUri) + "/c",
           fetchParams
         )
-        .then(jsonLdData => {
-          console.debug(
-            "Result when retrieving connection for socket(",
-            senderSocketUri,
-            ") - targetSocket(",
-            targetSocketUri,
-            ") => ",
-            jsonLdData
-          );
-
-          return jsonld.frame(jsonLdData, {
+        .then(jsonLdData =>
+          jsonld.frame(jsonLdData, {
             "@type": vocab.WON.Connection,
             "@context": won.defaultContext,
             "@embed": "@always",
-          });
-        })
+          })
+        )
         //add the eventUris
         .then(jsonResp => jsonResp && jsonResp["@id"])
         .then(connUri =>
