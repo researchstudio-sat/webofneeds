@@ -135,7 +135,7 @@ export const successfulCreate = wonMessage => dispatch => {
             status: {
               code: error.status,
               message: error.message,
-              requesterWebId: requesterWebId,
+              requestCredentials: { requesterWebId: requesterWebId },
             },
           }),
         });
@@ -646,7 +646,9 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
           .fetchActiveConnectionAndDispatchBySocketUris(
             senderSocketUri,
             targetSocketUri,
-            senderAtomUri,
+            {
+              requesterWebId: senderAtomUri,
+            },
             dispatch
           )
           .then(() => true);
@@ -670,7 +672,7 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
           .fetchActiveConnectionAndDispatchBySocketUris(
             targetSocketUri,
             senderSocketUri,
-            recipientAtomUri,
+            { requesterWebId: recipientAtomUri },
             dispatch
           )
           .then(() => true);
@@ -811,7 +813,7 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
       .fetchActiveConnectionAndDispatchBySocketUris(
         targetSocketUri,
         senderSocketUri,
-        targetAtomUri,
+        { requesterWebId: targetAtomUri },
         dispatch
       )
       .then(() => true);
@@ -829,7 +831,7 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
     return stateStore
       .fetchActiveConnectionAndDispatch(
         targetConnectionUri,
-        targetAtomUri,
+        { requesterWebId: targetAtomUri },
         dispatch
       )
       .then(() => true);
@@ -872,7 +874,7 @@ export const processAtomHintMessage = wonMessage =>
         .then(() =>
           stateStore.fetchActiveConnectionAndDispatch(
             ownedConnectionUri,
-            ownedAtomUri,
+            { requesterWebId: ownedAtomUri },
             dispatch
           )
         );

@@ -43,11 +43,11 @@ export const fetchOwnedMetaData = dispatch =>
 
 export const fetchActiveConnectionAndDispatch = (
   connUri,
-  requesterWebId,
+  requestCredentials,
   dispatch
 ) =>
   won
-    .fetchConnection(connUri, { requesterWebId: requesterWebId })
+    .fetchConnection(connUri, requestCredentials)
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -63,7 +63,7 @@ export const fetchActiveConnectionAndDispatch = (
           status: {
             code: error.status,
             message: error.message,
-            requesterWebId: requesterWebId,
+            requestCredentials: requestCredentials,
           },
         }),
       });
@@ -91,13 +91,15 @@ export const fetchConnectionUriBySocketUris = (
 export const fetchActiveConnectionAndDispatchBySocketUris = (
   senderSocketUri,
   targetSocketUri,
-  atomUri,
+  requestCredentials,
   dispatch
 ) =>
   won
-    .fetchConnectionBySocket(senderSocketUri, targetSocketUri, {
-      requesterWebId: atomUri,
-    })
+    .fetchConnectionBySocket(
+      senderSocketUri,
+      targetSocketUri,
+      requestCredentials
+    )
     .then(conn => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -384,7 +386,11 @@ export const fetchConnectionsContainerAndDispatch = (
           activeConnectionUris =>
             activeConnectionUris &&
             urisToLookupMap(activeConnectionUris, connUri =>
-              fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
+              fetchActiveConnectionAndDispatch(
+                connUri,
+                requestCredentials,
+                dispatch
+              )
             )
         )
         .catch(error => {
@@ -401,7 +407,7 @@ export const fetchConnectionsContainerAndDispatch = (
                 status: {
                   code: error.status,
                   message: error.message,
-                  requesterWebId: requestCredentials,
+                  requestCredentials: requestCredentials,
                 },
               }),
             });
@@ -512,7 +518,7 @@ export const fetchAtomAndDispatch = (
                   status: {
                     code: error.status,
                     message: error.message,
-                    requesterWebId: requestCredentials,
+                    requestCredentials: requestCredentials,
                   },
                 }),
               });
