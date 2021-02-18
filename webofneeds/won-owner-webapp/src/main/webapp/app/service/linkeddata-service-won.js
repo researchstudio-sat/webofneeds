@@ -117,8 +117,15 @@ import vocab from "./vocab.js";
     connectionContainerUri,
     requestCredentials
   ) =>
-    won
-      .fetchJsonLdNode(connectionContainerUri, requestCredentials)
+    ownerApi
+      .fetchJsonLdDataset(connectionContainerUri, requestCredentials)
+      .then(jsonLdData =>
+        jsonld.frame(jsonLdData, {
+          "@id": connectionContainerUri,
+          "@context": won.defaultContext,
+          "@embed": "@always",
+        })
+      )
       .then(
         connectionContainer =>
           connectionContainer && connectionContainer["@id"]
@@ -180,9 +187,16 @@ import vocab from "./vocab.js";
     }
 
     return (
-      won
-        //add the eventUris
-        .fetchJsonLdNode(connectionUri, fetchParams)
+      //add the eventUris
+      ownerApi
+        .fetchJsonLdDataset(connectionUri, fetchParams)
+        .then(jsonLdData =>
+          jsonld.frame(jsonLdData, {
+            "@id": connectionUri,
+            "@context": won.defaultContext,
+            "@embed": "@always",
+          })
+        )
         .then(jsonLdConnection => jsonld.expand(jsonLdConnection))
         .then(jsonLdConnection => {
           const connectionContentGraph = jsonLdConnection[0];
@@ -424,39 +438,6 @@ import vocab from "./vocab.js";
             requesterWebId: fetchParams.requesterWebId,
           })
         )
-    );
-  };
-
-  /**
-   * Fetches the triples where URI is subject and add objects of those triples to the
-   * resulting structure by the localname of the predicate.
-   * The URI is added as property 'uri'.
-   *
-   * If a predicate occurs multiple times the objects (in the rdf sense) will be
-   * grouped as an array. This is usually the case for rdfs:member, to give an example.
-   *
-   * NOTE: Atm it ignores prefixes which might lead to clashes.
-   *
-   * @param uri
-   * @param fetchParams: optional paramters
-   *        * requesterWebId: the WebID used to access the ressource (used
-   *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
-   *        * pagingSize: if specified the server will return the first
-   *            page (unless e.g. `queryParams.p=2` is specified when
-   *            it will return the second page of size N)
-   */
-  won.fetchJsonLdNode = (uri, fetchParams) => {
-    if (!uri) {
-      return Promise.reject({ message: "getJsonLdNode: uri must not be null" });
-    }
-
-    return ownerApi.fetchJsonLdDataset(uri, fetchParams).then(jsonLdData =>
-      jsonld.frame(jsonLdData, {
-        "@id": uri,
-        "@context": won.defaultContext,
-        "@embed": "@always",
-      })
     );
   };
 })();
