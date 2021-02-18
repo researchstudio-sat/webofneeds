@@ -39,21 +39,15 @@ export const successfulReopenAtom = wonMessage => (dispatch, getState) => {
     //dispatch(actionCreators.connections__denied(wonMessage));
   }
 };
-export const failedCloseAtom = wonMessage => (dispatch, getState) => {
-  const atomUri = wonMessage.getAtom();
-
+export const failedCloseAtom = wonMessage => (dispatch, getState) =>
   stateStore
-    .fetchAtomAndDispatch(atomUri, dispatch, getState)
+    .fetchAtomAndDispatch(wonMessage.getAtom(), dispatch, getState)
     .then(() => dispatch({ type: actionTypes.messages.closeAtom.failed }));
-};
 
-export const failedReopenAtom = wonMessage => (dispatch, getState) => {
-  const atomUri = wonMessage.getAtom();
-
+export const failedReopenAtom = wonMessage => (dispatch, getState) =>
   stateStore
-    .fetchAtomAndDispatch(atomUri, dispatch, getState)
+    .fetchAtomAndDispatch(wonMessage.getAtom(), dispatch, getState)
     .then(() => dispatch({ type: actionTypes.messages.reopenAtom.failed }));
-};
 
 export const successfulCloseConnection = wonMessage => (dispatch, getState) => {
   const state = getState();
@@ -97,11 +91,6 @@ export const failedCreate = wonMessage => dispatch => {
 };
 
 export const successfulCreate = wonMessage => dispatch => {
-  //const state = getState();
-  //TODO: if negative, use alternative atom URI and send again
-  //fetch atom data and store in local RDF store
-  //get URI of newly created atom from message
-
   //load the data into the local rdf store and publish AtomCreatedEvent when done
   const atomUri = wonMessage.getAtom();
   // since we know that created Atoms are only dispatched for owned atoms we add the atomUri as the requesterWebId for the atom fetch
@@ -158,22 +147,22 @@ export const successfulEdit = wonMessage => (dispatch, getState) => {
   console.debug("Received success replace message:", wonMessage);
   //const state = getState();
   //load the edited data into the local rdf store and publish AtomEditEvent when done
-  const atomURI = wonMessage.getAtom();
+  const atomUri = wonMessage.getAtom();
 
   const processState = get(getState(), "process");
 
-  if (processUtils.isAtomLoading(processState, atomURI)) {
+  if (processUtils.isAtomLoading(processState, atomUri)) {
     console.debug(
       "successfulEdit: Atom is currently loading DO NOT FETCH AGAIN"
     );
   } else {
     stateStore
-      .fetchAtomAndDispatch(atomURI, dispatch, getState, true)
+      .fetchAtomAndDispatch(atomUri, dispatch, getState, true)
       .then(() => {
         dispatch(
           actionCreators.atoms__editSuccessful({
             eventUri: wonMessage.getIsResponseTo(),
-            atomUri: wonMessage.getAtom(),
+            atomUri: atomUri,
             //atom: atom,
           })
         );
@@ -750,19 +739,16 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
   });
 };
 
-export const updateMessageStatus = wonMessage => dispatch => {
-  const payload = {
-    messageUri: wonMessage.messageUri,
-    connectionUri: wonMessage.connectionUri,
-    atomUri: wonMessage.atomUri,
-    messageStatus: wonMessage.messageStatus,
-  };
-
+export const updateMessageStatus = wonMessage => dispatch =>
   dispatch({
     type: actionTypes.messages.updateMessageStatus,
-    payload: payload,
+    payload: {
+      messageUri: wonMessage.messageUri,
+      connectionUri: wonMessage.connectionUri,
+      atomUri: wonMessage.atomUri,
+      messageStatus: wonMessage.messageStatus,
+    },
   });
-};
 
 export const atomMessageReceived = wonMessage => (dispatch, getState) => {
   //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
@@ -796,6 +782,9 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
 
   const targetAtom = generalSelectors.getAtom(targetAtomUri)(state);
   const isOwnTargetAtom = generalSelectors.isAtomOwned(targetAtomUri)(state);
+
+  //FIXME: processSocketHintMessage could fetch atoms/connections in a way that makes the atom unloadable
+  //e.g Atom is only accessible for Atoms with suggestedConns -> atom is fetched no connection is in the state yet so requesterWebId can't be found by a connection between the two
 
   if (!targetAtom) {
     console.debug(
@@ -851,6 +840,9 @@ export const processAtomHintMessage = wonMessage =>
     const currentState = getState();
     const ownedAtom = getIn(currentState, ["atoms", ownedAtomUri]);
     const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
+
+    //FIXME: processAtomHintMessage could fetch atoms/connections in a way that makes the atom unloadable
+    //e.g Atom is only accessible for Atoms with receivedRequests -> atom is fetched no connection is in the state yet so requesterWebId can't be found by a connection between the two
 
     const ownedConnectionUri = wonMessage.getRecipientConnection();
 
