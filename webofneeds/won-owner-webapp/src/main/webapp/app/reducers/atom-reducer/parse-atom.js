@@ -26,6 +26,10 @@ export function parseAtom(jsonldAtomAndAuth) {
       uri: atomUri,
       identiconSvg: generateIdenticon(atomUri),
       nodeUri: getIn(jsonldAtomImm, [vocab.WON.wonNodeCompacted, "@id"]),
+      connectionContainerUri: getIn(jsonldAtomImm, [
+        vocab.WON.connectionsCompacted,
+        "@id",
+      ]),
       state: extractState(jsonldAtomImm),
       content: generateContent(jsonldAtomImm, detailsToParse),
       seeks: generateContent(get(jsonldAtomImm, "match:seeks"), detailsToParse),

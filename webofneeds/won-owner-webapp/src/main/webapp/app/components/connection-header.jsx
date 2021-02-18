@@ -8,7 +8,6 @@ import WonConnectionState from "./connection-state.jsx";
 import PropTypes from "prop-types";
 import VisibilitySensor from "react-visibility-sensor";
 import {
-  get,
   getUri,
   generateLink,
   extractAtomUriFromConnectionUri,
@@ -250,7 +249,7 @@ export default function WonConnectionHeader({
       } else {
         const targetHolderName = atomUtils.hasHoldableSocket(targetAtom)
           ? atomUtils.getTitle(targetHolderAtom, externalDataState) ||
-            get(targetAtom, "fakePersonaName")
+            atomUtils.getFakePersonaName(targetAtom)
           : undefined;
 
         if (targetHolderName) {

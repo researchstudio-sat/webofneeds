@@ -214,7 +214,7 @@ export const getAllPartnerActivityConnections = createSelector(
       .flatMap(atomUtils.getAllNonClosedNonSuggestedPartnerActivityConnections)
       .toOrderedMap()
       .sortBy(conn => {
-        const lastUpdateDate = get(conn, "lastUpdateDate");
+        const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
         return lastUpdateDate && lastUpdateDate.getTime();
       })
       .reverse()

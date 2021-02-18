@@ -625,7 +625,7 @@ export const showLatestMessages = (connectionUri, numberOfEvents) => (
     dispatch,
     state,
     connectionUri,
-    atomUri,
+    { requesterWebId: atomUri },
     numberOfEvents
   );
 };
@@ -668,7 +668,7 @@ export const showMoreMessages = (connectionUri, numberOfEvents) => (
     dispatch,
     state,
     connectionUri,
-    atomUri,
+    { requesterWebId: atomUri },
     numberOfEvents,
     resumeAfterUri
   );

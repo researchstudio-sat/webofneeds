@@ -125,7 +125,7 @@ export const genericInterest = {
       [vocab.GROUP.GroupSocketCompacted]: {
         useCaseIdentifiers: ["genericPlan"],
       },
-      [vocab.GROUP.ChatSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["genericInterest", "persona"],
       },
     },

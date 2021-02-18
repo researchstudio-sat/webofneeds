@@ -60,7 +60,7 @@ export default function WonCombinedMessageContent({
 
     personaName = relevantPersona
       ? atomUtils.getTitle(relevantPersona, externalDataState)
-      : get(relevantAtom, "fakePersonaName");
+      : atomUtils.getFakePersonaName(relevantAtom);
   }
 
   const multiSelectType = connectionUtils.getMultiSelectType(connection);

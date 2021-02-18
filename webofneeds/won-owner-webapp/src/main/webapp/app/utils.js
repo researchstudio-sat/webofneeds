@@ -1,5 +1,9 @@
 import _ from "lodash";
-import { getHeldByUri, getTitle } from "./redux/utils/atom-utils.js";
+import {
+  getHeldByUri,
+  getTitle,
+  getFakePersonaName,
+} from "./redux/utils/atom-utils.js";
 import { getTargetAtomUri } from "./redux/utils/connection-utils.js";
 import fakeNames from "./fakeNames.json";
 
@@ -375,7 +379,7 @@ export function filterConnectionsBySearchValue(
         const targetPersona = get(allAtomsImm, getHeldByUri(targetAtom));
         const targetPersonaTitle =
           getTitle(targetPersona, externalDataState) ||
-          get(targetAtom, "fakePersonaName") ||
+          getFakePersonaName(targetAtom) ||
           "";
 
         found = targetPersonaTitle.search(regExp) !== -1;
@@ -401,7 +405,7 @@ export function filterConnectionsBySearchValue(
           const senderPersona = get(allAtomsImm, getHeldByUri(senderAtom));
           const senderPersonaTitle =
             getTitle(senderPersona, externalDataState) ||
-            get(senderAtom, "fakePersonaName") ||
+            getFakePersonaName(senderAtom) ||
             "";
 
           found = senderPersonaTitle.search(regExp) !== -1;

@@ -22,6 +22,10 @@ export function getState(atom) {
   return get(atom, "state");
 }
 
+export function getConnectionContainerUri(atom) {
+  return get(atom, "connectionContainerUri");
+}
+
 export function getFakePersonaName(atom) {
   return get(atom, "fakePersonaName");
 }

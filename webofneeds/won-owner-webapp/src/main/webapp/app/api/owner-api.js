@@ -452,16 +452,30 @@ export const fetchJsonLdDataset = (
       }
     });
 
-export const fetchTokenForAtom = (uri, params) =>
-  fetch(generateLinkedDataQueryString(uri, params), {
+export const fetchTokenForAtom = (atomUri, params) =>
+  fetch(generateLinkedDataQueryString(atomUri + "/token", params), {
     method: "get",
     credentials: "same-origin",
     headers: {
       // cachePolicy: "network-only",
+      Authorization: params.token ? "Bearer " + params.token : undefined,
       Accept: "application/json",
     },
   })
-    .then(checkHttpStatus(uri, params))
+    .then(checkHttpStatus(atomUri + "/token", params))
+    .then(response => response.json());
+
+export const fetchGrantsForAtom = (atomUri, params) =>
+  fetch(generateLinkedDataQueryString(atomUri + "/grants", params), {
+    method: "get",
+    credentials: "same-origin",
+    headers: {
+      // cachePolicy: "network-only",
+      Authorization: params.token ? "Bearer " + params.token : undefined,
+      Accept: "application/ld+json",
+    },
+  })
+    .then(checkHttpStatus(atomUri + "/grants", params))
     .then(response => response.json());
 
 function fetchMetaAtoms(

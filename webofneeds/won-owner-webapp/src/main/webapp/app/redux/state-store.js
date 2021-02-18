@@ -24,8 +24,8 @@ import cf from "clownface";
 import { actionCreators } from "../actions/actions";
 import * as useCaseUtils from "~/app/usecase-utils";
 
-export function fetchOwnedMetaData(dispatch) {
-  return ownerApi.fetchOwnedMetaAtoms().then(metaAtoms => {
+export const fetchOwnedMetaData = dispatch =>
+  ownerApi.fetchOwnedMetaAtoms().then(metaAtoms => {
     const atomsImm = Immutable.fromJS(metaAtoms);
     dispatch({
       type: actionTypes.atoms.storeOwnedMetaAtoms,
@@ -40,13 +40,14 @@ export function fetchOwnedMetaData(dispatch) {
 
     return [...activeAtomsImm.keys()];
   });
-}
 
-export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
-  const requesterWebId = atomUri;
-
-  return won
-    .fetchConnection(connUri, { requesterWebId: requesterWebId })
+export const fetchActiveConnectionAndDispatch = (
+  connUri,
+  requestCredentials,
+  dispatch
+) =>
+  won
+    .fetchConnection(connUri, requestCredentials)
     .then(connection => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -62,19 +63,18 @@ export function fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch) {
           status: {
             code: error.status,
             message: error.message,
-            requesterWebId: requesterWebId,
+            requestCredentials: requestCredentials,
           },
         }),
       });
     });
-}
 
-export function fetchConnectionUriBySocketUris(
+export const fetchConnectionUriBySocketUris = (
   senderSocketUri,
   targetSocketUri,
   atomUri
-) {
-  return won
+) =>
+  won
     .fetchConnectionUrisBySocket(senderSocketUri, targetSocketUri, {
       requesterWebId: atomUri,
     })
@@ -87,18 +87,19 @@ export function fetchConnectionUriBySocketUris(
         "failed"
       );
     });
-}
 
-export function fetchActiveConnectionAndDispatchBySocketUris(
+export const fetchActiveConnectionAndDispatchBySocketUris = (
   senderSocketUri,
   targetSocketUri,
-  atomUri,
+  requestCredentials,
   dispatch
-) {
-  return won
-    .fetchConnectionBySocket(senderSocketUri, targetSocketUri, {
-      requesterWebId: atomUri,
-    })
+) =>
+  won
+    .fetchConnectionBySocket(
+      senderSocketUri,
+      targetSocketUri,
+      requestCredentials
+    )
     .then(conn => {
       dispatch({
         type: actionTypes.connections.storeActive,
@@ -115,7 +116,6 @@ export function fetchActiveConnectionAndDispatchBySocketUris(
         "failed"
       );
     });
-}
 
 const determineRequestCredentials = (state, atomUri, isOwned) => {
   console.debug("## Determine requesterWebId for", atomUri);
@@ -240,12 +240,11 @@ const determineRequestCredentials = (state, atomUri, isOwned) => {
                 );
               }
 
-              return won
-                .fetchTokenForAtom(
-                  getUri(consideredAtom),
-                  fetchTokenRequesterId,
-                  vocab.HOLD.ScopeReadHeldAtoms
-                )
+              return ownerApi
+                .fetchTokenForAtom(getUri(consideredAtom), {
+                  requesterWebId: fetchTokenRequesterId,
+                  scopes: vocab.HOLD.ScopeReadHeldAtoms,
+                })
                 .then(tokens => {
                   console.debug("tokens: ", tokens);
                   return { token: tokens[0] };
@@ -295,11 +294,11 @@ const determineRequestCredentials = (state, atomUri, isOwned) => {
     }
   }
 };
-export function fetchConnectionsContainerAndDispatch(
+export const fetchConnectionsContainerAndDispatch = (
   atomUri,
   dispatch,
   getState
-) {
+) => {
   const state = getState();
   const processState = generalSelectors.getProcessState(state);
 
@@ -350,26 +349,21 @@ export function fetchConnectionsContainerAndDispatch(
     requestCredentials =>
       won
         .fetchConnectionUrisWithStateByAtomUri(
-          atomUri,
-          requestCredentials,
-          !isOwned
+          atomUtils.getConnectionContainerUri(
+            generalSelectors.getAtom(atomUri)(state)
+          ),
+          requestCredentials
         )
         .then(connectionsWithStateAndSocket => {
-          const connections = isOwned
-            ? connectionsWithStateAndSocket
-            : connectionsWithStateAndSocket.filter(
-                metaConn => metaConn.connectionState === vocab.WON.Connected
-              );
-
           dispatch({
             type: actionTypes.connections.storeMetaConnections,
             payload: Immutable.fromJS({
               atomUri: atomUri,
-              connections: connections,
+              connections: connectionsWithStateAndSocket,
             }),
           });
           if (isOwned) {
-            const activeConnectionUris = connections
+            const activeConnectionUris = connectionsWithStateAndSocket
               .filter(
                 conn =>
                   conn.connectionState !== vocab.WON.Closed &&
@@ -392,7 +386,11 @@ export function fetchConnectionsContainerAndDispatch(
           activeConnectionUris =>
             activeConnectionUris &&
             urisToLookupMap(activeConnectionUris, connUri =>
-              fetchActiveConnectionAndDispatch(connUri, atomUri, dispatch)
+              fetchActiveConnectionAndDispatch(
+                connUri,
+                requestCredentials,
+                dispatch
+              )
             )
         )
         .catch(error => {
@@ -409,14 +407,14 @@ export function fetchConnectionsContainerAndDispatch(
                 status: {
                   code: error.status,
                   message: error.message,
-                  requesterWebId: requestCredentials,
+                  requestCredentials: requestCredentials,
                 },
               }),
             });
           }
         })
   );
-}
+};
 
 /**
  * Fetches an atom (incl. the persona that holds it), the fetch is omitted if:
@@ -434,12 +432,12 @@ export function fetchConnectionsContainerAndDispatch(
  * @param {boolean} update, defaults to false
  * @returns {*}
  */
-export function fetchAtomAndDispatch(
+export const fetchAtomAndDispatch = (
   atomUri,
   dispatch,
   getState,
   update = false
-) {
+) => {
   const state = getState();
   const processState = generalSelectors.getProcessState(state);
 
@@ -481,45 +479,57 @@ export function fetchAtomAndDispatch(
     payload: Immutable.fromJS({ uri: atomUri }),
   });
 
-  return determineRequestCredentials(state, atomUri, isOwned).then(
-    requestCredentials =>
-      won
-        .fetchAtom(atomUri, requestCredentials)
-        .then(atom => {
-          const parsedAtom = parseAtom(atom);
-          if (parsedAtom) {
-            dispatch({
-              type: actionTypes.atoms.store,
-              payload: Immutable.fromJS({ atoms: { [atomUri]: parsedAtom } }),
-            });
-          }
-          return parsedAtom;
-        })
-        .catch(error => {
-          if (error.status && error.status === 410) {
-            dispatch({
-              type: actionTypes.atoms.delete,
-              payload: Immutable.fromJS({ uri: atomUri }),
-            });
-          } else {
-            dispatch({
-              type: actionTypes.atoms.storeUriFailed,
-              payload: Immutable.fromJS({
-                uri: atomUri,
-                status: {
-                  code: error.status,
-                  message: error.message,
-                  requesterWebId: requestCredentials,
-                },
-              }),
-            });
-          }
-        })
+  return (
+    determineRequestCredentials(state, atomUri, isOwned)
+      // TODO: INCLUDE GRANTS FETCH SOMEHOW
+      // .then(requestCredentials => {
+      //   ownerApi
+      //     .fetchGrantsForAtom(atomUri, requestCredentials)
+      //     .then(response => {
+      //       console.debug("fetchGrantsForAtom Response: ", response);
+      //     })
+      //     .catch(error => console.debug("fetchGrantsForAtom Error:", error));
+      //   return requestCredentials;
+      // })
+      .then(requestCredentials =>
+        won
+          .fetchAtom(atomUri, requestCredentials)
+          .then(atom => {
+            const parsedAtom = parseAtom(atom);
+            if (parsedAtom) {
+              dispatch({
+                type: actionTypes.atoms.store,
+                payload: Immutable.fromJS({ atoms: { [atomUri]: parsedAtom } }),
+              });
+            }
+            return parsedAtom;
+          })
+          .catch(error => {
+            if (error.status && error.status === 410) {
+              dispatch({
+                type: actionTypes.atoms.delete,
+                payload: Immutable.fromJS({ uri: atomUri }),
+              });
+            } else {
+              dispatch({
+                type: actionTypes.atoms.storeUriFailed,
+                payload: Immutable.fromJS({
+                  uri: atomUri,
+                  status: {
+                    code: error.status,
+                    message: error.message,
+                    requestCredentials: requestCredentials,
+                  },
+                }),
+              });
+            }
+          })
+      )
   );
-}
+};
 
-export function fetchPersonas(dispatch /*, getState,*/) {
-  return ownerApi.fetchAllActiveMetaPersonas().then(atoms => {
+export const fetchPersonas = (dispatch /*, getState,*/) =>
+  ownerApi.fetchAllActiveMetaPersonas().then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -530,14 +540,13 @@ export function fetchPersonas(dispatch /*, getState,*/) {
 
     return atomUris;
   });
-}
 
-export function fetchWhatsNew(
+export const fetchWhatsNew = (
   dispatch,
   getState,
   createdAfterDate = new Date(Date.now() - 30 /*Days before*/ * 86400000)
-) {
-  return ownerApi.fetchAllMetaAtoms(createdAfterDate).then(atoms => {
+) =>
+  ownerApi.fetchAllMetaAtoms(createdAfterDate).then(atoms => {
     const atomsImm = Immutable.fromJS(atoms);
     const atomUris = [...atomsImm.keys()];
 
@@ -547,16 +556,15 @@ export function fetchWhatsNew(
     });
     return atomUris;
   });
-}
 
-export function fetchWhatsAround(
+export const fetchWhatsAround = (
   dispatch,
   getState,
   createdAfterDate,
   location,
   maxDistance
-) {
-  return ownerApi
+) =>
+  ownerApi
     .fetchAllMetaAtomsNear(createdAfterDate, location, maxDistance)
     .then(atoms => {
       const atomsImm = Immutable.fromJS(atoms);
@@ -572,18 +580,17 @@ export function fetchWhatsAround(
       });
       return atomUris;
     });
-}
 
-export function fetchMessages(
+export const fetchMessages = (
   dispatch,
   state,
   connectionUri,
-  atomUri,
+  requestCredentials,
   numberOfMessages,
   resumeAfter /*msgUri: load numberOfEvents before this msgUri*/
-) {
+) => {
   const fetchParams = {
-    requesterWebId: atomUri,
+    ...requestCredentials,
     pagingSize: numberOfMessages * 3, // `*3*` to compensate for the *roughly* 2 additional success messages per chat message
     deep: true,
     resumeafter: resumeAfter,
@@ -664,7 +671,7 @@ export function fetchMessages(
         }
       }
     });
-}
+};
 
 /**
  * Takes a single uri or an array of uris, performs the lookup function on each
@@ -678,12 +685,12 @@ export function fetchMessages(
  * @param abortOnError -> abort the whole crawl by breaking the promisechain instead of ignoring the failures
  * @return {*}
  */
-function urisToLookupMap(
+const urisToLookupMap = (
   uris,
   asyncLookupFunction,
   excludeUris = [],
   abortOnError = false
-) {
+) => {
   //make sure we have an array and not a single uri.
   const urisAsArray = is("Array", uris) ? uris : [uris];
   const excludeUrisAsArray = is("Array", excludeUris)
@@ -725,7 +732,7 @@ function urisToLookupMap(
     });
     return lookupMap;
   });
-}
+};
 
 export const storeWikiData = (uri, dispatch, getState) => {
   const processState = generalSelectors.getProcessState(getState());
