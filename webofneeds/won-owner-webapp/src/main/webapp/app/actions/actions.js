@@ -529,20 +529,16 @@ window.actionTypes4Dbg = actionTypes;
 
 //////////// STUFF THAT SHOULD BE IN OTHER FILES BELOW //////////////////
 
-export function startTicking() {
-  return dispatch =>
-    setInterval(
-      () => dispatch({ type: actionTypes.tick, payload: Date.now() }),
-      60000
-    );
-}
+const startTicking = () => dispatch =>
+  setInterval(
+    () => dispatch({ type: actionTypes.tick, payload: Date.now() }),
+    60000
+  );
 
-function toggleDebugMode() {
-  return dispatch => {
-    won.debugmode = !won.debugmode;
-    dispatch({
-      type: actionTypes.view.toggleDebugMode,
-      payload: won.debugmode,
-    });
-  };
-}
+const toggleDebugMode = () => dispatch => {
+  won.debugmode = !won.debugmode;
+  dispatch({
+    type: actionTypes.view.toggleDebugMode,
+    payload: won.debugmode,
+  });
+};
