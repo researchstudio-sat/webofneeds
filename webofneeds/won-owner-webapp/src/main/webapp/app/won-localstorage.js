@@ -3,9 +3,19 @@
  */
 const READ_URIS = "wonReadUris";
 const DISCLAIMER_ACCEPTED = "disclaimerAccepted";
+const DELETED_URIS = "wonDeletedUris";
 
+let deletedUrisCache;
 let readUrisCache;
 let disclaimerAcceptedCache;
+
+export function markUriAsDeleted(uri) {
+  if (!isUriDeleted(uri)) {
+    deletedUrisCache = getDeletedUris();
+    deletedUrisCache.push(uri);
+    localStorage.setItem(DELETED_URIS, JSON.stringify(deletedUrisCache));
+  }
+}
 
 export function markUriAsRead(uri) {
   if (!isUriRead(uri)) {
@@ -34,8 +44,31 @@ export function getReadUris() {
   return readUrisCache;
 }
 
+export function getDeletedUris() {
+  if (!deletedUrisCache) {
+    let deletedUrisString = localStorage.getItem(DELETED_URIS);
+
+    if (deletedUrisString) {
+      try {
+        deletedUrisCache = JSON.parse(deletedUrisString);
+      } catch (e) {
+        localStorage.removeItem(DELETED_URIS);
+        deletedUrisCache = [];
+      }
+    } else {
+      deletedUrisCache = [];
+    }
+  }
+
+  return deletedUrisCache;
+}
+
 export function isUriRead(uri) {
   return getReadUris().includes(uri);
+}
+
+export function isUriDeleted(uri) {
+  return getDeletedUris().includes(uri);
 }
 
 export function clearReadUris() {
