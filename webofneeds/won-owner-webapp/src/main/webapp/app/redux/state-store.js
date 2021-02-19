@@ -6,6 +6,7 @@ import * as atomUtils from "./utils/atom-utils.js";
 import * as connectionUtils from "./utils/connection-utils.js";
 import * as accountUtils from "./utils/account-utils.js";
 import * as processUtils from "./utils/process-utils.js";
+import { isUriDeleted } from "~/app/won-localstorage";
 import {
   parseMetaAtom,
   parseAtom,
@@ -366,6 +367,7 @@ export const fetchConnectionsContainerAndDispatch = (
             const activeConnectionUris = connectionsWithStateAndSocket
               .filter(
                 conn =>
+                  !isUriDeleted(conn.uri) &&
                   conn.connectionState !== vocab.WON.Closed &&
                   conn.connectionState !== vocab.WON.Suggested
               )
