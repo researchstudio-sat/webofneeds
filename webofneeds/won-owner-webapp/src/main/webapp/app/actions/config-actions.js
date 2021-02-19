@@ -52,7 +52,7 @@ export const update = patch => (dispatch, getState) => {
 };
 
 let _themeCssElement;
-async function loadSkinConfig(themeName) {
+const loadSkinConfig = themeName => {
   if (!themeName) {
     return Promise.resolve({});
   } else {
@@ -72,4 +72,4 @@ async function loadSkinConfig(themeName) {
         return config;
       });
   }
-}
+};

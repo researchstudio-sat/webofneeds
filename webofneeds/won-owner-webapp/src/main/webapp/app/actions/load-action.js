@@ -17,15 +17,13 @@ export const pageLoadAction = () => (dispatch, getState) => {
         payload: Immutable.fromJS(data),
       })
     )
-    .then(() => loadingWhileSignedIn(dispatch, getState))
+    .then(() => {
+      // loadingWhileSignedIn reset websocket to make sure it's using the logged-in session
+      dispatch(actionCreators.reconnect__start());
+      return stateStore.fetchOwnedMetaData(dispatch, getState);
+    })
     .catch(() => handleNotLoggedIn())
     .then(() => dispatch({ type: actionTypes.initialLoadFinished }));
-};
-
-const loadingWhileSignedIn = (dispatch, getState) => {
-  // reset websocket to make sure it's using the logged-in session
-  dispatch(actionCreators.reconnect__start());
-  return stateStore.fetchOwnedMetaData(dispatch, getState);
 };
 
 export const fetchWhatsNew = createdAfterDate => (dispatch, getState) => {
