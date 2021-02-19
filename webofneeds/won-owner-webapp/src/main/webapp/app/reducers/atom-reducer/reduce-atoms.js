@@ -37,7 +37,7 @@ export function deleteAtom(allAtomsInState, deletedAtomUri) {
           connections &&
           connections.filter((conn, connUri) => {
             markUriAsDeleted(connUri);
-            connectionUtils.getTargetAtomUri(conn) !== deletedAtomUri;
+            return connectionUtils.getTargetAtomUri(conn) !== deletedAtomUri;
           })
       );
     };
