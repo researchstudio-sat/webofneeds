@@ -268,64 +268,6 @@ services:
       - wonnode
       - mongodb
 
-  spoco_raid_bot:
-    restart: always
-    image: webofneeds/won-spoco-raidbot:latest
-    environment:
-      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
-      - "WON_NODE_URI=https://node.matchat.org/won"
-      # - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
-      - "URI_PREFIX_OWNER=https://matchat.org/raid_bot" # set this for the trust store alias
-      - "API_LINZ_ENDPOINT=$RB_ENDPOINT_LINZ"
-      - "API_LINZ_TOKEN=$RB_TOKEN_LINZ"
-      - "API_VIENNA_ENDPOINT=$RB_ENDPOINT_VIENNA"
-      - "API_VIENNA_USERNAME=$RB_USER_VIENNA"
-      - "API_VIENNA_REQUEST=$RB_REQUEST_VIENNA"
-      - "RAIDBOT_FETCHINTERVAL=600" #fetch new raids every 600 seconds (10min)
-      - "RAIDBOT_SANITIZEINTERVAL=900" #sanitize existing raids every 900 seconds (15min)
-      - "BOTCONTEXT_IMPL=mongoBotContext"
-      - "BOTCONTEXT_MONGODB_USER=won"
-      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
-      - "BOTCONTEXT_MONGODB_HOST=satvm01.researchstudio.at"
-      - "BOTCONTEXT_MONGODB_PORT=27017"
-      - "BOTCONTEXT_MONGODB_DATABASE=live_bot"
-      # - "RAIDBOT_PHASEOUT=true" # set this if you do not want to create new atoms but just manage the existing ones
-    volumes:
-      - $base_folder/won-client-certs/raid_bot:/usr/src/bots/client-certs/
-    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
-    depends_on:
-      - mongodb
-      - wonnode
-
-
-  # job bot connecting hokify to WoN
-
-  hokify_bot:
-    restart: always
-    image: webofneeds/won-jobbot:latest
-    environment:
-      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
-      - "WON_NODE_URI=https://node.matchat.org/won"
-      #      - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
-      - "URI_PREFIX_OWNER=https://matchat.org/hokify_bot" # set this for the trust store alias
-      - "HOKIFYJOBBOT_JSONURL=https://hokify.at/jobfeed-webofneeds.json/"
-      - "HOKIFYJOBBOT_GEOURL=https://nominatim.openstreetmap.org/search"
-      - "HOKIFYJOBBOT_UPDATETIME=70"
-      - "HOKIFYJOBBOT_PUBLISHTIME=10"
-      - "HOKIFYJOBBOT_CREATEALLINONE=false"
-      - "BOTCONTEXT_IMPL=mongoBotContext"
-      - "BOTCONTEXT_MONGODB_USER=won"
-      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
-      - "BOTCONTEXT_MONGODB_HOST=satvm01.researchstudio.at"
-      - "BOTCONTEXT_MONGODB_PORT=27017"
-      - "BOTCONTEXT_MONGODB_DATABASE=live_bot"
-    volumes:
-      - $base_folder/won-client-certs/hokify_bot:/usr/src/bots/client-certs/
-    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
-    depends_on:
-      - mongodb
-      - wonnode
-
 #  spoco_raid_bot:
 #    restart: always
 #    image: webofneeds/won-spoco-raidbot:latest
@@ -345,11 +287,40 @@ services:
 #      - "BOTCONTEXT_MONGODB_USER=won"
 #      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
 #      - "BOTCONTEXT_MONGODB_HOST=satvm01.researchstudio.at"
-#      - "BOTCONTEXT_MONGODB_PORT=27018"
+#      - "BOTCONTEXT_MONGODB_PORT=27017"
 #      - "BOTCONTEXT_MONGODB_DATABASE=live_bot"
 #      # - "RAIDBOT_PHASEOUT=true" # set this if you do not want to create new atoms but just manage the existing ones
 #    volumes:
 #      - $base_folder/won-client-certs/raid_bot:/usr/src/bots/client-certs/
+#    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
+#    depends_on:
+#      - mongodb
+#      - wonnode
+
+
+  # job bot connecting hokify to WoN
+
+#  hokify_bot:
+#    restart: always
+#    image: webofneeds/won-jobbot:latest
+#    environment:
+#      - "WON_KEYSTORE_DIR=/usr/src/bots/client-certs/"
+#      - "WON_NODE_URI=https://node.matchat.org/won"
+#      #      - "LOGGING_CONFIG=/usr/src/bots/logback.xml"
+#      - "URI_PREFIX_OWNER=https://matchat.org/hokify_bot" # set this for the trust store alias
+#      - "HOKIFYJOBBOT_JSONURL=https://hokify.at/jobfeed-webofneeds.json/"
+#      - "HOKIFYJOBBOT_GEOURL=https://nominatim.openstreetmap.org/search"
+#      - "HOKIFYJOBBOT_UPDATETIME=70"
+#      - "HOKIFYJOBBOT_PUBLISHTIME=10"
+#      - "HOKIFYJOBBOT_CREATEALLINONE=false"
+#      - "BOTCONTEXT_IMPL=mongoBotContext"
+#      - "BOTCONTEXT_MONGODB_USER=won"
+#      - "BOTCONTEXT_MONGODB_PASS=$mongo_db_passwd"
+#      - "BOTCONTEXT_MONGODB_HOST=satvm01.researchstudio.at"
+#      - "BOTCONTEXT_MONGODB_PORT=27017"
+#      - "BOTCONTEXT_MONGODB_DATABASE=live_bot"
+#    volumes:
+#      - $base_folder/won-client-certs/hokify_bot:/usr/src/bots/client-certs/
 #    #     - $base_folder/logback_debug_bot.xml:/usr/src/bots/logback.xml
 #    depends_on:
 #      - mongodb
