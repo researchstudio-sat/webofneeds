@@ -584,9 +584,6 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
   const recipientAtomUri = extractAtomUriBySocketUri(targetSocketUri);
 
   const senderAtomUri = extractAtomUriBySocketUri(senderSocketUri);
-
-  const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
-  const recipientAtom = generalSelectors.getAtom(recipientAtomUri)(state);
   const isOwnSenderAtom = generalSelectors.isAtomOwned(senderAtomUri)(state);
   const isOwnRecipientAtom = generalSelectors.isAtomOwned(recipientAtomUri)(
     state
@@ -595,89 +592,66 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
   //FIXME: ProcessConnectMessage could fetch atoms/connections in a way that makes the atom unloadable
   //e.g Atom is only accessible for Atoms with receivedRequests -> atom is fetched no connection is in the state yet so requesterWebId can't be found by a connection between the two
 
-  const receiverConnectionUri = getUri(
-    atomUtils.getConnectionBySocketUris(
-      recipientAtom,
-      targetSocketUri,
-      senderSocketUri
-    )
-  );
-  const senderConnectionUri = getUri(
-    atomUtils.getConnectionBySocketUris(
-      senderAtom,
-      senderSocketUri,
-      targetSocketUri
-    )
-  );
+  //We know that all own atoms are already stored within the state, so we do not have to retrieve it
+  const senderAtomP = isOwnSenderAtom
+    ? Promise.resolve(true)
+    : stateStore.fetchAtomAndDispatch(senderAtomUri, dispatch, getState);
 
-  let senderAtomP;
-  if (isOwnSenderAtom) {
-    //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-    senderAtomP = Promise.resolve(true);
-  } else {
-    senderAtomP = stateStore.fetchAtomAndDispatch(
-      senderAtomUri,
-      dispatch,
-      getState
-    );
-  }
-
-  let recipientAtomP;
-  if (isOwnRecipientAtom) {
-    //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-    recipientAtomP = Promise.resolve(true);
-  } else {
-    recipientAtomP = stateStore.fetchAtomAndDispatch(
-      recipientAtomUri,
-      dispatch,
-      getState
-    );
-  }
+  //We know that all own atoms are already stored within the state, so we do not have to retrieve it
+  const recipientAtomP = isOwnRecipientAtom
+    ? Promise.resolve(true)
+    : stateStore.fetchAtomAndDispatch(recipientAtomUri, dispatch, getState);
 
   Promise.all([senderAtomP, recipientAtomP]).then(() => {
     let senderCP;
     if (isOwnSenderAtom) {
-      if (!senderConnectionUri) {
-        senderCP = stateStore
-          .fetchActiveConnectionAndDispatchBySocketUris(
-            senderSocketUri,
-            targetSocketUri,
-            {
-              requesterWebId: senderAtomUri,
-            },
-            dispatch
-          )
-          .then(() => true);
-      } else {
-        console.debug(
-          "senderConnection relevant and we already have it, resolve with true -> handle the connection"
-        );
-        senderCP = Promise.resolve(true);
-      }
-    } else {
-      console.debug(
-        "senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+      const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
+
+      const senderConnectionUri = getUri(
+        atomUtils.getConnectionBySocketUris(
+          senderAtom,
+          senderSocketUri,
+          targetSocketUri
+        )
       );
+      senderCP = senderConnectionUri
+        ? Promise.resolve(true)
+        : stateStore
+            .fetchActiveConnectionAndDispatchBySocketUris(
+              senderSocketUri,
+              targetSocketUri,
+              {
+                requesterWebId: senderAtomUri,
+              },
+              dispatch
+            )
+            .then(() => true);
+    } else {
       senderCP = Promise.resolve(false);
     }
 
     let receiverCP;
     if (isOwnRecipientAtom) {
-      if (!receiverConnectionUri) {
-        receiverCP = stateStore
-          .fetchActiveConnectionAndDispatchBySocketUris(
-            targetSocketUri,
-            senderSocketUri,
-            { requesterWebId: recipientAtomUri },
-            dispatch
-          )
-          .then(() => true);
-      } else {
-        console.debug(
-          "targetConnection relevant and we already have it, resolve with true -> handle the connection"
-        );
-        receiverCP = Promise.resolve(true);
-      }
+      const recipientAtom = generalSelectors.getAtom(recipientAtomUri)(state);
+
+      const receiverConnectionUri = getUri(
+        atomUtils.getConnectionBySocketUris(
+          recipientAtom,
+          targetSocketUri,
+          senderSocketUri
+        )
+      );
+
+      receiverCP = receiverConnectionUri
+        ? (receiverCP = Promise.resolve(true))
+        : stateStore
+            .fetchActiveConnectionAndDispatchBySocketUris(
+              targetSocketUri,
+              senderSocketUri,
+              { requesterWebId: recipientAtomUri },
+              dispatch
+            )
+            .then(() => true);
     } else {
       console.debug(
         "targetAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
@@ -688,10 +662,10 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
     //we have to retrieve the personas too
     Promise.all([senderCP, receiverCP]).then(
       ([senderConnectionRelevant, receiverConnectionRelevant]) => {
-        const newState = getState();
-
         if (receiverConnectionRelevant) {
-          const newRecipientAtom = getIn(newState, ["atoms", recipientAtomUri]);
+          const newRecipientAtom = generalSelectors.getAtom(recipientAtomUri)(
+            getState()
+          );
           const newReceiverConnection = atomUtils.getConnectionBySocketUris(
             newRecipientAtom,
             targetSocketUri,
@@ -715,7 +689,9 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
         }
 
         if (senderConnectionRelevant) {
-          const newSenderAtom = getIn(newState, ["atoms", senderAtomUri]);
+          const newSenderAtom = generalSelectors.getAtom(senderAtomUri)(
+            getState()
+          );
           const newSenderConnection = atomUtils.getConnectionBySocketUris(
             newSenderAtom,
             senderSocketUri,
@@ -806,12 +782,12 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
 
   if (targetConnection) {
     console.debug(
-      "receiverConnection relevant, resolve with true -> handle the connection"
+      "receiverConnection already stored, resolve with true -> handle the connection"
     );
     return Promise.resolve(true);
   } else if (!isOwnTargetAtom) {
     console.debug(
-      "receiverConnectionUri was recipientAtom is not ownedAtom, resolve promise with false -> ignore the connection"
+      "recipientAtom is not ownedAtom, resolve promise with false -> ignore the connection"
     );
     return Promise.resolve(false);
   } else {
