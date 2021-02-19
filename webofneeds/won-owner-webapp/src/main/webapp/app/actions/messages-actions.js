@@ -90,14 +90,17 @@ export const failedCreate = wonMessage => dispatch => {
   );
 };
 
-export const successfulCreate = wonMessage => dispatch => {
+export const successfulCreate = wonMessage => (dispatch, getState) => {
   //load the data into the local rdf store and publish AtomCreatedEvent when done
   const atomUri = wonMessage.getAtom();
-  // since we know that created Atoms are only dispatched for owned atoms we add the atomUri as the requesterWebId for the atom fetch
-  const requesterWebId = atomUri;
+  const requestCredentials = stateStore.determineRequestCredentials(
+    getState(),
+    atomUri,
+    true
+  );
 
   won
-    .fetchAtom(atomUri, { requesterWebId: requesterWebId })
+    .fetchAtom(atomUri, requestCredentials)
     .then(atom => {
       const parsedAtom = parseAtom(atom);
       if (parsedAtom) {
@@ -124,7 +127,7 @@ export const successfulCreate = wonMessage => dispatch => {
             status: {
               code: error.status,
               message: error.message,
-              requestCredentials: { requesterWebId: requesterWebId },
+              requestCredentials: requestCredentials,
             },
           }),
         });
@@ -643,12 +646,16 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
       );
 
       receiverCP = receiverConnectionUri
-        ? (receiverCP = Promise.resolve(true))
+        ? Promise.resolve(true)
         : stateStore
             .fetchActiveConnectionAndDispatchBySocketUris(
               targetSocketUri,
               senderSocketUri,
-              { requesterWebId: recipientAtomUri },
+              stateStore.determineRequestCredentials(
+                state,
+                recipientAtomUri,
+                true
+              ),
               dispatch
             )
             .then(() => true);
@@ -791,24 +798,24 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
     );
     return Promise.resolve(false);
   } else {
-    if (!targetConnectionUri) {
-      return stateStore
-        .fetchActiveConnectionAndDispatchBySocketUris(
+    const requestCredentials = stateStore.determineRequestCredentials(
+      state,
+      targetAtomUri,
+      true
+    );
+    return (!targetConnectionUri
+      ? stateStore.fetchActiveConnectionAndDispatchBySocketUris(
           targetSocketUri,
           senderSocketUri,
-          { requesterWebId: targetAtomUri },
+          requestCredentials,
           dispatch
         )
-        .then(() => true);
-    } else {
-      return stateStore
-        .fetchActiveConnectionAndDispatch(
+      : stateStore.fetchActiveConnectionAndDispatch(
           targetConnectionUri,
-          { requesterWebId: targetAtomUri },
+          requestCredentials,
           dispatch
         )
-        .then(() => true);
-    }
+    ).then(() => true);
   }
 };
 
@@ -851,7 +858,11 @@ export const processAtomHintMessage = wonMessage =>
         .then(() =>
           stateStore.fetchActiveConnectionAndDispatch(
             ownedConnectionUri,
-            { requesterWebId: ownedAtomUri },
+            stateStore.determineRequestCredentials(
+              getState(),
+              ownedAtomUri,
+              true
+            ),
             dispatch
           )
         );

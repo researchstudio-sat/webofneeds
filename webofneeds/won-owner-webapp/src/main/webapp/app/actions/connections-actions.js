@@ -621,11 +621,17 @@ export const showLatestMessages = (connectionUri, numberOfEvents) => (
     return Promise.resolve(); //only load if not already started and connection itself not loading
   }
 
+  const requestCredentials = stateStore.determineRequestCredentials(
+    state,
+    atomUri,
+    true
+  );
+
   return stateStore.fetchMessages(
     dispatch,
     state,
     connectionUri,
-    { requesterWebId: atomUri },
+    requestCredentials,
     numberOfEvents
   );
 };
@@ -663,12 +669,17 @@ export const showMoreMessages = (connectionUri, numberOfEvents) => (
     processState,
     connectionUri
   );
+  const requestCredentials = stateStore.determineRequestCredentials(
+    getState(),
+    atomUri,
+    true
+  );
 
   return stateStore.fetchMessages(
     dispatch,
     state,
     connectionUri,
-    { requesterWebId: atomUri },
+    requestCredentials,
     numberOfEvents,
     resumeAfterUri
   );

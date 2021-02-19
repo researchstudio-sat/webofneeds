@@ -120,7 +120,7 @@ export const fetchActiveConnectionAndDispatchBySocketUris = (
       );
     });
 
-const determineRequestCredentials = (state, atomUri, isOwned) => {
+export const determineRequestCredentials = (state, atomUri, isOwned) => {
   console.debug("## Determine requesterWebId for", atomUri);
   if (isOwned) {
     console.debug(
@@ -259,34 +259,6 @@ const determineRequestCredentials = (state, atomUri, isOwned) => {
           //******************************************************************************
         }
       }
-
-      //TODO: FIGURE OUT HOW TO REQUEST A TOKEN
-      //TODO IMPL TOKEN;
-      // console.debug("## Determine requesterTokenScopes for", atomUri);
-      // //we have a Connection to an atom, that is connected
-      // if (requesterWebId) {
-      //   const atoms = get(state, "atoms");
-      //   const atom = atoms && get(atoms, requesterWebId);
-      //   const acl = atom && get(atom, "acl");
-      //   //crawl for scopes in acl part
-      //   console.debug("## ACL part: ", acl);
-      //   //const scopesArray = [];
-      //   //TODO
-      //   //return scopesArray;
-      // }
-      //
-      // // const requesterTokenScopes = determineRequesterTokenScopes(
-      // //   state,
-      // //   atomUri,
-      // //   requesterWebId
-      // // );
-      // // if (requesterTokenScopes) {
-      // //   requestCredentials.token = won.fetchTokenForAtom(
-      // //     atomUri,
-      // //     requesterWebId,
-      // //     requesterTokenScopes
-      // //   );
-      // // }
 
       return Promise.resolve({ requesterWebId: undefined, token: undefined });
     } else {
