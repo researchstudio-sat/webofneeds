@@ -56,6 +56,17 @@ public class WonKeysReaderWriter {
             keys.add(key);
             return keys;
         }
+        // allow reading key from wonnode descriptor (no separate #key graph)
+        Iterator<String> names = dataset.listNames();
+        while (names.hasNext()) {
+            String graphUri = names.next();
+            key = readFromModel(dataset.getNamedModel(graphUri), keyUri);
+            if (key != null) {
+                keys.add(key);
+                // found key in content graph
+                return keys;
+            }
+        }
         // no key found
         return keys;
     }
