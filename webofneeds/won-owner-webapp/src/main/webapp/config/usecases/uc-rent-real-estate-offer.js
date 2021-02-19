@@ -159,7 +159,7 @@ export const rentRealEstateOffer = {
       filter = concatenateFilters(filters);
     }
 
-    const generatedQuery = sparqlQuery({
+    return sparqlQuery({
       prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
@@ -171,7 +171,5 @@ export const rentRealEstateOffer = {
         },
       ],
     });
-
-    return generatedQuery;
   },
 };

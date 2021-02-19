@@ -31,7 +31,7 @@ export const update = patch => (dispatch, getState) => {
   const currentTheme = generalSelectors.getTheme(getState());
   const currentThemeName = get(currentTheme, "name");
   const newThemeName = getIn(patch, ["theme", "name"]);
-  if (currentThemeName && newThemeName && currentThemeName != newThemeName) {
+  if (currentThemeName && newThemeName && currentThemeName !== newThemeName) {
     // theme has changed (or was initialized), load the updated theme config first
 
     //TODO fetch config. also do that in init!. note that this can fail if an invalid theme has been set.

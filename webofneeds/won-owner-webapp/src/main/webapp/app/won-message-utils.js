@@ -29,7 +29,7 @@ export function isFetchMessageEffectsNeeded(wonMsg) {
 
 export function buildCloseMessage(socketUri, targetSocketUri) {
   const buildMessage = function() {
-    const message = new won.MessageBuilder(vocab.WONMSG.closeMessage)
+    return new won.MessageBuilder(vocab.WONMSG.closeMessage)
       .protocolVersion("1.0")
       .eventURI(vocab.WONMSG.uriPlaceholder.event)
       .senderSocket(socketUri)
@@ -37,8 +37,6 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
-
-    return message;
   };
 
   //fetch all datan needed
@@ -354,7 +352,7 @@ function buildContentRdf(atomData, publishedContentUri) {
     publishedContentUri: publishedContentUri, //mandatory
   });
 
-  let contentRdf = won.buildAtomRdf({
+  return won.buildAtomRdf({
     content: atomData.content
       ? prepareContentNodeData(atomData.content)
       : undefined,
@@ -363,6 +361,4 @@ function buildContentRdf(atomData, publishedContentUri) {
     // FIXME: find a better way to include atom details that are not part of is or seeks
     socket: atomData.socket,
   });
-
-  return contentRdf;
 }

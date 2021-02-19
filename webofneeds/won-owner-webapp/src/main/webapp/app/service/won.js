@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+// noinspection BadExpressionStatementJS
 /**
  * Created by LEIH-NB on 19.08.2014.
  */
@@ -159,7 +160,7 @@ won.getSafeJsonLdValue = function(dataItem) {
 };
 
 won.reportError = function(message) {
-  if (arguments.length == 1) {
+  if (arguments.length === 1) {
     return function(reason) {
       console.error(message, " reason: ", reason);
     };
@@ -217,7 +218,7 @@ won.appendStrippingDuplicates = function(array1, array2, comparatorFun) {
   array2
     .filter(function(item) {
       for (const entry of array1) {
-        if (comparatorFun(item, entry) == 0) {
+        if (comparatorFun(item, entry) === 0) {
           return false;
         }
       }
@@ -310,34 +311,6 @@ won.JsonLdHelper = {
     return graphURIs;
   },
 
-  getDefaultGraph: function(data) {
-    if (data["@graph"] != null) {
-      //graph keyword is present. It could represent the default graph
-      // (in which case it contains only nodes) or a collection of
-      //, which are nodes that contain th @graph keyword.
-      //our naive test is: if the first node contains an '@graph' keyword
-      //we assume the outermost @graph array to contain only named graphs.
-      // we search for the one with '@id'='@default' or without
-      // an '@id' keyword and return it (if we find it)
-      //if the first node doesn't contain an @graph keyword, we assume that there
-      //are no named graphs and all data is in the default graph.
-      let outermostGraphContent = data["@graph"];
-      for (const curNode of outermostGraphContent) {
-        if (curNode["@graph"] == null) {
-          //we assume there are no named graphs, the outermost graph is the default graph
-          return outermostGraphContent;
-        }
-        if (curNode["@id"] == null || curNode["@id"] === "@default") {
-          //we've found the named graph without an @id attribute - that's the default graph
-          return curNode["@graph"];
-        }
-      }
-      return null; //no default graph found
-    } else {
-      //there is no @graph keyword at top level:
-      return data;
-    }
-  },
   getNamedGraph: function(data, graphName) {
     if (data["@graph"] != null) {
       if (data["@id"] != null) {
@@ -615,19 +588,13 @@ WonMessage.prototype = {
         return this.compactFramedMessage;
       } catch (e) {
         console.error(
-          "Failed to generate jsonld for message ",
-          this.getMessageUri(),
-          "\n\n",
-          e
-        );
-        const msg =
           "Failed to generate jsonld for message " +
-          this.getMessageUri() +
-          "\n\n" +
-          e.message +
-          "\n\n" +
-          e.stack;
-        this.compactFramedMessageError = msg;
+            this.getMessageUri() +
+            "\n\n" +
+            e.message +
+            "\n\n" +
+            e.stack
+        );
       }
     }
   },
@@ -642,7 +609,7 @@ WonMessage.prototype = {
   __singleValueOrArray: function(val) {
     if (!val) return null;
     if (is("Array", val)) {
-      if (val.length == 1) {
+      if (val.length === 1) {
         return won.getSafeJsonLdValue(val);
       }
       return val.map(x => won.getSafeJsonLdValue(x));
@@ -734,12 +701,6 @@ WonMessage.prototype = {
   isAcceptMessage: function() {
     return !!this.getProperty(vocab.AGR.accepts);
   },
-  isProposeToCancel: function() {
-    return !!this.getProperty(vocab.AGR.proposesToCancel);
-  },
-  isProposal: function() {
-    return !!this.getProperty(vocab.AGR.Proposal);
-  },
   isAgreement: function() {
     return !!this.getProperty(vocab.AGR.Agreement);
   },
@@ -758,11 +719,6 @@ WonMessage.prototype = {
     let direction = this.getMessageDirection();
     return direction === vocab.WONMSG.FromOwner;
   },
-  isFromExternal: function() {
-    let direction = this.getMessageDirection();
-    return direction === vocab.WONMSG.FromExternal;
-  },
-
   isAtomHintMessage: function() {
     return this.getMessageType() === vocab.WONMSG.atomHintMessage;
   },

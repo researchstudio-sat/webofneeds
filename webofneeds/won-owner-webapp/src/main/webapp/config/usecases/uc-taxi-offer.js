@@ -98,7 +98,7 @@ export const taxiOffer = {
       };
     }
 
-    const generatedQuery = sparqlQuery({
+    return sparqlQuery({
       prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
@@ -110,7 +110,5 @@ export const taxiOffer = {
         },
       ],
     });
-
-    return generatedQuery;
   },
 };

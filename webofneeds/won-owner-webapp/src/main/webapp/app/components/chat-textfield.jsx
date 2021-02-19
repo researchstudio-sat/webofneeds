@@ -260,7 +260,7 @@ export default function ChatTextfield({
   function saveReferencedContent() {
     const _referencedContent = state.referencedContent;
 
-    if (!selectedMessages || selectedMessages.size == 0) {
+    if (!selectedMessages || selectedMessages.size === 0) {
       _referencedContent.delete(multiSelectType);
     } else {
       _referencedContent.set(multiSelectType, selectedMessages);

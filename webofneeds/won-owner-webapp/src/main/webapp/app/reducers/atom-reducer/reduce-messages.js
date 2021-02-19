@@ -805,7 +805,7 @@ export function markMessageAsRejected(
       ? (rejectedMessageUris && rejectedMessageUris.add(messageUri)) ||
         Immutable.Set(messageUri)
       : (rejectedMessageUris &&
-          rejectedMessageUris.filter(uri => uri != messageUri)) ||
+          rejectedMessageUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
   );
 }
@@ -924,7 +924,7 @@ export function markMessageAsRetracted(
       ? (retractedMessageUris && retractedMessageUris.add(messageUri)) ||
         Immutable.Set(messageUri)
       : (retractedMessageUris &&
-          retractedMessageUris.filter(uri => uri != messageUri)) ||
+          retractedMessageUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
   );
 }
@@ -993,7 +993,7 @@ export function markMessageAsClaimed(
       ? (claimedMessageUris && claimedMessageUris.add(messageUri)) ||
         Immutable.Set(messageUri)
       : (claimedMessageUris &&
-          claimedMessageUris.filter(uri => uri != messageUri)) ||
+          claimedMessageUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
   );
 }
@@ -1062,7 +1062,7 @@ export function markMessageAsAgreed(
       ? (agreedMessageUris && agreedMessageUris.add(messageUri)) ||
         Immutable.Set(messageUri)
       : (agreedMessageUris &&
-          agreedMessageUris.filter(uri => uri != messageUri)) ||
+          agreedMessageUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
   );
 }
@@ -1132,7 +1132,7 @@ export function markMessageAsProposed(
       ? (proposedMessageUris && proposedMessageUris.add(messageUri)) ||
         Immutable.Set([messageUri])
       : (proposedMessageUris &&
-          proposedMessageUris.filter(uri => uri != messageUri)) ||
+          proposedMessageUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
   );
 }
@@ -1233,7 +1233,7 @@ export function markMessageAsCancelled(
 
     allAtomsInState = allAtomsInState.setIn(
       [atomUri, "connections", connectionUri, "agreementData", "agreementUris"],
-      (agreementUris && agreementUris.filter(uri => uri != messageUri)) ||
+      (agreementUris && agreementUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
     );
 
@@ -1251,7 +1251,7 @@ export function markMessageAsCancelled(
         "cancellationPendingAgreementUris",
       ],
       (cancellationPendingAgreementUris &&
-        cancellationPendingAgreementUris.filter(uri => uri != messageUri)) ||
+        cancellationPendingAgreementUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
     );
   }
@@ -1280,7 +1280,7 @@ export function markMessageAsCancelled(
       ? (cancelledAgreementUris && cancelledAgreementUris.add(messageUri)) ||
         Immutable.Set(messageUri)
       : (cancelledAgreementUris &&
-          cancelledAgreementUris.filter(uri => uri != messageUri)) ||
+          cancelledAgreementUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
   );
 }
@@ -1333,7 +1333,7 @@ export function markMessageAsCancellationPending(
       ? (cancellationPendingUris && cancellationPendingUris.add(messageUri)) ||
         Immutable.Set([messageUri])
       : (cancellationPendingUris &&
-          cancellationPendingUris.filter(uri => uri != messageUri)) ||
+          cancellationPendingUris.filter(uri => uri !== messageUri)) ||
         Immutable.Set()
   );
 }

@@ -83,12 +83,12 @@ export function getLinkAndParams(url) {
   const array = url && url.split("?");
 
   if (array) {
-    if (array.length == 1) {
+    if (array.length === 1) {
       return {
         url: array[0],
         params: {},
       };
-    } else if (array.length == 2) {
+    } else if (array.length === 2) {
       return {
         url: array[0],
         params: getParamsObject(array[1]),
@@ -463,13 +463,12 @@ export function generateHexColor(text) {
 export function generateRgbColorArray(text) {
   if (!text) return [0, 0, 0];
   const hexStr = generateHexColor(text);
-  const colorArray = [
+  return [
     // ignore first char, as that's the `#`
     hexStr.slice(1, 3),
     hexStr.slice(3, 5),
     hexStr.slice(5, 7),
   ].map(hexColor => parseInt(hexColor, 16));
-  return colorArray;
 }
 
 /**
@@ -595,7 +594,7 @@ export function toLocalISODateString(dateTime) {
     timezoneString = "+" + offsetHours + ":" + offsetMins;
   } else if (timezoneOffsetInMins > 0) {
     timezoneString = "-" + offsetHours + ":" + offsetMins;
-  } else if (timezoneOffsetInMins == 0) {
+  } else if (timezoneOffsetInMins === 0) {
     timezoneString = "Z";
   }
 
@@ -624,7 +623,7 @@ export function generateSimpleTransitionLabel(str) {
   if (str) {
     const indexOfLastSharp = str.lastIndexOf("#");
 
-    if (indexOfLastSharp != -1 && indexOfLastSharp + 1 < str.length) {
+    if (indexOfLastSharp !== -1 && indexOfLastSharp + 1 < str.length) {
       return str.substr(indexOfLastSharp + 1);
     }
   }
@@ -650,10 +649,10 @@ export function compareArrayBuffers(left, right) {
   const leftArray = new Uint8Array(left);
   const rightArray = new Uint8Array(right);
 
-  if (leftArray.length != rightArray.length) return false;
+  if (leftArray.length !== rightArray.length) return false;
 
   for (const [index] of leftArray.entries()) {
-    if (leftArray[index] != rightArray[index]) {
+    if (leftArray[index] !== rightArray[index]) {
       return false;
     }
   }

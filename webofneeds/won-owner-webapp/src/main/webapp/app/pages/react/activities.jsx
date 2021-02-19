@@ -49,6 +49,8 @@ export default function PageActivities() {
     generalSelectors.getAtom(get(selectedConnection, "targetAtomUri"))
   );
 
+  const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
+
   useEffect(
     () => {
       if (isAtomFetchNecessary) {
@@ -77,8 +79,6 @@ export default function PageActivities() {
       atomUriInRoute,
     ]
   );
-
-  const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
 
   const isSelectedConnectionGroupChat =
     selectedConnection &&

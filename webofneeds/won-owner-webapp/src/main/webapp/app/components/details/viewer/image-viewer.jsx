@@ -49,7 +49,7 @@ export default function WonImageViewer({ detail, content, className }) {
           <div
             className={
               "imagev__content__thumbnails__thumbnail " +
-              (selectedIndex == index
+              (selectedIndex === index
                 ? "imagev__content__thumbnails__thumbnail--selected"
                 : "")
             }

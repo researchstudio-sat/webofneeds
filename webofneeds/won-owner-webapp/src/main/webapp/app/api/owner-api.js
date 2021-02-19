@@ -510,19 +510,19 @@ function fetchMetaAtoms(
       (location &&
       location.lat &&
       location.lng &&
-      (maxDistance || maxDistance == 0)
+      (maxDistance || maxDistance === 0)
         ? "latitude=" + location.lat + "&"
         : "") +
       (location &&
       location.lat &&
       location.lng &&
-      (maxDistance || maxDistance == 0)
+      (maxDistance || maxDistance === 0)
         ? "longitude=" + location.lng + "&"
         : "") +
       (location &&
       location.lat &&
       location.lng &&
-      (maxDistance || maxDistance == 0)
+      (maxDistance || maxDistance === 0)
         ? "maxDistance=" + maxDistance + "&"
         : "")
   );
@@ -735,11 +735,9 @@ function generateLinkedDataQueryString(dataUri, queryParams) {
     requesterWebId: undefined,
     token: undefined,
   });
-  let query = (
+  return (
     queryOnOwner +
     "uri=" +
     encodeURIComponent(dataUri + (paramsString ? paramsString : ""))
   ).replace(new RegExp("%3A", "g"), ":"); // server can't resolve uri-encoded colons. revert the encoding done in `queryString`.
-
-  return query;
 }

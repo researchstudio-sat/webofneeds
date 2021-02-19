@@ -60,7 +60,7 @@ export const pokemonRaid = {
     if (id) {
       for (const idx in this.fullPokemonList) {
         if (
-          this.fullPokemonList[idx].id == id &&
+          this.fullPokemonList[idx].id === id &&
           ((form && this.fullPokemonList[idx].form === form) ||
             (!form && !this.fullPokemonList[idx].form))
         ) {

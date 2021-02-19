@@ -59,12 +59,6 @@ export default class WonSelectPicker extends React.Component {
     return false;
   }
 
-  getInputName() {
-    /*TODO: Implement a sort of hashcode to prepend to the returned name to add the
-    possibility of using the same identifier in is and seeks for these pickers*/
-    return this.props.detail.identifier;
-  }
-
   /**
    * Checks validity and uses callback method
    */

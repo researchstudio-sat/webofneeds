@@ -148,7 +148,7 @@ export const rehearsalRoomSearch = {
       filter = concatenateFilters(filters);
     }
 
-    const generatedQuery = sparqlQuery({
+    return sparqlQuery({
       prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
@@ -160,7 +160,5 @@ export const rehearsalRoomSearch = {
         },
       ],
     });
-
-    return generatedQuery;
   },
 };

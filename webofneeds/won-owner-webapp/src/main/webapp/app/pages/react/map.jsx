@@ -184,7 +184,7 @@ export default function PageMap() {
               ", continuing map initialization without currentLocation. fullerror:",
               error
             );
-            if (error.code == 1) {
+            if (error.code === 1) {
               console.error("User Denied access");
             }
             dispatch(actionCreators.view__locationAccessDenied());
@@ -232,7 +232,7 @@ export default function PageMap() {
               ", continuing map initialization without currentLocation. fullerror:",
               error
             );
-            if (error.code == 1) {
+            if (error.code === 1) {
               console.error("User Denied access");
             }
             dispatch(actionCreators.view__locationAccessDenied());

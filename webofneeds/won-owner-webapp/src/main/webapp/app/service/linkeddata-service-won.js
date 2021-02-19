@@ -197,7 +197,7 @@ import vocab from "./vocab.js";
         .then(jsonLdConnection => jsonld.expand(jsonLdConnection))
         .then(jsonLdConnection => {
           const connectionContentGraph = jsonLdConnection[0];
-          const connection = {
+          return {
             uri: connectionContentGraph["@id"],
             type: connectionContentGraph["@type"][0],
             modified:
@@ -224,8 +224,6 @@ import vocab from "./vocab.js";
               connectionContentGraph[vocab.WON.targetConnection][0]["@id"],
             hasEvents: [],
           };
-
-          return connection;
         })
         .catch(e => {
           const msg = "Failed to get connection " + connectionUri + ".";

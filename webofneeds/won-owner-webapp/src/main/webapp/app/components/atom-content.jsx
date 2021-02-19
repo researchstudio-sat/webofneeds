@@ -145,7 +145,7 @@ export default function WonAtomContent({
             contentBranchImm &&
             contentBranchImm.find(
               (detailValue, detailKey) =>
-                detailKey != "type" && detailKey != "sockets"
+                detailKey !== "type" && detailKey !== "sockets"
             )
           );
         };

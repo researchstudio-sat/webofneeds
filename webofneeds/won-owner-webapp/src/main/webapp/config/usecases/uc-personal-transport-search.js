@@ -223,7 +223,7 @@ export const personalTransportSearch = {
       };
     }
 
-    const generatedQuery = sparqlQuery({
+    return sparqlQuery({
       prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName, "?score"],
@@ -235,7 +235,5 @@ export const personalTransportSearch = {
         },
       ],
     });
-
-    return generatedQuery;
   },
 };

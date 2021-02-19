@@ -135,7 +135,7 @@ export function emptyFilter() {
  * @param {*} filters see `wellFormedFilter` for the returned structure.
  */
 export function concatenateFilters(filters) {
-  const concatenatedFilter = filters
+  return filters
     .filter(f => f) // filter out undefined filters
     .reduce((acc, f) => {
       if (!f) {
@@ -149,8 +149,6 @@ export function concatenateFilters(filters) {
         };
       }
     }, emptyFilter());
-
-  return concatenatedFilter;
 }
 
 /**
@@ -254,7 +252,7 @@ export function tagOverlapScoreSubQuery({
   prefixesInPath,
   tagLikes,
 }) {
-  if (!is("Array", tagLikes) || tagLikes.length == 0) {
+  if (!is("Array", tagLikes) || tagLikes.length === 0) {
     return undefined;
   }
 

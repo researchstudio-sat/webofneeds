@@ -31,7 +31,7 @@ export function reverseSearchNominatim(lat, lon, zoom) {
     url += "&zoom=" + Math.max(0, Math.min(zoom, 18));
   }
 
-  let json = fetchJSON(url).catch(function() {
+  return fetchJSON(url).catch(function() {
     const distance = 0.2;
     const gp = new GeoPoint(lat, lon);
     const bBox = gp.boundingCoordinates(distance, true);
@@ -47,7 +47,6 @@ export function reverseSearchNominatim(lat, lon, zoom) {
       ],
     };
   });
-  return json;
 }
 
 export function scrubSearchResults(searchResults) {
