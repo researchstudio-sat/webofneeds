@@ -56,24 +56,6 @@ public class WonKeysReaderWriter {
             keys.add(key);
             return keys;
         }
-        // allow legacy atoms (keys in content graph)
-        String aclGraphUri = WonRelativeUriHelper.createAclGraphURIForAtomURI(atomUri).toString();
-        String sysinfoGraphUri = WonRelativeUriHelper.createSysInfoGraphURIForAtomURI(atomUri).toString();
-        Iterator<String> names = dataset.listNames();
-        while (names.hasNext()) {
-            String graphUri = names.next();
-            if (graphUri.endsWith(WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX)
-                            || graphUri.equals(aclGraphUri)
-                            || graphUri.equals(sysinfoGraphUri)) {
-                continue;
-            }
-            key = readFromModel(dataset.getNamedModel(graphUri), keyUri);
-            if (key != null) {
-                keys.add(key);
-                // found key in content graph
-                return keys;
-            }
-        }
         // no key found
         return keys;
     }

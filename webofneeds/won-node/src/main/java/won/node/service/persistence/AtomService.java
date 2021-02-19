@@ -1,8 +1,6 @@
 package won.node.service.persistence;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
@@ -17,7 +15,6 @@ import won.auth.model.DecisionValue;
 import won.auth.model.GraphType;
 import won.auth.model.OperationRequest;
 import won.auth.socket.SocketAuthorizationSource;
-import won.cryptography.rdfsign.WonKeysReaderWriter;
 import won.node.service.nodeconfig.URIService;
 import won.protocol.exception.*;
 import won.protocol.message.WonMessage;
@@ -34,7 +31,6 @@ import javax.persistence.EntityManager;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.PublicKey;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -224,46 +220,13 @@ public class AtomService {
         Dataset oldAtomDataset = atom.getDatatsetHolder().getDataset();
         URI keyGraphUri = WonRelativeUriHelper.createKeyGraphURIForAtomURI(atom.getAtomURI());
         // store the atom content
-        boolean handleLegacyKey = false;
-        if (!oldAtomDataset.containsNamedModel(keyGraphUri.toString())) {
-            // there is no separate key graph in the atom, yet so there
-            // must be the public key in a content graph. We have to remove it from
-            // there. If the message does not contain a new one, we copy the old one to the
-            // key graph
-            // Note: we cannot delete the key from the content graph because that would
-            // invalidate its signature.
-            handleLegacyKey = true;
-        }
         Iterator<String> oldGraphNames = oldAtomDataset.listNames();
         String derivedDataName = atom.getAtomURI().toString() + "#derivedData";
-        boolean legacyKeyHandled = false;
         while (oldGraphNames.hasNext()) {
             String oldGraphName = oldGraphNames.next();
             if (oldGraphName.equals(derivedDataName)) {
                 newAtomContent.addNamedModel(oldGraphName, oldAtomDataset.getNamedModel(oldGraphName));
                 continue;
-            }
-            if (handleLegacyKey) {
-                Model model = oldAtomDataset.getNamedModel(oldGraphName);
-                PublicKey key = null;
-                try {
-                    key = WonKeysReaderWriter.readFromModel(model, atomURI.toString());
-                    if (key != null) {
-                        if (legacyKeyHandled) {
-                            throw new IllegalStateException("More than one legacy key found in atom " + atomURI);
-                        }
-                        legacyKeyHandled = true;
-                        if (!newAtomContent.containsNamedModel(keyGraphUri.toString())) {
-                            // only copy the legacy key to the key graph if the message
-                            // does not contain a key
-                            Model m = ModelFactory.createDefaultModel();
-                            WonKeysReaderWriter.writeToModel(m, m.getResource(atomURI.toString()), key);
-                            newAtomContent.addNamedModel(keyGraphUri.toString(), m);
-                        }
-                    }
-                } catch (Exception e) {
-                    throw new WonMessageProcessingException("Cannot process replace message", e);
-                }
             }
             if (!newAtomContent.containsNamedModel(oldGraphName)) {
                 // copy graphs not contained in the message from old to new state
