@@ -128,6 +128,7 @@ export default function(allToasts = initialState, action = {}) {
       );
 
     case actionTypes.messages.atomMessageReceived: {
+      //payload also includes currently unused atomUri
       const humanReadable = action.payload.humanReadable;
       const message = action.payload.message;
       return pushNewToast(

@@ -73,12 +73,14 @@ export const fetchActiveConnectionAndDispatch = (
 export const fetchConnectionUriBySocketUris = (
   senderSocketUri,
   targetSocketUri,
-  atomUri
+  requestCredentials
 ) =>
   won
-    .fetchConnectionUrisBySocket(senderSocketUri, targetSocketUri, {
-      requesterWebId: atomUri,
-    })
+    .fetchConnectionUrisBySocket(
+      senderSocketUri,
+      targetSocketUri,
+      requestCredentials
+    )
     .catch(() => {
       console.error(
         "Fetch of ConnectionUri of sockets",

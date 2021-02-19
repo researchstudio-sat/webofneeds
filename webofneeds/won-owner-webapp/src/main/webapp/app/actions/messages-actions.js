@@ -508,7 +508,9 @@ export const connectSuccessOwn = wonMessage => (dispatch, getState) => {
       connUriPromise = stateStore.fetchConnectionUriBySocketUris(
         connectionUtils.getSocketUri(connection),
         connectionUtils.getTargetSocketUri(connection),
-        atomUri
+        {
+          requesterWebId: atomUri,
+        }
       );
     } else {
       connUriPromise = Promise.resolve(getUri(connection));
@@ -553,7 +555,9 @@ export const connectSuccessRemote = wonMessage => (dispatch, getState) => {
       connUriPromise = stateStore.fetchConnectionUriBySocketUris(
         targetSocketUri,
         senderSocketUri,
-        atomUri
+        {
+          requesterWebId: atomUri,
+        }
       );
     } else {
       connUriPromise = Promise.resolve(getUri(connection));
@@ -752,25 +756,27 @@ export const updateMessageStatus = wonMessage => dispatch =>
 
 export const atomMessageReceived = wonMessage => (dispatch, getState) => {
   //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
+  const state = getState();
   const targetAtomUri = extractAtomUriBySocketUri(wonMessage.getTargetSocket());
-  const atom = getState().getIn(["atoms", targetAtomUri]);
+  const atom = generalSelectors.getAtom(targetAtomUri)(state);
   if (!atom) {
     console.debug(
       "ignoring atomMessage for an atom that is not ours:",
       targetAtomUri
     );
+  } else {
+    dispatch({
+      type: actionTypes.messages.atomMessageReceived,
+      payload: {
+        atomUri: targetAtomUri,
+        humanReadable: atomUtils.getTitle(
+          atom,
+          generalSelectors.getExternalDataState(state)
+        ),
+        message: wonMessage.getTextMessage(),
+      },
+    });
   }
-  dispatch({
-    type: actionTypes.messages.atomMessageReceived,
-    payload: {
-      atomUri: targetAtomUri,
-      humanReadable: atomUtils.getTitle(
-        atom,
-        generalSelectors.getExternalDataState(getState())
-      ),
-      message: wonMessage.getTextMessage(),
-    },
-  });
 };
 
 export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
@@ -783,14 +789,12 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
   const targetAtom = generalSelectors.getAtom(targetAtomUri)(state);
   const isOwnTargetAtom = generalSelectors.isAtomOwned(targetAtomUri)(state);
 
-  //FIXME: processSocketHintMessage could fetch atoms/connections in a way that makes the atom unloadable
-  //e.g Atom is only accessible for Atoms with suggestedConns -> atom is fetched no connection is in the state yet so requesterWebId can't be found by a connection between the two
-
   if (!targetAtom) {
     console.debug(
       "ignoring hint for an atom that is not yet in the state (could be a targetAtom, or a non stored ownedAtom):",
       targetAtomUri
     );
+    return Promise.resolve(false);
   }
 
   const targetConnection = atomUtils.getConnectionBySocketUris(
@@ -800,33 +804,35 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
   );
   const targetConnectionUri = getUri(targetConnection);
 
-  if (!targetConnectionUri && isOwnTargetAtom) {
-    return stateStore
-      .fetchActiveConnectionAndDispatchBySocketUris(
-        targetSocketUri,
-        senderSocketUri,
-        { requesterWebId: targetAtomUri },
-        dispatch
-      )
-      .then(() => true);
-  } else if (!targetConnectionUri || !isOwnTargetAtom) {
-    console.debug(
-      "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
-    );
-    return Promise.resolve(false);
-  } else if (targetConnection) {
+  if (targetConnection) {
     console.debug(
       "receiverConnection relevant, resolve with true -> handle the connection"
     );
     return Promise.resolve(true);
+  } else if (!isOwnTargetAtom) {
+    console.debug(
+      "receiverConnectionUri was recipientAtom is not ownedAtom, resolve promise with false -> ignore the connection"
+    );
+    return Promise.resolve(false);
   } else {
-    return stateStore
-      .fetchActiveConnectionAndDispatch(
-        targetConnectionUri,
-        { requesterWebId: targetAtomUri },
-        dispatch
-      )
-      .then(() => true);
+    if (!targetConnectionUri) {
+      return stateStore
+        .fetchActiveConnectionAndDispatchBySocketUris(
+          targetSocketUri,
+          senderSocketUri,
+          { requesterWebId: targetAtomUri },
+          dispatch
+        )
+        .then(() => true);
+    } else {
+      return stateStore
+        .fetchActiveConnectionAndDispatch(
+          targetConnectionUri,
+          { requesterWebId: targetAtomUri },
+          dispatch
+        )
+        .then(() => true);
+    }
   }
 };
 
