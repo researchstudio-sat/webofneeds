@@ -59,7 +59,7 @@ public class AclChecker extends AbstractCamelProcessor {
         Optional<Graph> aclGraph = atom.getAclGraph();
         if (aclGraph.isEmpty()) {
             // no checks if no acl present
-            if (sender != signer) {
+            if (!sender.equals(signer)) {
                 throw new IllegalMessageSignerException(
                                 String.format("%s must not be signer of %s message %s",
                                                 signer,
