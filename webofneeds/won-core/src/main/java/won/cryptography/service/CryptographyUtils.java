@@ -21,6 +21,8 @@ import javax.net.ssl.SSLContext;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.function.Supplier;
 
 /**
@@ -76,6 +78,8 @@ public class CryptographyUtils {
 
     private static SSLContext getCachedSslContextForKeystore(final KeyStore keyStore, String cacheKey,
                     Supplier<SSLContext> sslContextSupplier) throws Exception {
+        Instant start = Instant.now();
+        logger.debug("Creating or obtaining cached SSL context");
         Element cacheElement = ehcache.get(cacheKey);
         SSLContext sslContext;
         if (cacheElement != null) {
@@ -83,20 +87,43 @@ public class CryptographyUtils {
             if (keyStoreHasChanged(keyStore, cacheElement)) {
                 ehcache.remove(cacheElement);
                 cacheElement = null;
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Obtaining cached SSL context took {} millis",
+                                    Duration.between(start, Instant.now()).toMillis());
+                }
             }
         }
         if (cacheElement == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Creating new SSL context and caching it...");
+            }
             // we want to avoid creating the sslContext multiple times, so we snychronize on
             // an object shared by all threads:
             synchronized (ehcache) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Inside critical section, {} millis since method start",
+                                    Duration.between(start, Instant.now()).toMillis());
+                }
                 // now we have to check again (maybe we're in the thread that had to wait - in
                 // that case, the
                 // sslContext has been created already
                 cacheElement = ehcache.get(cacheKey);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("cached element found: {} ", (cacheElement != null));
+                    if (cacheElement != null) {
+                        logger.debug("current keystore size: {}, size of cached keystore:{}", keyStore.size(),
+                                        ((CacheEntry) cacheElement.getObjectValue()).keystoreSize);
+                    }
+                }
                 if (cacheElement == null || keyStoreHasChanged(keyStore, cacheElement)) {
                     sslContext = sslContextSupplier.get();
                     cacheElement = new Element(cacheKey, new CacheEntry(sslContext, keyStore.size()));
                     ehcache.put(cacheElement);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("new SSL Context created, {} millis since method start",
+                                        Duration.between(start, Instant.now()).toMillis());
+                    }
                 }
             }
         }
@@ -110,10 +137,14 @@ public class CryptographyUtils {
     private static SSLContextBuilder createSSLContextBuilder(final KeyStore keyStore, final String ksPass,
                     final PrivateKeyStrategy keyStrategy, final KeyStore trustStore, TrustStrategy trustStrategy)
                     throws Exception {
+        Instant start = Instant.now();
         SSLContextBuilder contextBuilder = SSLContexts.custom();
         contextBuilder.loadKeyMaterial(keyStore, ksPass.toCharArray(), keyStrategy);
         // if trustStore is null, default CAs trust store is used
         contextBuilder.loadTrustMaterial(trustStore, trustStrategy);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Loaded key material in {} millis", Duration.between(start, Instant.now()).toMillis());
+        }
         return contextBuilder;
     }
 
