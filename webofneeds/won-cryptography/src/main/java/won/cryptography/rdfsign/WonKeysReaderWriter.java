@@ -46,29 +46,35 @@ public class WonKeysReaderWriter {
     public static Set<PublicKey> readKeyFromAtom(URI atomUri, Dataset dataset, String keyUri)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         URI keyGraphUri = WonRelativeUriHelper.createKeyGraphURIForAtomURI(atomUri);
-        PublicKey key = readFromModel(dataset.getNamedModel(keyGraphUri.toString()), keyUri);
+        PublicKey key = null;
+        if (dataset.containsNamedModel(keyGraphUri.toString())) {
+            key = readFromModel(dataset.getNamedModel(keyGraphUri.toString()), keyUri);
+        }
         Set<PublicKey> keys = new HashSet<>();
         if (key != null) {
+            // key found in #key graph
             keys.add(key);
-        } else {
-            String aclGraphUri = WonRelativeUriHelper.createAclGraphURIForAtomURI(atomUri).toString();
-            String sysinfoGraphUri = WonRelativeUriHelper.createSysInfoGraphURIForAtomURI(atomUri).toString();
-            // allow legacy atoms (keys in content graph)
-            Iterator<String> names = dataset.listNames();
-            while (names.hasNext()) {
-                String graphUri = names.next();
-                if (graphUri.endsWith(WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX)
-                                || graphUri.equals(aclGraphUri)
-                                || graphUri.equals(sysinfoGraphUri)) {
-                    continue;
-                }
-                key = readFromModel(dataset.getNamedModel(graphUri), keyUri);
-                if (key != null) {
-                    keys.add(key);
-                    return keys;
-                }
+            return keys;
+        }
+        // allow legacy atoms (keys in content graph)
+        String aclGraphUri = WonRelativeUriHelper.createAclGraphURIForAtomURI(atomUri).toString();
+        String sysinfoGraphUri = WonRelativeUriHelper.createSysInfoGraphURIForAtomURI(atomUri).toString();
+        Iterator<String> names = dataset.listNames();
+        while (names.hasNext()) {
+            String graphUri = names.next();
+            if (graphUri.endsWith(WonMessage.SIGNATURE_URI_GRAPHURI_SUFFIX)
+                            || graphUri.equals(aclGraphUri)
+                            || graphUri.equals(sysinfoGraphUri)) {
+                continue;
+            }
+            key = readFromModel(dataset.getNamedModel(graphUri), keyUri);
+            if (key != null) {
+                keys.add(key);
+                // found key in content graph
+                return keys;
             }
         }
+        // no key found
         return keys;
     }
 
@@ -82,6 +88,9 @@ public class WonKeysReaderWriter {
     public static PublicKey readFromModel(Model model, String keyUri)
                     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         Map<String, PublicKey> keys = new HashMap<>();
+        if (model == null) {
+            return null;
+        }
         Resource keyRes = model.createResource(keyUri);
         readFromModel(model, keys, keyRes);
         return keys.get(keyUri);
