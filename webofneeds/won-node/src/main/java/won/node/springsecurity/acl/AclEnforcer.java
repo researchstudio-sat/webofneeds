@@ -2,6 +2,8 @@ package won.node.springsecurity.acl;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import won.auth.AuthUtils;
@@ -11,6 +13,7 @@ import won.auth.model.OperationRequest;
 import won.protocol.model.Connection;
 import won.protocol.model.DataWithEtag;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -19,6 +22,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class AclEnforcer implements MethodInterceptor {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     public AclEnforcer() {
     }
 
@@ -75,26 +80,33 @@ public class AclEnforcer implements MethodInterceptor {
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         Type type = methodInvocation.getMethod().getGenericReturnType();
-        if (type.equals(Connection.class)) {
-            return filterByAcl(
-                            getContextFromThreadLocal(),
-                            (Connection) methodInvocation.proceed());
-        } else if (isGenericTypeWithTypeParam(type, Collection.class, Connection.class)) {
-            return filterByAcl(
-                            getContextFromThreadLocal(),
-                            (Collection<Connection>) methodInvocation.proceed());
-        } else if (isGenericTypeWithTypeParam(type, Optional.class, Connection.class)) {
-            return filterByAcl(
-                            getContextFromThreadLocal(),
-                            (Optional<Connection>) methodInvocation.proceed());
-        } else if (isGenericTypeWithTypeParam(type, DataWithEtag.class, Connection.class)) {
-            return filterByAcl(
-                            getContextFromThreadLocal(),
-                            (DataWithEtag<Connection>) methodInvocation.proceed());
-        } else if (isGenericTypeWithTypeParam(type, Slice.class, Connection.class)) {
-            return filterByAcl(
-                            getContextFromThreadLocal(),
-                            (Slice<Connection>) methodInvocation.proceed());
+        long start = System.currentTimeMillis();
+        try {
+            if (type.equals(Connection.class)) {
+                return filterByAcl(
+                                getContextFromThreadLocal(),
+                                (Connection) methodInvocation.proceed());
+            } else if (isGenericTypeWithTypeParam(type, Collection.class, Connection.class)) {
+                return filterByAcl(
+                                getContextFromThreadLocal(),
+                                (Collection<Connection>) methodInvocation.proceed());
+            } else if (isGenericTypeWithTypeParam(type, Optional.class, Connection.class)) {
+                return filterByAcl(
+                                getContextFromThreadLocal(),
+                                (Optional<Connection>) methodInvocation.proceed());
+            } else if (isGenericTypeWithTypeParam(type, DataWithEtag.class, Connection.class)) {
+                return filterByAcl(
+                                getContextFromThreadLocal(),
+                                (DataWithEtag<Connection>) methodInvocation.proceed());
+            } else if (isGenericTypeWithTypeParam(type, Slice.class, Connection.class)) {
+                return filterByAcl(
+                                getContextFromThreadLocal(),
+                                (Slice<Connection>) methodInvocation.proceed());
+            }
+        } finally {
+            if (logger.isDebugEnabled()) {
+                logger.debug("filtering by acl took {} millis", System.currentTimeMillis() - start);
+            }
         }
         return methodInvocation.proceed();
     }
