@@ -93,46 +93,44 @@ export const failedCreate = wonMessage => dispatch => {
 export const successfulCreate = wonMessage => (dispatch, getState) => {
   //load the data into the local rdf store and publish AtomCreatedEvent when done
   const atomUri = wonMessage.getAtom();
-  const requestCredentials = stateStore.determineRequestCredentials(
-    getState(),
-    atomUri,
-    true
-  );
-
-  won
-    .fetchAtom(atomUri, requestCredentials)
-    .then(atom => {
-      const parsedAtom = parseAtom(atom);
-      if (parsedAtom) {
-        dispatch(
-          actionCreators.atoms__createSuccessful({
-            eventUri: wonMessage.getIsResponseTo(),
-            atomUri: atomUri,
-            atom: parsedAtom,
-          })
-        );
-      }
-    })
-    .catch(error => {
-      if (error.status && error.status === 410) {
-        dispatch({
-          type: actionTypes.atoms.delete,
-          payload: Immutable.fromJS({ uri: atomUri }),
-        });
-      } else {
-        dispatch({
-          type: actionTypes.atoms.storeUriFailed,
-          payload: Immutable.fromJS({
-            uri: atomUri,
-            status: {
-              code: error.status,
-              message: error.message,
-              requestCredentials: requestCredentials,
-            },
-          }),
-        });
-      }
-    });
+  stateStore
+    .determineRequestCredentials(getState(), atomUri, true)
+    .then(requestCredentials =>
+      won
+        .fetchAtom(atomUri, requestCredentials)
+        .then(atom => {
+          const parsedAtom = parseAtom(atom);
+          if (parsedAtom) {
+            dispatch(
+              actionCreators.atoms__createSuccessful({
+                eventUri: wonMessage.getIsResponseTo(),
+                atomUri: atomUri,
+                atom: parsedAtom,
+              })
+            );
+          }
+        })
+        .catch(error => {
+          if (error.status && error.status === 410) {
+            dispatch({
+              type: actionTypes.atoms.delete,
+              payload: Immutable.fromJS({ uri: atomUri }),
+            });
+          } else {
+            dispatch({
+              type: actionTypes.atoms.storeUriFailed,
+              payload: Immutable.fromJS({
+                uri: atomUri,
+                status: {
+                  code: error.status,
+                  message: error.message,
+                  requestCredentials: requestCredentials,
+                },
+              }),
+            });
+          }
+        })
+    );
 };
 
 export const failedEdit = wonMessage => dispatch => {
@@ -661,15 +659,14 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
       receiverCP = receiverConnectionUri
         ? Promise.resolve(true)
         : stateStore
-            .fetchActiveConnectionAndDispatchBySocketUris(
-              targetSocketUri,
-              senderSocketUri,
-              stateStore.determineRequestCredentials(
-                state,
-                recipientAtomUri,
-                true
-              ),
-              dispatch
+            .determineRequestCredentials(state, recipientAtomUri, true)
+            .then(requestCredentials =>
+              won.fetchActiveConnectionAndDispatchBySocketUris(
+                targetSocketUri,
+                senderSocketUri,
+                requestCredentials,
+                dispatch
+              )
             )
             .then(() => true);
     } else {
@@ -811,24 +808,23 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
     );
     return Promise.resolve(false);
   } else {
-    const requestCredentials = stateStore.determineRequestCredentials(
-      state,
-      targetAtomUri,
-      true
-    );
-    return (!targetConnectionUri
-      ? stateStore.fetchActiveConnectionAndDispatchBySocketUris(
-          targetSocketUri,
-          senderSocketUri,
-          requestCredentials,
-          dispatch
-        )
-      : stateStore.fetchActiveConnectionAndDispatch(
-          targetConnectionUri,
-          requestCredentials,
-          dispatch
-        )
-    ).then(() => true);
+    return stateStore
+      .determineRequestCredentials(state, targetAtomUri, true)
+      .then(requestCredentials =>
+        (!targetConnectionUri
+          ? stateStore.fetchActiveConnectionAndDispatchBySocketUris(
+              targetSocketUri,
+              senderSocketUri,
+              requestCredentials,
+              dispatch
+            )
+          : stateStore.fetchActiveConnectionAndDispatch(
+              targetConnectionUri,
+              requestCredentials,
+              dispatch
+            )
+        ).then(() => true)
+      );
   }
 };
 
@@ -865,13 +861,12 @@ export const processAtomHintMessage = wonMessage =>
           }
         })
         .then(() =>
+          stateStore.determineRequestCredentials(getState(), ownedAtomUri, true)
+        )
+        .then(requestCredentials =>
           stateStore.fetchActiveConnectionAndDispatch(
             ownedConnectionUri,
-            stateStore.determineRequestCredentials(
-              getState(),
-              ownedAtomUri,
-              true
-            ),
+            requestCredentials,
             dispatch
           )
         );
