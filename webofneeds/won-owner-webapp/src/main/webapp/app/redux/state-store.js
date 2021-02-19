@@ -406,13 +406,15 @@ export const fetchConnectionsContainerAndDispatch = (
  * @param dispatch
  * @param {function} getState
  * @param {boolean} update, defaults to false
+ * @param {Object} overrideCredentials, can be used to override the credentialDetermination
  * @returns {*}
  */
 export const fetchAtomAndDispatch = (
   atomUri,
   dispatch,
   getState,
-  update = false
+  update = false,
+  overrideCredentials
 ) => {
   const state = getState();
   const processState = generalSelectors.getProcessState(state);
@@ -456,7 +458,10 @@ export const fetchAtomAndDispatch = (
   });
 
   return (
-    determineRequestCredentials(state, atomUri, isOwned)
+    (overrideCredentials
+      ? Promise.resolve(overrideCredentials)
+      : determineRequestCredentials(state, atomUri, isOwned)
+    )
       // TODO: INCLUDE GRANTS FETCH SOMEHOW
       // .then(requestCredentials => {
       //   ownerApi
@@ -475,7 +480,9 @@ export const fetchAtomAndDispatch = (
             if (parsedAtom) {
               dispatch({
                 type: actionTypes.atoms.store,
-                payload: Immutable.fromJS({ atoms: { [atomUri]: parsedAtom } }),
+                payload: Immutable.fromJS({
+                  atoms: { [atomUri]: parsedAtom },
+                }),
               });
             }
             return parsedAtom;

@@ -594,16 +594,29 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
 
   //FIXME: ProcessConnectMessage could fetch atoms/connections in a way that makes the atom unloadable
   //e.g Atom is only accessible for Atoms with receivedRequests -> atom is fetched no connection is in the state yet so requesterWebId can't be found by a connection between the two
+  // Current solution is to assume that the connectMessage already grants the receiver or the sender access to the atom, so we just try that uri as requesterWebId instead and override the Credentials
 
   //We know that all own atoms are already stored within the state, so we do not have to retrieve it
   const senderAtomP = isOwnSenderAtom
     ? Promise.resolve(true)
-    : stateStore.fetchAtomAndDispatch(senderAtomUri, dispatch, getState);
+    : stateStore.fetchAtomAndDispatch(
+        senderAtomUri,
+        dispatch,
+        getState,
+        false,
+        isOwnRecipientAtom ? { requesterWebId: recipientAtomUri } : undefined
+      );
 
   //We know that all own atoms are already stored within the state, so we do not have to retrieve it
   const recipientAtomP = isOwnRecipientAtom
     ? Promise.resolve(true)
-    : stateStore.fetchAtomAndDispatch(recipientAtomUri, dispatch, getState);
+    : stateStore.fetchAtomAndDispatch(
+        recipientAtomUri,
+        dispatch,
+        getState,
+        false,
+        isOwnSenderAtom ? { requesterWebId: senderAtomUri } : undefined
+      );
 
   Promise.all([senderAtomP, recipientAtomP]).then(() => {
     let senderCP;
@@ -829,10 +842,6 @@ export const processAtomHintMessage = wonMessage =>
     const currentState = getState();
     const ownedAtom = getIn(currentState, ["atoms", ownedAtomUri]);
     const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
-
-    //FIXME: processAtomHintMessage could fetch atoms/connections in a way that makes the atom unloadable
-    //e.g Atom is only accessible for Atoms with receivedRequests -> atom is fetched no connection is in the state yet so requesterWebId can't be found by a connection between the two
-
     const ownedConnectionUri = wonMessage.getRecipientConnection();
 
     if (!ownedAtom) {
