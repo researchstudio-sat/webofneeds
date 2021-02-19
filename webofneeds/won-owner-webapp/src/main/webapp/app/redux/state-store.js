@@ -578,17 +578,13 @@ export const fetchMessages = (
   });
 
   const atom = generalSelectors.getAtomByConnectionUri(connectionUri)(state);
-  const connectionContainerUri = get(
+  const messageContainerUri = get(
     atomUtils.getConnection(atom, connectionUri),
     "messageContainerUri"
   );
 
   return won
-    .fetchMessagesOfConnection(
-      connectionUri,
-      connectionContainerUri,
-      fetchParams
-    )
+    .fetchMessagesOfConnection(connectionUri, messageContainerUri, fetchParams)
     .then(({ nextPage, messages }) => {
       const lookupMap = { success: {}, failed: {} };
       const loadingArray = [];
@@ -636,7 +632,7 @@ export const fetchMessages = (
         we can ensure that there is not going to be a lock on the connection because loadingMessages was complete but never
         reset its status
         */
-        if (successMessages.size == 0 && failedMessages.size == 0) {
+        if (successMessages.size === 0 && failedMessages.size === 0) {
           dispatch({
             type: actionTypes.connections.fetchMessagesEnd,
             payload: Immutable.fromJS({

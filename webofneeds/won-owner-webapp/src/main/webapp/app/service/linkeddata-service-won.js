@@ -238,7 +238,7 @@ import vocab from "./vocab.js";
 
   /**
    * @param connectionUri
-   * @param connectionContainerUri, if this parameter is present we do not fetch the connection at all, we fetch the containerUri directly
+   * @param messageContainerUri, if this parameter is present we do not fetch the connection at all, we fetch the containerUri directly
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
@@ -250,7 +250,7 @@ import vocab from "./vocab.js";
    */
   won.fetchMessagesOfConnection = (
     connectionUri,
-    connectionContainerUri,
+    messageContainerUri,
     fetchParams
   ) => {
     if (!is("String", connectionUri)) {
@@ -260,19 +260,16 @@ import vocab from "./vocab.js";
       );
     }
 
-    const connectionContainerPromise = connectionContainerUri
-      ? ownerApi.fetchJsonLdDataset(connectionContainerUri, fetchParams, true)
+    const connectionContainerPromise = messageContainerUri
+      ? Promise.resolve(messageContainerUri)
       : won
           .fetchConnection(connectionUri)
-          .then(connection =>
-            ownerApi.fetchJsonLdDataset(
-              connection.messageContainer,
-              fetchParams,
-              true
-            )
-          );
+          .then(connection => connection.messageContainer);
 
     return connectionContainerPromise
+      .then(messageContainerUri =>
+        ownerApi.fetchJsonLdDataset(messageContainerUri, fetchParams, true)
+      )
       .then(responseObject =>
         jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
           const messages = {};
