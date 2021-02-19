@@ -31,9 +31,10 @@ import java.util.function.Supplier;
 public class CryptographyUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Ehcache ehcache;
+    private static final Object monitor = new Object();
     static {
         CacheManager manager = CacheManager.getInstance();
-        ehcache = new Cache("sslContextCache", 100, false, false, 3600, 600);
+        ehcache = new Cache("sslContextCache", 500, false, false, 3600, 600);
         manager.addCache(ehcache);
     }
 
@@ -53,7 +54,7 @@ public class CryptographyUtils {
                     boolean allowCached) throws Exception {
         if (allowCached) {
             return getCachedSslContextForKeystore(keyStore,
-                            makeCacheKey(keyStore, keyStrategy, trustStore, trustStrategy), () -> {
+                            makeCacheKey(keyStore), () -> {
                                 try {
                                     return createSSLContextBuilder(keyStore, ksPass, keyStrategy, trustStore,
                                                     trustStrategy)
@@ -68,18 +69,14 @@ public class CryptographyUtils {
         }
     }
 
-    private static String makeCacheKey(KeyStore keyStore,
-                    PrivateKeyStrategy keyStrategy, KeyStore trustStore, TrustStrategy trustStrategy) {
-        return keyStore.hashCode()
-                        + "-" + keyStrategy.hashCode()
-                        + "-" + trustStore.hashCode()
-                        + "-" + trustStrategy.hashCode();
+    private static String makeCacheKey(KeyStore keyStore) {
+        return "" + keyStore.hashCode();
     }
 
     private static SSLContext getCachedSslContextForKeystore(final KeyStore keyStore, String cacheKey,
                     Supplier<SSLContext> sslContextSupplier) throws Exception {
         Instant start = Instant.now();
-        logger.debug("Creating or obtaining cached SSL context");
+        logger.debug("Creating or obtaining cached SSL context for cache key {}", cacheKey);
         Element cacheElement = ehcache.get(cacheKey);
         SSLContext sslContext;
         if (cacheElement != null) {
@@ -100,7 +97,7 @@ public class CryptographyUtils {
             }
             // we want to avoid creating the sslContext multiple times, so we snychronize on
             // an object shared by all threads:
-            synchronized (ehcache) {
+            synchronized (monitor) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Inside critical section, {} millis since method start",
                                     Duration.between(start, Instant.now()).toMillis());
