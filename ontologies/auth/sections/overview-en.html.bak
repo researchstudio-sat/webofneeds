@@ -4,29 +4,297 @@ This ontology has the following classes and properties.</span>
 <h4>Classes</h4>
 <ul class="hlist">
    <li>
-      <a href="#MessageOperation" title="https://w3id.org/won/auth#MessageOperation">
-         <span>message operation</span>
+      <a href="#AclEvalResult" title="https://w3id.org/won/auth#AclEvalResult">AclEvalResult</a>
+   </li>
+   <li>
+      <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">
+         <span>AseFilterProperty</span>
       </a>
    </li>
    <li>
-      <a href="#SimpleOperation" title="https://w3id.org/won/auth#SimpleOperation">
-         <span>simple operation</span>
+      <a href="#AsePosition" title="https://w3id.org/won/auth#AsePosition">AsePosition</a>
+   </li>
+   <li>
+      <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
+   </li>
+   <li>
+      <a href="#AtomExpression" title="https://w3id.org/won/auth#AtomExpression">AtomExpression</a>
+   </li>
+   <li>
+      <a href="#AtomMessageExpression" title="https://w3id.org/won/auth#AtomMessageExpression">AtomMessageExpression</a>
+   </li>
+   <li>
+      <a href="#AtomMessagesExpression"
+         title="https://w3id.org/won/auth#AtomMessagesExpression">AtomMessagesExpression</a>
+   </li>
+   <li>
+      <a href="#AtomStructureExpression"
+         title="https://w3id.org/won/auth#AtomStructureExpression">AtomStructureExpression</a>
+   </li>
+   <li>
+      <a href="#Authorization" title="https://w3id.org/won/auth#Authorization">Authorization</a>
+   </li>
+   <li>
+      <a href="#AuthToken" title="https://w3id.org/won/auth#AuthToken">AuthToken</a>
+   </li>
+   <li>
+      <a href="#ConnectionExpression" title="https://w3id.org/won/auth#ConnectionExpression">ConnectionExpression</a>
+   </li>
+   <li>
+      <a href="#ConnectionMessageExpression"
+         title="https://w3id.org/won/auth#ConnectionMessageExpression">ConnectionMessageExpression</a>
+   </li>
+   <li>
+      <a href="#ConnectionMessagesExpression"
+         title="https://w3id.org/won/auth#ConnectionMessagesExpression">ConnectionMessagesExpression</a>
+   </li>
+   <li>
+      <a href="#ConnectionsExpression" title="https://w3id.org/won/auth#ConnectionsExpression">ConnectionsExpression</a>
+   </li>
+   <li>
+      <a href="#DecisionValue" title="https://w3id.org/won/auth#DecisionValue">DecisionValue</a>
+   </li>
+   <li>
+      <a href="#ExpectedAclEvalResult" title="https://w3id.org/won/auth#ExpectedAclEvalResult">ExpectedAclEvalResult</a>
+   </li>
+   <li>
+      <a href="#GranteeWildcard" title="https://w3id.org/won/auth#GranteeWildcard">GranteeWildcard</a>
+   </li>
+   <li>
+      <a href="#GraphExpression" title="https://w3id.org/won/auth#GraphExpression">GraphExpression</a>
+   </li>
+   <li>
+      <a href="#InheritingShape" title="https://w3id.org/won/auth#InheritingShape">InheritingShape</a>
+   </li>
+   <li>
+      <a href="#MessageOperationExpression"
+         title="https://w3id.org/won/auth#MessageOperationExpression">MessageOperationExpression</a>
+   </li>
+   <li>
+      <a href="#MessageTypeSet" title="https://w3id.org/won/auth#MessageTypeSet">MessageTypeSet</a>
+   </li>
+   <li>
+      <a href="#OperationContainerShape"
+         title="https://w3id.org/won/auth#OperationContainerShape">OperationContainerShape</a>
+   </li>
+   <li>
+      <a href="#OperationExpression" title="https://w3id.org/won/auth#OperationExpression">OperationExpression</a>
+   </li>
+   <li>
+      <a href="#RelativeAtomExpression"
+         title="https://w3id.org/won/auth#RelativeAtomExpression">RelativeAtomExpression</a>
+   </li>
+   <li>
+      <a href="#SimpleOperationExpression"
+         title="https://w3id.org/won/auth#SimpleOperationExpression">SimpleOperation</a>
+   </li>
+   <li>
+      <a href="#SocketExpression" title="https://w3id.org/won/auth#SocketExpression">SocketExpression</a>
+   </li>
+   <li>
+      <a href="#TargetAtomContainerShape"
+         title="https://w3id.org/won/auth#TargetAtomContainerShape">TargetAtomContainerShape</a>
+   </li>
+   <li>
+      <a href="#TokenOperationExpression"
+         title="https://w3id.org/won/auth#TokenOperationExpression">TokenOperationExpression</a>
+   </li>
+   <li>
+      <a href="#TokenScope" title="https://w3id.org/won/auth#TokenScope">TokenScope</a>
+   </li>
+   <li>
+      <a href="#TokenShape" title="https://w3id.org/won/auth#TokenShape">TokenShape</a>
+   </li>
+   <li>
+      <a href="#TokenSpecification" title="https://w3id.org/won/auth#TokenSpecification">TokenSpecification</a>
+   </li>
+   <li>
+      <a href="#TreeExpressionShape" title="https://w3id.org/won/auth#TreeExpressionShape">TreeExpressionShape</a>
+   </li>
+</ul><h4>Object Properties</h4><ul class="hlist">
+   <li>
+      <a href="#AseBranchProperty" title="https://w3id.org/won/auth#AseBranchProperty">AseBranchProperty</a>
+   </li>
+   <li>
+      <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">
+         <span>AseFilterProperty</span>
       </a>
    </li>
    <li>
-      <a href="#TokenScope" title="https://w3id.org/won/auth#TokenScope">
-         <span>token scope</span>
+      <a href="#atom" title="https://w3id.org/won/auth#atom">atom</a>
+   </li>
+   <li>
+      <a href="#atomMessages" title="https://w3id.org/won/auth#atomMessages">atomMessages</a>
+   </li>
+   <li>
+      <a href="#atomState" title="https://w3id.org/won/auth#atomState">atomState</a>
+   </li>
+   <li>
+      <a href="#atomMessage" title="https://w3id.org/won/auth#atomMessage">auth:atomMessage</a>
+   </li>
+   <li>
+      <a href="#bearer" title="https://w3id.org/won/auth#bearer">bearer</a>
+   </li>
+   <li>
+      <a href="#connection" title="https://w3id.org/won/auth#connection">connection</a>
+   </li>
+   <li>
+      <a href="#connectionIri" title="https://w3id.org/won/auth#connectionIri">connectionIri</a>
+   </li>
+   <li>
+      <a href="#connectionMessage" title="https://w3id.org/won/auth#connectionMessage">connectionMessage</a>
+   </li>
+   <li>
+      <a href="#connectionMessages" title="https://w3id.org/won/auth#connectionMessages">connectionMessages</a>
+   </li>
+   <li>
+      <a href="#connections" title="https://w3id.org/won/auth#connections">connections</a>
+   </li>
+   <li>
+      <a href="#connectionState" title="https://w3id.org/won/auth#connectionState">connectionState</a>
+   </li>
+   <li>
+      <a href="#decision" title="https://w3id.org/won/auth#decision">decision</a>
+   </li>
+   <li>
+      <a href="#expiresAfter" title="https://w3id.org/won/auth#expiresAfter">
+         <span>expiresAfter</span>
+      </a>
+   </li>
+   <li>
+      <a href="#grant" title="https://w3id.org/won/auth#grant">grant</a>
+   </li>
+   <li>
+      <a href="#grantee" title="https://w3id.org/won/auth#grantee">grantee</a>
+   </li>
+   <li>
+      <a href="#graph" title="https://w3id.org/won/auth#graph">graph</a>
+   </li>
+   <li>
+      <a href="#graphIri" title="https://w3id.org/won/auth#graphIri">graphIri</a>
+   </li>
+   <li>
+      <a href="#graphType" title="https://w3id.org/won/auth#graphType">graphType</a>
+   </li>
+   <li>
+      <a href="#issuer" title="https://w3id.org/won/auth#issuer">issuer</a>
+   </li>
+   <li>
+      <a href="#issueToken" title="https://w3id.org/won/auth#issueToken">issueToken</a>
+   </li>
+   <li>
+      <a href="#localAuth" title="https://w3id.org/won/auth#localAuth">localAuth</a>
+   </li>
+   <li>
+      <a href="#messageOnBehalf" title="https://w3id.org/won/auth#messageOnBehalf">messageOnBehalf</a>
+   </li>
+   <li>
+      <a href="#messageTo" title="https://w3id.org/won/auth#messageTo">messageTo</a>
+   </li>
+   <li>
+      <a href="#operation" title="https://w3id.org/won/auth#operation">
+         <span>operation</span>
+      </a>
+   </li>
+   <li>
+      <a href="#requestedBy" title="https://w3id.org/won/auth#requestedBy">requestedBy</a>
+   </li>
+   <li>
+      <a href="#requestToken" title="https://w3id.org/won/auth#requestToken">requestToken</a>
+   </li>
+   <li>
+      <a href="#socket" title="https://w3id.org/won/auth#socket">socket</a>
+   </li>
+   <li>
+      <a href="#socketIri" title="https://w3id.org/won/auth#socketIri">socketIri</a>
+   </li>
+   <li>
+      <a href="#socketType" title="https://w3id.org/won/auth#socketType">socketType</a>
+   </li>
+   <li>
+      <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">
+         <span>targetAtom</span>
+      </a>
+   </li>
+   <li>
+      <a href="#targetAuth" title="https://w3id.org/won/auth#targetAuth">targetAuth</a>
+   </li>
+   <li>
+      <a href="#tokenExp" title="https://w3id.org/won/auth#tokenExp">
+         <span>tokenExp</span>
+      </a>
+   </li>
+   <li>
+      <a href="#tokenIat" title="https://w3id.org/won/auth#tokenIat">
+         <span>tokenIat</span>
+      </a>
+   </li>
+   <li>
+      <a href="#tokenIss" title="https://w3id.org/won/auth#tokenIss">tokenIss</a>
+   </li>
+   <li>
+      <a href="#tokenScope" title="https://w3id.org/won/auth#tokenScope">
+         <span>tokenScope</span>
+      </a>
+   </li>
+   <li>
+      <a href="#tokenSub" title="https://w3id.org/won/auth#tokenSub">tokenSub</a>
+   </li>
+</ul><h4>Data Properties</h4><ul class="hlist">
+   <li>
+      <a href="#inherit" title="https://w3id.org/won/auth#inherit">
+         <span>inherit</span>
+      </a>
+   </li>
+   <li>
+      <a href="#tokenExp" title="https://w3id.org/won/auth#tokenExp">
+         <span>tokenExp</span>
+      </a>
+   </li>
+   <li>
+      <a href="#tokenIat" title="https://w3id.org/won/auth#tokenIat">
+         <span>tokenIat</span>
       </a>
    </li>
 </ul><h4>Named Individuals</h4><ul class="hlist">
    <li>
-      <a href="#aclEvalResult" title="https://w3id.org/won/auth#aclEvalResult">
-         <span>acl eval result</span>
+      <a href="#accessDenied" title="https://w3id.org/won/auth#accessDenied">
+         <span>access denied</span>
+      </a>
+   </li>
+   <li>
+      <a href="#accessGranted" title="https://w3id.org/won/auth#accessGranted">
+         <span>access granted</span>
+      </a>
+   </li>
+   <li>
+      <a href="#aclEvalResultShape" title="https://w3id.org/won/auth#aclEvalResultShape">
+         <span>acl eval result shape</span>
+      </a>
+   </li>
+   <li>
+      <a href="#aclGraph" title="https://w3id.org/won/auth#aclGraph">
+         <span>acl graph</span>
+      </a>
+   </li>
+   <li>
+      <a href="#anyAtom" title="https://w3id.org/won/auth#anyAtom">
+         <span>any atom</span>
+      </a>
+   </li>
+   <li>
+      <a href="#anyMessageType" title="https://w3id.org/won/auth#anyMessageType">
+         <span>any message type</span>
       </a>
    </li>
    <li>
       <a href="#anyOperation" title="https://w3id.org/won/auth#anyOperation">
          <span>any operation</span>
+      </a>
+   </li>
+   <li>
+      <a href="#anyone" title="https://w3id.org/won/auth#anyone">
+         <span>anyone</span>
       </a>
    </li>
    <li>
@@ -69,7 +337,8 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#atomStatePropertyShape" title="https://w3id.org/won/auth#atomStatePropertyShape">
+      <a href="#atomStatePropertyShape"
+         title="https://w3id.org/won/auth#atomStatePropertyShape">
          <span>atom state property shape</span>
       </a>
    </li>
@@ -89,8 +358,15 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#authTokenTestSpecShape" title="https://w3id.org/won/auth#authTokenTestSpecShape">
+      <a href="#authTokenTestSpecShape"
+         title="https://w3id.org/won/auth#authTokenTestSpecShape">
          <span>auth token test spec shape</span>
+      </a>
+   </li>
+   <li>
+      <a href="#authorizationRequestor"
+         title="https://w3id.org/won/auth#authorizationRequestor">
+         <span>authorization requestor</span>
       </a>
    </li>
    <li>
@@ -149,6 +425,11 @@ This ontology has the following classes and properties.</span>
       <a href="#connectionsPropertyShape"
          title="https://w3id.org/won/auth#connectionsPropertyShape">
          <span>connections property shape</span>
+      </a>
+   </li>
+   <li>
+      <a href="#contentGraph" title="https://w3id.org/won/auth#contentGraph">
+         <span>content graph</span>
       </a>
    </li>
    <li>
@@ -233,6 +514,11 @@ This ontology has the following classes and properties.</span>
    <li>
       <a href="#inheritPropertyShape" title="https://w3id.org/won/auth#inheritPropertyShape">
          <span>inherit property shape</span>
+      </a>
+   </li>
+   <li>
+      <a href="#keyGraph" title="https://w3id.org/won/auth#keyGraph">
+         <span>key graph</span>
       </a>
    </li>
    <li>
@@ -358,6 +644,11 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
+      <a href="#operationRequestor" title="https://w3id.org/won/auth#operationRequestor">
+         <span>operation requestor</span>
+      </a>
+   </li>
+   <li>
       <a href="#OwnerToken" title="https://w3id.org/won/auth#OwnerToken">
          <span>owner token</span>
       </a>
@@ -416,6 +707,11 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
+      <a href="#self" title="https://w3id.org/won/auth#self">
+         <span>self</span>
+      </a>
+   </li>
+   <li>
       <a href="#simpleOperationExpressionShape"
          title="https://w3id.org/won/auth#simpleOperationExpressionShape">
          <span>simple operation expression shape</span>
@@ -434,6 +730,11 @@ This ontology has the following classes and properties.</span>
    <li>
       <a href="#socketPropertyShape" title="https://w3id.org/won/auth#socketPropertyShape">
          <span>socket property shape</span>
+      </a>
+   </li>
+   <li>
+      <a href="#sysinfoGraph" title="https://w3id.org/won/auth#sysinfoGraph">
+         <span>sysinfo graph</span>
       </a>
    </li>
    <li>
