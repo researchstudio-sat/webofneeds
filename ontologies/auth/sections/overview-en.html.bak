@@ -1,12 +1,20 @@
-<html><h2 id="overv" class="list">Web of Needs Authorization Vocabulary: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
-<span class="markdown"></span>
+<h2 id="overv" class="list">Web of Needs Authorization Vocabulary: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<span class="markdown">
+This ontology has the following classes and properties.</span>
 <h4>Classes</h4>
 <ul class="hlist">
    <li>
       <a href="#AclEvalResult" title="https://w3id.org/won/auth#AclEvalResult">AclEvalResult</a>
    </li>
    <li>
-      <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">
+      <a href="#AseFilterDatatypeProperty"
+         title="https://w3id.org/won/auth#AseFilterDatatypeProperty">
+         <span>AseFilterDatatypeProperty</span>
+      </a>
+   </li>
+   <li>
+      <a href="#AseFilterObjectProperty"
+         title="https://w3id.org/won/auth#AseFilterObjectProperty">
          <span>AseFilterProperty</span>
       </a>
    </li>
@@ -118,8 +126,14 @@
       <a href="#AseBranchProperty" title="https://w3id.org/won/auth#AseBranchProperty">AseBranchProperty</a>
    </li>
    <li>
-      <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">
+      <a href="#AseFilterObjectProperty"
+         title="https://w3id.org/won/auth#AseFilterObjectProperty">
          <span>AseFilterProperty</span>
+      </a>
+   </li>
+   <li>
+      <a href="#AseLeafObjectProperty" title="https://w3id.org/won/auth#AseLeafObjectProperty">
+         <span>AseLeafProperty</span>
       </a>
    </li>
    <li>
@@ -179,6 +193,11 @@
       <a href="#graphType" title="https://w3id.org/won/auth#graphType">graphType</a>
    </li>
    <li>
+      <a href="#inherit" title="https://w3id.org/won/auth#inherit">
+         <span>inherit</span>
+      </a>
+   </li>
+   <li>
       <a href="#issuer" title="https://w3id.org/won/auth#issuer">issuer</a>
    </li>
    <li>
@@ -194,9 +213,7 @@
       <a href="#messageTo" title="https://w3id.org/won/auth#messageTo">messageTo</a>
    </li>
    <li>
-      <a href="#operation" title="https://w3id.org/won/auth#operation">
-         <span>operation</span>
-      </a>
+      <a href="#operation" title="https://w3id.org/won/auth#operation">operation</a>
    </li>
    <li>
       <a href="#requestedBy" title="https://w3id.org/won/auth#requestedBy">requestedBy</a>
@@ -214,9 +231,7 @@
       <a href="#socketType" title="https://w3id.org/won/auth#socketType">socketType</a>
    </li>
    <li>
-      <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">
-         <span>targetAtom</span>
-      </a>
+      <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">targetAtom</a>
    </li>
    <li>
       <a href="#targetAuth" title="https://w3id.org/won/auth#targetAuth">targetAuth</a>
@@ -243,6 +258,12 @@
       <a href="#tokenSub" title="https://w3id.org/won/auth#tokenSub">tokenSub</a>
    </li>
 </ul><h4>Data Properties</h4><ul class="hlist">
+   <li>
+      <a href="#AseLeafDatatypeProperty"
+         title="https://w3id.org/won/auth#AseLeafDatatypeProperty">
+         <span>AseLeafDatatypeProperty</span>
+      </a>
+   </li>
    <li>
       <a href="#inherit" title="https://w3id.org/won/auth#inherit">
          <span>inherit</span>
@@ -717,4 +738,4 @@
          <span>token sub property shape</span>
       </a>
    </li>
-</ul></html>
+</ul>

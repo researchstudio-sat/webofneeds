@@ -1,4 +1,4 @@
-<html><h2 id="crossreference" class="list">Cross reference for Web of Needs Authorization Vocabulary classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<h2 id="crossreference" class="list">Cross reference for Web of Needs Authorization Vocabulary classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
 This section provides details for each class and property defined by Web of Needs Authorization Vocabulary.
 <div id="classes">
    <h3 id="classes-headline" class="list">Classes</h3>
@@ -7,7 +7,14 @@ This section provides details for each class and property defined by Web of Need
          <a href="#AclEvalResult" title="https://w3id.org/won/auth#AclEvalResult">AclEvalResult</a>
       </li>
       <li>
-         <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">
+         <a href="#AseFilterDatatypeProperty"
+            title="https://w3id.org/won/auth#AseFilterDatatypeProperty">
+            <span>AseFilterDatatypeProperty</span>
+         </a>
+      </li>
+      <li>
+         <a href="#AseFilterObjectProperty"
+            title="https://w3id.org/won/auth#AseFilterObjectProperty">
             <span>AseFilterProperty</span>
          </a>
       </li>
@@ -145,22 +152,42 @@ This section provides details for each class and property defined by Web of Need
          </dd>
       </dl>
    </div>
-   <div class="entity" id="AseFilterProperty">
+   <div class="entity" id="AseFilterDatatypeProperty">
+      <h3>AseFilterDatatypeProperty<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#AseFilterDatatypeProperty</p>
+      <dl class="description">
+         <dt>has super-classes</dt>
+         <dd>
+            <span class="dotted"
+                  title="https://w3id.org/won/auth#AseLeafDatatypeProperty">AseLeafDatatypeProperty</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+         <dt>is also defined as</dt>
+         <dd>
+            <a href="#AseFilterDatatypeProperty">annotation property</a>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="AseFilterObjectProperty">
       <h3>AseFilterProperty<sup class="type-c" title="class">c</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
          </span>
       </h3>
       <p>
-         <strong>IRI:</strong> https://w3id.org/won/auth#AseFilterProperty</p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#AseFilterObjectProperty</p>
       <dl class="description">
          <dt>has super-classes</dt>
          <dd>
-            <span class="dotted" title="https://w3id.org/won/auth#AseLeafProperty">AseLeafProperty</span>
+            <span class="dotted" title="https://w3id.org/won/auth#AseLeafObjectProperty">AseLeafProperty</span>
             <sup class="type-c" title="class">c</sup>
          </dd>
          <dt>is also defined as</dt>
          <dd>
-            <a href="#AseFilterProperty">object property</a>
+            <a href="#AseFilterObjectProperty">object property</a>
          </dd>
       </dl>
    </div>
@@ -362,8 +389,13 @@ This section provides details for each class and property defined by Web of Need
          <dt>is in domain of</dt>
          <dd>
             <a href="#AseBranchProperty" title="https://w3id.org/won/auth#AseBranchProperty">AseBranchProperty</a>
-            <sup class="type-op" title="object property">op</sup>, <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">AseFilterProperty</a>
-            <sup class="type-op" title="object property">op</sup>, <span class="dotted" title="https://w3id.org/won/auth#AseLeafProperty">AseLeafProperty</span>, <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">targetAtom</a>
+            <sup class="type-op" title="object property">op</sup>, <span class="dotted"
+                  title="https://w3id.org/won/auth#AseFilterDatatypeProperty">AseFilterDatatypeProperty</span>, <a href="#AseFilterObjectProperty"
+               title="https://w3id.org/won/auth#AseFilterObjectProperty">AseFilterProperty</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#AseLeafDatatypeProperty"
+               title="https://w3id.org/won/auth#AseLeafDatatypeProperty">AseLeafDatatypeProperty</a>
+            <sup class="type-dp" title="data property">dp</sup>, <a href="#AseLeafObjectProperty" title="https://w3id.org/won/auth#AseLeafObjectProperty">AseLeafProperty</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">targetAtom</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
          <dt>is in range of</dt>
@@ -1174,8 +1206,14 @@ This section provides details for each class and property defined by Web of Need
          <a href="#AseBranchProperty" title="https://w3id.org/won/auth#AseBranchProperty">AseBranchProperty</a>
       </li>
       <li>
-         <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">
+         <a href="#AseFilterObjectProperty"
+            title="https://w3id.org/won/auth#AseFilterObjectProperty">
             <span>AseFilterProperty</span>
+         </a>
+      </li>
+      <li>
+         <a href="#AseLeafObjectProperty" title="https://w3id.org/won/auth#AseLeafObjectProperty">
+            <span>AseLeafProperty</span>
          </a>
       </li>
       <li>
@@ -1235,6 +1273,11 @@ This section provides details for each class and property defined by Web of Need
          <a href="#graphType" title="https://w3id.org/won/auth#graphType">graphType</a>
       </li>
       <li>
+         <a href="#inherit" title="https://w3id.org/won/auth#inherit">
+            <span>inherit</span>
+         </a>
+      </li>
+      <li>
          <a href="#issuer" title="https://w3id.org/won/auth#issuer">issuer</a>
       </li>
       <li>
@@ -1250,9 +1293,7 @@ This section provides details for each class and property defined by Web of Need
          <a href="#messageTo" title="https://w3id.org/won/auth#messageTo">messageTo</a>
       </li>
       <li>
-         <a href="#operation" title="https://w3id.org/won/auth#operation">
-            <span>operation</span>
-         </a>
+         <a href="#operation" title="https://w3id.org/won/auth#operation">operation</a>
       </li>
       <li>
          <a href="#requestedBy" title="https://w3id.org/won/auth#requestedBy">requestedBy</a>
@@ -1270,9 +1311,7 @@ This section provides details for each class and property defined by Web of Need
          <a href="#socketType" title="https://w3id.org/won/auth#socketType">socketType</a>
       </li>
       <li>
-         <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">
-            <span>targetAtom</span>
-         </a>
+         <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">targetAtom</a>
       </li>
       <li>
          <a href="#targetAuth" title="https://w3id.org/won/auth#targetAuth">targetAuth</a>
@@ -1343,13 +1382,13 @@ This section provides details for each class and property defined by Web of Need
          </dl>
       </div>
    </div>
-   <div class="entity" id="AseFilterProperty">
+   <div class="entity" id="AseFilterObjectProperty">
       <h3>AseFilterProperty<sup class="type-op" title="object property">op</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
          </span>
       </h3>
       <p>
-         <strong>IRI:</strong> https://w3id.org/won/auth#AseFilterProperty</p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#AseFilterObjectProperty</p>
       <div class="description">
          <dl>
             <dt>has sub-properties</dt>
@@ -1371,8 +1410,35 @@ This section provides details for each class and property defined by Web of Need
             </dd>
             <dt>is also defined as</dt>
             <dd>
-               <a href="#AseFilterProperty">class</a>
+               <a href="#AseFilterObjectProperty">class</a>
             </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="AseLeafObjectProperty">
+      <h3>AseLeafProperty<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#AseLeafObjectProperty</p>
+      <div class="description">
+         <dl>
+            <dt>has sub-properties</dt>
+            <dd>
+               <a href="#inherit" title="https://w3id.org/won/auth#inherit">inherit</a>
+               <sup class="type-op" title="object property">op</sup>, <a href="#operation" title="https://w3id.org/won/auth#operation">operation</a>
+               <sup class="type-op" title="object property">op</sup>, <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">targetAtom</a>
+               <sup class="type-op" title="object property">op</sup>
+            </dd>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#AtomStructureExpression"
+                  title="https://w3id.org/won/auth#AtomStructureExpression">AtomStructureExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>is also defined as</dt>
+            <dd>class</dd>
          </dl>
       </div>
    </div>
@@ -1510,7 +1576,8 @@ This section provides details for each class and property defined by Web of Need
          <dl>
             <dt>has super-properties</dt>
             <dd>
-               <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">AseFilterProperty</a>
+               <a href="#AseFilterObjectProperty"
+                  title="https://w3id.org/won/auth#AseFilterObjectProperty">AseFilterProperty</a>
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
@@ -1618,7 +1685,8 @@ This section provides details for each class and property defined by Web of Need
          <dl>
             <dt>has super-properties</dt>
             <dd>
-               <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">AseFilterProperty</a>
+               <a href="#AseFilterObjectProperty"
+                  title="https://w3id.org/won/auth#AseFilterObjectProperty">AseFilterProperty</a>
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
@@ -1793,7 +1861,8 @@ This section provides details for each class and property defined by Web of Need
          <dl>
             <dt>has super-properties</dt>
             <dd>
-               <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">AseFilterProperty</a>
+               <a href="#AseFilterObjectProperty"
+                  title="https://w3id.org/won/auth#AseFilterObjectProperty">AseFilterProperty</a>
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
@@ -1993,7 +2062,8 @@ This section provides details for each class and property defined by Web of Need
          <dl>
             <dt>has super-properties</dt>
             <dd>
-               <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">AseFilterProperty</a>
+               <a href="#AseFilterObjectProperty"
+                  title="https://w3id.org/won/auth#AseFilterObjectProperty">AseFilterProperty</a>
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
@@ -2024,7 +2094,8 @@ This section provides details for each class and property defined by Web of Need
          <dl>
             <dt>has super-properties</dt>
             <dd>
-               <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">AseFilterProperty</a>
+               <a href="#AseFilterObjectProperty"
+                  title="https://w3id.org/won/auth#AseFilterObjectProperty">AseFilterProperty</a>
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
@@ -2036,6 +2107,27 @@ This section provides details for each class and property defined by Web of Need
             <dd>
                <span class="dotted" title="https://w3id.org/won/auth#GraphType">graph type</span>
                <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="inherit">
+      <h3>inherit<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#inherit</p>
+      <div class="description">
+         <dl>
+            <dt>has super-properties</dt>
+            <dd>
+               <a href="#AseLeafObjectProperty" title="https://w3id.org/won/auth#AseLeafObjectProperty">AseLeafProperty</a>
+               <sup class="type-op" title="object property">op</sup>
+            </dd>
+            <dt>is also defined as</dt>
+            <dd>
+               <a href="#inherit">data property</a>
             </dd>
          </dl>
       </div>
@@ -2228,16 +2320,28 @@ This section provides details for each class and property defined by Web of Need
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/auth#operation</p>
+      <div class="comment">
+         <span class="markdown">Used in ASEs to enumerate operations granted for the ASE's position in the atom's tree structure.
+        When checking for granted operations, operations are inherited by nested ASEs. An ASE can reject inheriting
+        the granted operations using `auth:inherit false`.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
       <div class="description">
          <dl>
+            <dt>has super-properties</dt>
+            <dd>
+               <a href="#AseLeafObjectProperty" title="https://w3id.org/won/auth#AseLeafObjectProperty">AseLeafProperty</a>
+               <sup class="type-op" title="object property">op</sup>
+            </dd>
             <dt>has range</dt>
             <dd>
                <a href="#OperationExpression" title="https://w3id.org/won/auth#OperationExpression">OperationExpression</a>
                <sup class="type-c" title="class">c</sup>
-            </dd>
-            <dt>is also defined as</dt>
-            <dd>
-               <a href="#operation">annotation property</a>
             </dd>
          </dl>
       </div>
@@ -2364,7 +2468,8 @@ This section provides details for each class and property defined by Web of Need
          <dl>
             <dt>has super-properties</dt>
             <dd>
-               <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">AseFilterProperty</a>
+               <a href="#AseFilterObjectProperty"
+                  title="https://w3id.org/won/auth#AseFilterObjectProperty">AseFilterProperty</a>
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
@@ -2400,7 +2505,8 @@ This section provides details for each class and property defined by Web of Need
          <dl>
             <dt>has super-properties</dt>
             <dd>
-               <a href="#AseFilterProperty" title="https://w3id.org/won/auth#AseFilterProperty">AseFilterProperty</a>
+               <a href="#AseFilterObjectProperty"
+                  title="https://w3id.org/won/auth#AseFilterObjectProperty">AseFilterProperty</a>
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
@@ -2423,17 +2529,27 @@ This section provides details for each class and property defined by Web of Need
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/auth#targetAtom</p>
+      <div class="comment">
+         <span class="markdown">Identifies target atoms of connections that are direct or transitive targetNodes of the expression's focus nodes.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
       <div class="description">
          <dl>
+            <dt>has super-properties</dt>
+            <dd>
+               <a href="#AseLeafObjectProperty" title="https://w3id.org/won/auth#AseLeafObjectProperty">AseLeafProperty</a>
+               <sup class="type-op" title="object property">op</sup>
+            </dd>
             <dt>has domain</dt>
             <dd>
                <a href="#AtomStructureExpression"
                   title="https://w3id.org/won/auth#AtomStructureExpression">AtomStructureExpression</a>
                <sup class="type-c" title="class">c</sup>
-            </dd>
-            <dt>is also defined as</dt>
-            <dd>
-               <a href="#targetAtom">annotation property</a>
             </dd>
          </dl>
       </div>
@@ -2615,6 +2731,12 @@ This section provides details for each class and property defined by Web of Need
    <h3 id="dataproperties-headline" class="list">Data Properties</h3>
    <ul class="hlist">
       <li>
+         <a href="#AseLeafDatatypeProperty"
+            title="https://w3id.org/won/auth#AseLeafDatatypeProperty">
+            <span>AseLeafDatatypeProperty</span>
+         </a>
+      </li>
+      <li>
          <a href="#inherit" title="https://w3id.org/won/auth#inherit">
             <span>inherit</span>
          </a>
@@ -2630,8 +2752,28 @@ This section provides details for each class and property defined by Web of Need
          </a>
       </li>
    </ul>
+   <div class="entity" id="AseLeafDatatypeProperty">
+      <h3>AseLeafDatatypeProperty<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#AseLeafDatatypeProperty</p>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#AtomStructureExpression"
+                  title="https://w3id.org/won/auth#AtomStructureExpression">AtomStructureExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>is also defined as</dt>
+            <dd>class</dd>
+         </dl>
+      </div>
+   </div>
    <div class="entity" id="inherit">
-      <h3>inherit<sup class="type-dp" title="data property">dp</sup>
+      <h3>inherit<sup class="type-op" title="object property">op</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
          </span>
       </h3>
@@ -2645,7 +2787,7 @@ This section provides details for each class and property defined by Web of Need
             </dd>
             <dt>is also defined as</dt>
             <dd>
-               <a href="#inherit">annotation property</a>
+               <a href="#inherit">object property</a>
             </dd>
          </dl>
       </div>
@@ -5713,4 +5855,3 @@ This section provides details for each class and property defined by Web of Need
 <sup class="type-ni" title="Named Individuals">ni</sup>: Named Individuals
 </div>
 </div>
-</html>

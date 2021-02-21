@@ -14,6 +14,18 @@
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
   } ],
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#authInfoShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#provideAuthInfo"
+  } ]
+}, {
+  "@id" : "_:genid101",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
   "http://www.w3.org/ns/shacl#minCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
@@ -28,24 +40,12 @@
     "@id" : "https://w3id.org/won/auth#decision"
   } ]
 }, {
-  "@id" : "_:genid101",
+  "@id" : "_:genid102",
   "http://www.w3.org/ns/shacl#node" : [ {
     "@id" : "https://w3id.org/won/auth#authTokenTestSpecShape"
   } ],
   "http://www.w3.org/ns/shacl#path" : [ {
     "@id" : "https://w3id.org/won/auth#issueToken"
-  } ]
-}, {
-  "@id" : "_:genid102",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#authInfoShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#provideAuthInfo"
   } ]
 }, {
   "@id" : "_:genid104",
@@ -296,105 +296,6 @@
   } ]
 }, {
   "@id" : "_:genid154",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#tokenSpecificationShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#requestToken"
-  } ]
-}, {
-  "@id" : "_:genid155",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#atomStateShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#reqAtomState"
-  } ]
-}, {
-  "@id" : "_:genid156",
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#reqGraph"
-  } ]
-}, {
-  "@id" : "_:genid157",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#graphTypeShape"
-  } ],
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#reqGraphType"
-  } ]
-}, {
-  "@id" : "_:genid158",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#reqSocketType"
-  } ]
-}, {
-  "@id" : "_:genid159",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#reqSocket"
-  } ]
-}, {
-  "@id" : "_:genid160",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#reqConnection"
-  } ]
-}, {
-  "@id" : "_:genid161",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionStateShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#reqConnectionState"
-  } ]
-}, {
-  "@id" : "_:genid162",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#reqAtom"
-  } ]
-}, {
-  "@id" : "_:genid163",
   "http://www.w3.org/ns/shacl#maxCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
@@ -406,7 +307,7 @@
     "@id" : "https://w3id.org/won/auth#requestor"
   } ]
 }, {
-  "@id" : "_:genid164",
+  "@id" : "_:genid155",
   "http://www.w3.org/ns/shacl#maxCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
@@ -418,16 +319,115 @@
     "@id" : "https://w3id.org/won/auth#reqPosition"
   } ]
 }, {
-  "@id" : "_:genid165",
+  "@id" : "_:genid156",
   "http://www.w3.org/ns/shacl#maxCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
   } ],
   "http://www.w3.org/ns/shacl#or" : [ {
-    "@id" : "_:genid166"
+    "@id" : "_:genid157"
   } ],
   "http://www.w3.org/ns/shacl#path" : [ {
     "@id" : "https://w3id.org/won/auth#operation"
+  } ]
+}, {
+  "@id" : "_:genid158",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#reqAtom"
+  } ]
+}, {
+  "@id" : "_:genid159",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#tokenSpecificationShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#requestToken"
+  } ]
+}, {
+  "@id" : "_:genid160",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#atomStateShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#reqAtomState"
+  } ]
+}, {
+  "@id" : "_:genid161",
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#reqGraph"
+  } ]
+}, {
+  "@id" : "_:genid162",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#graphTypeShape"
+  } ],
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#reqGraphType"
+  } ]
+}, {
+  "@id" : "_:genid163",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#reqSocketType"
+  } ]
+}, {
+  "@id" : "_:genid164",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#reqSocket"
+  } ]
+}, {
+  "@id" : "_:genid165",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#reqConnection"
+  } ]
+}, {
+  "@id" : "_:genid166",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionStateShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#reqConnectionState"
   } ]
 }, {
   "@id" : "_:genid167",
@@ -518,81 +518,93 @@
 }, {
   "@id" : "_:genid184",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid185"
+    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
   } ]
 }, {
   "@id" : "_:genid185",
-  "http://www.w3.org/ns/shacl#minCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#or" : [ {
+  "http://www.w3.org/ns/shacl#property" : [ {
     "@id" : "_:genid186"
+  } ]
+}, {
+  "@id" : "_:genid186",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionStateShape"
   } ],
   "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#messageTo"
+    "@id" : "https://w3id.org/won/auth#connectionState"
   } ]
 }, {
   "@id" : "_:genid187",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#messageTypesExpressionShape"
-  } ]
-}, {
-  "@id" : "_:genid188",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#messageTypeShape"
-  } ]
-}, {
-  "@id" : "_:genid189",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#tokenOperationExpressionShape"
-  } ]
-}, {
-  "@id" : "_:genid190",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#graphPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid191",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#atomStatePropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid192",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#atomMessagePropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid193",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#atomMessagesPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid194",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid195"
-  } ]
-}, {
-  "@id" : "_:genid195",
-  "http://www.w3.org/ns/shacl#minCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#or" : [ {
-    "@id" : "_:genid196"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#messageOnBehalf"
-  } ]
-}, {
-  "@id" : "_:genid197",
   "http://www.w3.org/ns/shacl#property" : [ {
     "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
   } ]
 }, {
+  "@id" : "_:genid188",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid189",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionMessagesPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid190",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionMessagePropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid191",
+  "http://www.w3.org/ns/shacl#datatype" : [ {
+    "@id" : "http://www.w3.org/2001/XMLSchema#string"
+  } ],
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#Literal"
+  } ],
+  "http://www.w3.org/ns/shacl#pattern" : [ {
+    "@value" : "^[^\\s]+$"
+  } ]
+}, {
+  "@id" : "_:genid192",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid193",
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ]
+}, {
+  "@id" : "_:genid194",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#targetAtomPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid195",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#atomExpressionShape"
+  } ]
+}, {
+  "@id" : "_:genid196",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid197"
+  } ]
+}, {
+  "@id" : "_:genid197",
+  "http://www.w3.org/ns/shacl#minCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#atomExpressionShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#grantee"
+  } ]
+}, {
   "@id" : "_:genid198",
   "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#messageTypesExpressionShape"
+    "@id" : "https://w3id.org/won/auth#aseRootShape"
   } ]
 }, {
   "@id" : "_:genid199",
@@ -602,90 +614,92 @@
 }, {
   "@id" : "_:genid200",
   "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#tokenShapeShape"
+    "@id" : "https://w3id.org/won/auth#connectionStateShape"
   } ],
   "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#bearer"
+    "@id" : "https://w3id.org/won/auth#connectionState"
   } ]
 }, {
   "@id" : "_:genid201",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid202"
+    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
   } ]
 }, {
   "@id" : "_:genid202",
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#socketType"
-  } ]
-}, {
-  "@id" : "_:genid203",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#messageTypeShape"
-  } ]
-}, {
-  "@id" : "_:genid204",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid205"
-  } ]
-}, {
-  "@id" : "_:genid205",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#minCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#messageWildcardShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#messageOnBehalf"
-  } ]
-}, {
-  "@id" : "_:genid206",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid207"
-  } ]
-}, {
-  "@id" : "_:genid207",
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#socketIri"
-  } ]
-}, {
-  "@id" : "_:genid208",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid209",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionsPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid210",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessagePropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid211",
   "http://www.w3.org/ns/shacl#property" : [ {
     "@id" : "https://w3id.org/won/auth#connectionMessagesPropertyShape"
   } ]
 }, {
-  "@id" : "_:genid212",
+  "@id" : "_:genid203",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid213"
+    "@id" : "_:genid204"
   } ]
 }, {
-  "@id" : "_:genid213",
+  "@id" : "_:genid204",
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#graphIri"
+  } ]
+}, {
+  "@id" : "_:genid205",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid206",
+  "http://www.w3.org/ns/shacl#minCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#bearsToken"
+  } ]
+}, {
+  "@id" : "_:genid207",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#messageOperationExpressionShape"
+  } ]
+}, {
+  "@id" : "_:genid208",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#simpleOperationExpressionShape"
+  } ]
+}, {
+  "@id" : "_:genid209",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#tokenOperationExpressionShape"
+  } ]
+}, {
+  "@id" : "_:genid210",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#messageTypesExpressionShape"
+  } ]
+}, {
+  "@id" : "_:genid211",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid212"
+  } ]
+}, {
+  "@id" : "_:genid212",
+  "http://www.w3.org/ns/shacl#minCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#or" : [ {
+    "@id" : "_:genid213"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#messageTo"
+  } ]
+}, {
+  "@id" : "_:genid214",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid215"
+  } ]
+}, {
+  "@id" : "_:genid215",
   "http://www.w3.org/ns/shacl#maxCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
@@ -701,19 +715,9 @@
     "@id" : "https://w3id.org/won/auth#messageTo"
   } ]
 }, {
-  "@id" : "_:genid214",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#socketPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid215",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#messageOperationExpressionShape"
-  } ]
-}, {
   "@id" : "_:genid216",
   "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#simpleOperationExpressionShape"
+    "@id" : "https://w3id.org/won/auth#messageTypeShape"
   } ]
 }, {
   "@id" : "_:genid217",
@@ -723,12 +727,12 @@
 }, {
   "@id" : "_:genid218",
   "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#tokenOperationExpressionShape"
+    "@id" : "https://w3id.org/won/auth#messageOperationExpressionShape"
   } ]
 }, {
   "@id" : "_:genid219",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#targetAtomPropertyShape"
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#tokenOperationExpressionShape"
   } ]
 }, {
   "@id" : "_:genid22",
@@ -742,79 +746,178 @@
   } ]
 }, {
   "@id" : "_:genid220",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid221",
-  "http://www.w3.org/ns/shacl#minCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#bearsToken"
-  } ]
-}, {
-  "@id" : "_:genid222",
   "http://www.w3.org/ns/shacl#node" : [ {
     "@id" : "https://w3id.org/won/auth#simpleOperationExpressionShape"
   } ]
 }, {
-  "@id" : "_:genid223",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#messageOperationExpressionShape"
-  } ]
-}, {
-  "@id" : "_:genid224",
+  "@id" : "_:genid221",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#atomMessagePropertyShape"
+    "@id" : "_:genid222"
   } ]
 }, {
-  "@id" : "_:genid225",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid226",
+  "@id" : "_:genid222",
   "http://www.w3.org/ns/shacl#minCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
   } ],
+  "http://www.w3.org/ns/shacl#or" : [ {
+    "@id" : "_:genid223"
+  } ],
   "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#requestor"
+    "@id" : "https://w3id.org/won/auth#messageOnBehalf"
+  } ]
+}, {
+  "@id" : "_:genid224",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#messageTypesExpressionShape"
+  } ]
+}, {
+  "@id" : "_:genid225",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid226"
+  } ]
+}, {
+  "@id" : "_:genid226",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#tokenShapeShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#bearer"
   } ]
 }, {
   "@id" : "_:genid227",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
+    "@id" : "_:genid228"
   } ]
 }, {
   "@id" : "_:genid228",
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#socketType"
+  } ]
+}, {
+  "@id" : "_:genid229",
   "http://www.w3.org/ns/shacl#property" : [ {
     "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
   } ]
 }, {
-  "@id" : "_:genid229",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#relativeAtomExpressionShape"
-  } ]
-}, {
   "@id" : "_:genid230",
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid231"
   } ]
 }, {
   "@id" : "_:genid231",
-  "http://www.w3.org/ns/shacl#datatype" : [ {
-    "@id" : "http://www.w3.org/2001/XMLSchema#int"
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#minCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#messageWildcardShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#messageOnBehalf"
   } ]
 }, {
   "@id" : "_:genid232",
-  "http://www.w3.org/ns/shacl#datatype" : [ {
-    "@id" : "http://www.w3.org/2001/XMLSchema#long"
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid233"
   } ]
 }, {
   "@id" : "_:genid233",
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#socketIri"
+  } ]
+}, {
+  "@id" : "_:genid234",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#messageTypeShape"
+  } ]
+}, {
+  "@id" : "_:genid235",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid236"
+  } ]
+}, {
+  "@id" : "_:genid236",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#aseRootShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#grantee"
+  } ]
+}, {
+  "@id" : "_:genid237",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid238"
+  } ]
+}, {
+  "@id" : "_:genid238",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#granteeWildcardShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#grantee"
+  } ]
+}, {
+  "@id" : "_:genid239",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionsPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid240",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionMessagesPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid241",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid242",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#targetAtomPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid243",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionMessagePropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid244",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#atomMessagePropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid245",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#atomStatePropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid246",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#graphPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid247",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#atomMessagesPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid248",
   "http://www.w3.org/ns/shacl#datatype" : [ {
     "@id" : "http://www.w3.org/2001/XMLSchema#string"
   } ],
@@ -825,105 +928,9 @@
     "@value" : "^[^\\s]+$"
   } ]
 }, {
-  "@id" : "_:genid234",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid235",
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ]
-}, {
-  "@id" : "_:genid236",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid237",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid238"
-  } ]
-}, {
-  "@id" : "_:genid238",
-  "http://www.w3.org/ns/shacl#minCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#aseRootShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#grant"
-  } ]
-}, {
-  "@id" : "_:genid239",
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#BlankNode"
-  } ]
-}, {
-  "@id" : "_:genid240",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid241"
-  } ]
-}, {
-  "@id" : "_:genid241",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#minCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#aseRootShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#provideAuthInfo"
-  } ]
-}, {
-  "@id" : "_:genid242",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#atomExpressionShape"
-  } ]
-}, {
-  "@id" : "_:genid243",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid244"
-  } ]
-}, {
-  "@id" : "_:genid244",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessageExpressionShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessage"
-  } ]
-}, {
-  "@id" : "_:genid245",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid246",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid247",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessagesPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid248",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#aseRootShape"
-  } ]
-}, {
   "@id" : "_:genid249",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
+  "http://www.w3.org/ns/shacl#datatype" : [ {
+    "@id" : "http://www.w3.org/2001/XMLSchema#long"
   } ]
 }, {
   "@id" : "_:genid25",
@@ -937,63 +944,30 @@
   } ]
 }, {
   "@id" : "_:genid250",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid251"
+  "http://www.w3.org/ns/shacl#datatype" : [ {
+    "@id" : "http://www.w3.org/2001/XMLSchema#int"
   } ]
 }, {
   "@id" : "_:genid251",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionStateShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionState"
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
   } ]
 }, {
   "@id" : "_:genid252",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid253"
+  "http://www.w3.org/ns/shacl#minCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#requestor"
   } ]
 }, {
   "@id" : "_:genid253",
-  "http://www.w3.org/ns/shacl#minCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#tokenShapeShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#bearer"
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid254"
   } ]
 }, {
   "@id" : "_:genid254",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid255"
-  } ]
-}, {
-  "@id" : "_:genid255",
-  "http://www.w3.org/ns/shacl#minCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#atomExpressionShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#grantee"
-  } ]
-}, {
-  "@id" : "_:genid256",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessagePropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid257",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid258"
-  } ]
-}, {
-  "@id" : "_:genid258",
   "http://www.w3.org/ns/shacl#minCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
@@ -1005,9 +979,32 @@
     "@id" : "https://w3id.org/won/auth#grantee"
   } ]
 }, {
-  "@id" : "_:genid259",
+  "@id" : "_:genid255",
   "http://www.w3.org/ns/shacl#property" : [ {
     "@id" : "https://w3id.org/won/auth#targetAtomPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid256",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionMessagePropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid257",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid258",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid259"
+  } ]
+}, {
+  "@id" : "_:genid259",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#graphTypeShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#graphType"
   } ]
 }, {
   "@id" : "_:genid260",
@@ -1042,26 +1039,33 @@
   } ]
 }, {
   "@id" : "_:genid264",
+  "http://www.w3.org/ns/shacl#minCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
   "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionStateShape"
+    "@id" : "https://w3id.org/won/auth#tokenShapeShape"
   } ],
   "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionState"
+    "@id" : "https://w3id.org/won/auth#bearer"
   } ]
 }, {
   "@id" : "_:genid265",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionPropertyShape"
+    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
   } ]
 }, {
   "@id" : "_:genid266",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessagesPropertyShape"
+    "@id" : "_:genid267"
   } ]
 }, {
   "@id" : "_:genid267",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionMessageExpressionShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionMessage"
   } ]
 }, {
   "@id" : "_:genid268",
@@ -1070,70 +1074,76 @@
   } ]
 }, {
   "@id" : "_:genid269",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#minCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
   "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#graphTypeShape"
+    "@id" : "https://w3id.org/won/auth#aseRootShape"
   } ],
   "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#graphType"
+    "@id" : "https://w3id.org/won/auth#provideAuthInfo"
   } ]
 }, {
   "@id" : "_:genid270",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid271",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid272",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
-  } ]
-}, {
-  "@id" : "_:genid273",
   "http://www.w3.org/ns/shacl#node" : [ {
     "@id" : "https://w3id.org/won/auth#atomExpressionShape"
   } ]
 }, {
-  "@id" : "_:genid274",
+  "@id" : "_:genid271",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessagePropertyShape"
+    "@id" : "https://w3id.org/won/auth#atomMessagePropertyShape"
+  } ]
+}, {
+  "@id" : "_:genid272",
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "_:genid273"
+  } ]
+}, {
+  "@id" : "_:genid273",
+  "http://www.w3.org/ns/shacl#minCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#aseRootShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#grant"
+  } ]
+}, {
+  "@id" : "_:genid274",
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#BlankNode"
   } ]
 }, {
   "@id" : "_:genid275",
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
   } ]
 }, {
   "@id" : "_:genid276",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#targetAtomPropertyShape"
+    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
   } ]
 }, {
   "@id" : "_:genid277",
-  "http://www.w3.org/ns/shacl#datatype" : [ {
-    "@id" : "http://www.w3.org/2001/XMLSchema#string"
-  } ],
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#Literal"
-  } ],
-  "http://www.w3.org/ns/shacl#pattern" : [ {
-    "@value" : "^[^\\s]+$"
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
   } ]
 }, {
   "@id" : "_:genid278",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid279"
+    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
   } ]
 }, {
   "@id" : "_:genid279",
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#IRI"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#graphIri"
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
   } ]
 }, {
   "@id" : "_:genid28",
@@ -1155,62 +1165,52 @@
 }, {
   "@id" : "_:genid281",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionPropertyShape"
+    "@id" : "https://w3id.org/won/auth#targetAtomPropertyShape"
   } ]
 }, {
   "@id" : "_:genid282",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessagesPropertyShape"
+    "@id" : "https://w3id.org/won/auth#inheritPropertyShape"
   } ]
 }, {
   "@id" : "_:genid283",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionMessagePropertyShape"
+    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
   } ]
 }, {
   "@id" : "_:genid284",
-  "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#targetAtomPropertyShape"
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#IRI"
   } ]
 }, {
   "@id" : "_:genid285",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid286"
+    "@id" : "https://w3id.org/won/auth#connectionsPropertyShape"
   } ]
 }, {
   "@id" : "_:genid286",
   "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#aseRootShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#grantee"
+    "@id" : "https://w3id.org/won/auth#relativeAtomExpressionShape"
   } ]
 }, {
   "@id" : "_:genid287",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "_:genid288"
+    "@id" : "https://w3id.org/won/auth#connectionPropertyShape"
   } ]
 }, {
   "@id" : "_:genid288",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#granteeWildcardShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#grantee"
+  "http://www.w3.org/ns/shacl#property" : [ {
+    "@id" : "https://w3id.org/won/auth#connectionMessagesPropertyShape"
   } ]
 }, {
   "@id" : "_:genid289",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#connectionsPropertyShape"
+    "@id" : "https://w3id.org/won/auth#connectionMessagePropertyShape"
   } ]
 }, {
   "@id" : "_:genid290",
   "http://www.w3.org/ns/shacl#property" : [ {
-    "@id" : "https://w3id.org/won/auth#operationPropertyShape"
+    "@id" : "https://w3id.org/won/auth#socketPropertyShape"
   } ]
 }, {
   "@id" : "_:genid32",
@@ -1326,6 +1326,41 @@
   } ]
 }, {
   "@id" : "_:genid63",
+  "http://www.w3.org/ns/shacl#datatype" : [ {
+    "@id" : "http://www.w3.org/2001/XMLSchema#boolean"
+  } ],
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#nodeKind" : [ {
+    "@id" : "http://www.w3.org/ns/shacl#Literal"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#insufficientScope"
+  } ]
+}, {
+  "@id" : "_:genid64",
+  "http://www.w3.org/ns/shacl#maxCount" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#authInfoShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#provideAuthInfo"
+  } ]
+}, {
+  "@id" : "_:genid65",
+  "http://www.w3.org/ns/shacl#node" : [ {
+    "@id" : "https://w3id.org/won/auth#authTokenShape"
+  } ],
+  "http://www.w3.org/ns/shacl#path" : [ {
+    "@id" : "https://w3id.org/won/auth#issueToken"
+  } ]
+}, {
+  "@id" : "_:genid66",
   "http://www.w3.org/ns/shacl#maxCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
@@ -1344,7 +1379,7 @@
     "@id" : "https://w3id.org/won/auth#requestedOperation"
   } ]
 }, {
-  "@id" : "_:genid64",
+  "@id" : "_:genid67",
   "http://www.w3.org/ns/shacl#maxCount" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#integer",
     "@value" : "1"
@@ -1363,41 +1398,6 @@
     "@id" : "https://w3id.org/won/auth#decision"
   } ]
 }, {
-  "@id" : "_:genid65",
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#authInfoShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#provideAuthInfo"
-  } ]
-}, {
-  "@id" : "_:genid66",
-  "http://www.w3.org/ns/shacl#node" : [ {
-    "@id" : "https://w3id.org/won/auth#authTokenShape"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#issueToken"
-  } ]
-}, {
-  "@id" : "_:genid67",
-  "http://www.w3.org/ns/shacl#datatype" : [ {
-    "@id" : "http://www.w3.org/2001/XMLSchema#boolean"
-  } ],
-  "http://www.w3.org/ns/shacl#maxCount" : [ {
-    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
-    "@value" : "1"
-  } ],
-  "http://www.w3.org/ns/shacl#nodeKind" : [ {
-    "@id" : "http://www.w3.org/ns/shacl#Literal"
-  } ],
-  "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#invalidToken"
-  } ]
-}, {
   "@id" : "_:genid68",
   "http://www.w3.org/ns/shacl#datatype" : [ {
     "@id" : "http://www.w3.org/2001/XMLSchema#boolean"
@@ -1410,7 +1410,7 @@
     "@id" : "http://www.w3.org/ns/shacl#Literal"
   } ],
   "http://www.w3.org/ns/shacl#path" : [ {
-    "@id" : "https://w3id.org/won/auth#insufficientScope"
+    "@id" : "https://w3id.org/won/auth#invalidToken"
   } ]
 }, {
   "@id" : "_:genid7",
@@ -1475,6 +1475,9 @@
   "http://www.w3.org/ns/shacl#path" : [ {
     "@id" : "https://w3id.org/won/auth#requestedOperation"
   } ]
+}, {
+  "@id" : "http://purl.org/dc/terms/abstract",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://www.w3.org/2001/XMLSchema#String",
   "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
@@ -1553,16 +1556,16 @@
 }, {
   "@id" : "https://w3id.org/won/auth#",
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
-  "http://purl.org/dc/elements/1.1/abstract" : [ {
-    "@language" : "en",
-    "@value" : "This vocabulary defines the terms used to express ACLs in WoN, as well as SHACL shapes for validating such ACLs."
-  } ],
   "http://purl.org/dc/elements/1.1/creator" : [ {
     "@value" : "Florian Kleedorfer"
   } ],
   "http://purl.org/dc/elements/1.1/title" : [ {
     "@language" : "en",
     "@value" : "Web of Needs Authorization Vocabulary"
+  } ],
+  "http://purl.org/dc/terms/abstract" : [ {
+    "@language" : "en",
+    "@value" : "This vocabulary defines the terms used to express ACLs in WoN, as well as SHACL shapes for validating such ACLs."
   } ],
   "http://purl.org/dc/terms/created" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#date",
@@ -1615,7 +1618,26 @@
     "@id" : "https://w3id.org/won/auth#AtomStructureExpression"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/auth#AseFilterProperty",
+  "@id" : "https://w3id.org/won/auth#AseFilterDatatypeProperty",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty", "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Object properties that can be used to filter the focus nodes of ASE expressions."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/auth#AtomStructureExpression"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/auth#"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "AseFilterDatatypeProperty"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#subClassOf" : [ {
+    "@id" : "https://w3id.org/won/auth#AseLeafDatatypeProperty"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/auth#AseFilterObjectProperty",
   "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#Class" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
@@ -1631,11 +1653,27 @@
     "@value" : "AseFilterProperty"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subClassOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseLeafProperty"
+    "@id" : "https://w3id.org/won/auth#AseLeafObjectProperty"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/auth#AseLeafProperty",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty", "http://www.w3.org/2002/07/owl#Class" ],
+  "@id" : "https://w3id.org/won/auth#AseLeafDatatypeProperty",
+  "@type" : [ "http://www.w3.org/2002/07/owl#DatatypeProperty", "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Object properties of ASEs that do not have ASEs as their object."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/auth#AtomStructureExpression"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/auth#"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "AseLeafDatatypeProperty"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/auth#AseLeafObjectProperty",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#Class" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "Object properties of ASEs that do not have ASEs as their object."
@@ -2466,7 +2504,7 @@
     "@id" : "https://w3id.org/won/core#AtomState"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseFilterProperty"
+    "@id" : "https://w3id.org/won/auth#AseFilterObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#atomStatePropertyShape",
@@ -2681,7 +2719,7 @@
     "@id" : "http://www.w3.org/2001/XMLSchema#anyUri"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseFilterProperty"
+    "@id" : "https://w3id.org/won/auth#AseFilterObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#connectionMessage",
@@ -2833,7 +2871,7 @@
     "@id" : "https://w3id.org/won/core#ConnectionState"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseFilterProperty"
+    "@id" : "https://w3id.org/won/auth#AseFilterObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#connectionStateShape",
@@ -3255,7 +3293,7 @@
     "@value" : "graphIri"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseFilterProperty"
+    "@id" : "https://w3id.org/won/auth#AseFilterObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#graphPropertyShape",
@@ -3293,7 +3331,7 @@
     "@id" : "https://w3id.org/won/auth#GraphType"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseFilterProperty"
+    "@id" : "https://w3id.org/won/auth#AseFilterObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#graphTypeShape",
@@ -3313,7 +3351,7 @@
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#inherit",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty", "http://www.w3.org/2002/07/owl#DatatypeProperty" ],
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#DatatypeProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "Atom structure expressions use `auth:inherit true` in order to not inherit granted operations from\n        their parent expressions"
@@ -3328,7 +3366,7 @@
     "@id" : "http://www.w3.org/2001/XMLSchema#boolean"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseLeafProperty"
+    "@id" : "https://w3id.org/won/auth#AseLeafObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#inheritPropertyShape",
@@ -3778,7 +3816,7 @@
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#operation",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty", "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "Used in ASEs to enumerate operations granted for the ASE's position in the atom's tree structure.\n        When checking for granted operations, operations are inherited by nested ASEs. An ASE can reject inheriting\n        the granted operations using `auth:inherit false`."
@@ -3793,7 +3831,7 @@
     "@id" : "https://w3id.org/won/auth#OperationExpression"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseLeafProperty"
+    "@id" : "https://w3id.org/won/auth#AseLeafObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#operationPropertyShape",
@@ -3834,8 +3872,6 @@
   }, {
     "@id" : "_:genid156"
   }, {
-    "@id" : "_:genid157"
-  }, {
     "@id" : "_:genid158"
   }, {
     "@id" : "_:genid159"
@@ -3851,6 +3887,8 @@
     "@id" : "_:genid164"
   }, {
     "@id" : "_:genid165"
+  }, {
+    "@id" : "_:genid166"
   }, {
     "@id" : "_:genid167"
   }, {
@@ -4171,7 +4209,7 @@
     "@id" : "http://www.w3.org/2001/XMLSchema#anyUri"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseFilterProperty"
+    "@id" : "https://w3id.org/won/auth#AseFilterObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#socketPropertyShape",
@@ -4209,7 +4247,7 @@
     "@id" : "http://www.w3.org/2001/XMLSchema#anyUri"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseFilterProperty"
+    "@id" : "https://w3id.org/won/auth#AseFilterObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#sysinfoGraph",
@@ -4226,7 +4264,7 @@
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#targetAtom",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty", "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "Identifies target atoms of connections that are direct or transitive targetNodes of the expression's focus nodes."
@@ -4241,7 +4279,7 @@
     "@value" : "targetAtom"
   } ],
   "http://www.w3.org/2000/01/rdf-schema#subPropertyOf" : [ {
-    "@id" : "https://w3id.org/won/auth#AseLeafProperty"
+    "@id" : "https://w3id.org/won/auth#AseLeafObjectProperty"
   } ]
 }, {
   "@id" : "https://w3id.org/won/auth#targetAtomExpressionShape",
