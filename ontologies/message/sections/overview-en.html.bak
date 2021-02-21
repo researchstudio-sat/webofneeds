@@ -102,6 +102,10 @@ This ontology has the following classes and properties.</span>
       <a href="#ActivateMessage" title="https://w3id.org/won/message#ActivateMessage">ActivateMessage</a>
    </li>
    <li>
+      <a href="#AtomCreatedNotificationMessage"
+         title="https://w3id.org/won/message#AtomCreatedNotificationMessage">AtomCreatedNotificationMessage</a>
+   </li>
+   <li>
       <a href="#AtomHintMessage" title="https://w3id.org/won/message#AtomHintMessage">AtomHintMessage</a>
    </li>
    <li>

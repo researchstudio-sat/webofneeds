@@ -306,6 +306,13 @@
 <https://w3id.org/won/message#ActivateMessage> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
 <https://w3id.org/won/message#ActivateMessage> <http://www.w3.org/2000/01/rdf-schema#label> "ActivateMessage" .
 # 
+# https://w3id.org/won/message#AtomCreatedNotificationMessage
+<https://w3id.org/won/message#AtomCreatedNotificationMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/message#AtomCreatedNotificationMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/message#MessageType> .
+<https://w3id.org/won/message#AtomCreatedNotificationMessage> <http://www.w3.org/2000/01/rdf-schema#comment> "Type of message sent from a WoN Node to indicate that an Atom has been created."@en .
+<https://w3id.org/won/message#AtomCreatedNotificationMessage> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/message> .
+<https://w3id.org/won/message#AtomCreatedNotificationMessage> <http://www.w3.org/2000/01/rdf-schema#label> "AtomCreatedNotificationMessage" .
+# 
 # https://w3id.org/won/message#AtomHintMessage
 <https://w3id.org/won/message#AtomHintMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/message#AtomHintMessage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/message#MessageType> .

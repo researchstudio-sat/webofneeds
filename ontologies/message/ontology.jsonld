@@ -162,6 +162,19 @@
   "@id" : "https://w3id.org/won/message#Atom",
   "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
 }, {
+  "@id" : "https://w3id.org/won/message#AtomCreatedNotificationMessage",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "Type of message sent from a WoN Node to indicate that an Atom has been created."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/message"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "AtomCreatedNotificationMessage"
+  } ]
+}, {
   "@id" : "https://w3id.org/won/message#AtomHintMessage",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/message#MessageType" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {

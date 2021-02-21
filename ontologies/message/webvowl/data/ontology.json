@@ -18,12 +18,12 @@
       "creator" : [ {
         "identifier" : "creator",
         "language" : "undefined",
-        "value" : "Florian Kleedorfer",
+        "value" : "Fabian Salcher",
         "type" : "label"
       }, {
         "identifier" : "creator",
         "language" : "undefined",
-        "value" : "Fabian Salcher",
+        "value" : "Florian Kleedorfer",
         "type" : "label"
       }, {
         "identifier" : "creator",
@@ -224,6 +224,24 @@
         "undefined" : "ChangeNotificationMessage"
       }
     }, {
+      "iri" : "https://w3id.org/won/message#AtomCreatedNotificationMessage",
+      "baseIri" : "https://w3id.org/won/message",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/message",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Type of message sent from a WoN Node to indicate that an Atom has been created."
+      },
+      "labels" : {
+        "IRI-based" : "AtomCreatedNotificationMessage",
+        "undefined" : "AtomCreatedNotificationMessage"
+      }
+    }, {
       "iri" : "https://w3id.org/won/message#SocketHintMessage",
       "baseIri" : "https://w3id.org/won/message",
       "comment" : {
@@ -288,24 +306,6 @@
         "undefined" : "ConnectMessage"
       }
     }, {
-      "iri" : "https://w3id.org/won/message#AtomHintMessage",
-      "baseIri" : "https://w3id.org/won/message",
-      "annotations" : {
-        "isDefinedBy" : [ {
-          "identifier" : "isDefinedBy",
-          "language" : "undefined",
-          "value" : "https://w3id.org/won/message",
-          "type" : "iri"
-        } ]
-      },
-      "comment" : {
-        "en" : "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection, or just generally of interest."
-      },
-      "labels" : {
-        "IRI-based" : "AtomHintMessage",
-        "undefined" : "AtomHintMessage"
-      }
-    }, {
       "iri" : "https://w3id.org/won/message#CreateMessage",
       "baseIri" : "https://w3id.org/won/message",
       "annotations" : {
@@ -322,6 +322,24 @@
       "labels" : {
         "IRI-based" : "CreateMessage",
         "undefined" : "CreateMessage"
+      }
+    }, {
+      "iri" : "https://w3id.org/won/message#AtomHintMessage",
+      "baseIri" : "https://w3id.org/won/message",
+      "annotations" : {
+        "isDefinedBy" : [ {
+          "identifier" : "isDefinedBy",
+          "language" : "undefined",
+          "value" : "https://w3id.org/won/message",
+          "type" : "iri"
+        } ]
+      },
+      "comment" : {
+        "en" : "Type of message sent by a matching service to an Atom in order to inform its owner of other Atoms possibly interesting for establishing a connection, or just generally of interest."
+      },
+      "labels" : {
+        "IRI-based" : "AtomHintMessage",
+        "undefined" : "AtomHintMessage"
       }
     }, {
       "iri" : "https://w3id.org/won/message#ConnectionMessage",
@@ -864,7 +882,7 @@
   }, {
     "range" : "16",
     "domain" : "5",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "23"
   }, {
     "iri" : "https://w3id.org/won/message#hash",
@@ -883,17 +901,17 @@
   }, {
     "range" : "4",
     "domain" : "7",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "26"
   }, {
     "range" : "4",
     "domain" : "13",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "27"
   }, {
     "range" : "16",
     "domain" : "20",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "28"
   }, {
     "iri" : "https://w3id.org/won/message#signature",
@@ -912,7 +930,7 @@
   }, {
     "range" : "4",
     "domain" : "31",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "30"
   }, {
     "iri" : "https://w3id.org/won/message#hintTargetSocket",
@@ -931,7 +949,7 @@
   }, {
     "range" : "9",
     "domain" : "10",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "35"
   }, {
     "iri" : "https://w3id.org/won/message#sender",
@@ -972,32 +990,32 @@
   }, {
     "range" : "10",
     "domain" : "5",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "39"
   }, {
     "range" : "9",
     "domain" : "4",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "40"
   }, {
     "range" : "10",
     "domain" : "4",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "41"
   }, {
     "range" : "10",
     "domain" : "9",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "42"
   }, {
     "range" : "4",
     "domain" : "5",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "45"
   }, {
     "range" : "9",
     "domain" : "5",
-    "attributes" : [ "object", "anonymous" ],
+    "attributes" : [ "anonymous", "object" ],
     "id" : "46"
   }, {
     "iri" : "https://w3id.org/won/message#timestamp",

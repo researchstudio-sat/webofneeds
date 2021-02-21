@@ -74,6 +74,9 @@ This ontology has the following classes and properties.</span>
       <a href="#MessageTypeSet" title="https://w3id.org/won/auth#MessageTypeSet">MessageTypeSet</a>
    </li>
    <li>
+      <a href="#MessageWildcard" title="https://w3id.org/won/auth#MessageWildcard">MessageWildcard</a>
+   </li>
+   <li>
       <a href="#OperationContainerShape"
          title="https://w3id.org/won/auth#OperationContainerShape">OperationContainerShape</a>
    </li>
@@ -206,7 +209,9 @@ This ontology has the following classes and properties.</span>
       <a href="#socket" title="https://w3id.org/won/auth#socket">socket</a>
    </li>
    <li>
-      <a href="#socketIri" title="https://w3id.org/won/auth#socketIri">socketIri</a>
+      <a href="#socketIri" title="https://w3id.org/won/auth#socketIri">
+         <span>socketIri</span>
+      </a>
    </li>
    <li>
       <a href="#socketType" title="https://w3id.org/won/auth#socketType">socketType</a>
@@ -247,6 +252,11 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
+      <a href="#socketIri" title="https://w3id.org/won/auth#socketIri">
+         <span>socketIri</span>
+      </a>
+   </li>
+   <li>
       <a href="#tokenExp" title="https://w3id.org/won/auth#tokenExp">
          <span>tokenExp</span>
       </a>
@@ -256,16 +266,17 @@ This ontology has the following classes and properties.</span>
          <span>tokenIat</span>
       </a>
    </li>
-</ul><h4>Named Individuals</h4><ul class="hlist">
    <li>
-      <a href="#accessDenied" title="https://w3id.org/won/auth#accessDenied">
-         <span>access denied</span>
+      <a href="#tokenScope" title="https://w3id.org/won/auth#tokenScope">
+         <span>tokenScope</span>
       </a>
    </li>
+</ul><h4>Named Individuals</h4><ul class="hlist">
    <li>
-      <a href="#accessGranted" title="https://w3id.org/won/auth#accessGranted">
-         <span>access granted</span>
-      </a>
+      <a href="#accessDenied" title="https://w3id.org/won/auth#accessDenied">accessDenied</a>
+   </li>
+   <li>
+      <a href="#accessGranted" title="https://w3id.org/won/auth#accessGranted">accessGranted</a>
    </li>
    <li>
       <a href="#aclEvalResultShape" title="https://w3id.org/won/auth#aclEvalResultShape">
@@ -273,29 +284,19 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#aclGraph" title="https://w3id.org/won/auth#aclGraph">
-         <span>acl graph</span>
-      </a>
+      <a href="#aclGraph" title="https://w3id.org/won/auth#aclGraph">aclGraph</a>
    </li>
    <li>
-      <a href="#anyAtom" title="https://w3id.org/won/auth#anyAtom">
-         <span>any atom</span>
-      </a>
+      <a href="#anyAtom" title="https://w3id.org/won/auth#anyAtom">anyAtom</a>
    </li>
    <li>
-      <a href="#anyMessageType" title="https://w3id.org/won/auth#anyMessageType">
-         <span>any message type</span>
-      </a>
+      <a href="#anyMessageType" title="https://w3id.org/won/auth#anyMessageType">anyMessageType</a>
    </li>
    <li>
-      <a href="#anyOperation" title="https://w3id.org/won/auth#anyOperation">
-         <span>any operation</span>
-      </a>
+      <a href="#anyone" title="https://w3id.org/won/auth#anyone">anyone</a>
    </li>
    <li>
-      <a href="#anyone" title="https://w3id.org/won/auth#anyone">
-         <span>anyone</span>
-      </a>
+      <a href="#anyOperation" title="https://w3id.org/won/auth#anyOperation">anyOperation</a>
    </li>
    <li>
       <a href="#asePositionShape" title="https://w3id.org/won/auth#asePositionShape">
@@ -364,15 +365,13 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#authorizationRequestor"
-         title="https://w3id.org/won/auth#authorizationRequestor">
-         <span>authorization requestor</span>
-      </a>
-   </li>
-   <li>
       <a href="#authorizationShape" title="https://w3id.org/won/auth#authorizationShape">
          <span>authorization shape</span>
       </a>
+   </li>
+   <li>
+      <a href="#authorizationRequestor"
+         title="https://w3id.org/won/auth#authorizationRequestor">authorizationRequestor</a>
    </li>
    <li>
       <a href="#connectionExpressionShape"
@@ -428,9 +427,7 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#contentGraph" title="https://w3id.org/won/auth#contentGraph">
-         <span>content graph</span>
-      </a>
+      <a href="#contentGraph" title="https://w3id.org/won/auth#contentGraph">contentGraph</a>
    </li>
    <li>
       <a href="#decisionValueShape" title="https://w3id.org/won/auth#decisionValueShape">
@@ -456,45 +453,33 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#grantOwnerTokenToOwner"
-         title="https://w3id.org/won/auth#grantOwnerTokenToOwner">
-         <span>grant owner token to owner</span>
-      </a>
-   </li>
-   <li>
       <a href="#granteeWildcardShape" title="https://w3id.org/won/auth#granteeWildcardShape">
          <span>grantee wildcard shape</span>
       </a>
    </li>
    <li>
+      <a href="#grantOwnerTokenToOwner"
+         title="https://w3id.org/won/auth#grantOwnerTokenToOwner">grantOwnerTokenToOwner</a>
+   </li>
+   <li>
       <a href="#grantsForConnStateClosed"
-         title="https://w3id.org/won/auth#grantsForConnStateClosed">
-         <span>grants for conn state closed</span>
-      </a>
+         title="https://w3id.org/won/auth#grantsForConnStateClosed">grantsForConnStateClosed</a>
    </li>
    <li>
       <a href="#grantsForConnStateConnected"
-         title="https://w3id.org/won/auth#grantsForConnStateConnected">
-         <span>grants for conn state connected</span>
-      </a>
+         title="https://w3id.org/won/auth#grantsForConnStateConnected">grantsForConnStateConnected</a>
    </li>
    <li>
       <a href="#grantsForConnStateRequestReceived"
-         title="https://w3id.org/won/auth#grantsForConnStateRequestReceived">
-         <span>grants for conn state request received</span>
-      </a>
+         title="https://w3id.org/won/auth#grantsForConnStateRequestReceived">grantsForConnStateRequestReceived</a>
    </li>
    <li>
       <a href="#grantsForConnStateRequestSent"
-         title="https://w3id.org/won/auth#grantsForConnStateRequestSent">
-         <span>grants for conn state request sent</span>
-      </a>
+         title="https://w3id.org/won/auth#grantsForConnStateRequestSent">grantsForConnStateRequestSent</a>
    </li>
    <li>
       <a href="#grantsForOwnerTokenBearer"
-         title="https://w3id.org/won/auth#grantsForOwnerTokenBearer">
-         <span>grants for owner token bearer</span>
-      </a>
+         title="https://w3id.org/won/auth#grantsForOwnerTokenBearer">grantsForOwnerTokenBearer</a>
    </li>
    <li>
       <a href="#graphExpressionShape" title="https://w3id.org/won/auth#graphExpressionShape">
@@ -517,9 +502,7 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#keyGraph" title="https://w3id.org/won/auth#keyGraph">
-         <span>key graph</span>
-      </a>
+      <a href="#keyGraph" title="https://w3id.org/won/auth#keyGraph">keyGraph</a>
    </li>
    <li>
       <a href="#localAuthPropertyShape"
@@ -550,24 +533,16 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#msgTypesCommunicate" title="https://w3id.org/won/auth#msgTypesCommunicate">
-         <span>msg types communicate</span>
-      </a>
+      <a href="#msgTypesCommunicate" title="https://w3id.org/won/auth#msgTypesCommunicate">msgTypesCommunicate</a>
    </li>
    <li>
-      <a href="#msgTypesConnectClose" title="https://w3id.org/won/auth#msgTypesConnectClose">
-         <span>msg types connect close</span>
-      </a>
+      <a href="#msgTypesConnectClose" title="https://w3id.org/won/auth#msgTypesConnectClose">msgTypesConnectClose</a>
    </li>
    <li>
-      <a href="#msgTypesHint" title="https://w3id.org/won/auth#msgTypesHint">
-         <span>msg types hint</span>
-      </a>
+      <a href="#msgTypesHint" title="https://w3id.org/won/auth#msgTypesHint">msgTypesHint</a>
    </li>
    <li>
-      <a href="#msgTypesModify" title="https://w3id.org/won/auth#msgTypesModify">
-         <span>msg types modify</span>
-      </a>
+      <a href="#msgTypesModify" title="https://w3id.org/won/auth#msgTypesModify">msgTypesModify</a>
    </li>
    <li>
       <a href="#nodeSignedPropertyShape"
@@ -576,61 +551,24 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#opAutoConnect" title="https://w3id.org/won/auth#opAutoConnect">
-         <span>op auto connect</span>
-      </a>
+      <a href="#opAutoConnect" title="https://w3id.org/won/auth#opAutoConnect">opAutoConnect</a>
    </li>
    <li>
-      <a href="#opCommunicate" title="https://w3id.org/won/auth#opCommunicate">
-         <span>op communicate</span>
-      </a>
+      <a href="#opCommunicate" title="https://w3id.org/won/auth#opCommunicate">opCommunicate</a>
    </li>
    <li>
-      <a href="#opCommunicateOnBehalf" title="https://w3id.org/won/auth#opCommunicateOnBehalf">
-         <span>op communicate on behalf</span>
-      </a>
+      <a href="#opCommunicateOnBehalf" title="https://w3id.org/won/auth#opCommunicateOnBehalf">opCommunicateOnBehalf</a>
    </li>
    <li>
       <a href="#opConnectAndCommunicateOnBehalf"
-         title="https://w3id.org/won/auth#opConnectAndCommunicateOnBehalf">
-         <span>op connect and communicate on behalf</span>
-      </a>
+         title="https://w3id.org/won/auth#opConnectAndCommunicateOnBehalf">opConnectAndCommunicateOnBehalf</a>
    </li>
    <li>
-      <a href="#opConnectClose" title="https://w3id.org/won/auth#opConnectClose">
-         <span>op connect close</span>
-      </a>
+      <a href="#opConnectClose" title="https://w3id.org/won/auth#opConnectClose">opConnectClose</a>
    </li>
    <li>
       <a href="#opConnectCloseOnBehalf"
-         title="https://w3id.org/won/auth#opConnectCloseOnBehalf">
-         <span>op connect close on behalf</span>
-      </a>
-   </li>
-   <li>
-      <a href="#opHint" title="https://w3id.org/won/auth#opHint">
-         <span>op hint</span>
-      </a>
-   </li>
-   <li>
-      <a href="#opModifyOnBehalf" title="https://w3id.org/won/auth#opModifyOnBehalf">
-         <span>op modify on behalf</span>
-      </a>
-   </li>
-   <li>
-      <a href="#opNop" title="https://w3id.org/won/auth#opNop">
-         <span>op nop</span>
-      </a>
-   </li>
-   <li>
-      <a href="#opObserve" title="https://w3id.org/won/auth#opObserve">
-         <span>op observe</span>
-      </a>
-   </li>
-   <li>
-      <a href="#opRead" title="https://w3id.org/won/auth#opRead">
-         <span>op read</span>
-      </a>
+         title="https://w3id.org/won/auth#opConnectCloseOnBehalf">opConnectCloseOnBehalf</a>
    </li>
    <li>
       <a href="#operationPropertyShape"
@@ -644,61 +582,54 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#operationRequestor" title="https://w3id.org/won/auth#operationRequestor">
-         <span>operation requestor</span>
-      </a>
+      <a href="#operationRequestor" title="https://w3id.org/won/auth#operationRequestor">operationRequestor</a>
    </li>
    <li>
-      <a href="#OwnerToken" title="https://w3id.org/won/auth#OwnerToken">
-         <span>owner token</span>
-      </a>
+      <a href="#opHint" title="https://w3id.org/won/auth#opHint">opHint</a>
    </li>
    <li>
-      <a href="#positionAtomGraph" title="https://w3id.org/won/auth#positionAtomGraph">
-         <span>position atom graph</span>
-      </a>
+      <a href="#opModifyOnBehalf" title="https://w3id.org/won/auth#opModifyOnBehalf">opModifyOnBehalf</a>
    </li>
    <li>
-      <a href="#positionAtomMessage" title="https://w3id.org/won/auth#positionAtomMessage">
-         <span>position atom message</span>
-      </a>
+      <a href="#opNop" title="https://w3id.org/won/auth#opNop">opNop</a>
    </li>
    <li>
-      <a href="#positionAtomMessages" title="https://w3id.org/won/auth#positionAtomMessages">
-         <span>position atom messages</span>
-      </a>
+      <a href="#opObserve" title="https://w3id.org/won/auth#opObserve">opObserve</a>
    </li>
    <li>
-      <a href="#positionConnection" title="https://w3id.org/won/auth#positionConnection">
-         <span>position connection</span>
-      </a>
+      <a href="#opRead" title="https://w3id.org/won/auth#opRead">opRead</a>
+   </li>
+   <li>
+      <a href="#OwnerToken" title="https://w3id.org/won/auth#OwnerToken">OwnerToken</a>
+   </li>
+   <li>
+      <a href="#positionAtomGraph" title="https://w3id.org/won/auth#positionAtomGraph">positionAtomGraph</a>
+   </li>
+   <li>
+      <a href="#positionAtomMessage" title="https://w3id.org/won/auth#positionAtomMessage">positionAtomMessage</a>
+   </li>
+   <li>
+      <a href="#positionAtomMessages" title="https://w3id.org/won/auth#positionAtomMessages">positionAtomMessages</a>
+   </li>
+   <li>
+      <a href="#positionConnection" title="https://w3id.org/won/auth#positionConnection">positionConnection</a>
    </li>
    <li>
       <a href="#positionConnectionMessage"
-         title="https://w3id.org/won/auth#positionConnectionMessage">
-         <span>position connection message</span>
-      </a>
+         title="https://w3id.org/won/auth#positionConnectionMessage">positionConnectionMessage</a>
    </li>
    <li>
       <a href="#positionConnectionMessages"
-         title="https://w3id.org/won/auth#positionConnectionMessages">
-         <span>position connection messages</span>
-      </a>
+         title="https://w3id.org/won/auth#positionConnectionMessages">positionConnectionMessages</a>
    </li>
    <li>
-      <a href="#positionConnections" title="https://w3id.org/won/auth#positionConnections">
-         <span>position connections</span>
-      </a>
+      <a href="#positionConnections" title="https://w3id.org/won/auth#positionConnections">positionConnections</a>
    </li>
    <li>
-      <a href="#positionRoot" title="https://w3id.org/won/auth#positionRoot">
-         <span>position root</span>
-      </a>
+      <a href="#positionRoot" title="https://w3id.org/won/auth#positionRoot">positionRoot</a>
    </li>
    <li>
-      <a href="#positionSocket" title="https://w3id.org/won/auth#positionSocket">
-         <span>position socket</span>
-      </a>
+      <a href="#positionSocket" title="https://w3id.org/won/auth#positionSocket">positionSocket</a>
    </li>
    <li>
       <a href="#relativeAtomExpressionShape"
@@ -707,9 +638,7 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#self" title="https://w3id.org/won/auth#self">
-         <span>self</span>
-      </a>
+      <a href="#self" title="https://w3id.org/won/auth#self">self</a>
    </li>
    <li>
       <a href="#simpleOperationExpressionShape"
@@ -733,9 +662,7 @@ This ontology has the following classes and properties.</span>
       </a>
    </li>
    <li>
-      <a href="#sysinfoGraph" title="https://w3id.org/won/auth#sysinfoGraph">
-         <span>sysinfo graph</span>
-      </a>
+      <a href="#sysinfoGraph" title="https://w3id.org/won/auth#sysinfoGraph">sysinfoGraph</a>
    </li>
    <li>
       <a href="#targetAtomExpressionShape"

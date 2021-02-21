@@ -551,6 +551,18 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom&a
     
 
 
+    <!-- https://w3id.org/won/message#AtomCreatedNotificationMessage -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/message#AtomCreatedNotificationMessage">
+        <rdf:type rdf:resource="https://w3id.org/won/message#MessageType"/>
+        <rdfs:comment xml:lang="en">Type of message sent from a WoN Node to indicate that an Atom has been created.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/message"/>
+        <rdfs:label>AtomCreatedNotificationMessage</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
     <!-- https://w3id.org/won/message#AtomHintMessage -->
 
 
