@@ -7,28 +7,105 @@
 <h2>Main ontologies</h2>
 <p>The main Web of Needs ontologies are those relevant to all or most conceivable application domains. They are organized in modules modules by topic area.</p>
 <ul>
-<li><a href="./core">WoN Core Ontology</a> (prefix <code>won:</code>): describes atoms, connections, and other fundamental concepts.</li>
-<li><a href="./message">WoN Message Ontology</a> (prefix <code>msg:</code>): resources for messaging</li>
-<li><a href="./auth">WoN Authorization Ontology</a> (prefix <code>auth:</code>): framework for declarative authorization in WoN</li>
-<li><a href="./agreement">WoN Agreement Ontology</a> (prefix <code>agr:</code>): agreements based on message exchange</li>
-<li><a href="./content">WoN Content Ontology</a> (prefix <code>con:</code>): resources for adding content to atoms/messages</li>
-<li><a href="./matching">WoN Matching Ontology</a> (prefix <code>match:</code>): vocabulary for expressing matching criteria</li>
-<li><a href="./modification">WoN Modification Ontology</a> (prefix <code>mod:</code>): extension for modifying messages after sending them</li>
-<li><a href="./workflow">WoN Workflow Ontology</a> (prefix <code>wf:</code>): vocabulary for embedding workflows in WoN conversations.</li>
+<li><a href="./core">WoN Core Ontology</a>: describes atoms, connections, and other fundamental concepts.
+<ul>
+<li><code>@prefix won: &lt;https://w3id.org/core#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./message">WoN Message Ontology</a>: resources for messaging
+<ul>
+<li><code>@prefix msg: &lt;https://w3id.org/message#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./auth">WoN Authorization Ontology</a>: framework for declarative authorization in WoN
+<ul>
+<li><code>@prefix auth: &lt;https://w3id.org/auth#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./agreement">WoN Agreement Ontology</a>: agreements based on message exchange
+<ul>
+<li><code>@prefix agr: &lt;https://w3id.org/agreement#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./content">WoN Content Ontology</a>: resources for adding content to atoms/messages
+<ul>
+<li><code>@prefix con: &lt;https://w3id.org/content#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./matching">WoN Matching Ontology</a>: vocabulary for expressing matching criteria
+<ul>
+<li><code>@prefix match: &lt;https://w3id.org/match#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./modification">WoN Modification Ontology</a>: extension for modifying messages after sending them
+<ul>
+<li><code>@prefix mod: &lt;https://w3id.org/mod#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./workflow">WoN Workflow Ontology</a>: vocabulary for embedding workflows in WoN conversations.
+<ul>
+<li><code>@prefix wf: &lt;https://w3id.org/workflow#&gt; .</code></li>
+</ul>
+</li>
 </ul>
 <h2>Extensions</h2>
 <p>Extension ontologies provide resources for specific domains or aspects that may be applicable to many domains.</p>
 <ul>
-<li><a href="./ext/hold">WoN Hold Extension</a> (prefix:<code>wx_hold</code>): enables atoms to 'hold'(own, control) other atoms via connections.</li>
-<li><a href="./ext/persona">WoN Persona Extension</a> (prefix:<code>wx_persona</code>)</li>
-<li><a href="./ext/chat">WoN Chat Extension</a> (prefix:<code>wx_chat</code>): provides the chat socket</li>
-<li><a href="./ext/buddy">WoN Buddy Extension</a> (prefix:<code>wx_buddy</code>): enables atoms to become 'buddies' via connections</li>
-<li><a href="./ext/group">WoN Group Extension</a> (prefix:<code>wx_group</code>): enables group chat</li>
-<li><a href="./ext/bot">WoN Bot Extension</a> (prefix:<code>wx_bot</code>): provides resources for bots</li>
-<li><a href="./ext/demo">WoN Demo Extension</a> (prefix:<code>wx_demo</code>): provides resources for example use cases</li>
-<li><a href="./ext/review">WoN Review Extension</a> (prefix:<code>wx_review</code>): provides the possibility to add reviews to atoms</li>
-<li><a href="./ext/schema">WoN Schema Extension</a> (prefix:<code>wx_schema</code>): automatic translation of all (most?) schema.org properties into sockets such that atoms can establish these properties by establishing connections.</li>
-<li><a href="./ext/pogo">WoN Pokemon Go Extension</a> (prefix:<code>wx_pogo</code>): resources for a pokemon go prototype</li>
+<li><a href="./ext/hold">WoN Hold Extension</a>: enables atoms to 'hold'(own, control) other atoms via connections.
+<ul>
+<li><code>@prefix wx-hold: &lt;https://w3id.org/ext/hold#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/persona">WoN Persona Extension</a>
+<ul>
+<li><code>@prefix wx-persona: &lt;https://w3id.org/ext/persona#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/chat">WoN Chat Extension</a>: provides the chat socket
+<ul>
+<li><code>@prefix wx-chat: &lt;https://w3id.org/ext/chat#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/buddy">WoN Buddy Extension</a>: enables atoms to become 'buddies' via connections
+<ul>
+<li><code>@prefix wx-buddy: &lt;https://w3id.org/ext/buddy#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/group">WoN Group Extension</a>: enables group chat
+<ul>
+<li><code>@prefix wx-group: &lt;https://w3id.org/ext/group#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/bot">WoN Bot Extension</a>: provides resources for bots
+<ul>
+<li><code>@prefix wx-bot: &lt;https://w3id.org/ext/bot#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/demo">WoN Demo Extension</a>: provides resources for example use cases
+<ul>
+<li><code>@prefix wx-demo: &lt;https://w3id.org/ext/demo#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/valueflows">WoN ValueFlows Extension</a>: provides resources for using valueflows on top of WoN
+<ul>
+<li><code>@prefix wx-vf: &lt;https://w3id.org/ext/valueflows#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/review">WoN Review Extension</a>: provides the possibility to add reviews to atoms
+<ul>
+<li><code>@prefix wx-review: &lt;https://w3id.org/ext/review#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/schema">WoN Schema Extension</a>: automatic translation of all (most?) schema.org properties into sockets such that atoms can establish these properties by establishing connections.
+<ul>
+<li><code>@prefix wx-schema: &lt;https://w3id.org/ext/schema#&gt; .</code></li>
+</ul>
+</li>
+<li><a href="./ext/pogo">WoN Pokemon Go Extension</a>: resources for a pokemon go prototype
+<ul>
+<li><code>@prefix wx-pogo: &lt;https://w3id.org/ext/pogo#&gt; .</code></li>
+</ul>
+</li>
 </ul>
 <footer>
 </footer>
