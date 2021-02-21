@@ -1,4 +1,4 @@
-<html><h2 id="crossreference" class="list">Cross reference for Web of Needs Core Ontology classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<h2 id="crossreference" class="list">Cross reference for Web of Needs Core Ontology classes, properties and dataproperties <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
 This section provides details for each class and property defined by Web of Needs Core Ontology.
 <div id="classes">
    <h3 id="classes-headline" class="list">Classes</h3>
@@ -25,6 +25,9 @@ This section provides details for each class and property defined by Web of Need
       </li>
       <li>
          <a href="#ConnectionState" title="https://w3id.org/won/core#ConnectionState">ConnectionState</a>
+      </li>
+      <li>
+         <a href="#DerivedDataGraph" title="https://w3id.org/won/core#DerivedDataGraph">DerivedDataGraph</a>
       </li>
       <li>
          <a href="#MessageContainer" title="https://w3id.org/won/core#MessageContainer">MessageContainer</a>
@@ -138,6 +141,7 @@ The container supports LDP paging as described here: https://github.com/research
          <dt>has members</dt>
          <dd>
             <a href="#Active" title="https://w3id.org/won/core#Active">Active</a>
+            <sup class="type-ni" title="named individual">ni</sup>, <a href="#Deleted" title="https://w3id.org/won/core#Deleted">Deleted</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#Inactive" title="https://w3id.org/won/core#Inactive">Inactive</a>
             <sup class="type-ni" title="named individual">ni</sup>
          </dd>
@@ -262,6 +266,8 @@ The container supports LDP paging as described here: https://github.com/research
          <dt>is in range of</dt>
          <dd>
             <a href="#connectionState" title="https://w3id.org/won/core#connectionState">connectionState</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#derivedForConnectionState"
+               title="https://w3id.org/won/core#derivedForConnectionState">derivedForConnectionState</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
          <dt>has members</dt>
@@ -272,6 +278,31 @@ The container supports LDP paging as described here: https://github.com/research
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#RequestSent" title="https://w3id.org/won/core#RequestSent">RequestSent</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#Suggested" title="https://w3id.org/won/core#Suggested">Suggested</a>
             <sup class="type-ni" title="named individual">ni</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="DerivedDataGraph">
+      <h3>DerivedDataGraph<sup class="type-c" title="class">c</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#classes">Class ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#DerivedDataGraph</p>
+      <div class="comment">
+         <span class="markdown">Graph of derived data.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>is in domain of</dt>
+         <dd>
+            <a href="#derivedForConnectionState"
+               title="https://w3id.org/won/core#derivedForConnectionState">derivedForConnectionState</a>
+            <sup class="type-op" title="object property">op</sup>
          </dd>
       </dl>
    </div>
@@ -523,6 +554,10 @@ The container supports LDP paging as described here: https://github.com/research
          <a href="#defaultSocket" title="https://w3id.org/won/core#defaultSocket">defaultSocket</a>
       </li>
       <li>
+         <a href="#derivedForConnectionState"
+            title="https://w3id.org/won/core#derivedForConnectionState">derivedForConnectionState</a>
+      </li>
+      <li>
          <a href="#derivesAtomProperty" title="https://w3id.org/won/core#derivesAtomProperty">derivesAtomProperty</a>
       </li>
       <li>
@@ -759,6 +794,31 @@ The container supports LDP paging as described here: https://github.com/research
             <dt>has range</dt>
             <dd>
                <a href="#Socket" title="https://w3id.org/won/core#Socket">Socket</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="derivedForConnectionState">
+      <h3>derivedForConnectionState<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#derivedForConnectionState</p>
+      <div class="comment">
+         <span class="markdown">links a derived data graph to the connection state in which it was derived.</span>
+      </div>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#DerivedDataGraph" title="https://w3id.org/won/core#DerivedDataGraph">DerivedDataGraph</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#ConnectionState" title="https://w3id.org/won/core#ConnectionState">ConnectionState</a>
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
@@ -1643,6 +1703,9 @@ The container supports LDP paging as described here: https://github.com/research
          <a href="#Connected" title="https://w3id.org/won/core#Connected">Connected</a>
       </li>
       <li>
+         <a href="#Deleted" title="https://w3id.org/won/core#Deleted">Deleted</a>
+      </li>
+      <li>
          <a href="#Inactive" title="https://w3id.org/won/core#Inactive">Inactive</a>
       </li>
       <li>
@@ -1723,6 +1786,30 @@ The container supports LDP paging as described here: https://github.com/research
          <dt>belongs to</dt>
          <dd>
             <a href="#ConnectionState" title="https://w3id.org/won/core#ConnectionState">ConnectionState</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="Deleted">
+      <h3>Deleted<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/core#Deleted</p>
+      <div class="comment">
+         <span class="markdown">The deleted state. A deleted atom's URI is still remembered and associated with this state so that the WoN node can respond appropriately (410 GONE) when queried.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/core">https://w3id.org/won/core</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#AtomState" title="https://w3id.org/won/core#AtomState">AtomState</a>
             <sup class="type-c" title="class">c</sup>
          </dd>
       </dl>
@@ -1832,4 +1919,3 @@ The container supports LDP paging as described here: https://github.com/research
 <sup class="type-ni" title="Named Individuals">ni</sup>: Named Individuals
 </div>
 </div>
-</html>

@@ -1,4 +1,4 @@
-<html><h2 id="overv" class="list">Web of Needs Core Ontology: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<h2 id="overv" class="list">Web of Needs Core Ontology: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
 <span class="markdown">
 This ontology has the following classes and properties.</span>
 <h4>Classes</h4>
@@ -25,6 +25,9 @@ This ontology has the following classes and properties.</span>
    </li>
    <li>
       <a href="#ConnectionState" title="https://w3id.org/won/core#ConnectionState">ConnectionState</a>
+   </li>
+   <li>
+      <a href="#DerivedDataGraph" title="https://w3id.org/won/core#DerivedDataGraph">DerivedDataGraph</a>
    </li>
    <li>
       <a href="#MessageContainer" title="https://w3id.org/won/core#MessageContainer">MessageContainer</a>
@@ -75,6 +78,10 @@ This ontology has the following classes and properties.</span>
    </li>
    <li>
       <a href="#defaultSocket" title="https://w3id.org/won/core#defaultSocket">defaultSocket</a>
+   </li>
+   <li>
+      <a href="#derivedForConnectionState"
+         title="https://w3id.org/won/core#derivedForConnectionState">derivedForConnectionState</a>
    </li>
    <li>
       <a href="#derivesAtomProperty" title="https://w3id.org/won/core#derivesAtomProperty">derivesAtomProperty</a>
@@ -183,6 +190,9 @@ This ontology has the following classes and properties.</span>
       <a href="#Connected" title="https://w3id.org/won/core#Connected">Connected</a>
    </li>
    <li>
+      <a href="#Deleted" title="https://w3id.org/won/core#Deleted">Deleted</a>
+   </li>
+   <li>
       <a href="#Inactive" title="https://w3id.org/won/core#Inactive">Inactive</a>
    </li>
    <li>
@@ -194,4 +204,4 @@ This ontology has the following classes and properties.</span>
    <li>
       <a href="#Suggested" title="https://w3id.org/won/core#Suggested">Suggested</a>
    </li>
-</ul></html>
+</ul>

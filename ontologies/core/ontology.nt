@@ -1,9 +1,9 @@
 <https://w3id.org/won/core> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
 <https://w3id.org/won/core> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/core/1.0> .
-<https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/abstract> "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. \n\nBased on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.\n\nAtoms can establish *Connections*  with other Atoms, if both Atoms' owners agree to it.\n\nMatching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en .
 <https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/creator> "Fabian Salcher" .
 <https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
 <https://w3id.org/won/core> <http://purl.org/dc/elements/1.1/title> "Web of Needs Core Ontology" .
+<https://w3id.org/won/core> <http://purl.org/dc/terms/abstract> "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense.\n\nBased on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.\n\nAtoms can establish *Connections*  with other Atoms, if both Atoms' owners agree to it.\n\nMatching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."@en .
 <https://w3id.org/won/core> <http://purl.org/dc/terms/created> "2013-12-13"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/core> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
 <https://w3id.org/won/core> <http://purl.org/vocab/vann/preferredNamespacePrefix> "won" .
@@ -17,9 +17,6 @@
 # #################################################################
 # 
 # 
-# http://purl.org/dc/elements/1.1/abstract
-<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
-# 
 # http://purl.org/dc/elements/1.1/creator
 <http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
@@ -31,6 +28,9 @@
 # 
 # http://purl.org/dc/elements/1.1/title
 <http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/abstract
+<http://purl.org/dc/terms/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
 # http://purl.org/dc/terms/created
 <http://purl.org/dc/terms/created> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
@@ -119,6 +119,13 @@
 <https://w3id.org/won/core#defaultSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "Indicates the socket to connect to by default."@en .
 <https://w3id.org/won/core#defaultSocket> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
 <https://w3id.org/won/core#defaultSocket> <http://www.w3.org/2000/01/rdf-schema#label> "defaultSocket" .
+# 
+# https://w3id.org/won/core#derivedForConnectionState
+<https://w3id.org/won/core#derivedForConnectionState> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/core#derivedForConnectionState> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#DerivedDataGraph> .
+<https://w3id.org/won/core#derivedForConnectionState> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#ConnectionState> .
+<https://w3id.org/won/core#derivedForConnectionState> <http://www.w3.org/2000/01/rdf-schema#comment> "links a derived data graph to the connection state in which it was derived." .
+<https://w3id.org/won/core#derivedForConnectionState> <http://www.w3.org/2000/01/rdf-schema#label> "derivedForConnectionState" .
 # 
 # https://w3id.org/won/core#derivesAtomProperty
 <https://w3id.org/won/core#derivesAtomProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
@@ -441,6 +448,12 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#ConnectionState> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
 <https://w3id.org/won/core#ConnectionState> <http://www.w3.org/2000/01/rdf-schema#label> "ConnectionState" .
 # 
+# https://w3id.org/won/core#DerivedDataGraph
+<https://w3id.org/won/core#DerivedDataGraph> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<https://w3id.org/won/core#DerivedDataGraph> <http://www.w3.org/2000/01/rdf-schema#comment> "Graph of derived data." .
+<https://w3id.org/won/core#DerivedDataGraph> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#DerivedDataGraph> <http://www.w3.org/2000/01/rdf-schema#label> "DerivedDataGraph" .
+# 
 # https://w3id.org/won/core#MessageContainer
 <https://w3id.org/won/core#MessageContainer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/core#MessageContainer> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/ns/ldp#CompositeContainer> .
@@ -514,6 +527,13 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/core#Connected> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
 <https://w3id.org/won/core#Connected> <http://www.w3.org/2000/01/rdf-schema#label> "Connected" .
 # 
+# https://w3id.org/won/core#Deleted
+<https://w3id.org/won/core#Deleted> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/core#Deleted> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#AtomState> .
+<https://w3id.org/won/core#Deleted> <http://www.w3.org/2000/01/rdf-schema#comment> "The deleted state. A deleted atom's URI is still remembered and associated with this state so that the WoN node can respond appropriately (410 GONE) when queried."@en .
+<https://w3id.org/won/core#Deleted> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/core> .
+<https://w3id.org/won/core#Deleted> <http://www.w3.org/2000/01/rdf-schema#label> "Deleted" .
+# 
 # https://w3id.org/won/core#Inactive
 <https://w3id.org/won/core#Inactive> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/core#Inactive> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#AtomState> .
@@ -567,4 +587,4 @@ _:genid8 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 _:genid10 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AllDifferent> .
 _:genid10 <http://www.w3.org/2002/07/owl#distinctMembers> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
 # 
-# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/
+# Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/

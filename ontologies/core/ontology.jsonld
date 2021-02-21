@@ -35,9 +35,6 @@
     } ]
   } ]
 }, {
-  "@id" : "http://purl.org/dc/elements/1.1/abstract",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
-}, {
   "@id" : "http://purl.org/dc/elements/1.1/creator",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
@@ -48,6 +45,9 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://purl.org/dc/elements/1.1/title",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/abstract",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://purl.org/dc/terms/created",
@@ -76,10 +76,6 @@
 }, {
   "@id" : "https://w3id.org/won/core",
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
-  "http://purl.org/dc/elements/1.1/abstract" : [ {
-    "@language" : "en",
-    "@value" : "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense. \n\nBased on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.\n\nAtoms can establish *Connections*  with other Atoms, if both Atoms' owners agree to it.\n\nMatching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."
-  } ],
   "http://purl.org/dc/elements/1.1/creator" : [ {
     "@value" : "Fabian Salcher"
   }, {
@@ -87,6 +83,10 @@
   } ],
   "http://purl.org/dc/elements/1.1/title" : [ {
     "@value" : "Web of Needs Core Ontology"
+  } ],
+  "http://purl.org/dc/terms/abstract" : [ {
+    "@language" : "en",
+    "@value" : "The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense.\n\nBased on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.\n\nAtoms can establish *Connections*  with other Atoms, if both Atoms' owners agree to it.\n\nMatching services can make suggestions which atoms to connect to. An Atom specifies 'Sockets' indicating the kinds of Connections it is prepared to establish."
   } ],
   "http://purl.org/dc/terms/created" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#date",
@@ -226,6 +226,31 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
     "@value" : "ConnectionState"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/core#Deleted",
+  "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/core#AtomState" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@language" : "en",
+    "@value" : "The deleted state. A deleted atom's URI is still remembered and associated with this state so that the WoN node can respond appropriately (410 GONE) when queried."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/core"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "Deleted"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/core#DerivedDataGraph",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@value" : "Graph of derived data."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#isDefinedBy" : [ {
+    "@id" : "https://w3id.org/won/core"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "DerivedDataGraph"
   } ]
 }, {
   "@id" : "https://w3id.org/won/core#Inactive",
@@ -665,6 +690,21 @@
   } ],
   "http://www.w3.org/2000/01/rdf-schema#range" : [ {
     "@id" : "https://w3id.org/won/core#Socket"
+  } ]
+}, {
+  "@id" : "https://w3id.org/won/core#derivedForConnectionState",
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
+  "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
+    "@value" : "links a derived data graph to the connection state in which it was derived."
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#domain" : [ {
+    "@id" : "https://w3id.org/won/core#DerivedDataGraph"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "derivedForConnectionState"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#range" : [ {
+    "@id" : "https://w3id.org/won/core#ConnectionState"
   } ]
 }, {
   "@id" : "https://w3id.org/won/core#derivesAtomProperty",
