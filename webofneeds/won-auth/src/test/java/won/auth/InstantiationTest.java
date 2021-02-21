@@ -36,7 +36,7 @@ public class InstantiationTest {
 
     @Autowired
     private ResourceLoader loader;
-    @Value("classpath:/shacl/won-auth-shapes.ttl")
+    @Value("classpath:/shacl/won-auth.ttl")
     private Resource shapesDef;
     @Value("classpath:/shacl/won-test-atom-shapes.ttl")
     private Resource atomDataShapesDef;

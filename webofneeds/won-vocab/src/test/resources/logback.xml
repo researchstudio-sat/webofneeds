@@ -14,7 +14,7 @@
   ~    limitations under the License.
   -->
 
-<configuration debug="true" scan="true" scanPeriod="5 seconds">
+<configuration debug="true" scan="true" scanPeriod="30 seconds">
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type
@@ -23,20 +23,6 @@
             <pattern>%d{d.M.yy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %X %n</pattern>
         </encoder>
     </appender>
-
-    <!-- avoid logging Exceptions with stack traces on WARN level when JMS Connection is broken -->
-    <logger name="org.apache.camel.component.jms.reply.TemporaryQueueReplyManager" level="ERROR"/>
-    <logger name="org.springframework.jms.connection.CachingConnectionFactory" level="ERROR"/>
-    <logger name="org.springframework" level="info"/>
-    <logger name="org.springframework.security" level="info"/>
-    <logger name="won.node" level="info"/>
-    <logger name="won.owner" level="info"/>
-    <logger name="won.auth.WonAclEvaluator" level="info"/>
-    <logger name="won.protocol.rest.LinkedDataRestClient" level="debug"/>
-    <logger name="won.auth.WonAclInstanceFactory" level="debug"/>
-    <logger name="won.cryptography.service.CryptographyUtils" level="DEBUG"/>
-    <logger name="won.protocol.rest.LinkedDataRestBridge" level="DEBUG"/>
-    <logger name="won.node.service.linkeddata.generate.LinkedDataServiceImpl" level="DEBUG"/>
 
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="WARN">

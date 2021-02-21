@@ -15,7 +15,7 @@
 <https://w3id.org/won/ext/valueflows> rdf:type owl:Ontology ;
                                  owl:versionIRI <https://w3id.org/won/ext/valueflows/1.0> ;
                                  owl:imports <https://w3id.org/won/core> ;
-                                 dc:abstract "This ontology contains a pair of Socket definitions automatically generated for each object property in https://valueflo.ws/. These sockets allow Atoms to connect to each other and thereby establish the respective relationship."@en ; ;
+                                 dcterms:abstract "This ontology contains a pair of Socket definitions automatically generated for each object property in https://valueflo.ws/. These sockets allow Atoms to connect to each other and thereby establish the respective relationship."@en ; ;
                                  dc:creator "Maximilian Stolze", "Florian Kleedorfer" ;
                                  dc:date "2020-06-24"^^xsd:date ;
                                  dc:title "Web of Needs Value Flows Extension" ;

@@ -14,7 +14,7 @@
 <https://w3id.org/won/message> rdf:type owl:Ontology ;
                                 owl:versionIRI <https://w3id.org/won/message/1.0> ;
                                 owl:imports <https://w3id.org/won/core/1.0> ;
-                                dc:abstract """This ontology is used to model the Message objects central to the Web of Needs. Messages are entities that encapsulate addressing information, signing information, and optionally, content in an RDF dataset. A message is identified by a URI in the URI space on the WoN node it was created on. 
+                                dcterms:abstract """This ontology is used to model the Message objects central to the Web of Needs. Messages are entities that encapsulate addressing information, signing information, and optionally, content in an RDF dataset. A message is identified by a URI in the URI space on the WoN node it was created on.
 
 A message consists of graphs that can conceptually contain other graphs; thus the message dataset conceptually is a tree of graphs, which can either be envelope graphs, holding addressing information and signatures, or content graphs, holding arbitrary content.
 
@@ -32,7 +32,7 @@ If a message is sent to another Atom, a new Message URI is minted on that Atom's
 #################################################################
 
 ###  http://purl.org/dc/elements/1.1/abstract
-dc:abstract rdf:type owl:AnnotationProperty .
+dcterms:abstract rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/elements/1.1/creator
