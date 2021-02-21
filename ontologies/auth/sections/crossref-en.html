@@ -291,7 +291,7 @@ This section provides details for each class and property defined by Web of Need
          </dd>
          <dt>is in range of</dt>
          <dd>
-            <a href="#atomMessage" title="https://w3id.org/won/auth#atomMessage">auth:atomMessage</a>
+            <a href="#atomMessage" title="https://w3id.org/won/auth#atomMessage">atomMessage</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
       </dl>
@@ -1182,13 +1182,13 @@ This section provides details for each class and property defined by Web of Need
          <a href="#atom" title="https://w3id.org/won/auth#atom">atom</a>
       </li>
       <li>
+         <a href="#atomMessage" title="https://w3id.org/won/auth#atomMessage">atomMessage</a>
+      </li>
+      <li>
          <a href="#atomMessages" title="https://w3id.org/won/auth#atomMessages">atomMessages</a>
       </li>
       <li>
          <a href="#atomState" title="https://w3id.org/won/auth#atomState">atomState</a>
-      </li>
-      <li>
-         <a href="#atomMessage" title="https://w3id.org/won/auth#atomMessage">auth:atomMessage</a>
       </li>
       <li>
          <a href="#bearer" title="https://w3id.org/won/auth#bearer">bearer</a>
@@ -1264,9 +1264,7 @@ This section provides details for each class and property defined by Web of Need
          <a href="#socket" title="https://w3id.org/won/auth#socket">socket</a>
       </li>
       <li>
-         <a href="#socketIri" title="https://w3id.org/won/auth#socketIri">
-            <span>socketIri</span>
-         </a>
+         <a href="#socketIri" title="https://w3id.org/won/auth#socketIri">socketIri</a>
       </li>
       <li>
          <a href="#socketType" title="https://w3id.org/won/auth#socketType">socketType</a>
@@ -1321,8 +1319,8 @@ This section provides details for each class and property defined by Web of Need
          <dl>
             <dt>has sub-properties</dt>
             <dd>
-               <a href="#atomMessages" title="https://w3id.org/won/auth#atomMessages">atomMessages</a>
-               <sup class="type-op" title="object property">op</sup>, <a href="#atomMessage" title="https://w3id.org/won/auth#atomMessage">auth:atomMessage</a>
+               <a href="#atomMessage" title="https://w3id.org/won/auth#atomMessage">atomMessage</a>
+               <sup class="type-op" title="object property">op</sup>, <a href="#atomMessages" title="https://w3id.org/won/auth#atomMessages">atomMessages</a>
                <sup class="type-op" title="object property">op</sup>, <a href="#connection" title="https://w3id.org/won/auth#connection">connection</a>
                <sup class="type-op" title="object property">op</sup>, <a href="#connectionMessage" title="https://w3id.org/won/auth#connectionMessage">connectionMessage</a>
                <sup class="type-op" title="object property">op</sup>, <a href="#connectionMessages" title="https://w3id.org/won/auth#connectionMessages">connectionMessages</a>
@@ -1402,7 +1400,55 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
-            <dd/>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/auth#Atom">atom</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#RelativeAtomExpression"
+                  title="https://w3id.org/won/auth#RelativeAtomExpression">RelativeAtomExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="atomMessage">
+      <h3>atomMessage<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#atomMessage</p>
+      <div class="comment">
+         <span class="markdown">Used in the ASE root or atom messages expressions to specify a auth:AtomMessageExpression. The atom
+     messages directly or transitively reachable from all target nodes become focus nodes of the atom message expression.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
+      <div class="description">
+         <dl>
+            <dt>has super-properties</dt>
+            <dd>
+               <a href="#AseBranchProperty" title="https://w3id.org/won/auth#AseBranchProperty">AseBranchProperty</a>
+               <sup class="type-op" title="object property">op</sup>
+            </dd>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#AtomMessagesExpression"
+                  title="https://w3id.org/won/auth#AtomMessagesExpression">AtomMessagesExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#AtomMessageExpression" title="https://w3id.org/won/auth#AtomMessageExpression">AtomMessageExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
          </dl>
       </div>
    </div>
@@ -1479,40 +1525,6 @@ This section provides details for each class and property defined by Web of Need
          </dl>
       </div>
    </div>
-   <div class="entity" id="atomMessage">
-      <h3>auth:atomMessage<sup class="type-op" title="object property">op</sup>
-         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
-         </span>
-      </h3>
-      <p>
-         <strong>IRI:</strong> https://w3id.org/won/auth#atomMessage</p>
-      <div class="comment">
-         <span class="markdown">Used in the ASE root or atom messages expressions to specify a auth:AtomMessageExpression. The atom
-     messages directly or transitively reachable from all target nodes become focus nodes of the atom message expression.</span>
-      </div>
-      <dl class="definedBy">
-         <dt>Is defined by</dt>
-         <dd>
-            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
-         </dd>
-      </dl>
-      <div class="description">
-         <dl>
-            <dt>has super-properties</dt>
-            <dd>
-               <a href="#AseBranchProperty" title="https://w3id.org/won/auth#AseBranchProperty">AseBranchProperty</a>
-               <sup class="type-op" title="object property">op</sup>
-            </dd>
-            <dt>has domain</dt>
-            <dd/>
-            <dt>has range</dt>
-            <dd>
-               <a href="#AtomMessageExpression" title="https://w3id.org/won/auth#AtomMessageExpression">AtomMessageExpression</a>
-               <sup class="type-c" title="class">c</sup>
-            </dd>
-         </dl>
-      </div>
-   </div>
    <div class="entity" id="bearer">
       <h3>bearer<sup class="type-op" title="object property">op</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
@@ -1568,7 +1580,16 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
-            <dd/>
+            <dd>
+               <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#ConnectionsExpression" title="https://w3id.org/won/auth#ConnectionsExpression">ConnectionsExpression</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#SocketExpression" title="https://w3id.org/won/auth#SocketExpression">SocketExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
             <dt>has range</dt>
             <dd>
                <a href="#ConnectionExpression" title="https://w3id.org/won/auth#ConnectionExpression">ConnectionExpression</a>
@@ -1608,6 +1629,7 @@ This section provides details for each class and property defined by Web of Need
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="http://www.w3.org/2001/XMLSchema#anyUri">any uri</span>
+               <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
       </div>
@@ -1638,7 +1660,23 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
-            <dd/>
+            <dd>
+               <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#ConnectionExpression" title="https://w3id.org/won/auth#ConnectionExpression">ConnectionExpression</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#ConnectionMessagesExpression"
+                  title="https://w3id.org/won/auth#ConnectionMessagesExpression">ConnectionMessagesExpression</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#ConnectionsExpression" title="https://w3id.org/won/auth#ConnectionsExpression">ConnectionsExpression</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#SocketExpression" title="https://w3id.org/won/auth#SocketExpression">SocketExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
             <dt>has range</dt>
             <dd>
                <a href="#ConnectionMessageExpression"
@@ -1674,7 +1712,19 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
-            <dd/>
+            <dd>
+               <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#ConnectionExpression" title="https://w3id.org/won/auth#ConnectionExpression">ConnectionExpression</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#ConnectionsExpression" title="https://w3id.org/won/auth#ConnectionsExpression">ConnectionsExpression</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#SocketExpression" title="https://w3id.org/won/auth#SocketExpression">SocketExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
             <dt>has range</dt>
             <dd>
                <a href="#ConnectionMessagesExpression"
@@ -1708,7 +1758,13 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
-            <dd/>
+            <dd>
+               <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#SocketExpression" title="https://w3id.org/won/auth#SocketExpression">SocketExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
             <dt>has range</dt>
             <dd>
                <a href="#ConnectionExpression" title="https://w3id.org/won/auth#ConnectionExpression">ConnectionExpression</a>
@@ -1741,7 +1797,13 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
-            <dd/>
+            <dd>
+               <a href="#ConnectionExpression" title="https://w3id.org/won/auth#ConnectionExpression">ConnectionExpression</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#ConnectionsExpression" title="https://w3id.org/won/auth#ConnectionsExpression">ConnectionsExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="https://w3id.org/won/core#ConnectionState">connection state</span>
@@ -1795,7 +1857,15 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
-            <dd/>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#int">int</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#integer">integer</span> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#long">long</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
             <dt>is also defined as</dt>
             <dd>data property</dd>
          </dl>
@@ -1859,7 +1929,16 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
-            <dd/>
+            <dd>
+               <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#AtomExpression" title="https://w3id.org/won/auth#AtomExpression">AtomExpression</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#GranteeWildcard" title="https://w3id.org/won/auth#GranteeWildcard">GranteeWildcard</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
          </dl>
       </div>
    </div>
@@ -1984,9 +2063,21 @@ This section provides details for each class and property defined by Web of Need
       <div class="description">
          <dl>
             <dt>has domain</dt>
-            <dd/>
+            <dd>
+               <a href="#TokenShape" title="https://w3id.org/won/auth#TokenShape">TokenShape</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#TokenSpecification" title="https://w3id.org/won/auth#TokenSpecification">TokenSpecification</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
             <dt>has range</dt>
-            <dd/>
+            <dd>
+               <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#AtomExpression" title="https://w3id.org/won/auth#AtomExpression">AtomExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
          </dl>
       </div>
    </div>
@@ -2081,7 +2172,13 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
-            <dd/>
+            <dd>
+               <a href="#MessageTypeSet" title="https://w3id.org/won/auth#MessageTypeSet">MessageTypeSet</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="https://w3id.org/won/message#MessageType">message type</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
          </dl>
       </div>
    </div>
@@ -2114,7 +2211,13 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
-            <dd/>
+            <dd>
+               <a href="#MessageTypeSet" title="https://w3id.org/won/auth#MessageTypeSet">MessageTypeSet</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="https://w3id.org/won/message#MessageType">message type</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
          </dl>
       </div>
    </div>
@@ -2248,6 +2351,15 @@ This section provides details for each class and property defined by Web of Need
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/auth#socketIri</p>
+      <div class="comment">
+         <span class="markdown">Filters focus nodes of the socket expression by socket IRI (not to be confused with auth:socketType, which filters by IRI of the socket definition).</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
       <div class="description">
          <dl>
             <dt>has super-properties</dt>
@@ -2260,9 +2372,10 @@ This section provides details for each class and property defined by Web of Need
                <a href="#SocketExpression" title="https://w3id.org/won/auth#SocketExpression">SocketExpression</a>
                <sup class="type-c" title="class">c</sup>
             </dd>
-            <dt>is also defined as</dt>
+            <dt>has range</dt>
             <dd>
-               <a href="#socketIri">data property</a>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#anyUri">any uri</span>
+               <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
       </div>
@@ -2298,6 +2411,7 @@ This section provides details for each class and property defined by Web of Need
             <dt>has range</dt>
             <dd>
                <span class="dotted" title="http://www.w3.org/2001/XMLSchema#anyUri">any uri</span>
+               <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
       </div>
@@ -2420,7 +2534,11 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
-            <dd/>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="https://w3id.org/won/core#Node">node</span>
+            </dd>
          </dl>
       </div>
    </div>
@@ -2434,13 +2552,32 @@ This section provides details for each class and property defined by Web of Need
       <div class="description">
          <dl>
             <dt>has domain</dt>
-            <dd/>
-            <dt>has range</dt>
-            <dd/>
-            <dt>is also defined as</dt>
             <dd>
-               <a href="#tokenScope">data property</a>
+               <a href="#AuthToken" title="https://w3id.org/won/auth#AuthToken">AuthToken</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#TokenShape" title="https://w3id.org/won/auth#TokenShape">TokenShape</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#TokenSpecification" title="https://w3id.org/won/auth#TokenSpecification">TokenSpecification</a>
+               <sup class="type-c" title="class">c</sup>
             </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#String">string</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#anyUri">any uri</span>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#anyUri">any uri</span>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#string">string</span>
+            </dd>
+            <dt>is also defined as</dt>
+            <dd>data property</dd>
          </dl>
       </div>
    </div>
@@ -2468,7 +2605,9 @@ This section provides details for each class and property defined by Web of Need
                <sup class="type-c" title="class">c</sup>
             </dd>
             <dt>has range</dt>
-            <dd/>
+            <dd>
+               <span class="dotted" title="https://w3id.org/won/core#Atom">atom</span>
+            </dd>
          </dl>
       </div>
    </div>
@@ -2481,11 +2620,6 @@ This section provides details for each class and property defined by Web of Need
          </a>
       </li>
       <li>
-         <a href="#socketIri" title="https://w3id.org/won/auth#socketIri">
-            <span>socketIri</span>
-         </a>
-      </li>
-      <li>
          <a href="#tokenExp" title="https://w3id.org/won/auth#tokenExp">
             <span>tokenExp</span>
          </a>
@@ -2493,11 +2627,6 @@ This section provides details for each class and property defined by Web of Need
       <li>
          <a href="#tokenIat" title="https://w3id.org/won/auth#tokenIat">
             <span>tokenIat</span>
-         </a>
-      </li>
-      <li>
-         <a href="#tokenScope" title="https://w3id.org/won/auth#tokenScope">
-            <span>tokenScope</span>
          </a>
       </li>
    </ul>
@@ -2517,26 +2646,6 @@ This section provides details for each class and property defined by Web of Need
             <dt>is also defined as</dt>
             <dd>
                <a href="#inherit">annotation property</a>
-            </dd>
-         </dl>
-      </div>
-   </div>
-   <div class="entity" id="socketIri">
-      <h3>socketIri<sup class="type-op" title="object property">op</sup>
-         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
-         </span>
-      </h3>
-      <p>
-         <strong>IRI:</strong> https://w3id.org/won/auth#socketIri</p>
-      <div class="description">
-         <dl>
-            <dt>has range</dt>
-            <dd>
-               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#anyUri">any uri</span>
-            </dd>
-            <dt>is also defined as</dt>
-            <dd>
-               <a href="#socketIri">object property</a>
             </dd>
          </dl>
       </div>
@@ -2577,24 +2686,6 @@ This section provides details for each class and property defined by Web of Need
             <dt>is also defined as</dt>
             <dd>
                <a href="#tokenIat">object property</a>
-            </dd>
-         </dl>
-      </div>
-   </div>
-   <div class="entity" id="tokenScope">
-      <h3>tokenScope<sup class="type-op" title="object property">op</sup>
-         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
-         </span>
-      </h3>
-      <p>
-         <strong>IRI:</strong> https://w3id.org/won/auth#tokenScope</p>
-      <div class="description">
-         <dl>
-            <dt>has range</dt>
-            <dd/>
-            <dt>is also defined as</dt>
-            <dd>
-               <a href="#tokenScope">object property</a>
             </dd>
          </dl>
       </div>
