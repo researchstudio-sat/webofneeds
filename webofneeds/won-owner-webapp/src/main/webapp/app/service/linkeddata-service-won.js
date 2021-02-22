@@ -24,14 +24,18 @@ import jsonld from "jsonld/dist/jsonld.min.js";
 import won from "./won.js";
 import vocab from "./vocab.js";
 
+import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
+
 (function() {
   /**
    * Loads the atom-data without following up
    * with a request for the connection-container
    * to get the connection-uris. Thus it's faster.
    */
-  won.fetchAtom = (atomUri, requestCredentials) =>
-    ownerApi
+  won.fetchAtom = (atomUri, requestCredentials) => {
+    const ldWorker = worker();
+
+    return ldWorker
       .fetchJsonLdDataset(atomUri, requestCredentials)
       .then(jsonLdData =>
         Promise.all([
@@ -77,6 +81,7 @@ import vocab from "./vocab.js";
         console.error(e.message);
         throw e;
       });
+  };
 
   won.validateEnvelopeDataForAtom = atomUri => {
     if (typeof atomUri === "undefined" || atomUri == null) {
