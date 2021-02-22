@@ -1,10 +1,10 @@
 <https://w3id.org/won/ext/hold> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
 <https://w3id.org/won/ext/hold> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/ext/hold/1.0> .
 <https://w3id.org/won/ext/hold> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core> .
-<https://w3id.org/won/ext/hold> <http://purl.org/dc/elements/1.1/abstract> "This ontology contains the definition of the *HolderSocket* and the *HoldableSocket*, the *holds* and the *heldBy* properties. These express control relationships in WoN. The Atoms holding other atoms represent agents (users or programs) and can themselves not be held."@en .
 <https://w3id.org/won/ext/hold> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
 <https://w3id.org/won/ext/hold> <http://purl.org/dc/elements/1.1/date> "2019-04-15"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/ext/hold> <http://purl.org/dc/elements/1.1/title> "Web of Needs Hold Extension" .
+<https://w3id.org/won/ext/hold> <http://purl.org/dc/terms/abstract> "This ontology contains the definition of the *HolderSocket* and the *HoldableSocket*, the *holds* and the *heldBy* properties. These express control relationships in WoN. The Atoms holding other atoms represent agents (users or programs) and can themselves not be held."@en .
 <https://w3id.org/won/ext/hold> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
 <https://w3id.org/won/ext/hold> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-hold" .
 # 
@@ -15,9 +15,6 @@
 # #
 # #################################################################
 # 
-# 
-# http://purl.org/dc/elements/1.1/abstract
-<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
 # http://purl.org/dc/elements/1.1/creator
 <http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
@@ -30,6 +27,9 @@
 # 
 # http://purl.org/dc/elements/1.1/title
 <http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/abstract
+<http://purl.org/dc/terms/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
 # http://purl.org/dc/terms/license
 <http://purl.org/dc/terms/license> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
@@ -97,6 +97,18 @@
 # https://w3id.org/won/auth#tokenScope
 <https://w3id.org/won/auth#tokenScope> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
+# https://w3id.org/won/core#autoOpen
+<https://w3id.org/won/core#autoOpen> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# https://w3id.org/won/core#compatibleSocketDefinition
+<https://w3id.org/won/core#compatibleSocketDefinition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# https://w3id.org/won/core#derivesAtomProperty
+<https://w3id.org/won/core#derivesAtomProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# https://w3id.org/won/core#socketCapacity
+<https://w3id.org/won/core#socketCapacity> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
 # 
 # 
 # #################################################################
@@ -109,13 +121,18 @@
 # https://w3id.org/won/ext/hold#heldBy
 <https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#Atom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
 <https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2002/07/owl#propertyDisjointWith> <https://w3id.org/won/ext/hold#holds> .
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en .
+<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#label> "heldBy" .
 # 
 # https://w3id.org/won/ext/hold#holds
 <https://w3id.org/won/ext/hold#holds> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
 <https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en .
+<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#label> "holds" .
 # 
 # 
 # 
@@ -132,6 +149,11 @@
 # https://w3id.org/won/auth#TokenScope
 <https://w3id.org/won/auth#TokenScope> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 # 
+# https://w3id.org/won/core#Atom
+# 
+# https://w3id.org/won/core#SocketDefinition
+<https://w3id.org/won/core#SocketDefinition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
 # 
 # 
 # #################################################################
@@ -144,43 +166,41 @@
 # https://w3id.org/won/ext/hold#HoldableSocket
 <https://w3id.org/won/ext/hold#HoldableSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/hold#HoldableSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
-<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/hold#HolderSocket> .
-<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/hold#heldBy> .
-<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/ext/hold#HoldableSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it."@en .
 <https://w3id.org/won/ext/hold#HoldableSocket> <http://www.w3.org/2000/01/rdf-schema#label> "HoldableSocket" .
 <https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/hold#grantAccessToHolderAuth> .
 <https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/hold#grantReadViaHolderAuth> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/hold#HolderSocket> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/hold#heldBy> .
+<https://w3id.org/won/ext/hold#HoldableSocket> <https://w3id.org/won/core#socketCapacity> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 # 
 # https://w3id.org/won/ext/hold#HolderSocket
 <https://w3id.org/won/ext/hold#HolderSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/hold#HolderSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
-<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/hold#HoldableSocket> .
-<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/hold#holds> .
-<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 <https://w3id.org/won/ext/hold#HolderSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "A Persona Atom uses a Socket with this configuration to connect to Atoms it holds."@en .
 <https://w3id.org/won/ext/hold#HolderSocket> <http://www.w3.org/2000/01/rdf-schema#label> "HolderSocket" .
 <https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/hold#grantReadViaHeldAuth> .
+<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#autoOpen> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/hold#HoldableSocket> .
+<https://w3id.org/won/ext/hold#HolderSocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/hold#holds> .
 # 
 # https://w3id.org/won/ext/hold#ScopeReadHeldAtoms
 <https://w3id.org/won/ext/hold#ScopeReadHeldAtoms> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/hold#ScopeReadHeldAtoms> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TokenScope> .
-<https://w3id.org/won/ext/hold#ScopeReadHeldAtoms> <http://www.w3.org/2000/01/rdf-schema#comment> "Tokens with this scope, signed by the holder of an atom, provide read/connect\r\n               access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."@en .
+<https://w3id.org/won/ext/hold#ScopeReadHeldAtoms> <http://www.w3.org/2000/01/rdf-schema#comment> "Tokens with this scope, signed by the holder of an atom, provide read/connect\n               access to the holder's atoms (see https://w3id.org/won/ext/hold#HoldableSocket)."@en .
 <https://w3id.org/won/ext/hold#ScopeReadHeldAtoms> <http://www.w3.org/2000/01/rdf-schema#label> "ScopeReadHeldAtoms" .
 # 
 # https://w3id.org/won/ext/hold#ScopeReadHolderAtom
 <https://w3id.org/won/ext/hold#ScopeReadHolderAtom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/hold#ScopeReadHolderAtom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TokenScope> .
-<https://w3id.org/won/ext/hold#ScopeReadHolderAtom> <http://www.w3.org/2000/01/rdf-schema#comment> "Tokens with this scope, provide read/connect\r\n               access to the holder of an atom (see https://w3id.org/won/ext/hold#HolderSocket)."@en .
+<https://w3id.org/won/ext/hold#ScopeReadHolderAtom> <http://www.w3.org/2000/01/rdf-schema#comment> "Tokens with this scope, provide read/connect\n               access to the holder of an atom (see https://w3id.org/won/ext/hold#HolderSocket)."@en .
 <https://w3id.org/won/ext/hold#ScopeReadHolderAtom> <http://www.w3.org/2000/01/rdf-schema#label> "ScopeReadHolderAtom" .
 # 
 # https://w3id.org/won/ext/hold#grantAccessToHolderAuth
 <https://w3id.org/won/ext/hold#grantAccessToHolderAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/hold#grantAccessToHolderAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/ext/hold#grantAccessToHolderAuth> <http://www.w3.org/2000/01/rdf-schema#label> "grantAccessToHolderAuth" .
+<https://w3id.org/won/ext/hold#grantAccessToHolderAuth> <http://www.w3.org/2000/01/rdf-schema#label> "GrantAccessToHolderAuth" .
 <https://w3id.org/won/ext/hold#grantAccessToHolderAuth> <https://w3id.org/won/auth#grant> _:genid1 .
 _:genid1 <https://w3id.org/won/auth#operation> _:genid2 .
 _:genid2 <https://w3id.org/won/auth#requestToken> _:genid3 .
@@ -242,25 +262,6 @@ _:genid26 <https://w3id.org/won/auth#connectionMessages> _:genid27 .
 _:genid27 <https://w3id.org/won/auth#inherit> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 _:genid26 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 _:genid25 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/hold#HoldableSocket> .
-# 
-# https://w3id.org/won/ext/hold#heldBy
-# 
-# https://w3id.org/won/ext/hold#holds
-# 
-# 
-# 
-# #################################################################
-# #
-# #    Annotations
-# #
-# #################################################################
-# 
-# 
-<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#comment> "Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both."@en .
-<https://w3id.org/won/ext/hold#heldBy> <http://www.w3.org/2000/01/rdf-schema#label> "heldBy" .
-# 
-<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#comment> "Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control."@en .
-<https://w3id.org/won/ext/hold#holds> <http://www.w3.org/2000/01/rdf-schema#label> "holds" .
 # 
 # 
 # 

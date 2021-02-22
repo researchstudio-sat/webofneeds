@@ -15,56 +15,54 @@
     "@value" : "3600"
   } ],
   "https://w3id.org/won/auth#tokenScope" : [ {
-    "@id" : "https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"
+    "@id" : "https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"
   } ]
 }, {
   "@id" : "_:genid12",
-  "https://w3id.org/won/auth#socket" : [ {
+  "https://w3id.org/won/auth#requestToken" : [ {
     "@id" : "_:genid13"
   } ]
 }, {
   "@id" : "_:genid13",
-  "https://w3id.org/won/auth#connection" : [ {
-    "@id" : "_:genid14"
-  } ],
-  "https://w3id.org/won/auth#socketType" : [ {
-    "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
-  } ]
-}, {
-  "@id" : "_:genid14",
-  "https://w3id.org/won/auth#connectionState" : [ {
-    "@id" : "https://w3id.org/won/core#Connected"
-  } ],
-  "https://w3id.org/won/auth#targetAtom" : [ {
-    "@id" : "_:genid15"
-  } ]
-}, {
-  "@id" : "_:genid16",
-  "https://w3id.org/won/auth#issuer" : [ {
-    "@id" : "_:genid17"
+  "https://w3id.org/won/auth#expiresAfter" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "3600"
   } ],
   "https://w3id.org/won/auth#tokenScope" : [ {
     "@id" : "https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"
   } ]
 }, {
-  "@id" : "_:genid17",
+  "@id" : "_:genid14",
   "https://w3id.org/won/auth#socket" : [ {
-    "@id" : "_:genid18"
+    "@id" : "_:genid15"
   } ]
 }, {
-  "@id" : "_:genid18",
+  "@id" : "_:genid15",
   "https://w3id.org/won/auth#connection" : [ {
-    "@id" : "_:genid19"
+    "@id" : "_:genid16"
   } ],
   "https://w3id.org/won/auth#socketType" : [ {
     "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
   } ]
 }, {
-  "@id" : "_:genid19",
+  "@id" : "_:genid16",
   "https://w3id.org/won/auth#connectionState" : [ {
     "@id" : "https://w3id.org/won/core#Connected"
   } ],
   "https://w3id.org/won/auth#targetAtom" : [ {
+    "@id" : "_:genid17"
+  } ]
+}, {
+  "@id" : "_:genid18",
+  "https://w3id.org/won/auth#issuer" : [ {
+    "@id" : "_:genid19"
+  } ],
+  "https://w3id.org/won/auth#tokenScope" : [ {
+    "@id" : "https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"
+  } ]
+}, {
+  "@id" : "_:genid19",
+  "https://w3id.org/won/auth#socket" : [ {
     "@id" : "_:genid20"
   } ]
 }, {
@@ -74,19 +72,26 @@
   } ],
   "https://w3id.org/won/auth#socketType" : [ {
     "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
+  }, {
+    "@id" : "https://w3id.org/won/ext/persona#ExpertiseSocket"
+  }, {
+    "@id" : "https://w3id.org/won/ext/persona#InterestSocket"
   } ]
 }, {
-  "@id" : "_:genid21",
-  "https://w3id.org/won/auth#socket" : [ {
-    "@id" : "_:genid22"
-  } ]
-}, {
-  "@id" : "_:genid22",
-  "https://w3id.org/won/auth#operation" : [ {
-    "@id" : "https://w3id.org/won/auth#opConnectClose"
+  "@id" : "_:genid20",
+  "https://w3id.org/won/auth#connection" : [ {
+    "@id" : "_:genid21"
   } ],
   "https://w3id.org/won/auth#socketType" : [ {
     "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
+  } ]
+}, {
+  "@id" : "_:genid21",
+  "https://w3id.org/won/auth#connectionState" : [ {
+    "@id" : "https://w3id.org/won/core#Connected"
+  } ],
+  "https://w3id.org/won/auth#targetAtom" : [ {
+    "@id" : "_:genid22"
   } ]
 }, {
   "@id" : "_:genid23",
@@ -102,6 +107,19 @@
   } ],
   "https://w3id.org/won/auth#operation" : [ {
     "@id" : "https://w3id.org/won/auth#opRead"
+  } ]
+}, {
+  "@id" : "_:genid25",
+  "https://w3id.org/won/auth#socket" : [ {
+    "@id" : "_:genid26"
+  } ]
+}, {
+  "@id" : "_:genid26",
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "https://w3id.org/won/auth#opConnectClose"
+  } ],
+  "https://w3id.org/won/auth#socketType" : [ {
+    "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
   } ]
 }, {
   "@id" : "_:genid3",
@@ -142,6 +160,8 @@
     "@id" : "_:genid8"
   }, {
     "@id" : "_:genid10"
+  }, {
+    "@id" : "_:genid12"
   } ]
 }, {
   "@id" : "_:genid8",
@@ -155,11 +175,8 @@
     "@value" : "3600"
   } ],
   "https://w3id.org/won/auth#tokenScope" : [ {
-    "@id" : "https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"
+    "@id" : "https://w3id.org/won/ext/buddy#BuddySocket"
   } ]
-}, {
-  "@id" : "http://purl.org/dc/elements/1.1/abstract",
-  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://purl.org/dc/elements/1.1/creator",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
@@ -171,6 +188,9 @@
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://purl.org/dc/elements/1.1/title",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "http://purl.org/dc/terms/abstract",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
   "@id" : "http://purl.org/dc/terms/created",
@@ -248,17 +268,29 @@
   "@id" : "https://w3id.org/won/auth#tokenScope",
   "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
 }, {
+  "@id" : "https://w3id.org/won/core#Atom",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
+}, {
+  "@id" : "https://w3id.org/won/core#SocketDefinition",
+  "@type" : [ "http://www.w3.org/2002/07/owl#Class" ]
+}, {
+  "@id" : "https://w3id.org/won/core#compatibleSocketDefinition",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
+  "@id" : "https://w3id.org/won/core#derivesAtomProperty",
+  "@type" : [ "http://www.w3.org/2002/07/owl#AnnotationProperty" ]
+}, {
   "@id" : "https://w3id.org/won/ext/buddy",
   "@type" : [ "http://www.w3.org/2002/07/owl#Ontology" ],
-  "http://purl.org/dc/elements/1.1/abstract" : [ {
-    "@language" : "en",
-    "@value" : "This ontology contains the definition of the BuddySocket, which, when used to establish a connection, derives a *buddy* relationship between the Atoms."
-  } ],
   "http://purl.org/dc/elements/1.1/creator" : [ {
     "@value" : "Florian Kleedorfer"
   } ],
   "http://purl.org/dc/elements/1.1/title" : [ {
     "@value" : "Web of Needs Buddy Extension"
+  } ],
+  "http://purl.org/dc/terms/abstract" : [ {
+    "@language" : "en",
+    "@value" : "This ontology contains the definition of the BuddySocket, which, when used to establish a connection, derives a *buddy* relationship between the Atoms."
   } ],
   "http://purl.org/dc/terms/created" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#date",
@@ -291,7 +323,7 @@
     "@value" : "BuddySocket"
   } ],
   "https://w3id.org/won/auth#localAuth" : [ {
-    "@id" : "https://w3id.org/won/ext/buddy#grantAccessToBuddies"
+    "@id" : "https://w3id.org/won/ext/buddy#grantAccessForBuddies"
   }, {
     "@id" : "https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy"
   } ],
@@ -313,7 +345,7 @@
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/buddy#buddy",
-  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/2002/07/owl#NamedIndividual" ],
+  "@type" : [ "http://www.w3.org/2002/07/owl#ObjectProperty" ],
   "http://www.w3.org/2000/01/rdf-schema#comment" : [ {
     "@language" : "en",
     "@value" : "Links a buddy Atom to one of its buddies. This should generally imply natural\n                       persons on both ends. We interpret buddies are people who like to do things\n                       together; such as engaging in sports or other social activities."
@@ -331,25 +363,31 @@
     "@id" : "http://schema.org/knows"
   } ]
 }, {
-  "@id" : "https://w3id.org/won/ext/buddy#grantAccessToBuddies",
+  "@id" : "https://w3id.org/won/ext/buddy#grantAccessForBuddies",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "GrantAccessForBuddies"
+  } ],
   "https://w3id.org/won/auth#grant" : [ {
     "@id" : "_:genid1"
   }, {
     "@id" : "_:genid7"
   } ],
   "https://w3id.org/won/auth#grantee" : [ {
-    "@id" : "_:genid12"
+    "@id" : "_:genid14"
   } ]
 }, {
   "@id" : "https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "GrantReadConnectToBuddyOfBuddy"
+  } ],
   "https://w3id.org/won/auth#bearer" : [ {
-    "@id" : "_:genid16"
+    "@id" : "_:genid18"
   } ],
   "https://w3id.org/won/auth#grant" : [ {
-    "@id" : "_:genid21"
-  }, {
     "@id" : "_:genid23"
+  }, {
+    "@id" : "_:genid25"
   } ]
 } ]

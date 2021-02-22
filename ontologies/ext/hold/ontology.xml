@@ -9,16 +9,15 @@
      xmlns:auth="https://w3id.org/won/auth#"
      xmlns:core="https://w3id.org/won/core#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
      xmlns:vann="http://purl.org/vocab/vann/"
      xmlns:terms="http://purl.org/dc/terms/">
     <owl:Ontology rdf:about="https://w3id.org/won/ext/hold">
         <owl:versionIRI rdf:resource="https://w3id.org/won/ext/hold/1.0"/>
         <owl:imports rdf:resource="https://w3id.org/won/core"/>
-        <dc:abstract xml:lang="en">This ontology contains the definition of the *HolderSocket* and the *HoldableSocket*, the *holds* and the *heldBy* properties. These express control relationships in WoN. The Atoms holding other atoms represent agents (users or programs) and can themselves not be held.</dc:abstract>
         <dc:creator>Florian Kleedorfer</dc:creator>
         <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-04-15</dc:date>
         <dc:title>Web of Needs Hold Extension</dc:title>
+        <terms:abstract xml:lang="en">This ontology contains the definition of the *HolderSocket* and the *HoldableSocket*, the *holds* and the *heldBy* properties. These express control relationships in WoN. The Atoms holding other atoms represent agents (users or programs) and can themselves not be held.</terms:abstract>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
         <vann:preferredNamespacePrefix>wx-hold</vann:preferredNamespacePrefix>
     </owl:Ontology>
@@ -34,13 +33,6 @@
      -->
 
 
-    
-
-
-    <!-- http://purl.org/dc/elements/1.1/abstract -->
-
-
-    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/abstract"/>
     
 
 
@@ -69,6 +61,13 @@
 
 
     <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/abstract"/>
     
 
 
@@ -226,6 +225,34 @@
     
 
 
+    <!-- https://w3id.org/won/core#autoOpen -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#autoOpen"/>
+    
+
+
+    <!-- https://w3id.org/won/core#compatibleSocketDefinition -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#compatibleSocketDefinition"/>
+    
+
+
+    <!-- https://w3id.org/won/core#derivesAtomProperty -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#derivesAtomProperty"/>
+    
+
+
+    <!-- https://w3id.org/won/core#socketCapacity -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#socketCapacity"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -245,6 +272,8 @@
         <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
         <owl:propertyDisjointWith rdf:resource="https://w3id.org/won/ext/hold#holds"/>
+        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
+        <rdfs:label>heldBy</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -255,6 +284,8 @@
     <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/hold#holds">
         <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
+        <rdfs:label>holds</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -285,6 +316,20 @@
     
 
 
+    <!-- https://w3id.org/won/core#Atom -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#Atom"/>
+    
+
+
+    <!-- https://w3id.org/won/core#SocketDefinition -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#SocketDefinition"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -302,14 +347,14 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#HoldableSocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
-        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/hold#HolderSocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/hold#heldBy"/>
-        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
-        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to connect to the Persona Atom that holds it.</rdfs:comment>
         <rdfs:label>HoldableSocket</rdfs:label>
         <auth:localAuth rdf:resource="https://w3id.org/won/ext/hold#grantAccessToHolderAuth"/>
         <auth:localAuth rdf:resource="https://w3id.org/won/ext/hold#grantReadViaHolderAuth"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/hold#HolderSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/hold#heldBy"/>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
     </owl:NamedIndividual>
     
 
@@ -319,12 +364,12 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#HolderSocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
-        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/hold#HoldableSocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/hold#holds"/>
-        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
         <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to connect to Atoms it holds.</rdfs:comment>
         <rdfs:label>HolderSocket</rdfs:label>
         <auth:localAuth rdf:resource="https://w3id.org/won/ext/hold#grantReadViaHeldAuth"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/hold#HoldableSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/hold#holds"/>
     </owl:NamedIndividual>
     
 
@@ -358,7 +403,7 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#grantAccessToHolderAuth">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
-        <rdfs:label>grantAccessToHolderAuth</rdfs:label>
+        <rdfs:label>GrantAccessToHolderAuth</rdfs:label>
         <auth:grant rdf:nodeID="genid1"/>
         <auth:grantee>
             <rdf:Description>
@@ -492,40 +537,6 @@
             </rdf:Description>
         </auth:connectionMessages>
         <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
-    </rdf:Description>
-    
-
-
-    <!-- https://w3id.org/won/ext/hold#heldBy -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#heldBy"/>
-    
-
-
-    <!-- https://w3id.org/won/ext/hold#holds -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/hold#holds"/>
-    
-
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Annotations
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-
-    <rdf:Description rdf:about="https://w3id.org/won/ext/hold#heldBy">
-        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
-        <rdfs:label>heldBy</rdfs:label>
-    </rdf:Description>
-    <rdf:Description rdf:about="https://w3id.org/won/ext/hold#holds">
-        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
-        <rdfs:label>holds</rdfs:label>
     </rdf:Description>
     
 

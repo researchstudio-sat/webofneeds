@@ -9,15 +9,14 @@
      xmlns:auth="https://w3id.org/won/auth#"
      xmlns:core="https://w3id.org/won/core#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
      xmlns:vann="http://purl.org/vocab/vann/"
      xmlns:terms="http://purl.org/dc/terms/">
     <owl:Ontology rdf:about="https://w3id.org/won/ext/buddy">
         <owl:versionIRI rdf:resource="https://w3id.org/won/ext/buddy/1.0"/>
         <owl:imports rdf:resource="https://w3id.org/won/core"/>
-        <dc:abstract xml:lang="en">This ontology contains the definition of the BuddySocket, which, when used to establish a connection, derives a *buddy* relationship between the Atoms.</dc:abstract>
         <dc:creator>Florian Kleedorfer</dc:creator>
         <dc:title>Web of Needs Buddy Extension</dc:title>
+        <terms:abstract xml:lang="en">This ontology contains the definition of the BuddySocket, which, when used to establish a connection, derives a *buddy* relationship between the Atoms.</terms:abstract>
         <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-04-15</terms:created>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
         <vann:preferredNamespacePrefix>wx-buddy</vann:preferredNamespacePrefix>
@@ -35,13 +34,6 @@
      -->
 
 
-    
-
-
-    <!-- http://purl.org/dc/elements/1.1/abstract -->
-
-
-    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/abstract"/>
     
 
 
@@ -70,6 +62,13 @@
 
 
     <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/abstract"/>
     
 
 
@@ -227,6 +226,20 @@
     
 
 
+    <!-- https://w3id.org/won/core#compatibleSocketDefinition -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#compatibleSocketDefinition"/>
+    
+
+
+    <!-- https://w3id.org/won/core#derivesAtomProperty -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#derivesAtomProperty"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -253,6 +266,10 @@
         <rdfs:subPropertyOf rdf:resource="http://schema.org/knows"/>
         <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:comment xml:lang="en">Links a buddy Atom to one of its buddies. This should generally imply natural
+                       persons on both ends. We interpret buddies are people who like to do things
+                       together; such as engaging in sports or other social activities.</rdfs:comment>
+        <rdfs:label>buddy</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -283,6 +300,20 @@
     
 
 
+    <!-- https://w3id.org/won/core#Atom -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#Atom"/>
+    
+
+
+    <!-- https://w3id.org/won/core#SocketDefinition -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#SocketDefinition"/>
+    
+
+
     <!-- 
     ///////////////////////////////////////////////////////////////////////////////////////
     //
@@ -300,8 +331,6 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/buddy#BuddySocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
-        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/buddy#buddy"/>
         <rdfs:comment xml:lang="en">Compatible with other BuddySockets, derives the buddy relationship. Installs local
                                    authorizations that
                                    &lt;ol&gt;
@@ -315,8 +344,10 @@
                                    &lt;/li&gt;
                                    &lt;/ol&gt;</rdfs:comment>
         <rdfs:label>BuddySocket</rdfs:label>
-        <auth:localAuth rdf:resource="https://w3id.org/won/ext/buddy#grantAccessToBuddies"/>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/buddy#grantAccessForBuddies"/>
         <auth:localAuth rdf:resource="https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/buddy#buddy"/>
     </owl:NamedIndividual>
     
 
@@ -333,90 +364,87 @@
     
 
 
-    <!-- https://w3id.org/won/ext/buddy#buddy -->
+    <!-- https://w3id.org/won/ext/buddy#grantAccessForBuddies -->
 
 
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/buddy#buddy"/>
-    
-
-
-    <!-- https://w3id.org/won/ext/buddy#grantAccessToBuddies -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/buddy#grantAccessToBuddies">
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/buddy#grantAccessForBuddies">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantAccessForBuddies</rdfs:label>
         <auth:grant>
             <rdf:Description>
-                <auth:socket>
-                    <rdf:Description rdf:nodeID="genid2">
-                        <auth:connections>
-                            <rdf:Description rdf:nodeID="genid3">
-                                <auth:connection>
-                                    <rdf:Description>
-                                        <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
-                                    </rdf:Description>
-                                </auth:connection>
-                                <auth:connection>
-                                    <rdf:Description rdf:nodeID="genid5">
-                                        <auth:connectionMessages>
-                                            <rdf:Description>
-                                                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
-                                            </rdf:Description>
-                                        </auth:connectionMessages>
-                                        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
-                                        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
-                                    </rdf:Description>
-                                </auth:connection>
-                                <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
-                            </rdf:Description>
-                        </auth:connections>
-                        <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
-                    </rdf:Description>
-                </auth:socket>
+                <auth:socket rdf:nodeID="genid2"/>
             </rdf:Description>
         </auth:grant>
-        <auth:grant>
-            <rdf:Description rdf:nodeID="genid7">
-                <auth:operation>
-                    <rdf:Description>
-                        <auth:requestToken>
-                            <rdf:Description rdf:nodeID="genid9">
-                                <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
-                                <auth:tokenScope rdf:resource="https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"/>
-                            </rdf:Description>
-                        </auth:requestToken>
-                    </rdf:Description>
-                </auth:operation>
-                <auth:operation>
-                    <rdf:Description>
-                        <auth:requestToken>
-                            <rdf:Description rdf:nodeID="genid11">
-                                <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
-                                <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"/>
-                            </rdf:Description>
-                        </auth:requestToken>
-                    </rdf:Description>
-                </auth:operation>
-            </rdf:Description>
-        </auth:grant>
+        <auth:grant rdf:nodeID="genid7"/>
         <auth:grantee>
             <rdf:Description>
-                <auth:socket>
-                    <rdf:Description rdf:nodeID="genid13">
-                        <auth:connection>
-                            <rdf:Description rdf:nodeID="genid14">
-                                <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
-                                <auth:targetAtom>
-                                    <rdf:Description/>
-                                </auth:targetAtom>
-                            </rdf:Description>
-                        </auth:connection>
-                        <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
-                    </rdf:Description>
-                </auth:socket>
+                <auth:socket rdf:nodeID="genid15"/>
             </rdf:Description>
         </auth:grantee>
     </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid2">
+        <auth:connections rdf:nodeID="genid3"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#ExpertiseSocket"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#InterestSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid7">
+        <auth:operation>
+            <rdf:Description>
+                <auth:requestToken rdf:nodeID="genid9"/>
+            </rdf:Description>
+        </auth:operation>
+        <auth:operation>
+            <rdf:Description>
+                <auth:requestToken rdf:nodeID="genid11"/>
+            </rdf:Description>
+        </auth:operation>
+        <auth:operation>
+            <rdf:Description>
+                <auth:requestToken rdf:nodeID="genid13"/>
+            </rdf:Description>
+        </auth:operation>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid15">
+        <auth:connection rdf:nodeID="genid16"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid3">
+        <auth:connection>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connection>
+        <auth:connection rdf:nodeID="genid5"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid9">
+        <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
+        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid11">
+        <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
+        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/hold#ScopeReadHeldAtoms"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid13">
+        <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
+        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid16">
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:targetAtom>
+            <rdf:Description/>
+        </auth:targetAtom>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid5">
+        <auth:connectionMessages>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connectionMessages>
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
     
 
 
@@ -425,72 +453,50 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
-        <auth:bearer>
-            <rdf:Description rdf:nodeID="genid16">
-                <auth:issuer>
-                    <rdf:Description>
-                        <auth:socket>
-                            <rdf:Description rdf:nodeID="genid18">
-                                <auth:connection>
-                                    <rdf:Description rdf:nodeID="genid19">
-                                        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
-                                        <auth:targetAtom>
-                                            <rdf:Description/>
-                                        </auth:targetAtom>
-                                    </rdf:Description>
-                                </auth:connection>
-                                <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
-                            </rdf:Description>
-                        </auth:socket>
-                    </rdf:Description>
-                </auth:issuer>
-                <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"/>
-            </rdf:Description>
-        </auth:bearer>
+        <rdfs:label>GrantReadConnectToBuddyOfBuddy</rdfs:label>
+        <auth:bearer rdf:nodeID="genid18"/>
         <auth:grant>
             <rdf:Description>
-                <auth:socket>
-                    <rdf:Description rdf:nodeID="genid22">
-                        <auth:operation rdf:resource="https://w3id.org/won/auth#opConnectClose"/>
-                        <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
-                    </rdf:Description>
-                </auth:socket>
+                <auth:graph rdf:nodeID="genid24"/>
             </rdf:Description>
         </auth:grant>
         <auth:grant>
             <rdf:Description>
-                <auth:graph>
-                    <rdf:Description rdf:nodeID="genid24">
-                        <auth:graphType rdf:resource="https://w3id.org/won/auth#contentGraph"/>
-                        <auth:graphType rdf:resource="https://w3id.org/won/auth#sysinfoGraph"/>
-                        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
-                    </rdf:Description>
-                </auth:graph>
+                <auth:socket rdf:nodeID="genid26"/>
             </rdf:Description>
         </auth:grant>
     </owl:NamedIndividual>
-    
-
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Annotations
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-
-    <rdf:Description rdf:about="https://w3id.org/won/ext/buddy#buddy">
-        <rdfs:comment xml:lang="en">Links a buddy Atom to one of its buddies. This should generally imply natural
-                       persons on both ends. We interpret buddies are people who like to do things
-                       together; such as engaging in sports or other social activities.</rdfs:comment>
-        <rdfs:label>buddy</rdfs:label>
+    <rdf:Description rdf:nodeID="genid18">
+        <auth:issuer>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid20"/>
+            </rdf:Description>
+        </auth:issuer>
+        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid24">
+        <auth:graphType rdf:resource="https://w3id.org/won/auth#contentGraph"/>
+        <auth:graphType rdf:resource="https://w3id.org/won/auth#sysinfoGraph"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid26">
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opConnectClose"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid20">
+        <auth:connection rdf:nodeID="genid21"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid21">
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:targetAtom>
+            <rdf:Description/>
+        </auth:targetAtom>
     </rdf:Description>
 </rdf:RDF>
 
 
 
-<!-- Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/ -->
+<!-- Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/ -->
 
 

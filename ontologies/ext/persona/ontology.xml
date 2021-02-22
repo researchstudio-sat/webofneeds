@@ -6,18 +6,18 @@
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:xml="http://www.w3.org/XML/1998/namespace"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:auth="https://w3id.org/won/auth#"
      xmlns:core="https://w3id.org/won/core#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
      xmlns:vann="http://purl.org/vocab/vann/"
      xmlns:terms="http://purl.org/dc/terms/">
     <owl:Ontology rdf:about="https://w3id.org/won/ext/persona">
         <owl:versionIRI rdf:resource="https://w3id.org/won/ext/persona/1.0"/>
         <owl:imports rdf:resource="https://w3id.org/won/core"/>
-        <dc:abstract xml:lang="en">This ontology contains the definition of the *InterestSocket* the *InterestOfSocket* the *ExpertiseSocket* and the *ExpertiseOfSocket*, the *interest* the *interestOf* the *expertise* and the *expertOf* properties. These express control relationships in WoN. The Atoms with expertise/interest in other atoms represent agents (users or programs) and can themselves not be interests/expertises of other atoms.</dc:abstract>
         <dc:creator>Fabian Suda</dc:creator>
         <dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2021-02-02</dc:date>
         <dc:title>Web of Needs Persona Extension</dc:title>
+        <terms:abstract xml:lang="en">This ontology contains the definition of the *InterestSocket* the *InterestOfSocket* the *ExpertiseSocket* and the *ExpertiseOfSocket*, the *interest* the *interestOf* the *expertise* and the *expertOf* properties. These express control relationships in WoN. The Atoms with expertise/interest in other atoms represent agents (users or programs) and can themselves not be interests/expertises of other atoms.</terms:abstract>
         <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
         <vann:preferredNamespacePrefix>wx-persona</vann:preferredNamespacePrefix>
     </owl:Ontology>
@@ -33,13 +33,6 @@
      -->
 
 
-    
-
-
-    <!-- http://purl.org/dc/elements/1.1/abstract -->
-
-
-    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/abstract"/>
     
 
 
@@ -71,6 +64,13 @@
     
 
 
+    <!-- http://purl.org/dc/terms/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/abstract"/>
+    
+
+
     <!-- http://purl.org/dc/terms/license -->
 
 
@@ -89,6 +89,125 @@
 
 
     <owl:AnnotationProperty rdf:about="http://www.w3.org/2000/01/rdf-schema#labels"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#bearer -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#bearer"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connection -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connection"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connectionState -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connectionState"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#grant -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#grant"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#graph -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#graph"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#graphType -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#graphType"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#issuer -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#issuer"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#localAuth -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#localAuth"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#operation -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#operation"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#socket -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#socket"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#socketType -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#socketType"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#targetAtom -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#targetAtom"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#tokenScope -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#tokenScope"/>
+    
+
+
+    <!-- https://w3id.org/won/core#autoOpen -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#autoOpen"/>
+    
+
+
+    <!-- https://w3id.org/won/core#compatibleSocketDefinition -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#compatibleSocketDefinition"/>
+    
+
+
+    <!-- https://w3id.org/won/core#derivesAtomProperty -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#derivesAtomProperty"/>
+    
+
+
+    <!-- https://w3id.org/won/core#socketCapacity -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/core#socketCapacity"/>
     
 
 
@@ -111,6 +230,8 @@
         <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
         <owl:propertyDisjointWith rdf:resource="https://w3id.org/won/ext/persona#expertiseOf"/>
+        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
+        <rdfs:label>expertise</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -121,6 +242,8 @@
     <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/persona#expertiseOf">
         <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
+        <rdfs:label>expertiseOf</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -132,6 +255,8 @@
         <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
         <owl:propertyDisjointWith rdf:resource="https://w3id.org/won/ext/persona#interestOf"/>
+        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
+        <rdfs:label>interest</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -142,6 +267,8 @@
     <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/persona#interestOf">
         <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
         <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
+        <rdfs:label>interestOf</rdfs:label>
     </owl:ObjectProperty>
     
 
@@ -155,6 +282,27 @@
      -->
 
 
+    
+
+
+    <!-- https://w3id.org/won/auth#Authorization -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/auth#Authorization"/>
+    
+
+
+    <!-- https://w3id.org/won/core#Atom -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#Atom"/>
+    
+
+
+    <!-- https://w3id.org/won/core#SocketDefinition -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/core#SocketDefinition"/>
     
 
 
@@ -195,12 +343,13 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#ExpertiseOfSocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
-        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#ExpertiseSocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#expertiseOf"/>
-        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
-        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to identify an expertise of the Persona Atom that it is connected to</rdfs:comment>
         <rdfs:label>ExpertiseOfSocket</rdfs:label>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/persona#grantReadExpertisesViaBuddyAuth"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#ExpertiseSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#expertiseOf"/>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
     </owl:NamedIndividual>
     
 
@@ -210,11 +359,11 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#ExpertiseSocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
-        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#ExpertiseOfSocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#expertise"/>
-        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
         <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to represent Expertises.</rdfs:comment>
         <rdfs:label>ExpertiseSocket</rdfs:label>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#ExpertiseOfSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#expertise"/>
     </owl:NamedIndividual>
     
 
@@ -224,12 +373,13 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#InterestOfSocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
-        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#InterestSocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#interestOf"/>
-        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
-        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
         <rdfs:comment xml:lang="en">An Atom uses a Socket with this configuration to identify an interest of the Persona Atom that it is connected to.</rdfs:comment>
         <rdfs:label>InterestOfSocket</rdfs:label>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/persona#grantReadInterestsViaBuddyAuth"/>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#InterestSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#interestOf"/>
+        <core:socketCapacity rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</core:socketCapacity>
     </owl:NamedIndividual>
     
 
@@ -239,67 +389,87 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#InterestSocket">
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
-        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#InterestOfSocket"/>
-        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#interest"/>
-        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
         <rdfs:comment xml:lang="en">A Persona Atom uses a Socket with this configuration to represent Interests.</rdfs:comment>
         <rdfs:label>InterestSocket</rdfs:label>
+        <core:autoOpen rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</core:autoOpen>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/persona#InterestOfSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/persona#interest"/>
     </owl:NamedIndividual>
     
 
 
-    <!-- https://w3id.org/won/ext/persona#expertise -->
+    <!-- https://w3id.org/won/ext/persona#grantReadExpertisesViaBuddyAuth -->
 
 
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#expertise"/>
-    
-
-
-    <!-- https://w3id.org/won/ext/persona#expertiseOf -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#expertiseOf"/>
-    
-
-
-    <!-- https://w3id.org/won/ext/persona#interest -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#interest"/>
-    
-
-
-    <!-- https://w3id.org/won/ext/persona#interestOf -->
-
-
-    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#interestOf"/>
-    
-
-
-    <!-- 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //
-    // Annotations
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////
-     -->
-
-
-    <rdf:Description rdf:about="https://w3id.org/won/ext/persona#expertise">
-        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
-        <rdfs:label>expertise</rdfs:label>
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#grantReadExpertisesViaBuddyAuth">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantReadViaBuddyAuth</rdfs:label>
+        <auth:bearer rdf:nodeID="genid1"/>
+        <auth:grant>
+            <rdf:Description>
+                <auth:graph rdf:nodeID="genid7"/>
+            </rdf:Description>
+        </auth:grant>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid1">
+        <auth:issuer>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid3"/>
+            </rdf:Description>
+        </auth:issuer>
+        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
     </rdf:Description>
-    <rdf:Description rdf:about="https://w3id.org/won/ext/persona#expertiseOf">
-        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
-        <rdfs:label>expertiseOf</rdfs:label>
+    <rdf:Description rdf:nodeID="genid7">
+        <auth:graphType rdf:resource="https://w3id.org/won/auth#contentGraph"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
     </rdf:Description>
-    <rdf:Description rdf:about="https://w3id.org/won/ext/persona#interest">
-        <rdfs:comment xml:lang="en">Links the Atom representing an agent (a person, organization, bot, ...) to another Atom they control.</rdfs:comment>
-        <rdfs:label>interest</rdfs:label>
+    <rdf:Description rdf:nodeID="genid3">
+        <auth:connection rdf:nodeID="genid4"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#ExpertiseOfSocket"/>
     </rdf:Description>
-    <rdf:Description rdf:about="https://w3id.org/won/ext/persona#interestOf">
-        <rdfs:comment xml:lang="en">Links an Atom to the Atom representing the agent (a person, organization, bot, ...) that controls both.</rdfs:comment>
-        <rdfs:label>interestOf</rdfs:label>
+    <rdf:Description rdf:nodeID="genid4">
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:targetAtom>
+            <rdf:Description/>
+        </auth:targetAtom>
+    </rdf:Description>
+    
+
+
+    <!-- https://w3id.org/won/ext/persona#grantReadInterestsViaBuddyAuth -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/persona#grantReadInterestsViaBuddyAuth">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantReadInterestsViaBuddyAuth</rdfs:label>
+        <auth:bearer rdf:nodeID="genid8"/>
+        <auth:grant>
+            <rdf:Description>
+                <auth:graph rdf:nodeID="genid14"/>
+            </rdf:Description>
+        </auth:grant>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid8">
+        <auth:issuer>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid10"/>
+            </rdf:Description>
+        </auth:issuer>
+        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/buddy#BuddySocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid14">
+        <auth:graphType rdf:resource="https://w3id.org/won/auth#contentGraph"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid10">
+        <auth:connection rdf:nodeID="genid11"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#InterestOfSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid11">
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:targetAtom>
+            <rdf:Description/>
+        </auth:targetAtom>
     </rdf:Description>
     
 

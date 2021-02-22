@@ -1,9 +1,9 @@
 <https://w3id.org/won/ext/buddy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
 <https://w3id.org/won/ext/buddy> <http://www.w3.org/2002/07/owl#versionIRI> <https://w3id.org/won/ext/buddy/1.0> .
 <https://w3id.org/won/ext/buddy> <http://www.w3.org/2002/07/owl#imports> <https://w3id.org/won/core> .
-<https://w3id.org/won/ext/buddy> <http://purl.org/dc/elements/1.1/abstract> "This ontology contains the definition of the BuddySocket, which, when used to establish a connection, derives a *buddy* relationship between the Atoms."@en .
 <https://w3id.org/won/ext/buddy> <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" .
 <https://w3id.org/won/ext/buddy> <http://purl.org/dc/elements/1.1/title> "Web of Needs Buddy Extension" .
+<https://w3id.org/won/ext/buddy> <http://purl.org/dc/terms/abstract> "This ontology contains the definition of the BuddySocket, which, when used to establish a connection, derives a *buddy* relationship between the Atoms."@en .
 <https://w3id.org/won/ext/buddy> <http://purl.org/dc/terms/created> "2019-04-15"^^<http://www.w3.org/2001/XMLSchema#date> .
 <https://w3id.org/won/ext/buddy> <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> .
 <https://w3id.org/won/ext/buddy> <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-buddy" .
@@ -17,9 +17,6 @@
 # #################################################################
 # 
 # 
-# http://purl.org/dc/elements/1.1/abstract
-<http://purl.org/dc/elements/1.1/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
-# 
 # http://purl.org/dc/elements/1.1/creator
 <http://purl.org/dc/elements/1.1/creator> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
@@ -31,6 +28,9 @@
 # 
 # http://purl.org/dc/elements/1.1/title
 <http://purl.org/dc/elements/1.1/title> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# http://purl.org/dc/terms/abstract
+<http://purl.org/dc/terms/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
 # http://purl.org/dc/terms/created
 <http://purl.org/dc/terms/created> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
@@ -98,6 +98,12 @@
 # https://w3id.org/won/auth#tokenScope
 <https://w3id.org/won/auth#tokenScope> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
+# https://w3id.org/won/core#compatibleSocketDefinition
+<https://w3id.org/won/core#compatibleSocketDefinition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
+# https://w3id.org/won/core#derivesAtomProperty
+<https://w3id.org/won/core#derivesAtomProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
+# 
 # 
 # 
 # #################################################################
@@ -114,7 +120,10 @@
 <https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <http://schema.org/knows> .
 <https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/core#Atom> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 <https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/core#Atom> .
+<https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a buddy Atom to one of its buddies. This should generally imply natural\n                       persons on both ends. We interpret buddies are people who like to do things\n                       together; such as engaging in sports or other social activities."@en .
+<https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/2000/01/rdf-schema#label> "buddy" .
 # 
 # 
 # 
@@ -131,6 +140,11 @@
 # https://w3id.org/won/auth#TokenScope
 <https://w3id.org/won/auth#TokenScope> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 # 
+# https://w3id.org/won/core#Atom
+# 
+# https://w3id.org/won/core#SocketDefinition
+<https://w3id.org/won/core#SocketDefinition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
 # 
 # 
 # #################################################################
@@ -143,13 +157,12 @@
 # https://w3id.org/won/ext/buddy#BuddySocket
 <https://w3id.org/won/ext/buddy#BuddySocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/buddy#BuddySocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
-<https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/buddy#BuddySocket> .
-<https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/buddy#buddy> .
-<https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/buddy#BuddySocket> <http://www.w3.org/2000/01/rdf-schema#comment> "Compatible with other BuddySockets, derives the buddy relationship. Installs local\n                                   authorizations that\n                                   <ol>\n                                   <li>\n                                   Gives buddies access to atoms on the https://w3id.org/won/ext/hold#HolderSocket\n                                   by granting a token with scope https://w3id.org/won/ext/hold#ScopeReadHeldAtoms.\n                                   </li>\n                                   <li>\n                                   Gives buddies access to the connections to other buddies using\n                                   https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy\n                                   </li>\n                                   </ol>"@en .
 <https://w3id.org/won/ext/buddy#BuddySocket> <http://www.w3.org/2000/01/rdf-schema#label> "BuddySocket" .
-<https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/buddy#grantAccessToBuddies> .
+<https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/buddy#grantAccessForBuddies> .
 <https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> .
+<https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/buddy#BuddySocket> .
+<https://w3id.org/won/ext/buddy#BuddySocket> <https://w3id.org/won/core#derivesAtomProperty> <https://w3id.org/won/ext/buddy#buddy> .
 # 
 # https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy
 <https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -157,12 +170,11 @@
 <https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy> <http://www.w3.org/2000/01/rdf-schema#comment> "Scope for tokens that a) atoms grant their buddies, b) give access to the atom's\n    content and the list of buddies if signed by a buddy."@en .
 <https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy> <http://www.w3.org/2000/01/rdf-schema#label> "ScopeReadConnectToBuddyOfBuddy" .
 # 
-# https://w3id.org/won/ext/buddy#buddy
-# 
-# https://w3id.org/won/ext/buddy#grantAccessToBuddies
-<https://w3id.org/won/ext/buddy#grantAccessToBuddies> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/ext/buddy#grantAccessToBuddies> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/ext/buddy#grantAccessToBuddies> <https://w3id.org/won/auth#grant> _:genid1 .
+# https://w3id.org/won/ext/buddy#grantAccessForBuddies
+<https://w3id.org/won/ext/buddy#grantAccessForBuddies> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/ext/buddy#grantAccessForBuddies> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
+<https://w3id.org/won/ext/buddy#grantAccessForBuddies> <http://www.w3.org/2000/01/rdf-schema#label> "GrantAccessForBuddies" .
+<https://w3id.org/won/ext/buddy#grantAccessForBuddies> <https://w3id.org/won/auth#grant> _:genid1 .
 _:genid1 <https://w3id.org/won/auth#socket> _:genid2 .
 _:genid2 <https://w3id.org/won/auth#connections> _:genid3 .
 _:genid3 <https://w3id.org/won/auth#connection> _:genid4 .
@@ -174,53 +186,48 @@ _:genid5 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#
 _:genid5 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 _:genid3 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 _:genid2 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/buddy#BuddySocket> .
-<https://w3id.org/won/ext/buddy#grantAccessToBuddies> <https://w3id.org/won/auth#grant> _:genid7 .
+_:genid2 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#ExpertiseSocket> .
+_:genid2 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#InterestSocket> .
+<https://w3id.org/won/ext/buddy#grantAccessForBuddies> <https://w3id.org/won/auth#grant> _:genid7 .
 _:genid7 <https://w3id.org/won/auth#operation> _:genid8 .
 _:genid8 <https://w3id.org/won/auth#requestToken> _:genid9 .
 _:genid9 <https://w3id.org/won/auth#expiresAfter> "3600"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid9 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/hold#ScopeReadHeldAtoms> .
+_:genid9 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/buddy#BuddySocket> .
 _:genid7 <https://w3id.org/won/auth#operation> _:genid10 .
 _:genid10 <https://w3id.org/won/auth#requestToken> _:genid11 .
 _:genid11 <https://w3id.org/won/auth#expiresAfter> "3600"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid11 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy> .
-<https://w3id.org/won/ext/buddy#grantAccessToBuddies> <https://w3id.org/won/auth#grantee> _:genid12 .
-_:genid12 <https://w3id.org/won/auth#socket> _:genid13 .
-_:genid13 <https://w3id.org/won/auth#connection> _:genid14 .
-_:genid14 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
-_:genid14 <https://w3id.org/won/auth#targetAtom> _:genid15 .
-_:genid13 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/buddy#BuddySocket> .
+_:genid11 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/hold#ScopeReadHeldAtoms> .
+_:genid7 <https://w3id.org/won/auth#operation> _:genid12 .
+_:genid12 <https://w3id.org/won/auth#requestToken> _:genid13 .
+_:genid13 <https://w3id.org/won/auth#expiresAfter> "3600"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid13 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy> .
+<https://w3id.org/won/ext/buddy#grantAccessForBuddies> <https://w3id.org/won/auth#grantee> _:genid14 .
+_:genid14 <https://w3id.org/won/auth#socket> _:genid15 .
+_:genid15 <https://w3id.org/won/auth#connection> _:genid16 .
+_:genid16 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
+_:genid16 <https://w3id.org/won/auth#targetAtom> _:genid17 .
+_:genid15 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/buddy#BuddySocket> .
 # 
 # https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy
 <https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> <https://w3id.org/won/auth#bearer> _:genid16 .
-_:genid16 <https://w3id.org/won/auth#issuer> _:genid17 .
-_:genid17 <https://w3id.org/won/auth#socket> _:genid18 .
-_:genid18 <https://w3id.org/won/auth#connection> _:genid19 .
-_:genid19 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
-_:genid19 <https://w3id.org/won/auth#targetAtom> _:genid20 .
-_:genid18 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/buddy#BuddySocket> .
-_:genid16 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy> .
-<https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> <https://w3id.org/won/auth#grant> _:genid21 .
-_:genid21 <https://w3id.org/won/auth#socket> _:genid22 .
-_:genid22 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
-_:genid22 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/buddy#BuddySocket> .
+<https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> <http://www.w3.org/2000/01/rdf-schema#label> "GrantReadConnectToBuddyOfBuddy" .
+<https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> <https://w3id.org/won/auth#bearer> _:genid18 .
+_:genid18 <https://w3id.org/won/auth#issuer> _:genid19 .
+_:genid19 <https://w3id.org/won/auth#socket> _:genid20 .
+_:genid20 <https://w3id.org/won/auth#connection> _:genid21 .
+_:genid21 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
+_:genid21 <https://w3id.org/won/auth#targetAtom> _:genid22 .
+_:genid20 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/buddy#BuddySocket> .
+_:genid18 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/buddy#ScopeReadConnectToBuddyOfBuddy> .
 <https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> <https://w3id.org/won/auth#grant> _:genid23 .
 _:genid23 <https://w3id.org/won/auth#graph> _:genid24 .
 _:genid24 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
 _:genid24 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#sysinfoGraph> .
 _:genid24 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+<https://w3id.org/won/ext/buddy#grantReadConnectToBuddyOfBuddy> <https://w3id.org/won/auth#grant> _:genid25 .
+_:genid25 <https://w3id.org/won/auth#socket> _:genid26 .
+_:genid26 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
+_:genid26 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/buddy#BuddySocket> .
 # 
-# 
-# 
-# #################################################################
-# #
-# #    Annotations
-# #
-# #################################################################
-# 
-# 
-<https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/2000/01/rdf-schema#comment> "Links a buddy Atom to one of its buddies. This should generally imply natural\n                       persons on both ends. We interpret buddies are people who like to do things\n                       together; such as engaging in sports or other social activities."@en .
-<https://w3id.org/won/ext/buddy#buddy> <http://www.w3.org/2000/01/rdf-schema#label> "buddy" .
-# 
-# Generated by the OWL API (version 5.1.9) https://github.com/owlcs/owlapi/
+# Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/
