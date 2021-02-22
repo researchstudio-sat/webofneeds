@@ -22,7 +22,7 @@ import { is } from "../utils.js";
 import jsonld from "jsonld/dist/jsonld.min.js";
 import won from "./won.js";
 
-import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
+import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
 
 (function() {
   /**
@@ -30,11 +30,8 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
    * with a request for the connection-container
    * to get the connection-uris. Thus it's faster.
    */
-  won.fetchAtom = (atomUri, requestCredentials) => {
-    const ldWorker = worker();
-
-    return ldWorker.fetchAtom(atomUri, requestCredentials);
-  };
+  won.fetchAtom = (atomUri, requestCredentials) =>
+    linkedDataWorker().fetchAtom(atomUri, requestCredentials);
 
   won.validateEnvelopeDataForAtom = atomUri => {
     if (typeof atomUri === "undefined" || atomUri == null) {
@@ -71,13 +68,11 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
   won.fetchConnectionUrisWithStateByAtomUri = (
     connectionContainerUri,
     requestCredentials
-  ) => {
-    const ldWorker = worker();
-    return ldWorker.fetchConnectionUrisWithStateByAtomUri(
+  ) =>
+    linkedDataWorker().fetchConnectionUrisWithStateByAtomUri(
       connectionContainerUri,
       requestCredentials
     );
-  };
 
   /**
    * @param connectionUri
@@ -98,8 +93,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
       );
     }
 
-    const ldWorker = worker();
-    return ldWorker.fetchConnection(connectionUri, fetchParams);
+    return linkedDataWorker().fetchConnection(connectionUri, fetchParams);
   };
 
   /**
@@ -126,9 +120,8 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
       );
     }
 
-    const ldWorker = worker();
     //TODO: MOVE THE SUBSEQUENT PROMISES TO ld-worker once we figured out how to parse a message within a worker with wonMessageFromJsonLd
-    return ldWorker
+    return linkedDataWorker()
       .fetchMessagesOfConnection(
         connectionUri,
         messageContainerUri,
@@ -211,8 +204,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
       );
     }
 
-    const ldWorker = worker();
-    return ldWorker.fetchConnectionUrisBySocket(
+    return linkedDataWorker().fetchConnectionUrisBySocket(
       senderSocketUri,
       targetSocketUri,
       fetchParams
@@ -245,8 +237,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
       );
     }
 
-    const ldWorker = worker();
-    return ldWorker.fetchConnectionBySocket(
+    return linkedDataWorker().fetchConnectionBySocket(
       senderSocketUri,
       targetSocketUri,
       fetchParams
