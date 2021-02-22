@@ -41,12 +41,12 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
         Promise.all([
           jsonld.frame(jsonLdData, {
             "@id": atomUri, // start the framing from this uri. Otherwise will generate all possible nesting-variants.
-            "@context": won.defaultContext,
+            "@context": vocab.defaultContext,
             "@embed": "@always",
           }),
           jsonld.frame(jsonLdData, {
             "@type": vocab.AUTH.AuthorizationCompacted,
-            "@context": won.defaultContext,
+            "@context": vocab.defaultContext,
             "@embed": "@always",
           }),
         ])
@@ -124,7 +124,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
       .then(jsonLdData =>
         jsonld.frame(jsonLdData, {
           "@id": connectionContainerUri,
-          "@context": won.defaultContext,
+          "@context": vocab.defaultContext,
           "@embed": "@always",
         })
       )
@@ -195,7 +195,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
         .then(jsonLdData =>
           jsonld.frame(jsonLdData, {
             "@id": connectionUri,
-            "@context": won.defaultContext,
+            "@context": vocab.defaultContext,
             "@embed": "@always",
           })
         )
@@ -361,7 +361,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
       .then(jsonLdData =>
         jsonld.frame(jsonLdData, {
           "@type": vocab.WON.Connection,
-          "@context": won.defaultContext,
+          "@context": vocab.defaultContext,
           "@embed": "@always",
         })
       )
@@ -406,7 +406,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
         .then(jsonLdData =>
           jsonld.frame(jsonLdData, {
             "@type": vocab.WON.Connection,
-            "@context": won.defaultContext,
+            "@context": vocab.defaultContext,
             "@embed": "@always",
           })
         )

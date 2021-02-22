@@ -126,7 +126,7 @@ import vocab from "./vocab.js";
     return {
       "@graph": msgGraph,
       "@context": won.merge(
-        won.defaultContext,
+        vocab.defaultContext,
         contentRdf["@context"],
         getTypesForContext()
       ),

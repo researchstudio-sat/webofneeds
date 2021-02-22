@@ -146,7 +146,7 @@ export function buildChatMessage({
   targetSocketUri,
 }) {
   let jsonldGraphPayloadP = isRDF
-    ? won.rdfToJsonLd(won.defaultTurtlePrefixes + "\n" + chatMessage)
+    ? won.rdfToJsonLd(vocab.defaultTurtlePrefixes + "\n" + chatMessage)
     : Promise.resolve();
 
   const envelopeDataP = won.validateEnvelopeDataForConnection(

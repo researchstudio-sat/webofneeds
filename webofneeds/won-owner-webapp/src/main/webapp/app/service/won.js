@@ -230,62 +230,6 @@ won.appendStrippingDuplicates = function(array1, array2, comparatorFun) {
   return array1;
 };
 
-function context2ttlPrefixes(jsonldContext) {
-  return Object.entries(jsonldContext)
-    .filter(([, uri]) => is("String", uri))
-    .map(([prefix, uri]) => `@prefix ${prefix}: <${uri}>.`)
-    .join("\n");
-}
-
-won.minimalContext = {
-  [vocab.WONMSG.prefix]: vocab.WONMSG.baseUri,
-  [vocab.WON.prefix]: vocab.WON.baseUri,
-  [vocab.WONCON.prefix]: vocab.WONCON.baseUri,
-  [vocab.WONMATCH.prefix]: vocab.WONMATCH.baseUri,
-  [vocab.DEMO.prefix]: vocab.DEMO.baseUri,
-  [vocab.WXPERSONA.prefix]: vocab.WXPERSONA.baseUri,
-  [vocab.BOT.prefix]: vocab.BOT.baseUri,
-  [vocab.WXSCHEMA.prefix]: vocab.WXSCHEMA.baseUri,
-  [vocab.HOLD.prefix]: vocab.HOLD.baseUri,
-  [vocab.CHAT.prefix]: vocab.CHAT.baseUri,
-  [vocab.GROUP.prefix]: vocab.GROUP.baseUri,
-  [vocab.BUDDY.prefix]: vocab.BUDDY.baseUri,
-  [vocab.AGR.prefix]: vocab.AGR.baseUri,
-  [vocab.PAYMENT.prefix]: vocab.PAYMENT.baseUri,
-  [vocab.WORKFLOW.prefix]: vocab.WORKFLOW.baseUri,
-  [vocab.VALUEFLOWS.prefix]: vocab.VALUEFLOWS.baseUri,
-  [vocab.WXVALUEFLOWS.prefix]: vocab.WXVALUEFLOWS.baseUri,
-  [vocab.AUTH.prefix]: vocab.AUTH.baseUri,
-  rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  gr: "http://purl.org/goodrelations/v1#",
-  rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
-};
-won.minimalTurtlePrefixes = context2ttlPrefixes(won.minimalContext);
-
-won.defaultContext = {
-  ...won.minimalContext,
-  [vocab.RDFS.prefix]: vocab.RDFS.baseUri,
-  webID: "http://www.example.com/webids/",
-  dc: "http://purl.org/dc/elements/1.1/",
-  geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
-  xsd: "http://www.w3.org/2001/XMLSchema#",
-  gr: "http://purl.org/goodrelations/v1#",
-  ldp: "http://www.w3.org/ns/ldp#",
-  sioc: "http://rdfs.org/sioc/ns#",
-  dct: "http://purl.org/dc/terms/",
-  cert: "http://www.w3.org/ns/auth/cert#",
-  s: "http://schema.org/",
-  sh: "http://www.w3.org/ns/shacl#",
-  om2: "http://www.ontology-of-units-of-measure.org/resource/om-2/",
-  foaf: "http://xmlns.com/foaf/0.1/",
-  "msg:messageType": {
-    "@id": vocab.WONMSG.messageType,
-    "@type": "@id",
-  },
-};
-/** ttl-prefixes e.g. `@prefix msg: <https://w3id.org/won/message#>.\n @prefix...` */
-won.defaultTurtlePrefixes = context2ttlPrefixes(won.defaultContext);
-
 won.JsonLdHelper = {
   /**
    * Returns all graph URIs. If none are found, an empty array is returned.
@@ -577,12 +521,12 @@ WonMessage.prototype = {
       try {
         this.compactFramedMessage = await jsonld.compact(
           this.framedMessage,
-          won.defaultContext
+          vocab.defaultContext
         );
 
         this.compactRawMessage = await jsonld.compact(
           this.rawMessage,
-          won.defaultContext
+          vocab.defaultContext
         );
 
         return this.compactFramedMessage;
@@ -822,7 +766,7 @@ won.MessageBuilder = function MessageBuilder(messageType, content) {
   } else {
     this.data = {
       "@graph": [],
-      "@context": won.clone(won.defaultContext),
+      "@context": won.clone(vocab.defaultContext),
     };
   }
   this.messageGraph = null;

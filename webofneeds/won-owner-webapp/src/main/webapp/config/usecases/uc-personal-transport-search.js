@@ -7,7 +7,6 @@ import {
   defaultReactions,
 } from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
@@ -62,11 +61,11 @@ export const personalTransportSearch = {
     ) {
       filter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
-          con: won.defaultContext["con"],
+          con: vocab.defaultContext["con"],
         },
         operations: [
           `
@@ -141,11 +140,11 @@ export const personalTransportSearch = {
     } else if (fromLocation && fromLocation.lat && fromLocation.lng) {
       filter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
-          con: won.defaultContext["con"],
+          con: vocab.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.
@@ -177,11 +176,11 @@ export const personalTransportSearch = {
     } else if (toLocation && toLocation.lat && toLocation.lng) {
       filter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
-          con: won.defaultContext["con"],
+          con: vocab.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.
@@ -213,8 +212,8 @@ export const personalTransportSearch = {
     } else {
       filter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
         },
         operations: [
           `${resultName} a won:Atom.`,

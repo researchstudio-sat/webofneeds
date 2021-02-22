@@ -1,3 +1,5 @@
+import { is } from "~/app/utils";
+
 let vocab = {};
 
 vocab.RDFS = {};
@@ -581,5 +583,60 @@ vocab.refuseAddToNonOwned = {
   [vocab.WXPERSONA.ExpertiseSocketCompacted]: true,
   [vocab.WXPERSONA.InterestSocketCompacted]: true,
 };
+
+vocab.minimalContext = {
+  [vocab.WONMSG.prefix]: vocab.WONMSG.baseUri,
+  [vocab.WON.prefix]: vocab.WON.baseUri,
+  [vocab.WONCON.prefix]: vocab.WONCON.baseUri,
+  [vocab.WONMATCH.prefix]: vocab.WONMATCH.baseUri,
+  [vocab.DEMO.prefix]: vocab.DEMO.baseUri,
+  [vocab.WXPERSONA.prefix]: vocab.WXPERSONA.baseUri,
+  [vocab.BOT.prefix]: vocab.BOT.baseUri,
+  [vocab.WXSCHEMA.prefix]: vocab.WXSCHEMA.baseUri,
+  [vocab.HOLD.prefix]: vocab.HOLD.baseUri,
+  [vocab.CHAT.prefix]: vocab.CHAT.baseUri,
+  [vocab.GROUP.prefix]: vocab.GROUP.baseUri,
+  [vocab.BUDDY.prefix]: vocab.BUDDY.baseUri,
+  [vocab.AGR.prefix]: vocab.AGR.baseUri,
+  [vocab.PAYMENT.prefix]: vocab.PAYMENT.baseUri,
+  [vocab.WORKFLOW.prefix]: vocab.WORKFLOW.baseUri,
+  [vocab.VALUEFLOWS.prefix]: vocab.VALUEFLOWS.baseUri,
+  [vocab.WXVALUEFLOWS.prefix]: vocab.WXVALUEFLOWS.baseUri,
+  [vocab.AUTH.prefix]: vocab.AUTH.baseUri,
+  rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  gr: "http://purl.org/goodrelations/v1#",
+  rdfg: "http://www.w3.org/2004/03/trix/rdfg-1/",
+};
+vocab.defaultContext = {
+  ...vocab.minimalContext,
+  [vocab.RDFS.prefix]: vocab.RDFS.baseUri,
+  webID: "http://www.example.com/webids/",
+  dc: "http://purl.org/dc/elements/1.1/",
+  geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
+  xsd: "http://www.w3.org/2001/XMLSchema#",
+  gr: "http://purl.org/goodrelations/v1#",
+  ldp: "http://www.w3.org/ns/ldp#",
+  sioc: "http://rdfs.org/sioc/ns#",
+  dct: "http://purl.org/dc/terms/",
+  cert: "http://www.w3.org/ns/auth/cert#",
+  s: "http://schema.org/",
+  sh: "http://www.w3.org/ns/shacl#",
+  om2: "http://www.ontology-of-units-of-measure.org/resource/om-2/",
+  foaf: "http://xmlns.com/foaf/0.1/",
+  "msg:messageType": {
+    "@id": vocab.WONMSG.messageType,
+    "@type": "@id",
+  },
+};
+
+/** ttl-prefixes e.g. `@prefix msg: <https://w3id.org/won/message#>.\n @prefix...` */
+vocab.defaultTurtlePrefixes = context2ttlPrefixes(vocab.defaultContext);
+
+function context2ttlPrefixes(jsonldContext) {
+  return Object.entries(jsonldContext)
+    .filter(([, uri]) => is("String", uri))
+    .map(([prefix, uri]) => `@prefix ${prefix}: <${uri}>.`)
+    .join("\n");
+}
 
 export default vocab;

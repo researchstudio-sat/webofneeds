@@ -1,7 +1,7 @@
 import { get, getIn } from "../../app/utils.js";
 import * as wonUtils from "../../app/won-utils.js";
 import Immutable from "immutable";
-import won from "../../app/won-es6.js";
+import vocab from "../../app/service/vocab";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import WonLocationViewer from "../../app/components/details/viewer/location-viewer.jsx";
 import WonTravelActionViewer from "../../app/components/details/viewer/travel-action-viewer.jsx";
@@ -129,14 +129,14 @@ export const travelAction = {
       jsonLdUtils.getFromJsonLd(
         jsonLdTravelActionImm,
         "s:fromLocation",
-        won.defaultContext
+        vocab.defaultContext
       )
     );
     const toLocation = jsonLdUtils.parsePlaceLeniently(
       jsonLdUtils.getFromJsonLd(
         jsonLdTravelActionImm,
         "s:toLocation",
-        won.defaultContext
+        vocab.defaultContext
       )
     );
 
