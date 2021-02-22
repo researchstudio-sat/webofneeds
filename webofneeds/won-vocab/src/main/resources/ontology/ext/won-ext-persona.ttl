@@ -149,7 +149,7 @@ rdfs:labels
 
 :grantReadInterestsViaBuddyAuth
     a           auth:Authorization ;
-    rdfs:label  "grantReadInterestsViaBuddyAuth" ;
+    rdfs:label  "GrantReadInterestsViaBuddyAuth" ;
     auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
                   auth:issuer     [ auth:socket [ auth:socketType :InterestOfSocket ;
                                                   auth:connection [ auth:targetAtom      [ ] ;
@@ -181,7 +181,7 @@ rdfs:labels
 
 :grantReadExpertisesViaBuddyAuth
     a           auth:Authorization ;
-    rdfs:label  "grantReadViaBuddyAuth" ;
+    rdfs:label  "GrantReadViaBuddyAuth" ;
     auth:bearer [ auth:tokenScope wx-buddy:BuddySocket ;
                   auth:issuer     [ auth:socket [ auth:socketType :ExpertiseOfSocket ;
                                                   auth:connection [ auth:targetAtom      [ ] ;

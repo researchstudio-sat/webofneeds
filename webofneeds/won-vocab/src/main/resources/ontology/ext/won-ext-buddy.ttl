@@ -136,7 +136,7 @@ s:knows
 
 :grantAccessForBuddies
     a            auth:Authorization ;
-    rdfs:label   "grantAccessForBuddies" ;
+    rdfs:label   "GrantAccessForBuddies" ;
     auth:grantee [ auth:socket [ auth:socketType :BuddySocket ;
                                  auth:connection [ auth:connectionState won:Connected ;
                                                    auth:targetAtom      [ ] ] ] ] ;
@@ -150,7 +150,7 @@ s:knows
 
 :grantReadConnectToBuddyOfBuddy
     a           auth:Authorization ;
-    rdfs:label   "grantReadConnectToBuddyOfBuddy" ;
+    rdfs:label   "GrantReadConnectToBuddyOfBuddy" ;
     auth:bearer [ auth:tokenScope :ScopeReadConnectToBuddyOfBuddy ;
                   auth:issuer     [ auth:socket [ auth:socketType :BuddySocket ;
                                                   auth:connection [ auth:targetAtom      [ ] ;
