@@ -19,7 +19,6 @@
  */
 import { is, getIn, extractAtomUriBySocketUri } from "../utils.js";
 
-import * as ownerApi from "../api/owner-api.js";
 import jsonld from "jsonld/dist/jsonld.min.js";
 import won from "./won.js";
 import vocab from "./vocab.js";
@@ -118,8 +117,9 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
   won.fetchConnectionUrisWithStateByAtomUri = (
     connectionContainerUri,
     requestCredentials
-  ) =>
-    ownerApi
+  ) => {
+    const ldWorker = worker();
+    return ldWorker
       .fetchJsonLdDataset(connectionContainerUri, requestCredentials)
       .then(jsonLdData =>
         jsonld.frame(jsonLdData, {
@@ -168,13 +168,14 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
           return [];
         }
       });
+  };
 
   /**
    * @param connectionUri
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
+   *        * queryParams: GET-params as documented for ld-worker.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
@@ -188,55 +189,51 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
       );
     }
 
-    return (
-      //add the eventUris
-      ownerApi
-        .fetchJsonLdDataset(connectionUri, fetchParams)
-        .then(jsonLdData =>
-          jsonld.frame(jsonLdData, {
-            "@id": connectionUri,
-            "@context": vocab.defaultContext,
-            "@embed": "@always",
-          })
-        )
-        .then(jsonLdConnection => jsonld.expand(jsonLdConnection))
-        .then(jsonLdConnection => {
-          const connectionContentGraph = jsonLdConnection[0];
-          return {
-            uri: connectionContentGraph["@id"],
-            type: connectionContentGraph["@type"][0],
-            modified:
-              connectionContentGraph["http://purl.org/dc/terms/modified"][0][
-                "@value"
-              ],
-            messageContainer:
-              connectionContentGraph[vocab.WON.messageContainer][0]["@id"],
-            socket: connectionContentGraph[vocab.WON.socket][0]["@id"],
-            wonNode: connectionContentGraph[vocab.WON.wonNode][0]["@id"],
-            connectionState:
-              connectionContentGraph[vocab.WON.connectionState][0]["@id"],
-            sourceAtom: connectionContentGraph[vocab.WON.sourceAtom][0]["@id"],
-            targetAtom: connectionContentGraph[vocab.WON.targetAtom][0]["@id"],
-            targetSocket:
-              connectionContentGraph[vocab.WON.targetSocket][0]["@id"],
-            previousConnectionState:
-              connectionContentGraph[vocab.WON.previousConnectionState] &&
-              connectionContentGraph[vocab.WON.previousConnectionState][0][
-                "@id"
-              ],
-            targetConnection:
-              connectionContentGraph[vocab.WON.targetConnection] &&
-              connectionContentGraph[vocab.WON.targetConnection][0]["@id"],
-            hasEvents: [],
-          };
+    const ldWorker = worker();
+    return ldWorker
+      .fetchJsonLdDataset(connectionUri, fetchParams)
+      .then(jsonLdData =>
+        jsonld.frame(jsonLdData, {
+          "@id": connectionUri,
+          "@context": vocab.defaultContext,
+          "@embed": "@always",
         })
-        .catch(e => {
-          const msg = "Failed to get connection " + connectionUri + ".";
-          e.message += msg;
-          console.error(e.message);
-          throw e;
-        })
-    );
+      )
+      .then(jsonLdConnection => jsonld.expand(jsonLdConnection))
+      .then(jsonLdConnection => {
+        const connectionContentGraph = jsonLdConnection[0];
+        return {
+          uri: connectionContentGraph["@id"],
+          type: connectionContentGraph["@type"][0],
+          modified:
+            connectionContentGraph["http://purl.org/dc/terms/modified"][0][
+              "@value"
+            ],
+          messageContainer:
+            connectionContentGraph[vocab.WON.messageContainer][0]["@id"],
+          socket: connectionContentGraph[vocab.WON.socket][0]["@id"],
+          wonNode: connectionContentGraph[vocab.WON.wonNode][0]["@id"],
+          connectionState:
+            connectionContentGraph[vocab.WON.connectionState][0]["@id"],
+          sourceAtom: connectionContentGraph[vocab.WON.sourceAtom][0]["@id"],
+          targetAtom: connectionContentGraph[vocab.WON.targetAtom][0]["@id"],
+          targetSocket:
+            connectionContentGraph[vocab.WON.targetSocket][0]["@id"],
+          previousConnectionState:
+            connectionContentGraph[vocab.WON.previousConnectionState] &&
+            connectionContentGraph[vocab.WON.previousConnectionState][0]["@id"],
+          targetConnection:
+            connectionContentGraph[vocab.WON.targetConnection] &&
+            connectionContentGraph[vocab.WON.targetConnection][0]["@id"],
+          hasEvents: [],
+        };
+      })
+      .catch(e => {
+        const msg = "Failed to get connection " + connectionUri + ".";
+        e.message += msg;
+        console.error(e.message);
+        throw e;
+      });
   };
 
   /**
@@ -245,7 +242,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
+   *        * queryParams: GET-params as documented for ld-worker.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
@@ -270,9 +267,14 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
           .then(connection => connection.messageContainer);
 
     return connectionContainerPromise
-      .then(messageContainerUri =>
-        ownerApi.fetchJsonLdDataset(messageContainerUri, fetchParams, true)
-      )
+      .then(messageContainerUri => {
+        const ldWorker = worker();
+        return ldWorker.fetchJsonLdDataset(
+          messageContainerUri,
+          fetchParams,
+          true
+        );
+      })
       .then(responseObject =>
         jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
           const messages = {};
@@ -330,7 +332,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
+   *        * queryParams: GET-params as documented for ld-worker.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
@@ -353,7 +355,8 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
     fetchParams.socket = senderSocketUri;
     fetchParams.targetSocket = targetSocketUri;
 
-    return ownerApi
+    const ldWorker = worker();
+    return ldWorker
       .fetchJsonLdDataset(
         extractAtomUriBySocketUri(senderSocketUri) + "/c",
         fetchParams
@@ -374,7 +377,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
+   *        * queryParams: GET-params as documented for ld-worker.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
@@ -397,8 +400,9 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
     fetchParams.socket = senderSocketUri;
     fetchParams.targetSocket = targetSocketUri;
 
+    const ldWorker = worker();
     return (
-      ownerApi
+      ldWorker
         .fetchJsonLdDataset(
           extractAtomUriBySocketUri(senderSocketUri) + "/c",
           fetchParams

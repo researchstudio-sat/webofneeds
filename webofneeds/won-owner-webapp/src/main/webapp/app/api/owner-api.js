@@ -1,11 +1,7 @@
 import urljoin from "url-join";
 import { ownerBaseUrl } from "~/config/default.js";
 import * as wonUtils from "../won-utils.js";
-import {
-  generateQueryParamsString,
-  parseHeaderLinks,
-  getLinkAndParams,
-} from "../utils.js";
+import { generateQueryParamsString } from "../utils.js";
 import vocab from "../service/vocab.js";
 import * as N3 from "n3";
 // import { bestfetch } from "bestfetch";
@@ -412,45 +408,6 @@ export function fetchAllActiveMetaPersonas() {
     undefined
   );
 }
-
-export const fetchJsonLdDataset = (
-  uri,
-  params = {},
-  includeLinkHeader = false
-) =>
-  // bestfetch(requestUri, {
-  fetch(generateLinkedDataQueryString(uri, params), {
-    method: "get",
-    credentials: "same-origin",
-    headers: {
-      // cachePolicy: "network-only",
-      Accept: "application/ld+json",
-      Authorization: params.token ? "Bearer " + params.token : undefined,
-      Prefer: params.pagingSize
-        ? `return=representation; max-member-count="${params.pagingSize}"`
-        : undefined,
-    },
-  })
-    .then(checkHttpStatus(uri, params))
-    .then(response => {
-      if (includeLinkHeader) {
-        const linkHeaderString =
-          response.headers && response.headers.get("Link");
-        const linkHeaders = parseHeaderLinks(linkHeaderString);
-
-        const nextPageLinkObject =
-          linkHeaders && linkHeaders.next && getLinkAndParams(linkHeaders.next);
-        return Promise.all([
-          response.json(),
-          Promise.resolve(nextPageLinkObject),
-        ]).then(([jsonLdData, nextPage]) => ({
-          jsonLdData: jsonLdData,
-          nextPage: nextPage,
-        }));
-      } else {
-        return response.json();
-      }
-    });
 
 export const fetchTokenForAtom = (atomUri, params) =>
   fetch(generateLinkedDataQueryString(atomUri + "/token", params), {

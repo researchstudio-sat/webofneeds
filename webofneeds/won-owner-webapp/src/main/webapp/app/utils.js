@@ -1,4 +1,3 @@
-import _ from "lodash";
 import {
   getHeldByUri,
   getTitle,
@@ -13,29 +12,6 @@ import fakeNames from "./fakeNames.json";
 
 export function getPathname(location) {
   return location && location.pathname;
-}
-
-export function parseHeaderLinks(linkHeaderString) {
-  return (
-    linkHeaderString &&
-    _.chain(linkHeaderString)
-      .split(",")
-      .map(link => {
-        return {
-          ref: link
-            .split(";")[1]
-            .replace(/rel="(.*)"/, "$1")
-            .trim(),
-          url: link
-            .split(";")[0]
-            .replace(/<(.*)>/, "$1")
-            .trim(),
-        };
-      })
-      .keyBy("ref")
-      .mapValues("url")
-      .value()
-  );
 }
 
 /*
@@ -72,30 +48,6 @@ function getParamsObject(paramsString) {
   });
 
   return JSON.parse(JSON.stringify(result));
-}
-
-/**
- * parses a json object out of a url, that puts the url/query params within a json object
- * @param url
- * @returns {{params: {}, url: (*|string)}|{params: any, url: (*|string)}|undefined}
- */
-export function getLinkAndParams(url) {
-  const array = url && url.split("?");
-
-  if (array) {
-    if (array.length === 1) {
-      return {
-        url: array[0],
-        params: {},
-      };
-    } else if (array.length === 2) {
-      return {
-        url: array[0],
-        params: getParamsObject(array[1]),
-      };
-    }
-  }
-  return undefined;
 }
 
 /**

@@ -63,10 +63,22 @@ function config(env, argv): Configuration {
         {
           test: /\.jsx?$/,
           exclude: [/node_modules/],
-          loader: ["babel-loader", "eslint-loader"],
-          options: {
-            presets: [["env", { modules: false }]],
-          },
+          loader: [
+            {
+              loader: "babel-loader",
+              options: {
+                presets: [
+                  [
+                    "@babel/preset-env",
+                    {
+                      modules: false,
+                    },
+                  ],
+                ],
+              },
+            },
+            "eslint-loader",
+          ],
         },
         {
           test: /\.s?css$/,
