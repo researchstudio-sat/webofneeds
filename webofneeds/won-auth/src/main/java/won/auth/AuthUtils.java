@@ -38,7 +38,7 @@ public class AuthUtils {
     private static Graph readShapesData() {
         Graph graph = GraphFactory.createGraphMem();
         RDFDataMgr.read(graph,
-                        AuthUtils.class.getClassLoader().getResourceAsStream("shacl/won-auth-shapes.ttl"),
+                        AuthUtils.class.getClassLoader().getResourceAsStream("shacl/won-auth.ttl"),
                         Lang.TTL);
         return graph;
     }

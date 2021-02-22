@@ -1,17 +1,1729 @@
-@prefix : <https://w3id.org/won/auth#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won: <https://w3id.org/won/core#> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@base <https://w3id.org/won/content> .
+@prefix ex:      <http://example.org/ns#> .
+@prefix auth:    <https://w3id.org/won/auth#> .
+@prefix won:     <https://w3id.org/won/core#> .
+@prefix msg:     <https://w3id.org/won/message#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix vs:      <http://www.w3.org/2003/06/sw-vocab-status/ns#> .
+@prefix dc:      <http://purl.org/dc/elements/1.1/> .
+@prefix vann:    <http://purl.org/vocab/vann/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 
-<https://w3id.org/won/auth> rdf:type owl:Ontology ;
-                               owl:versionIRI <https://w3id.org/won/auth/1.0> ;
-                               owl:imports <https://w3id.org/won/core/1.0> ;
-                               <http://purl.org/dc/elements/1.1/abstract> "This ontology defines classes and properties used to express access control rules in WoN atoms."@en ;
-                               <http://purl.org/dc/elements/1.1/created> "2020-11-19"^^xsd:date ;
-                               <http://purl.org/dc/elements/1.1/title> "Web of Needs Authorization Ontology"@en ;
-                               <http://purl.org/dc/terms/license> "https://creativecommons.org/licenses/by/4.0/"^^xsd:string ;
-                               <http://purl.org/vocab/vann/preferredNamespacePrefix> "auth"^^xsd:string .
+auth:
+    a                             owl:Ontology ;
+    owl:versionIRI                <https://w3id.org/won/auth/1.0> ;
+    owl:imports                   <https://w3id.org/won/core> ;
+    owl:imports                   <https://w3id.org/won/msg> ;
+    vann:preferredNamespacePrefix "auth" ;
+    dcterms:created               "2020-11-19"^^xsd:date ;
+    dcterms:license               <https://creativecommons.org/licenses/by/4.0/> ;
+    dc:creator                    "Florian Kleedorfer" ;
+    dc:title                      "Web of Needs Authorization Vocabulary"@en ;
+    dcterms:abstract
+                                  "This vocabulary defines the terms used to express ACLs in WoN, as well as SHACL shapes for validating such ACLs."@en .
+
+
+# Note: This shapes system provides and requires certain individuals (e.g. auth:anyone) to
+# be present in the data graph with all their triples. These individuals are specified in
+# the shapes graph (see end of file). So, the shapes have to be evaluated on
+# the union of the data graph and the shapes graph.
+
+auth:ensureShapesGraphIsAddedToDataGraph1
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:target        auth:anyOperation, auth:opRead ;
+    sh:class         auth:SimpleOperationExpression .
+
+
+auth:atomStatePropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:atomState ;
+    sh:node          auth:atomStateShape ;
+    sh:minCount      1 .
+
+
+auth:graphPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:graph ;
+    sh:node          auth:graphExpressionShape ;
+    sh:minCount      1 .
+
+auth:atomMessagesPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:atomMessages ;
+    sh:node          auth:atomMessagesExpressionShape ;
+    sh:minCount      1 .
+
+auth:atomMessagePropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:atomMessage ;
+    sh:node          auth:atomMessageExpressionShape ;
+    sh:minCount      1 .
+
+auth:socketPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:socket ;
+    sh:node          auth:socketExpressionShape ;
+    sh:minCount      1 .
+
+auth:connectionsPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:connections ;
+    sh:node          auth:connectionsExpressionShape ;
+    sh:minCount      1 .
+
+auth:connectionPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:connection ;
+    sh:node          auth:connectionExpressionShape ;
+    sh:minCount      1 .
+
+auth:connectionMessagesPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:connectionMessages ;
+    sh:node          auth:connectionMessagesExpressionShape ;
+    sh:minCount      1 .
+
+auth:connectionMessagePropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:connectionMessage ;
+    sh:node          auth:connectionMessageExpressionShape ;
+    sh:minCount      1 .
+
+auth:operationPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:operation ;
+    sh:or            ( [ sh:node auth:simpleOperationExpressionShape ]
+                       [ sh:node auth:messageOperationExpressionShape ]
+                       [ sh:node auth:tokenOperationExpressionShape ] ) ;
+    sh:minCount      1 .
+
+auth:targetAtomPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:targetAtom ;
+    sh:maxCount      1 ;
+    sh:node          auth:targetAtomExpressionShape ;
+    sh:minCount      1 .
+
+auth:expiresAfterPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:expiresAfter ;
+    sh:nodeKind      sh:Literal ;
+    sh:maxCount      1 ;
+    sh:or            ( [ sh:datatype xsd:integer ] [ sh:datatype xsd:long ] [ sh:datatype xsd:int ] ) .
+
+auth:tokenIssPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:tokenIss ;
+    sh:nodeKind      sh:IRI ;
+    sh:minCount      1 ;
+    sh:maxCount      1 .
+
+auth:tokenSigPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:tokenSig ;
+    sh:nodeKind      sh:IRI ;
+    sh:minCount      0 ;
+    sh:maxCount      1 .
+
+auth:tokenSubPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:tokenSub ;
+    sh:nodeKind      sh:IRI ;
+    sh:minCount      1 ;
+    sh:maxCount      1 .
+
+auth:tokenScopePropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:tokenScope ;
+    sh:minCount      1 ;
+    sh:maxCount      1 ;
+    sh:or            ( [ sh:nodeKind sh:IRI ]
+                       [ sh:nodeKind sh:Literal ;
+                         sh:datatype xsd:string ;
+                         sh:pattern  "^[^\\s]+$" ; ] ) .
+
+auth:tokenIatPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:tokenIat ;
+    sh:nodeKind      sh:Literal ;
+    sh:datatype      xsd:dateTime ;
+    sh:minCount      1 ;
+    sh:maxCount      1 .
+
+auth:tokenExpPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:tokenExp ;
+    sh:nodeKind      sh:Literal ;
+    sh:datatype      xsd:dateTime ;
+    sh:minCount      1 ;
+    sh:maxCount      1 .
+
+auth:nodeSignedPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:nodeSigned ;
+    sh:nodeKind      sh:Literal ;
+    sh:datatype      xsd:boolean ;
+    sh:minCount      0 ;
+    sh:maxCount      1 .
+
+# Definition 6 (root expression)
+
+auth:aseRootShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape,
+                         auth:TargetAtomContainerShape ;
+    auth:asePosition     auth:positionRoot ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:atomState auth:graph auth:atomMessages auth:atomMessage auth:socket
+                           auth:connections
+                           auth:connection auth:connectionMessages auth:connectionMessage
+                           auth:operation auth:targetAtom rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:nodeKind          sh:BlankNodeOrIRI ;
+    sh:or                ( [ sh:property auth:atomStatePropertyShape ]
+                           [ sh:property auth:graphPropertyShape ]
+                           [ sh:property auth:atomMessagesPropertyShape ]
+                           [ sh:property auth:atomMessagePropertyShape ]
+                           [ sh:property auth:socketPropertyShape ]
+                           [ sh:property auth:connectionsPropertyShape ]
+                           [ sh:property auth:connectionPropertyShape ]
+                           [ sh:property auth:connectionMessagesPropertyShape ]
+                           [ sh:property auth:connectionMessagePropertyShape ]
+                           [ sh:property auth:operationPropertyShape ]
+                           [ sh:property auth:targetAtomPropertyShape ] ) .
+
+
+auth:atomStateShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:closed        true ;
+    sh:nodeKind      sh:IRI ;
+    sh:in            ( won:Active won:Inactive won:Deleted ) .
+
+# Definition 7 (atom messages expression)
+
+auth:atomMessagesExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:inherit auth:operation auth:atomMessage ) ;
+    auth:asePosition     auth:positionAtomMessages ;
+    sh:or                ( [ sh:property auth:inheritPropertyShape ]
+                           [ sh:property auth:operationPropertyShape ]
+                           [ sh:property auth:atomMessagePropertyShape ] ) .
+
+# Definition 8 (atom message expression)
+
+auth:atomMessageExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:operation auth:inherit ) ;
+    auth:asePosition     auth:positionAtomMessage ;
+    sh:or                ( [ sh:property auth:inheritPropertyShape ]
+                           [ sh:property auth:operationPropertyShape ] ) .
+
+# Definition 9 (graph expression)
+
+auth:graphExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:graphType auth:graphIri auth:operation auth:inherit ) ;
+    auth:asePosition     auth:positionAtomGraph ;
+    sh:or                ( [ sh:property auth:inheritPropertyShape ]
+                           [ sh:property [ sh:path auth:graphType ;
+                                           sh:node auth:graphTypeShape ] ]
+                           [ sh:property [ sh:path     auth:graphIri ;
+                                           sh:nodeKind sh:IRI ] ]
+                           [ sh:property auth:operationPropertyShape ] ) .
+
+auth:graphTypeShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type rdfs:comment rdfs:label rdfs:isDefinedBy ) ;
+    sh:in                ( auth:contentGraph auth:sysinfoGraph auth:aclGraph auth:keyGraph ) .
+
+# Definition 10 (socket expression)
+
+auth:socketExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape,
+                         auth:TargetAtomContainerShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:connections
+                           auth:connection auth:connectionMessages auth:connectionMessage
+                           auth:operation auth:targetAtom auth:socketType auth:socketIri
+                           auth:inherit ) ;
+    sh:targetObjectsOf   auth:socket ;
+    auth:asePosition     auth:positionSocket ;
+    sh:or                ( [ sh:property auth:inheritPropertyShape ]
+                           [ sh:property [ sh:path     auth:socketType ;
+                                           sh:nodeKind sh:IRI ] ]
+                           [ sh:property [ sh:path     auth:socketIri ;
+                                           sh:nodeKind sh:IRI ] ]
+                           [ sh:property auth:connectionsPropertyShape ]
+                           [ sh:property auth:connectionPropertyShape ]
+                           [ sh:property auth:connectionMessagesPropertyShape ]
+                           [ sh:property auth:connectionMessagePropertyShape ]
+                           [ sh:property auth:targetAtomPropertyShape ]
+                           [ sh:property auth:operationPropertyShape ] ) .
+
+# Definition 11 (connections expression)
+
+auth:connectionsExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape,
+                         auth:TargetAtomContainerShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:connection auth:connectionMessages auth:connectionMessage
+                           auth:operation auth:targetAtom auth:socketType auth:socketIri
+                           auth:connectionState
+                           auth:inherit ) ;
+    auth:asePosition     auth:positionConnections ;
+    sh:targetObjectsOf   auth:connections ;
+    sh:or                ( [ sh:property auth:inheritPropertyShape ]
+                           [ sh:property [ sh:path auth:connectionState ;
+                                           sh:node auth:connectionStateShape ] ]
+                           [ sh:property auth:connectionPropertyShape ]
+                           [ sh:property auth:connectionMessagesPropertyShape ]
+                           [ sh:property auth:connectionMessagePropertyShape ]
+                           [ sh:property auth:targetAtomPropertyShape ]
+                           [ sh:property auth:operationPropertyShape ] ) .
+
+# Definition 12 (connection expression)
+
+auth:connectionExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape,
+                         auth:TargetAtomContainerShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:connectionMessages auth:connectionMessage
+                           auth:operation auth:targetAtom auth:connectionState auth:inherit ) ;
+    sh:targetObjectsOf   auth:connection ;
+    auth:asePosition     auth:positionConnection ;
+    sh:or                ( [ sh:property auth:inheritPropertyShape ]
+                           [ sh:property [ sh:path auth:connectionState ;
+                                           sh:node auth:connectionStateShape ] ]
+                           [ sh:property auth:connectionMessagesPropertyShape ]
+                           [ sh:property auth:connectionMessagePropertyShape ]
+                           [ sh:property auth:targetAtomPropertyShape ]
+                           [ sh:property auth:operationPropertyShape ] ) .
+
+auth:connectionStateShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:closed        true ;
+    sh:in            ( won:RequestSent
+                       won:RequestReceived
+                       won:Connected
+                       won:Closed
+                       won:Suggested ) .
+
+# Definition 13 (target atom expression )
+
+auth:targetAtomExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:closed            true ;
+    sh:targetObjectsOf   auth:targetAtom ;
+    sh:ignoredProperties ( auth:atom ) ;
+    sh:or                ( [ sh:nodeKind sh:BlankNode ]
+                           [ sh:node auth:atomExpressionShape ] ) .
+
+# Definition 14 (connection messages expression)
+
+auth:connectionMessagesExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:connectionMessage auth:operation auth:inherit ) ;
+    auth:asePosition     auth:positionConnectionMessages ;
+    sh:or                ( [ sh:property auth:inheritPropertyShape ]
+                           [ sh:property [ sh:path auth:connectionMessage ;
+                                           sh:node auth:connectionMessageExpressionShape ] ]
+                           [ sh:property auth:operationPropertyShape ] ) .
+
+# Definition 15 (connection message expression)
+
+auth:connectionMessageExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:TreeExpressionShape, auth:OperationContainerShape, auth:InheritingShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( auth:operation auth:inherit ) ;
+    auth:asePosition     auth:positionConnectionMessage ;
+    sh:or                ( [ sh:property auth:inheritPropertyShape ]
+                           [ sh:property auth:operationPropertyShape ] ) .
+
+# Definition 17 (atom expression)
+
+auth:atomExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:targetSubjectsOf  auth:atom ;
+    sh:property          [ sh:path     auth:atom ;
+                           sh:or       ( [ sh:node auth:relativeAtomExpressionShape ]
+                                         [ sh:nodeKind sh:IRI ] ) ;
+                           sh:minCount 1 ] .
+
+auth:relativeAtomExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:nodeKind          sh:IRI ;
+    sh:in                ( auth:self
+                           auth:operationRequestor
+                           auth:authorizationRequestor
+                           auth:anyAtom ) .
+
+# Definition 18 (operation expression)
+
+# TODO: Update definition of operation expression
+
+auth:messageOperationExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:OperationExpressionShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type auth:messageTo auth:messageOnBehalf rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:targetClass       auth:MessageOperationExpression ;
+    sh:or                ( [ sh:property [ sh:path     auth:messageTo ;
+                                           sh:minCount 1 ;
+                                           sh:or       ( [ sh:node auth:messageTypesExpressionShape ]
+                                                         [ sh:node auth:messageTypeShape ] ) ] ]
+                           [ sh:property [ sh:path     auth:messageTo ;
+                                           sh:minCount 1 ;
+                                           sh:maxCount 1 ;
+                                           sh:node     auth:messageWildcardShape ] ]
+                           [ sh:property [ sh:path     auth:messageOnBehalf ;
+                                           sh:minCount 1 ;
+                                           sh:or       ( [ sh:node auth:messageTypesExpressionShape ]
+                                                         [ sh:node auth:messageTypeShape ] ) ] ]
+                           [ sh:property [ sh:path     auth:messageOnBehalf ;
+                                           sh:minCount 1 ;
+                                           sh:maxCount 1 ;
+                                           sh:node     auth:messageWildcardShape ] ] ) .
+
+
+# TODO: Add Definition for token operation expression
+
+auth:tokenOperationExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:OperationExpressionShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:property          [ sh:path     auth:requestToken ;
+                           sh:minCount 1 ;
+                           sh:maxCount 1 ;
+                           sh:node     auth:tokenSpecificationShape ] .
+
+auth:simpleOperationExpressionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:OperationExpressionShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:class             auth:SimpleOperationExpression ;
+    sh:targetClass       auth:SimpleOperationExpression .
+
+
+auth:messageWildcardShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:MessageTypeSpecificationShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:nodeKind          sh:IRI ;
+    sh:in                ( auth:anyMessageType ) .
+
+# TODO: Add Definition for auth info expression
+
+# Definition 19 (message types expression)
+
+auth:messageTypesExpressionShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape, auth:MessageTypeSpecificationShape ;
+    sh:targetClass   auth:MessageTypeSet ;
+    sh:property      [ sh:path     rdfs:member ;
+                       sh:minCount 1 ;
+                       sh:node     auth:messageTypeShape ] .
+
+auth:messageTypeShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape, auth:MessageTypeSpecificationShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type rdfs:isDefinedBy rdfs:label rdfs:comment ) ;
+    sh:in                ( msg:ActivateMessage
+                           msg:AtomHintMessage
+                           msg:AtomMessage
+                           msg:ChangeNotificationMessage
+                           msg:AtomCreatedNotificationMessage
+                           msg:CloseMessage
+                           msg:ConnectMessage
+                           msg:ConnectionMessage
+                           msg:CreateMessage
+                           msg:DeactivateMessage
+                           msg:FailureResponse
+                           msg:ReplaceMessage
+                           msg:SocketHintMessage
+                           msg:SuccessResponse ) .
+
+# Definition 20 (inherit expression)
+
+auth:inheritPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:inherit ;
+    sh:maxCount      1 ;
+    sh:datatype      xsd:boolean .
+
+# Definition 21 (token shape)
+
+auth:tokenShapeShape
+    rdfs:isDefinedBy   auth: ;
+    a                  sh:NodeShape ;
+    sh:closed          true ;
+    sh:targetObjectsOf auth:bearer ;
+    sh:property        [ sh:path     auth:tokenScope ;
+                         sh:minCount 1 ;
+                         sh:or       ( [ sh:nodeKind sh:IRI ]
+                                       [ sh:nodeKind sh:Literal ;
+                                         sh:datatype xsd:string ;
+                                         sh:pattern  "^[^\\s]+$" ] ) ] ;
+    sh:property        [ sh:path     auth:issuer ;
+                         sh:or       ( [ sh:node auth:atomExpressionShape ]
+                                       [ sh:node auth:aseRootShape ] ) ;
+                         sh:minCount 1 ; ] ;
+    sh:property        auth:nodeSignedPropertyShape .
+
+# Definition 22 (token specification)
+
+auth:tokenSpecificationShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:closed        true ;
+    sh:property      auth:tokenScopePropertyShape ;
+    sh:property      auth:expiresAfterPropertyShape ;
+    sh:property      auth:nodeSignedPropertyShape .
+
+# Definition 23 (authorization)
+# TODO: update definition to include auth:provideAuthInfo
+
+auth:authorizationShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:targetClass       auth:Authorization ;
+    sh:class             auth:Authorization ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type auth:grantee auth:grant auth:provideAuthInfo
+                           auth:bearer rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:or                ( [ sh:property [ sh:path     auth:grantee ;
+                                           sh:minCount 1 ;
+                                           sh:node     auth:atomExpressionShape ] ]
+                           [ sh:property [ sh:path     auth:grantee ;
+                                           sh:minCount 1 ;
+                                           sh:node     auth:aseRootShape ] ]
+                           [ sh:property [ sh:path     auth:grantee ;
+                                           sh:minCount 1 ;
+                                           sh:maxCount 1 ;
+                                           sh:node     auth:granteeWildcardShape ] ]
+                           [ sh:property [ sh:path     auth:bearer ;
+                                           sh:minCount 1 ;
+                                           sh:node     auth:tokenShapeShape ; ] ] ) ;
+    sh:or                ( [ sh:property [ sh:path     auth:grant ;
+                                           sh:minCount 1 ;
+                                           sh:node     auth:aseRootShape ] ]
+                           [ sh:property [ sh:path     auth:provideAuthInfo ;
+                                           sh:minCount 1 ;
+                                           sh:maxCount 1 ;
+                                           sh:node     auth:aseRootShape ] ] ) ;
+    sh:property          [ sh:path     auth:requestedBy ;
+                           sh:nodeKind sh:IRI ] .
+
+auth:granteeWildcardShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:nodeKind          sh:IRI ;
+    sh:in                ( auth:anyone ) .
+
+# Requesting authorization
+
+auth:localAuthPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:localAuth ;
+    sh:node          auth:authorizationShape .
+
+auth:targetAuthPropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:targetAuth ;
+    sh:node          auth:authorizationShape .
+
+auth:SocketDefinitionShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:targetClass   won:SocketDefinition ;
+    sh:property      auth:localAuthPropertyShape ;
+    sh:property      auth:targetAuthPropertyShape .
+
+# Requesting an operation (might not be necessary to express this in RDF)
+
+# position in the atom structure expression tree (instances defined in this ontology)
+
+auth:asePositionShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:targetClass       auth:AsePosition ;
+    sh:property          [ sh:path     auth:parentPosition ;
+                           sh:maxCount 1 ;
+                           sh:class    auth:AsePosition ] ;
+    sh:in                ( auth:positionRoot
+                           auth:positionAtomGraph
+                           auth:positionAtomMessage
+                           auth:positionAtomMessages
+                           auth:positionSocket
+                           auth:positionConnections
+                           auth:positionConnection
+                           auth:positionConnectionMessages
+                           auth:positionConnectionMessage ) .
+
+auth:operationRequestShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:targetClass       auth:OperationRequest ;
+    sh:ignoredProperties ( rdf:type ) ;
+    sh:closed            true ;
+    sh:or                ( [ sh:path     auth:requestor ;
+                             sh:minCount 1 ] [ sh:path     auth:bearsToken ;
+                                               sh:minCount 1 ] ) ;
+    sh:property          [ sh:path     auth:requestor ;
+                           sh:nodeKind sh:IRI ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path     auth:reqPosition ;
+                           sh:maxCount 1 ;
+                           sh:node     auth:asePositionShape ] ;
+    sh:property          [ sh:path     auth:operation ;
+                           sh:maxCount 1 ;
+                           sh:or       ( [ sh:node auth:simpleOperationExpressionShape ]
+                                         [ sh:node auth:messageOperationExpressionShape ]
+                                         [ sh:node auth:tokenOperationExpressionShape ] ) ] ;
+    sh:property          [ sh:path     auth:reqAtom ;
+                           sh:nodeKind sh:IRI ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path auth:requestToken ;
+                           sh:node auth:tokenSpecificationShape ] ;
+    sh:property          [ sh:path     auth:reqAtomState ;
+                           sh:node     auth:atomStateShape ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path     auth:reqGraph ;
+                           sh:nodeKind sh:IRI ] ;
+    sh:property          [ sh:path     auth:reqGraphType ;
+                           sh:node     auth:graphTypeShape ;
+                           sh:nodeKind sh:IRI ] ;
+    sh:property          [ sh:path     auth:reqSocketType ;
+                           sh:nodeKind sh:IRI ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path     auth:reqSocket ;
+                           sh:nodeKind sh:IRI ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path     auth:reqConnection ;
+                           sh:nodeKind sh:IRI ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path     auth:reqConnectionState ;
+                           sh:node     auth:connectionStateShape ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path     auth:reqConnectionTargetAtom ;
+                           sh:nodeKind sh:IRI ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path     auth:reqConnectionMessage ;
+                           sh:nodeKind sh:IRI ;
+                           sh:maxCount 1 ; ] ;
+    sh:property          [ sh:path auth:bearsToken ;
+                           sh:node auth:authTokenShape ; ] .
+
+auth:authTokenShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:targetClass   auth:AuthToken ;
+    sh:property      auth:tokenIssPropertyShape ;
+    sh:property      auth:tokenSigPropertyShape ;
+    sh:property      auth:tokenSubPropertyShape ;
+    sh:property      auth:tokenScopePropertyShape ;
+    sh:property      auth:tokenIatPropertyShape ;
+    sh:property      auth:tokenExpPropertyShape .
+
+# communicates the auth info in the WWW-Authenticate header, stripped-down version of auth:authorizationShape, omitting
+# all grant/grantToken information. Moreover, explicit grants via atomExpressions are not communicated this way as this
+# might divulge delicate information.
+
+auth:authInfoShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:targetClass       auth:AuthInfo ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type auth:bearer auth:grantee ) ;
+    sh:or                ( [ sh:property [ sh:path auth:bearer ;
+                                           sh:node auth:tokenShapeShape ] ]
+                           [ sh:property [ sh:path auth:grantee ;
+                                           sh:node auth:aseRootShape ] ]
+                           [ sh:property [ sh:path     auth:grantee ;
+                                           sh:maxCount 1 ;
+                                           sh:node     auth:granteeWildcardShape ] ] ) .
+
+
+auth:authTokenTestSpecShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:property      auth:tokenIssPropertyShape ;
+    sh:property      auth:tokenSubPropertyShape ;
+    sh:property      auth:tokenSigPropertyShape ;
+    sh:property      auth:tokenScopePropertyShape ;
+    sh:property      auth:expiresAfterPropertyShape .
+
+auth:aclEvalResultShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:targetClass   auth:OperationResult ;
+    sh:class         auth:OperationResult ;
+    sh:property      [ sh:path     auth:requestedOperation ;
+                       sh:node     auth:operationRequestShape ;
+                       sh:nodeKind sh:IRI ;
+                       sh:minCount 1 ;
+                       sh:maxCount 1 ] ;
+    sh:property      [ sh:path     auth:decision ;
+                       sh:nodeKind sh:IRI ;
+                       sh:node     auth:decisionValueShape ;
+                       sh:minCount 1 ;
+                       sh:maxCount 1 ] ;
+    sh:property      [ sh:path     auth:provideAuthInfo ;
+                       sh:maxCount 1 ;
+                       sh:node     auth:authInfoShape ] ;
+    sh:property      [ sh:path auth:issueToken ;
+                       sh:node auth:authTokenShape ] ;
+    sh:property      [ sh:path     auth:invalidToken ;
+                       sh:maxCount 1 ;
+                       sh:nodeKind sh:Literal ;
+                       sh:datatype xsd:boolean ] ;
+    sh:property      [ sh:path     auth:insufficientScope ;
+                       sh:maxCount 1 ;
+                       sh:nodeKind sh:Literal ;
+                       sh:datatype xsd:boolean ] .
+
+auth:expectedAclEvalResultShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:NodeShape ;
+    sh:targetClass   auth:ExpectedAclEvalResult ;
+    sh:class         auth:ExpectedAclEvalResult ;
+    sh:property      [ sh:path     auth:requestedOperation ;
+                       sh:node     auth:operationRequestShape ;
+                       sh:nodeKind sh:IRI ;
+                       sh:minCount 1 ;
+                       sh:maxCount 1 ] ;
+    sh:property      [ sh:path     auth:decision ;
+                       sh:nodeKind sh:IRI ;
+                       sh:node     auth:decisionValueShape ;
+                       sh:minCount 1 ;
+                       sh:maxCount 1 ] ;
+    sh:property      [ sh:path auth:issueToken ;
+                       sh:node auth:authTokenTestSpecShape ] ;
+    sh:property      [ sh:path     auth:provideAuthInfo ;
+                       sh:maxCount 1 ;
+                       sh:node     auth:authInfoShape ] .
+
+auth:decisionValueShape
+    rdfs:isDefinedBy     auth: ;
+    a                    sh:NodeShape ;
+    sh:closed            true ;
+    sh:ignoredProperties ( rdf:type rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+    sh:in                ( auth:accessGranted auth:accessDenied ) .
+
+
+auth:AtomStructureExpression
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:comment     "Class of all atom structure expressions (ASEs)."@en ;
+    rdfs:label       "AtomStructureExpression" .
+
+auth:AseRoot
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment     "Class of the roots of ASE trees"@en ;
+    rdfs:label       "AseRoot" .
+
+auth:GraphExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment     "Class of all ASE that correspond to the graph position in the atom tree structure."@en ;
+    rdfs:label       "GraphExpression" .
+
+auth:SocketExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment     "Class of all ASE that correspond to the socket position in the atom tree structure."@en ;
+    rdfs:label       "SocketExpression" .
+
+auth:AtomMessagesExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment
+                     "Class of all ASE that correspond to the atom message container position in the atom tree structure."@en ;
+    rdfs:label       "AtomMessagesExpression" .
+
+auth:AtomMessageExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment     "Class of all ASE that correspond to the atom message position in the atom tree structure."@en ;
+    rdfs:label       "AtomMessageExpression" .
+
+auth:ConnectionsExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment
+                     "Class of all ASE that correspond to the connection container position in the atom tree structure."@en ;
+    rdfs:label       "ConnectionsExpression" .
+
+auth:ConnectionExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment     "Class of all ASE that correspond to the connection position in the atom tree structure."@en ;
+    rdfs:label       "ConnectionExpression" .
+
+auth:ConnectionMessagesExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment
+                     "Class of all ASE that correspond to the connection message container position in the atom tree structure."@en ;
+    rdfs:label       "ConnectionMessagesExpression" .
+
+auth:ConnectionMessageExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomStructureExpression ;
+    rdfs:comment
+                     "Class of all ASE that correspond to the connection message position in the atom tree structure."@en ;
+    rdfs:label       "ConnectionMessageExpression" .
+
+auth:AtomExpression
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:comment
+                     "An expression evaluating to an atom URI, either relative to some evaluation context or by its absolute URI."@en ;
+    rdfs:label       "AtomExpression" .
+
+auth:RelativeAtomExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AtomExpression ;
+    rdfs:comment     "An expression evaluating to an atom URI relative to a given evaluation context."@en ;
+    rdfs:label       "RelativeAtomExpression" .
+
+
+auth:GranteeWildcard
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:comment     "Expresses that any client is a grantee."@en ;
+    rdfs:label       "GranteeWildcard" .
+
+auth:Authorization
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:comment
+                     "Class of authorizations in WoN. Authorizations combine definitions of __who__ is allowed __what__ and if they are not, under which circumstances they may learn how to obtain access (i.e., get __authInfo__)."@en ;
+    rdfs:label       "Authorization" .
+
+auth:DecisionValue
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:comment     "The class of autorization decisions (access denied or granted)"@en ;
+    rdfs:label       "DecisionValue" .
+
+auth:TreeExpressionShape
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "TreeExpressionShape" ;
+    rdfs:comment     "Class of all SHACL shapes that specify atom structure expressions (ASEs)."@en .
+
+auth:OperationContainerShape
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "OperationContainerShape" ;
+    rdfs:comment
+                     "Class of all auth:TreeExpressionShape instances thay may link to auth:OperationExpression instances via auth:operation."@en .
+
+auth:InheritingShape
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "InheritingShape" ;
+    rdfs:comment
+                     "Class of all auth:TreeExpressionShape instances that inherit allowed operations from their parent and are thus allowed to use the auth:inherit property to block inheritance."@en .
+
+auth:TargetAtomContainerShape
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "TargetAtomContainerShape" ;
+    rdfs:comment
+                     "Class of all auth:TreeExpressionShape instances thay may contain a target atom expression via auth:targetAtom."@en .
+
+auth:OperationExpression
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "OperationExpression" ;
+    rdfs:comment
+                     "Class of all WoN operations, such as reading the linked data representation of a resource, sending a message, etc."@en .
+
+auth:SimpleOperationExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:OperationExpression ;
+    rdfs:label       "SimpleOperation" ;
+    rdfs:comment
+                     "Class of all auth:OperationExpression instances that require no further defining properties beyond their identifier."@en .
+
+auth:MessageOperationExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:OperationExpression ;
+    rdfs:label       "MessageOperationExpression" ;
+    rdfs:comment     "Class of all auth:OperationExpression instances that refer to sending messages."@en .
+
+auth:TokenOperationExpression
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:OperationExpression ;
+    rdfs:label       "TokenOperationExpression" ;
+    rdfs:comment
+                     "Class of all auth:OperationExpression instances that refer to requesting an authentication token."@en .
+
+auth:MessageWildcard
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:comment     "Expresses that any message type is covered by an operation."@en ;
+    rdfs:label       "MessageWildcard" .
+
+auth:MessageTypeSet
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "MessageTypeSet" ;
+    rdfs:comment
+                     "Class of sets of msg:MessageType, identified by a resource, and listing message types via rdfs:member."@en .
+
+auth:TokenShape
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "TokenShape" ;
+    rdfs:comment
+                     "Class of all definitions of token shapes, i.e. of specifications of the properties a token must have in order to be accepted."@en .
+
+auth:TokenSpecification
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "TokenSpecification" ;
+    rdfs:comment     "Class of all definition of tokens to be granted or tokens requested."@en .
+
+auth:AsePosition
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "AsePosition" ;
+    rdfs:comment     "Class of all positions in the atom's tree structure"@en .
+
+auth:AuthToken
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "AuthToken" ;
+    rdfs:comment     "Class of all authentication tokens (when expressed in RDF, which makes sense for testing)."@en .
+
+auth:ExpectedAclEvalResult
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:subClassOf  auth:AclEvalResult ;
+    rdfs:label       "ExpectedAclEvalResult" ;
+    rdfs:comment
+                     "Class of expected authorization evaluation results, specifying a) the decision, b) granted auth tokens (if any), c) authInfo (if any)."@en .
+
+auth:AclEvalResult
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "AclEvalResult" ;
+    rdfs:comment
+                     "Class of all authorization evaluation results, specifying a) the decision, b) granted auth tokens (if any), c) authInfo (if any)."@en .
+
+
+auth:TokenScope
+    rdfs:isDefinedBy auth: ;
+    a                owl:Class ;
+    rdfs:label       "TokenScope" ;
+    rdfs:comment
+                     "Class of all well-known token scopes. Using such scopes allows coordination across different domain ontologies." .
+
+auth:anyone
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:GranteeWildcard ;
+    rdfs:label       "anyone" ;
+    rdfs:comment
+                     "Special wildcard matching any client - no credentials necessary. Example: `[ auth:grantee auth:anyone ; ... ]`"@en .
+
+auth:self
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:RelativeAtomExpression ;
+    rdfs:label       "self" ;
+    rdfs:comment     "Placeholder for the atom's own URI in an atom expression, e.g. `[ auth:atom auth:self ]`. "@en .
+
+auth:anyAtom
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:RelativeAtomExpression ;
+    rdfs:label       "anyAtom" ;
+    rdfs:comment     "Placeholder for any atom URI in an atom expression, e.g. `[ auth:atom auth:anyAtom ]`"@en .
+
+auth:authorizationRequestor
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:RelativeAtomExpression ;
+    rdfs:label       "authorizationRequestor" ;
+    rdfs:comment     """Placeholder for the URI of the socket that requests an operation via auth:localAuth, or
+     of the local socket of the connection of which the target socket requests an operation via auth:targetAuth."""@en .
+
+auth:operationRequestor
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:RelativeAtomExpression ;
+    rdfs:label       "operationRequestor" ;
+    rdfs:comment     """Placeholder for the uri of the atom that requests an operation. In the case of bearer
+    authentication, there is no operationRequestor; arguably, one could use the token's subject claim, but that
+    would extend additional trust to the issuer of the token."""@en .
+
+auth:aclGraph
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:GraphType ;
+    rdfs:label       "aclGraph" ;
+    rdfs:comment
+                     "Graph type identifying all acl graphs of an atom (contains the ACLs, there is one `#acl` and one `#socket-acl` graph)."@en .
+
+auth:contentGraph
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:GraphType ;
+    rdfs:label       "contentGraph" ;
+    rdfs:comment     "Graph type identifying all content graphs of an atom (contains user-generated information)"@en .
+
+auth:keyGraph
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:GraphType ;
+    rdfs:label       "keyGraph" ;
+    rdfs:comment     "Graph type identifying the key graph of an atom (contains the public key)"@en .
+
+auth:sysinfoGraph
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:GraphType ;
+    rdfs:label       "sysinfoGraph" ;
+    rdfs:comment     "Graph type identifying the sysinfo graph of an atom (contains system-generated information)"@en .
+
+auth:anyMessageType
+    rdfs:isDefinedBy auth: ;
+    a                auth:MessageWildcard, owl:NamedIndividual ;
+    rdfs:label       "anyMessageType" ;
+    rdfs:comment     "Any message type"@en .
+
+auth:anyOperation
+    rdfs:isDefinedBy auth: ;
+    a                auth:SimpleOperationExpression, owl:NamedIndividual ;
+    rdfs:label       "anyOperation" ;
+    rdfs:comment     "Any operation at all"@en .
+
+auth:accessGranted
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:DecisionValue ;
+    rdfs:label       "accessGranted" ;
+    rdfs:comment     "The requested operation is granted."@en .
+
+auth:accessDenied
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:DecisionValue ;
+    rdfs:label       "accessDenied" ;
+    rdfs:comment     "The requested operation is denied."@en .
+
+auth:decision
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AclEvalResult ;
+    rdfs:range       auth:DecisionValue ;
+    rdfs:label       "decision" ;
+    rdfs:comment     "The decision (access granted or denied) made by evaluating the ACL."@en .
+
+auth:issueToken
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AclEvalResult ;
+    rdfs:range       auth:AuthToken ;
+    rdfs:label       "issueToken" ;
+    rdfs:comment     "The token issued as the result of an ACL evaluation."@en .
+
+auth:localAuth
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      won:SocketDefinition ;
+    rdfs:range       auth:Authorization ;
+    rdfs:label       "localAuth" ;
+    rdfs:comment
+                     "Authorization that a socket requests its own atom to add to its `#socket-acl` graph when it is added to the atom."@en .
+
+auth:targetAuth
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      won:SocketDefinition ;
+    rdfs:range       auth:Authorization ;
+    rdfs:label       "targetAuth" ;
+    rdfs:comment
+                     "Authorization that a socket requests the target atoms of its connections to add to their `#socket-acl` graphs upon establishing a connection."@en .
+
+auth:graph
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AseRoot ;
+    rdfs:range       auth:GraphExpression ;
+    rdfs:label       "graph" ;
+    rdfs:comment     "Used in the ASE root to specify a auth:GraphExpression."@en .
+
+auth:atom
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AtomExpression ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( auth:RelativeAtomExpression auth:Atom ) ] ;
+    rdfs:label       "atom" ;
+    rdfs:comment     "The relative or absolute reference to an atom."@en .
+
+auth:AseFilterObjectProperty
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AseLeafObjectProperty ;
+    rdfs:domain      auth:AtomStructureExpression ;
+    rdfs:label       "AseFilterProperty" ;
+    rdfs:comment     "Object properties that can be used to filter the focus nodes of ASE expressions."@en .
+
+auth:AseFilterDatatypeProperty
+    rdfs:isDefinedBy auth: ;
+    rdfs:subClassOf  auth:AseLeafDatatypeProperty ;
+    rdfs:domain      auth:AtomStructureExpression ;
+    rdfs:label       "AseFilterDatatypeProperty" ;
+    rdfs:comment     "Object properties that can be used to filter the focus nodes of ASE expressions."@en .
+
+
+auth:AseLeafObjectProperty
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AtomStructureExpression ;
+    rdfs:label       "AseLeafProperty" ;
+    rdfs:comment     "Object properties of ASEs that do not have ASEs as their object."@en .
+
+auth:AseLeafDatatypeProperty
+    rdfs:isDefinedBy auth: ;
+    a                owl:DatatypeProperty ;
+    rdfs:domain      auth:AtomStructureExpression ;
+    rdfs:label       "AseLeafDatatypeProperty" ;
+    rdfs:comment     "Object properties of ASEs that do not have ASEs as their object."@en .
+
+auth:AseBranchProperty
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AtomStructureExpression ;
+    rdfs:range       auth:AtomStructureExpression ;
+    rdfs:label       "AseBranchProperty" ;
+    rdfs:comment     "Object properties of ASEs that have ASEs as their object."@en .
+
+auth:inherit
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseLeafObjectProperty ;
+    a                  owl:DatatypeProperty ;
+    rdfs:range         xsd:boolean ;
+    rdfs:label         "inherit" ;
+    rdfs:comment       """Atom structure expressions use `auth:inherit true` in order to not inherit granted operations from
+        their parent expressions"""@en .
+
+auth:graphType
+    rdfs:isDefinedBy   auth: ;
+    a                  owl:ObjectProperty ;
+    rdfs:subPropertyOf auth:AseFilterObjectProperty ;
+    rdfs:domain        auth:GraphExpression ;
+    rdfs:range         auth:GraphType ;
+    rdfs:label         "graphType" ;
+    rdfs:comment       "Filters focus nodes of the graph expression by graph type."@en .
+
+auth:graphIri
+    rdfs:isDefinedBy   auth: ;
+    a                  owl:ObjectProperty ;
+    rdfs:subPropertyOf auth:AseFilterObjectProperty ;
+    rdfs:domain        auth:GraphExpression ;
+    rdfs:label         "graphIri" ;
+    rdfs:comment       "Filters focus nodes of the graph expression by graph IRI."@en .
+
+auth:targetAtom
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseLeafObjectProperty ;
+    a                  owl:ObjectProperty ;
+    rdfs:domain        auth:AtomStructureExpression ;
+    rdfs:comment
+                       "Identifies target atoms of connections that are direct or transitive targetNodes of the expression's focus nodes."@en ;
+    rdfs:label         "targetAtom" .
+
+auth:atomState
+    rdfs:isDefinedBy   auth: ;
+    a                  owl:ObjectProperty ;
+    rdfs:subPropertyOf auth:AseFilterObjectProperty ;
+    rdfs:domain        auth:AseRoot ;
+    rdfs:range         won:AtomState ;
+    rdfs:label         "atomState" ;
+    rdfs:comment       "Filters focus nodes of the ASE root by atom state."@en .
+
+auth:tokenScope
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      [ a           owl:Class ;
+                       owl:unionOf ( auth:AuthToken auth:TokenShape auth:TokenSpecification ) ] ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( xsd:String xsd:anyUri ) ] ;
+    rdfs:comment
+                     "Scope of an actual token, of a token to be granted, or required scope of a token to be accepted."@en ;
+    rdfs:label       "tokenScope" .
+
+auth:socketIri
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseFilterObjectProperty ;
+    a                  owl:ObjectProperty ;
+    rdfs:domain        auth:SocketExpression ;
+    rdfs:range         xsd:anyUri ;
+    rdfs:comment
+                       "Filters focus nodes of the socket expression by socket IRI (not to be confused with auth:socketType, which filters by IRI of the socket definition)."@en ;
+    rdfs:label         "socketIri" .
+
+auth:socketType
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseFilterObjectProperty ;
+    a                  owl:ObjectProperty ;
+    rdfs:domain        auth:SocketExpression ;
+    rdfs:range         xsd:anyUri ;
+    rdfs:comment
+                       "Filters focus nodes of the socket expression by socket definition IRI (not to be confused with auth:socketIri, which filters by IRI of the socket)."@en ;
+    rdfs:label         "socketType" .
+
+auth:socket
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseBranchProperty ;
+    rdfs:domain        auth:AseRoot ;
+    rdfs:range         auth:SocketExpression ;
+    rdfs:label         "socket" ;
+    rdfs:comment
+                       "Used in the ASE root to specify a auth:SocketExpression. All sockets of the atom become focus nodes of the socket expression."@en .
+
+auth:connection
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseBranchProperty ;
+    rdfs:domain        [ a           owl:Class ;
+                         owl:unionOf ( auth:AseRoot auth:SocketExpression
+                                       auth:ConnectionsExpression ) ] ;
+    rdfs:range         auth:ConnectionExpression ;
+    rdfs:label         "connection" ;
+    rdfs:comment
+                       "Used in the ASE root, socket or connections expressions to specify a auth:ConnectionExpression. The connections directly or transitively reachable from all target nodes become focus nodes of the connection expression."@en .
+
+auth:connectionState
+    rdfs:isDefinedBy   auth: ;
+    a                  owl:ObjectProperty ;
+    rdfs:subPropertyOf auth:AseFilterObjectProperty ;
+    rdfs:domain        [ a           owl:Class ;
+                         owl:unionOf ( auth:ConnectionsExpression auth:ConnectionExpression ) ] ;
+    rdfs:range         won:ConnectionState ;
+    rdfs:label         "connectionState" ;
+    rdfs:comment       "Filters focus nodes of the connection or connections expression by connection state."@en .
+
+auth:connectionIri
+    rdfs:isDefinedBy   auth: ;
+    a                  owl:ObjectProperty ;
+    rdfs:subPropertyOf auth:AseFilterObjectProperty ;
+    rdfs:domain        auth:ConnectionExpression ;
+    rdfs:range         xsd:anyUri ;
+    rdfs:label         "connectionIri" ;
+    rdfs:comment       "Filters focus nodes of the connection expression by connection IRI."@en .
+
+auth:connections
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseBranchProperty ;
+    rdfs:domain        [ a           owl:Class ;
+                         owl:unionOf ( auth:AseRoot auth:SocketExpression ) ] ;
+    rdfs:range         auth:ConnectionExpression ;
+    rdfs:label         "connections" ;
+    rdfs:comment
+                       "Used in the ASE root or socket expressions to specify a auth:ConnectionsExpression. The connection containers directly or transitively reachable from all target nodes become focus nodes of the connections expression."@en .
+
+auth:atomMessage
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseBranchProperty ;
+    rdfs:domain        [ a           owl:Class ;
+                         owl:unionOf ( auth:AseRoot auth:AtomMessagesExpression ) ] ;
+    rdfs:range         auth:AtomMessageExpression ;
+    rdfs:label         "atomMessage" ;
+    rdfs:comment       """Used in the ASE root or atom messages expressions to specify a auth:AtomMessageExpression. The atom
+     messages directly or transitively reachable from all target nodes become focus nodes of the atom message expression."""@en .
+
+auth:connectionMessage
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseBranchProperty ;
+    rdfs:domain        [ a           owl:Class ;
+                         owl:unionOf ( auth:AseRoot auth:SocketExpression auth:ConnectionsExpression
+                                     auth:ConnectionExpression auth:ConnectionMessagesExpression ) ] ;
+    rdfs:range         auth:ConnectionMessageExpression ;
+    rdfs:label         "connectionMessage" ;
+    rdfs:comment       """Used in the ASE root, socket, connections, connection, or connection messages expressions to specify
+    a auth:ConnectionMessageExpression. The connection messages directly or transitively reachable from all target nodes 
+    become focus nodes of the connection message expression."""@en .
+
+auth:connectionMessages
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseBranchProperty ;
+    rdfs:domain        [ a           owl:Class ;
+                         owl:unionOf ( auth:AseRoot auth:SocketExpression auth:ConnectionsExpression
+                                       auth:ConnectionExpression ) ] ;
+    rdfs:range         auth:ConnectionMessagesExpression ;
+    rdfs:label         "connectionMessages" ;
+    rdfs:comment       """Used in the ASE root, socket, connections, or connection expressions to specify
+    a auth:ConnectionMessagesExpression. The connection containers directly or transitively reachable from all target nodes 
+    become focus nodes of the connection messages expression."""@en .
+
+auth:atomMessages
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseBranchProperty ;
+    rdfs:domain        auth:AseRoot ;
+    rdfs:range         auth:AtomMessagesExpression ;
+    rdfs:label         "atomMessages" ;
+    rdfs:comment       """Used in the ASE root to specify a auth:AtomMessagesExpression. The atom message containers reachable from all target nodes
+    become focus nodes of the atom messages expression."""@en .
+
+auth:grantee
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:Authorization ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( auth:AseRoot auth:AtomExpression auth:GranteeWildcard ) ] ;
+    rdfs:label       "grantee" ;
+    rdfs:comment     """Used in an Authorization to define the set of grantees. Linking to an ASE root means that the targets
+        of auth:TargetAtomExpressions are grantees. Linking to an atom expression means that the targets of
+        the atom expression are grantees. Linking to a granteeWildcard means any client is a grantee."""@en .
+
+auth:bearer
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:Authorization ;
+    rdfs:range       auth:TokenShape ;
+    rdfs:label       "bearer" ;
+    rdfs:comment
+                     """Used in an Authorization to define constraints for tokens that if fulfilled, make their bearer a grantee."""@en .
+
+auth:operation
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseLeafObjectProperty ;
+    rdfs:range         auth:OperationExpression ;
+    rdfs:comment       """Used in ASEs to enumerate operations granted for the ASE's position in the atom's tree structure.
+        When checking for granted operations, operations are inherited by nested ASEs. An ASE can reject inheriting
+        the granted operations using `auth:inherit false`."""@en ;
+    rdfs:label         "operation" .
+
+auth:messageOnBehalf
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:MessageOperationExpression ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( msg:MessageType auth:MessageTypeSet ) ] ;
+    rdfs:label       "messageOnBehalf" ;
+    rdfs:comment     """Allows an auth:MessageOperationExpression to specify msg:MessageTypes that the grantee of the operation may
+     send __on behalf__ of the actual atom owner, at the operation's position in the atom's tree structure. The message
+     types are either listed as objects of auth:messageOnBealf or defined
+     transitively. In the latter case, the object of auth:messageOnBehalf is an auth:MessageTypeSet, which in turn lists
+     message types.
+        """@en .
+
+auth:messageTo
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:MessageOperationExpression ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( msg:MessageType auth:MessageTypeSet ) ] ;
+    rdfs:label       "messageTo" ;
+    rdfs:comment     """Allows an auth:MessageOperationExpression to specify msg:MessageTypes that the grantee of the operation may
+     send __to__ the atom, at the operation's position in the atom's tree structure. The message types are either
+     listed as objects of auth:messageTo or defined transitively. In the latter case, the object of auth:messageTo
+     is an auth:MessageTypeSet, which in turn lists message types.
+        """@en .
+
+auth:requestedBy
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:Authorization ;
+    rdfs:range       auth:Socket ;
+    rdfs:label       "requestedBy" ;
+    rdfs:comment     """Sockets may define auth:Authorizaitons for the atoms they are added to and for the target atoms of
+        connections that are made via the socket. These Authorizations are added to the atom's `#socket-acl` graph. In order
+         to be able to remove the authorizations again when a socket is removed from the atom, the authorization links
+         to the socket using auth:requestedBy."""@en .
+
+auth:grant
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:Authorization ;
+    rdfs:range       auth:AseRoot ;
+    rdfs:label       "grant" ;
+    rdfs:comment     """An authorization defines the operations it grants in the form of an ASE tree annotated with
+        auth:OperationExpressions using auth:grant."""@en .
+
+auth:requestToken
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:TokenOperationExpression ;
+    rdfs:range       auth:TokenSpecification ;
+    rdfs:label       "requestToken" ;
+    rdfs:comment
+                     "A TokenOperationExpression links to the specification of the requested token via auth:requestToken."@en .
+
+auth:issuer
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      [ a           owl:Class ;
+                       owl:unionOf ( auth:TokenShape auth:TokenSpecification ) ] ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( auth:AtomExpression auth:AseRoot ) ] ;
+    rdfs:comment     """auth:issuer is used to link indicate who did, was asked to, or is required as the issuer of a token.
+    Note that it is not required that the issuer is identical with the signer of a token. Unless the property `auth:nodeSigned true` 
+    is used, a token requested from an atom is signed by the WoN node on behalf of the atom. A token signed using
+    the atom's private key can only be generated by the owner of the atom and thus involves a much more complex process
+    to create."""@en ;
+    rdfs:label       "issuer" .
+
+auth:tokenScope
+    rdfs:isDefinedBy auth: ;
+    a                owl:DatatypeProperty ;
+    rdfs:domain      [ a           owl:Class ;
+                       owl:unionOf ( auth:TokenShape auth:AuthToken auth:TokenSpecification ) ] ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( xsd:string xsd:anyUri ) ] ;
+    rdfs:label       "tokenScope" ;
+    rdfs:comment     """The auth:tokenScope property is used to annotate which scope value a token has, is requested with,
+    or is required to have. Token scopes with URI values allow different socket definitions to collaborate: one socket
+    adds an authorization to an atom granting a token with a specific scope URI, another socket specifies an authorization
+    requiring a token with that scope URI (from a defined set of accepted issuers) in order to grant some operation."""@en .
+
+auth:expiresAfter
+    rdfs:isDefinedBy auth: ;
+    a                owl:DatatypeProperty ;
+    rdfs:domain      auth:TokenSpecification ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( xsd:int xsd:integer xsd:long ) ] ;
+    rdfs:label       "expiresAfter" ;
+    rdfs:comment     "Specifies the lifetime of a token in seconds."@en .
+
+auth:tokenIss
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AuthToken ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( won:Atom won:Node ) ] ;
+    rdfs:label       "tokenIss" ;
+    rdfs:comment     "The issuer of an actual token (either an atom uri or a won node uri)."@en .
+
+auth:tokenSub
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AuthToken ;
+    rdfs:range       [ a           owl:Class ;
+                       owl:unionOf ( won:Atom ) ] ;
+    rdfs:label       "tokenSub" ;
+    rdfs:comment     "The subject of an actual token - the atom that requested it."@en .
+
+
+auth:tokenIat
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AuthToken ;
+    rdfs:range       xsd:dateTime ;
+    rdfs:label       "tokenIat" ;
+    rdfs:comment     "The date/time the token was issued, according to the signer's clock."@en .
+
+auth:tokenExp
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:AuthToken ;
+    rdfs:range       xsd:dateTime ;
+    rdfs:label       "tokenExp" ;
+    rdfs:comment     "The date/time the token expires, according to the signer's clock."@en .
+
+auth:OwnerToken
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:TokenScope ;
+    rdfs:comment     "URI reserved for the value of the scope claim of owner tokens"@en ;
+    rdfs:label       "OwnerToken" .
+
+# Implicit authorizations for all atoms:
+
+auth:grantsForOwnerTokenBearer
+    rdfs:isDefinedBy auth: ;
+    a                auth:Authorization, owl:NamedIndividual ;
+    auth:grant       [ auth:operation auth:anyOperation ] ;
+    auth:bearer      [ auth:tokenScope auth:OwnerToken ;
+                       auth:nodeSigned true ;
+                       auth:issuer     [ auth:atom auth:self ] ] ;
+    rdfs:label       "grantsForOwnerTokenBearer" ;
+    rdfs:comment
+                     "Implicit authorization granting any operation to bearers of a valid token with scope auth:OwnerToken"@en .
+
+auth:grantOwnerTokenToOwner
+    rdfs:isDefinedBy auth: ;
+    a                auth:Authorization, owl:NamedIndividual ;
+    auth:grant       [ auth:operation [ auth:requestToken [ auth:tokenScope   auth:OwnerToken ;
+                                                            auth:nodeSigned   true ;
+                                                            auth:expiresAfter 3600 ] ] ] ;
+    rdfs:label       "grantOwnerTokenToOwner" ;
+    rdfs:comment     "Implicit authorization granting an token with scope auth:OwnerToken to the atom's owner"@en ;
+    auth:grantee     [ auth:atom auth:self ] .
+
+auth:grantsForConnStateRequestSent
+    rdfs:isDefinedBy auth: ;
+    a                auth:Authorization, owl:NamedIndividual ;
+    auth:grant       [ auth:graph      [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                         auth:operation auth:opRead ] ;
+                       auth:connection [ auth:targetAtom [ auth:atom auth:operationRequestor ] ;
+                                         auth:operation  auth:opConnectClose ] ] ;
+    auth:grantee     [ auth:connection [ auth:targetAtom      [ ] ;
+                                         auth:connectionState won:RequestSent ] ] ;
+    rdfs:label       "grantsForConnStateRequestSent" ;
+    rdfs:comment
+                     "Implicit authorization for connections that have been requested by us but have not yet been accepted by the partner"@en .
+
+auth:grantsForConnStateRequestReceived
+    rdfs:isDefinedBy auth: ;
+    a                auth:Authorization, owl:NamedIndividual ;
+    auth:grant       [ auth:graph      [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                         auth:operation auth:opRead ] ;
+                       auth:connection [ auth:targetAtom [ auth:atom auth:operationRequestor ] ;
+                                         auth:operation  auth:opConnectClose ] ] ;
+    auth:grantee     [ auth:connection [ auth:targetAtom      [ ] ;
+                                         auth:connectionState won:RequestReceived ] ] ;
+    rdfs:label       "grantsForConnStateRequestReceived" ;
+    rdfs:comment
+                     "Implicit authorization for connections that have been requested by the partner but not yet established"@en .
+
+auth:grantsForConnStateClosed
+    rdfs:isDefinedBy auth: ;
+    a                auth:Authorization, owl:NamedIndividual ;
+    auth:grant       [ auth:connection [ auth:targetAtom [ auth:atom auth:operationRequestor ] ;
+                                         auth:operation  auth:opConnectClose ] ] ;
+    auth:grantee     [ auth:connection [ auth:targetAtom      [ ] ;
+                                         auth:connectionState won:Closed ] ] ;
+    rdfs:label       "grantsForConnStateClosed" ;
+    rdfs:comment     "Implicit authorization for closed connections"@en .
+
+auth:grantsForConnStateConnected
+    rdfs:isDefinedBy auth: ;
+    a                auth:Authorization, owl:NamedIndividual ;
+    auth:grant       [ auth:graph      [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                         auth:operation auth:opRead ] ;
+                       auth:connection [ auth:targetAtom [ auth:atom auth:operationRequestor ] ;
+                                         auth:operation  auth:opCommunicate ] ] ;
+    auth:grantee     [ auth:connection [ auth:targetAtom      [ ] ;
+                                         auth:connectionState won:Connected ] ] ;
+    rdfs:label       "grantsForConnStateConnected" ;
+    rdfs:comment     "Implicit authorization for established connections"@en .
+
+# Operations
+
+
+auth:opAutoConnect
+    rdfs:isDefinedBy auth: ;
+    a                auth:SimpleOperationExpression ;
+    rdfs:label       "opAutoConnect" ;
+    rdfs:comment     """The 'operation' of auto-connecting an atom, i.e. automatically replying with a msg:ConnectMessage
+    when a connection is requested. One could call this an inverse operation, being executed by the observed atom only for
+        atoms that are granted the operation"""@en .
+
+auth:opObserve
+    rdfs:isDefinedBy auth: ;
+    a                auth:SimpleOperationExpression ;
+    rdfs:label       "opObserve" ;
+    rdfs:comment     """The 'operation' of observing an atom, i.e. being informed of changes to its content or connections.
+        One could call this an inverse operation, being executed by the observed atom only for
+        atoms that are granted the operation"""@en .
+
+auth:opRead
+    rdfs:isDefinedBy auth: ;
+    a                auth:SimpleOperationExpression ;
+    rdfs:label       "opRead" ;
+    rdfs:comment     "The operation of reading a linked data resource"@en .
+
+auth:opNop
+    rdfs:isDefinedBy auth: ;
+    a                auth:SimpleOperationExpression ;
+    rdfs:label       "opNop" ;
+    rdfs:comment     "No operation - used where an operation is syntactically required but none should be allowed."@en .
+
+auth:opHint
+    rdfs:isDefinedBy auth: ;
+    a                auth:MessageOperationExpression ;
+    auth:messageTo   auth:msgTypesHint ;
+    rdfs:label       "opHint" ;
+    rdfs:comment     "The operation of sending a hint message to an atom"@en .
+
+auth:opConnectClose
+    rdfs:isDefinedBy auth: ;
+    a                auth:MessageOperationExpression ;
+    auth:messageTo   auth:msgTypesConnectClose ;
+    rdfs:label       "opConnectClose" ;
+    rdfs:comment
+                     "The operation of establishing or closing a connection with another atom, i.e., sending such messages __to__ the atom"@en .
+
+auth:opCommunicate
+    rdfs:isDefinedBy auth: ;
+    a                auth:MessageOperationExpression ;
+    auth:messageTo   auth:msgTypesCommunicate ;
+    rdfs:label       "opCommunicate" ;
+    rdfs:comment
+                     "The operation of communicating with an atom via a connection, i.e, sending such messages __to__ the atom"@en .
+
+auth:opModifyOnBehalf
+    rdfs:isDefinedBy     auth: ;
+    a                    auth:MessageOperationExpression ;
+    auth:messageOnBehalf auth:msgTypesModify ;
+    rdfs:label           "opModifyOnBehalf" ;
+    rdfs:comment
+                         "The operation of modifying an atom on behalf of that atom, i.e., the message is not signed using the atom owner's key"@en .
+
+
+auth:opCommunicateOnBehalf
+    rdfs:isDefinedBy     auth: ;
+    a                    auth:MessageOperationExpression ;
+    auth:messageOnBehalf auth:msgTypesCommunicate ;
+    rdfs:label           "opCommunicateOnBehalf" ;
+    rdfs:comment
+                         "The operations of communicating via a connection on behalf of an atom, i.e., not signed by the atom owner's key"@en .
+
+auth:opConnectAndCommunicateOnBehalf
+    rdfs:isDefinedBy     auth: ;
+    a                    auth:MessageOperationExpression ;
+    auth:messageOnBehalf auth:msgTypesConnectClose, auth:msgTypesCommunicate ;
+    rdfs:label           "opConnectAndCommunicateOnBehalf" ;
+    rdfs:comment
+                         "The operations of establishing or closing a connection or communicating via the connection on behalf of an atom, i.e., not signed by the atom owner's key"@en .
+
+auth:opConnectCloseOnBehalf
+    rdfs:isDefinedBy     auth: ;
+    a                    auth:MessageOperationExpression ;
+    auth:messageOnBehalf auth:msgTypesConnectClose ;
+    rdfs:label           "opConnectCloseOnBehalf" ;
+    rdfs:comment
+                         "The operations of establishing or closing a connection on behalf of an atom, i.e., not signed by the atom owner's key"@en .
+
+
+auth:msgTypesConnectClose
+    rdfs:isDefinedBy auth: ;
+    a                auth:MessageTypeSet ;
+    rdfs:member      msg:ConnectMessage, msg:CloseMessage ;
+    rdfs:label       "msgTypesConnectClose" ;
+    rdfs:comment     "Message types for establishing and closing a connection"@en .
+
+auth:msgTypesCommunicate
+    rdfs:isDefinedBy auth: ;
+    a                auth:MessageTypeSet ;
+    rdfs:member      msg:ConnectionMessage, msg:ChangeNotificationMessage ;
+    rdfs:label       "msgTypesCommunicate" ;
+    rdfs:comment     "Messages used in established connections"@en .
+
+auth:msgTypesHint
+    rdfs:isDefinedBy auth: ;
+    a                auth:MessageTypeSet ;
+    rdfs:member      msg:SocketHintMessage, msg:AtomHintMessage ;
+    rdfs:label       "msgTypesHint" ;
+    rdfs:comment     "Hint message types"@en .
+
+auth:msgTypesModify
+    rdfs:isDefinedBy auth: ;
+    a                auth:MessageTypeSet ;
+    rdfs:member      msg:ReplaceMessage, msg:DeactivateMessage, msg:ActivateMessage ;
+    rdfs:label       "msgTypesModify" ;
+    rdfs:comment     "Message types that modify an atom"@en .
+
+
+auth:positionRoot
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:AsePosition ;
+    rdfs:label       "positionRoot" ;
+    rdfs:comment     "Identifies the root of the atom's tree structure"@en .
+
+auth:positionAtomGraph
+    rdfs:isDefinedBy    auth: ;
+    a                   owl:NamedIndividual, auth:AsePosition ;
+    auth:parentPosition auth:positionRoot ;
+    rdfs:label          "positionAtomGraph" ;
+    rdfs:comment        "Identifies the position of the __atom graph__ in the atom's tree structure"@en .
+
+auth:positionAtomMessage
+    rdfs:isDefinedBy    auth: ;
+    a                   owl:NamedIndividual, auth:AsePosition ;
+    auth:parentPosition auth:positionAtomMessages ;
+    rdfs:label          "positionAtomMessage" ;
+    rdfs:comment        "Identifies the position of the __atom message__ in the atom's tree structure"@en .
+
+auth:positionAtomMessages
+    rdfs:isDefinedBy    auth: ;
+    a                   owl:NamedIndividual, auth:AsePosition ;
+    auth:parentPosition auth:positionRoot ;
+    rdfs:label          "positionAtomMessages" ;
+    rdfs:comment        "Identifies the position of the __atom message container__ in the atom's tree structure"@en .
+
+auth:positionSocket
+    rdfs:isDefinedBy    auth: ;
+    a                   owl:NamedIndividual, auth:AsePosition ;
+    auth:parentPosition auth:positionRoot ;
+    rdfs:label          "positionSocket" ;
+    rdfs:comment        "Identifies the position of the __socket__ in the atom's tree structure"@en .
+
+auth:positionConnections
+    rdfs:isDefinedBy    auth: ;
+    a                   owl:NamedIndividual, auth:AsePosition ;
+    auth:parentPosition auth:positionSocket ;
+    rdfs:label          "positionConnections" ;
+    rdfs:comment        "Identifies the position of the __connection container__ in the atom's tree structure"@en .
+
+auth:positionConnection
+    rdfs:isDefinedBy    auth: ;
+    a                   owl:NamedIndividual, auth:AsePosition ;
+    auth:parentPosition auth:positionConnections ;
+    rdfs:label          "positionConnection" ;
+    rdfs:comment        "Identifies the position of the __connection__ in the atom's tree structure"@en .
+
+auth:positionConnectionMessages
+    rdfs:isDefinedBy    auth: ;
+    a                   owl:NamedIndividual, auth:AsePosition ;
+    auth:parentPosition auth:positionConnection ;
+    rdfs:label          "positionConnectionMessages" ;
+    rdfs:comment        "Identifies the position of __connection message container__ in the atom's tree structure"@en .
+
+auth:positionConnectionMessage
+    rdfs:isDefinedBy    auth: ;
+    a                   owl:NamedIndividual, auth:AsePosition ;
+    auth:parentPosition auth:positionConnectionMessages ;
+    rdfs:label          "positionConnectionMessage" ;
+    rdfs:comment        "Identifies the position of the __connection message__ in the atom's tree structure"@en .

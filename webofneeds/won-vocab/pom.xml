@@ -10,7 +10,8 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<parent>
-		<artifactId>webofneeds</artifactId>
+		<artifactId>won-parent-pom</artifactId>
+		<relativePath>../won-parent-pom</relativePath>
 		<groupId>at.researchstudio.sat</groupId>
 		<version>0.10-SNAPSHOT</version>
 	</parent>
@@ -21,6 +22,9 @@
 	<version>0.10-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<build>
+		<testResources>
+			<testResource><directory>src/test/resources</directory></testResource>
+		</testResources>
 		<plugins>
 			<plugin>
 				<groupId>net.revelc.code.formatter</groupId>
@@ -35,7 +39,53 @@
 	              </includes>
 	            </configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.ruleoftech</groupId>
+				<artifactId>markdown-page-generator-plugin</artifactId>
+				<version>2.2.0</version>
+				<executions>
+					<execution>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<inputDirectory>${project.basedir}/src/main/resources/site</inputDirectory>
+					<outputDirectory>${project.build.directory}/site/ontologies</outputDirectory>
+					<headerHtmlFile>${project.basedir}/src/main/resources/site/html/header.html</headerHtmlFile>
+					<footerHtmlFile>${project.basedir}/src/main/resources/site/html/footer.html</footerHtmlFile>
+					<inputFileExtensions>md,markdown</inputFileExtensions>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- RDF STUFF -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-shacl</artifactId>
+		</dependency>
+	</dependencies>
 	
 </project>

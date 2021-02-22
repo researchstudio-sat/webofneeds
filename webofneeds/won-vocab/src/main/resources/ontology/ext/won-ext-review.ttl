@@ -13,7 +13,7 @@
 <https://w3id.org/won/ext/review> rdf:type owl:Ontology ;
                                    owl:versionIRI <https://w3id.org/won/ext/review/1.0> ;
                                    owl:imports <https://w3id.org/won/core> ;
-                                   dc:abstract "This ontology defines the *ReviewSocket* and the *reviews* relationship. They are used when an Atom wants to give or receive reviews"@en ;
+                                   dcterms:abstract "This ontology defines the *ReviewSocket* and the *reviews* relationship. They are used when an Atom wants to give or receive reviews"@en ;
                                    dc:creator "Florian Kleedorfer" ;
                                    dc:date "2019-04-15"^^xsd:date ;
                                    dc:title "Web of Needs Review Extension" ;
@@ -25,7 +25,7 @@
 #################################################################
 
 ###  http://purl.org/dc/elements/1.1/abstract
-dc:abstract rdf:type owl:AnnotationProperty .
+dcterms:abstract rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/elements/1.1/creator
@@ -75,7 +75,7 @@ vann:preferredNamespacePrefix rdf:type owl:AnnotationProperty .
 
 ###  https://w3id.org/won/ext/review#ReviewSocket
 :ReviewSocket rdf:type owl:NamedIndividual ,
-                       won:SocketDefinition ;:reviews
+                       won:SocketDefinition ;
               won:compatibleSocketDefinition :ReviewSocket ;
               won:derivesAtomProperty :reviews ;
               won:autoOpen "true"^^xsd:boolean ;

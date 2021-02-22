@@ -7,12 +7,12 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix vaem: <http://www.linkedmodel.org/schema/vaem#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
-@prefix terms: <http://purl.org/dc/terms/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @base <https://w3id.org/won/core> .
 
 <https://w3id.org/won/core> rdf:type owl:Ontology ;
                              owl:versionIRI <https://w3id.org/won/core/1.0> ;
-                             dc:abstract """The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense.
+                             dcterms:abstract """The Web of Needs is a decentralized linked data application infrastructure for mediating cooperation in the broadest sense.
 
 Based on append-only message logs, users (or other agents) publish and manage objects (*Atoms*). The main goal of publishing Atoms is to express interest in cooperation, for example by specifying something that is needed or being offered. However, Atoms can contain arbitrary data and thus be used to build general linked data knowledge graphs.
 
@@ -22,8 +22,8 @@ Matching services can make suggestions which atoms to connect to. An Atom specif
                              dc:creator "Fabian Salcher" ,
                                         "Florian Kleedorfer" ;
                              dc:title "Web of Needs Core Ontology" ;
-                             terms:created "2013-12-13"^^xsd:date ;
-                             terms:license <https://creativecommons.org/licenses/by/4.0/> ;
+                             dcterms:created "2013-12-13"^^xsd:date ;
+                             dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
                              vann:preferredNamespacePrefix "won" ;
                              rdfs:comment "Ontology for the Web of Needs data model."@en .
 
@@ -32,7 +32,7 @@ Matching services can make suggestions which atoms to connect to. An Atom specif
 #################################################################
 
 ###  http://purl.org/dc/elements/1.1/abstract
-dc:abstract rdf:type owl:AnnotationProperty .
+dcterms:abstract rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/elements/1.1/creator
@@ -52,11 +52,11 @@ dc:title rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/terms/created
-terms:created rdf:type owl:AnnotationProperty .
+dcterms:created rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/terms/license
-terms:license rdf:type owl:AnnotationProperty .
+dcterms:license rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/vocab/vann/preferredNamespacePrefix

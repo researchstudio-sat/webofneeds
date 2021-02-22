@@ -13,7 +13,7 @@
 <https://w3id.org/won/ext/persona> rdf:type owl:Ontology ;
                                  owl:versionIRI <https://w3id.org/won/ext/persona/1.0> ;
                                  owl:imports <https://w3id.org/won/core> ;
-                                 dc:abstract "This ontology contains the definition of the *InterestSocket* the *InterestOfSocket* the *ExpertiseSocket* and the *ExpertiseOfSocket*, the *interest* the *interestOf* the *expertise* and the *expertOf* properties. These express control relationships in WoN. The Atoms with expertise/interest in other atoms represent agents (users or programs) and can themselves not be interests/expertises of other atoms."@en ;
+                                 dcterms:abstract "This ontology contains the definition of the *InterestSocket* the *InterestOfSocket* the *ExpertiseSocket* and the *ExpertiseOfSocket*, the *interest* the *interestOf* the *expertise* and the *expertOf* properties. These express control relationships in WoN. The Atoms with expertise/interest in other atoms represent agents (users or programs) and can themselves not be interests/expertises of other atoms."@en ;
                                  dc:creator "Fabian Suda" ;
                                  dc:date "2021-02-02"^^xsd:date ;
                                  dc:title "Web of Needs Persona Extension" ;
@@ -25,7 +25,7 @@
 #################################################################
 
 ###  http://purl.org/dc/elements/1.1/abstract
-dc:abstract rdf:type owl:AnnotationProperty .
+dcterms:abstract rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/elements/1.1/creator
