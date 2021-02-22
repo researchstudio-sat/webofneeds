@@ -33,7 +33,7 @@ import worker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
   won.fetchAtom = (atomUri, requestCredentials) => {
     const ldWorker = worker();
 
-    return ldWorker.Atom(atomUri, requestCredentials);
+    return ldWorker.fetchAtom(atomUri, requestCredentials);
   };
 
   won.validateEnvelopeDataForAtom = atomUri => {
