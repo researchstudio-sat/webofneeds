@@ -6,6 +6,7 @@ import * as atomUtils from "./utils/atom-utils.js";
 import * as connectionUtils from "./utils/connection-utils.js";
 import * as accountUtils from "./utils/account-utils.js";
 import * as processUtils from "./utils/process-utils.js";
+import * as useCaseUtils from "~/app/usecase-utils";
 import { isUriDeleted } from "~/app/won-localstorage";
 import {
   parseMetaAtom,
@@ -23,7 +24,8 @@ import vocab from "../service/vocab.js";
 import { fetchWikiData } from "~/app/api/wikidata-api";
 import cf from "clownface";
 import { actionCreators } from "../actions/actions";
-import * as useCaseUtils from "~/app/usecase-utils";
+import parseAtomWorker from "workerize-loader?[name].[contenthash:8]!../../parseAtom-worker.js";
+import fakeNames from "~/app/fakeNames.json";
 
 export const fetchOwnedMetaData = dispatch =>
   ownerApi.fetchOwnedMetaAtoms().then(metaAtoms => {
@@ -475,6 +477,13 @@ export const fetchAtomAndDispatch = (
       .then(requestCredentials =>
         won
           .fetchAtom(atomUri, requestCredentials)
+          .then(atom => {
+            parseAtomWorker()
+              .parse(atom, fakeNames, vocab)
+              .then(res => console.debug(res))
+              .catch(err => console.error(err));
+            return atom;
+          })
           .then(atom => {
             const parsedAtom = parseAtom(atom);
             if (parsedAtom) {
