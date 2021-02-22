@@ -20,6 +20,7 @@
 import { is } from "../utils.js";
 
 import jsonld from "jsonld/dist/jsonld.min.js";
+import vocab from "~/app/service/vocab";
 import won from "./won.js";
 
 import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
@@ -31,7 +32,7 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
    * to get the connection-uris. Thus it's faster.
    */
   won.fetchAtom = (atomUri, requestCredentials) =>
-    linkedDataWorker().fetchAtom(atomUri, requestCredentials);
+    linkedDataWorker().fetchAtom(atomUri, requestCredentials, vocab);
 
   won.validateEnvelopeDataForAtom = atomUri => {
     if (typeof atomUri === "undefined" || atomUri == null) {
@@ -71,7 +72,8 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
   ) =>
     linkedDataWorker().fetchConnectionUrisWithStateByAtomUri(
       connectionContainerUri,
-      requestCredentials
+      requestCredentials,
+      vocab
     );
 
   /**
@@ -93,7 +95,11 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
       );
     }
 
-    return linkedDataWorker().fetchConnection(connectionUri, fetchParams);
+    return linkedDataWorker().fetchConnection(
+      connectionUri,
+      fetchParams,
+      vocab
+    );
   };
 
   /**
@@ -125,7 +131,8 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
       .fetchMessagesOfConnection(
         connectionUri,
         messageContainerUri,
-        fetchParams
+        fetchParams,
+        vocab
       )
       .then(responseObject =>
         jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
@@ -207,7 +214,8 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     return linkedDataWorker().fetchConnectionUrisBySocket(
       senderSocketUri,
       targetSocketUri,
-      fetchParams
+      fetchParams,
+      vocab
     );
   };
 
@@ -240,7 +248,8 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     return linkedDataWorker().fetchConnectionBySocket(
       senderSocketUri,
       targetSocketUri,
-      fetchParams
+      fetchParams,
+      vocab
     );
   };
 })();

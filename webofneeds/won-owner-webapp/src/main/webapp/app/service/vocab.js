@@ -1,4 +1,4 @@
-import { is } from "~/app/utils";
+// Warning: this file is imported into serviceWorkers, do not make any other imports here, otherwise the serviceWorkers might fail
 
 let vocab = {};
 
@@ -633,6 +633,11 @@ vocab.defaultContext = {
 vocab.defaultTurtlePrefixes = context2ttlPrefixes(vocab.defaultContext);
 
 function context2ttlPrefixes(jsonldContext) {
+  function is(type, obj) {
+    const clas = Object.prototype.toString.call(obj).slice(8, -1);
+    return obj !== undefined && obj !== null && clas === type;
+  }
+
   return Object.entries(jsonldContext)
     .filter(([, uri]) => is("String", uri))
     .map(([prefix, uri]) => `@prefix ${prefix}: <${uri}>.`)
