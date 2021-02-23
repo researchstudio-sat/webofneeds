@@ -17,7 +17,6 @@
 /**
  * Created by fkleedorfer on 05.09.2014.
  */
-import jsonld from "jsonld/dist/jsonld.min.js";
 import vocab from "~/app/service/vocab";
 import won from "./won.js";
 
@@ -155,5 +154,3 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
       vocab
     );
 })();
-
-window.jsonld4dbg = jsonld;
