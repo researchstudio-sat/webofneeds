@@ -86,52 +86,22 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
         messageContainerUri,
         fetchParams,
         vocab
-      ) //TODO: MOVE THE SUBSEQUENT PROMISES TO ld-worker once we figured out how to parse a message within a worker with wonMessageFromJsonLd
-      .then(responseObject =>
-        jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
-          const messages = {};
-
-          jsonLdData &&
-            jsonLdData
-              .filter(graph => graph["@id"].indexOf("wm:/") === 0)
-              .forEach(graph => {
-                const msgUri = graph["@id"].split("#")[0];
-                const singleMessage = messages[msgUri];
-
-                if (singleMessage) {
-                  singleMessage["@graph"].push(graph);
-                } else {
-                  messages[msgUri] = { "@graph": [graph] };
-                }
-              });
-
-          const promiseArray = [];
-          for (const msgUri in messages) {
-            const msg = messages[msgUri];
-            promiseArray.push(
-              won
-                .wonMessageFromJsonLd(msg, msgUri)
-                .then(wonMessage => ({
-                  msgUri: msgUri,
-                  wonMessage: wonMessage,
-                }))
-                .catch(error => {
-                  console.error(
-                    "Could not parse msg to wonMessage: ",
-                    msg,
-                    "error: ",
-                    error
-                  );
-                  return { msgUri: msgUri, wonMessage: undefined };
-                })
-            );
-          }
-          return Promise.all([
-            Promise.resolve(responseObject.nextPage),
-            Promise.all(promiseArray),
-          ]);
-        })
       )
+      .then(([nextPage, messages]) => {
+        const promiseArray = [];
+        for (const idx in messages) {
+          const message = messages[idx];
+          console.debug("message: ", message);
+          promiseArray.push(
+            Promise.resolve({
+              msgUri: message.msgUri,
+              wonMessage: won.createWonMessage(message.wonMessage),
+            })
+          );
+        }
+
+        return Promise.all([nextPage, Promise.all(promiseArray)]);
+      })
       .then(([nextPage, messages]) => ({
         nextPage: nextPage,
         messages: messages,

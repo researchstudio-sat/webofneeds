@@ -30,6 +30,8 @@ import vocab from "./vocab.js";
 import jsonld from "jsonld/dist/jsonld.min.js";
 import * as jsonldUtils from "./jsonld-utils.js";
 
+import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
+
 import * as N3 from "n3";
 
 window.N34dbg = N3;
@@ -387,48 +389,10 @@ won.newGraph = function(hashFragement) {
   };
 };
 
-won.wonMessageFromJsonLd = function(rawMessageJsonLd, msgUri) {
-  return jsonld
-    .frame(rawMessageJsonLd, { "@id": msgUri, "@embed": "@always" })
-    .then(
-      framedMessageJsonLd =>
-        new WonMessage(framedMessageJsonLd, rawMessageJsonLd)
-    )
-    .then(wonMessage => {
-      //Only generate compactedFramedMessage if it is not a response or not from Owner
-      if (wonMessage.isResponse() || wonMessage.isFromOwner()) {
-        if (wonMessage.compactFramedMessage) {
-          return wonMessage;
-        }
-        if (wonMessage.framedMessage && wonMessage.rawMessage) {
-          return Promise.all([
-            jsonld
-              .compact(wonMessage.framedMessage, vocab.defaultContext)
-              .then(
-                compactFramedMessage =>
-                  (wonMessage.compactFramedMessage = compactFramedMessage)
-              ),
-            jsonld
-              .compact(wonMessage.rawMessage, vocab.defaultContext)
-              .then(
-                compactRawMessage =>
-                  (wonMessage.compactRawMessage = compactRawMessage)
-              ),
-          ])
-            .catch(e =>
-              console.error(
-                "Failed to generate jsonld for message " +
-                  wonMessage.getMessageUri() +
-                  "\n\n" +
-                  e.message +
-                  "\n\n" +
-                  e.stack
-              )
-            )
-            .then(() => wonMessage);
-        }
-      }
-    })
+won.wonMessageFromJsonLd = (rawMessageJsonLd, msgUri) =>
+  linkedDataWorker()
+    .wonMessageFromJsonLd(rawMessageJsonLd, msgUri, vocab)
+    .then(wonMessage => new WonMessage(wonMessage))
     .catch(e => {
       console.error(
         "Error in wonMessageFromJsonLd: rawMessage: ",
@@ -436,7 +400,6 @@ won.wonMessageFromJsonLd = function(rawMessageJsonLd, msgUri) {
       );
       rethrow(e);
     });
-};
 
 window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
 
@@ -512,17 +475,19 @@ window.rdfToJsonLd4dbg = won.rdfToJsonLd;
  * @param rawMessageJsonLd
  * @constructor
  */
-function WonMessage(framedMessageJsonLd, rawMessageJsonLd) {
+export function WonMessage(wonMessage) {
   if (!(this instanceof WonMessage)) {
-    return new WonMessage(framedMessageJsonLd);
+    return new WonMessage(wonMessage);
   }
-  this.framedMessage = framedMessageJsonLd;
-  this.rawMessage = rawMessageJsonLd;
+  this.framedMessage = wonMessage.framedMessage;
+  this.rawMessage = wonMessage.rawMessage;
 
-  this.messageStructure = {};
-  this.messageStructure.messageUri = this.framedMessage["@id"];
-  this.messageStructure.messageDirection = this.framedMessage["@type"];
+  this.messageStructure = wonMessage.messageStructure;
 }
+
+won.createWonMessage = message => {
+  return new WonMessage(message);
+};
 
 WonMessage.prototype = {
   constructor: WonMessage,

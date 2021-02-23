@@ -123,9 +123,54 @@ export const fetchMessagesOfConnection = (
         connection => connection.messageContainer
       );
 
-  return connectionContainerPromise.then(messageContainerUri =>
-    fetchJsonLdDataset(messageContainerUri, fetchParams, true)
-  );
+  return connectionContainerPromise
+    .then(messageContainerUri =>
+      fetchJsonLdDataset(messageContainerUri, fetchParams, true)
+    )
+    .then(responseObject =>
+      Promise.all([
+        Promise.resolve(responseObject.nextPage),
+        jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
+          const messages = {};
+
+          jsonLdData &&
+            jsonLdData
+              .filter(graph => graph["@id"].indexOf("wm:/") === 0)
+              .forEach(graph => {
+                const msgUri = graph["@id"].split("#")[0];
+                const singleMessage = messages[msgUri];
+
+                if (singleMessage) {
+                  singleMessage["@graph"].push(graph);
+                } else {
+                  messages[msgUri] = { "@graph": [graph] };
+                }
+              });
+
+          const promiseArray = [];
+          for (const msgUri in messages) {
+            const msg = messages[msgUri];
+            promiseArray.push(
+              wonMessageFromJsonLd(msg, msgUri, vocab)
+                .then(wonMessage => ({
+                  msgUri: msgUri,
+                  wonMessage: wonMessage,
+                }))
+                .catch(error => {
+                  console.error(
+                    "Could not parse msg to wonMessage: ",
+                    msg,
+                    "error: ",
+                    error
+                  );
+                  return { msgUri: msgUri, wonMessage: undefined };
+                })
+            );
+          }
+          return Promise.all(promiseArray);
+        }),
+      ])
+    );
 };
 
 export const fetchConnectionUrisBySocket = (
@@ -254,6 +299,103 @@ export const fetchConnection = (connectionUri, fetchParams, vocab) => {
       throw e;
     });
 };
+
+export const wonMessageFromJsonLd = (rawMessageJsonLd, msgUri, vocab) =>
+  jsonld
+    .frame(rawMessageJsonLd, { "@id": msgUri, "@embed": "@always" })
+    .then(framedMessageJsonLd => ({
+      framedMessage: framedMessageJsonLd,
+      rawMessage: rawMessageJsonLd,
+      messageStructure: {
+        messageUri: framedMessageJsonLd["@id"],
+        messageDirection: framedMessageJsonLd["@type"],
+      },
+    }))
+    .then(wonMessage => {
+      //Only generate compactedFramedMessage if it is not a response or not from Owner
+      const getProperty = (wonMessage, property) => {
+        const jsonldUtilsGetProperty = (jsonld, property) => {
+          if (jsonld && property) {
+            if (jsonld["@graph"] && jsonld["@graph"][0]) {
+              return jsonld["@graph"][0][property];
+            } else {
+              return jsonld[property];
+            }
+          }
+          return undefined;
+        };
+
+        let val = jsonldUtilsGetProperty(wonMessage.framedMessage, property);
+        if (val) {
+          const __singleValueOrArray = (wonMessage, val) => {
+            const getSafeJsonLdValue = dataItem => {
+              if (dataItem == null) return null;
+              if (typeof dataItem === "object") {
+                if (dataItem["@id"]) return dataItem["@id"];
+                if (dataItem["@value"]) return dataItem["@value"];
+              } else {
+                return dataItem;
+              }
+              return null;
+            };
+
+            if (!val) return null;
+            if (is("Array", val)) {
+              if (val.length === 1) {
+                return getSafeJsonLdValue(val);
+              }
+              return val.map(x => getSafeJsonLdValue(x));
+            }
+            return getSafeJsonLdValue(val);
+          };
+
+          return __singleValueOrArray(wonMessage, val);
+        }
+        return null;
+      };
+
+      const messageType = getProperty(wonMessage, vocab.WONMSG.messageType);
+      const messageDirection =
+        wonMessage.messageStructure &&
+        wonMessage.messageStructure.messageDirection;
+
+      if (
+        messageType === vocab.WONMSG.successResponse ||
+        messageType === vocab.WONMSG.failureResponse ||
+        messageDirection === vocab.WONMSG.FromOwner
+      ) {
+        if (wonMessage.compactFramedMessage) {
+          return wonMessage;
+        }
+        if (wonMessage.framedMessage && wonMessage.rawMessage) {
+          return Promise.all([
+            jsonld
+              .compact(wonMessage.framedMessage, vocab.defaultContext)
+              .then(
+                compactFramedMessage =>
+                  (wonMessage.compactFramedMessage = compactFramedMessage)
+              ),
+            jsonld
+              .compact(wonMessage.rawMessage, vocab.defaultContext)
+              .then(
+                compactRawMessage =>
+                  (wonMessage.compactRawMessage = compactRawMessage)
+              ),
+          ])
+            .catch(e =>
+              console.error(
+                "Failed to generate jsonld for message " +
+                  wonMessage.getMessageUri() +
+                  "\n\n" +
+                  e.message +
+                  "\n\n" +
+                  e.stack
+              )
+            )
+            .then(() => wonMessage);
+        }
+      }
+    });
 
 export const fetchJsonLdDataset = (
   uri,
