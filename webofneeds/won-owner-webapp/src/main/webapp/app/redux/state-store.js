@@ -24,8 +24,10 @@ import vocab from "../service/vocab.js";
 import { fetchWikiData } from "~/app/api/wikidata-api";
 import cf from "clownface";
 import { actionCreators } from "../actions/actions";
-import parseAtomWorker from "workerize-loader?[name].[contenthash:8]!../../parseAtom-worker.js";
+import paWorker from "workerize-loader?[name].[contenthash:8]!../../parseAtom-worker.js";
 import fakeNames from "~/app/fakeNames.json";
+
+const parseAtomWorker = paWorker();
 
 export const fetchOwnedMetaData = dispatch =>
   ownerApi.fetchOwnedMetaAtoms().then(metaAtoms => {
@@ -477,7 +479,7 @@ export const fetchAtomAndDispatch = (
       .then(requestCredentials =>
         won
           .fetchAtom(atomUri, requestCredentials)
-          .then(atom => parseAtomWorker().parse(atom, fakeNames, vocab))
+          .then(atom => parseAtomWorker.parse(atom, fakeNames, vocab))
           .then(partiallyParsedAtom => {
             const parsedAtomImm = parseAtomContent(partiallyParsedAtom);
             if (parsedAtomImm) {

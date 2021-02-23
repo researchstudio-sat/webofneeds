@@ -29,7 +29,7 @@ import {
 import vocab from "./vocab.js";
 import * as jsonldUtils from "./jsonld-utils.js";
 
-import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
+import ldWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
 
 let won = {};
 
@@ -37,6 +37,8 @@ let won = {};
  *  Constants
  *
  */
+
+const linkedDataWorker = ldWorker();
 
 won.debugmode = false; //if you set this to true, the created atoms will get flagged as debug atoms in order to get matches and requests from the debugbot
 
@@ -95,44 +97,6 @@ won.PRIVATEID_NOT_FOUND_ERROR = Object.freeze({
   message: "invalid privateId",
 });
 
-won.clone = function(obj) {
-  if (obj === undefined) return undefined;
-  else return JSON.parse(JSON.stringify(obj));
-};
-
-/**
- * Copies all arguments properties recursively into a
- * new object and returns that.
- */
-won.merge = function(/*args...*/) {
-  const o = {};
-  for (const argument of arguments) {
-    won.mergeIntoLast(argument, o);
-  }
-  return o;
-};
-/*
- * Recursively merge properties of several objects
- * Copies all properties from the passed objects into the last one starting
- * from the left (thus the further right, the higher the priority in
- * case of name-clashes)
- * You might prefer this function over won.merge for performance reasons
- * (e.g. if you're copying into a very large object). Otherwise the former
- * is recommended.
- * @param args merges all passed objects onto the first passed
- */
-won.mergeIntoLast = function(/*args...*/) {
-  let obj1;
-  for (const argument of arguments) {
-    obj1 = arguments[arguments.length - 1];
-    const obj2 = argument;
-    for (const p in obj2) {
-      obj1[p] = obj2[p];
-    }
-  }
-  return obj1;
-};
-
 /**
  * Method that checks if the given element is already an array, if so return it, if not
  * return the element as a single element array, if element is undefined return undefined
@@ -142,35 +106,6 @@ won.mergeIntoLast = function(/*args...*/) {
 function createArray(elements) {
   return !elements || is("Array", elements) ? elements : [elements];
 }
-
-//get the URI from a jsonld resource (expects an object with an '@id' property)
-//or the value from a typed literal
-won.getSafeJsonLdValue = function(dataItem) {
-  if (dataItem == null) return null;
-  if (typeof dataItem === "object") {
-    if (dataItem["@id"]) return dataItem["@id"];
-    if (dataItem["@value"]) return dataItem["@value"];
-  } else {
-    return dataItem;
-  }
-  return null;
-};
-
-won.reportError = function(message) {
-  if (arguments.length === 1) {
-    return function(reason) {
-      console.error(message, " reason: ", reason);
-    };
-  } else {
-    return function(reason) {
-      console.error("Error! reason: ", reason);
-    };
-  }
-};
-
-won.replaceRegExp = function(string) {
-  return string.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
-};
 
 /**
  * Visits the specified data structure. For each element, the callback is called
@@ -385,7 +320,7 @@ won.newGraph = function(hashFragement) {
 };
 
 won.wonMessageFromJsonLd = (rawMessageJsonLd, msgUri) =>
-  linkedDataWorker()
+  linkedDataWorker
     .wonMessageFromJsonLd(rawMessageJsonLd, msgUri, vocab)
     .then(wonMessage => new WonMessage(wonMessage))
     .catch(e => {
@@ -402,7 +337,7 @@ window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
  *
  * @param {string} rdf
  */
-won.rdfToJsonLd = rdf => linkedDataWorker().rdfToJsonLd(rdf);
+won.rdfToJsonLd = rdf => linkedDataWorker.rdfToJsonLd(rdf);
 
 window.rdfToJsonLd4dbg = won.rdfToJsonLd;
 
@@ -433,27 +368,34 @@ WonMessage.prototype = {
   getMessageUri: function() {
     return this.messageStructure && this.messageStructure.messageUri;
   },
-
   getMessageDirection: function() {
     return this.messageStructure && this.messageStructure.messageDirection;
   },
   getProperty: function(property) {
     let val = jsonldUtils.getProperty(this.framedMessage, property);
     if (val) {
-      return this.__singleValueOrArray(val);
+      //get the URI from a jsonld resource (expects an object with an '@id' property)
+      //or the value from a typed literal
+      const getSafeJsonLdValue = dataItem => {
+        if (dataItem == null) return null;
+        if (typeof dataItem === "object") {
+          if (dataItem["@id"]) return dataItem["@id"];
+          if (dataItem["@value"]) return dataItem["@value"];
+        } else {
+          return dataItem;
+        }
+        return null;
+      };
+
+      if (is("Array", val)) {
+        if (val.length === 1) {
+          return getSafeJsonLdValue(val);
+        }
+        return val.map(x => getSafeJsonLdValue(x));
+      }
+      return getSafeJsonLdValue(val);
     }
     return null;
-  },
-
-  __singleValueOrArray: function(val) {
-    if (!val) return null;
-    if (is("Array", val)) {
-      if (val.length === 1) {
-        return won.getSafeJsonLdValue(val);
-      }
-      return val.map(x => won.getSafeJsonLdValue(x));
-    }
-    return won.getSafeJsonLdValue(val);
   },
   getCompactFramedMessageContent: function() {
     return this.compactFramedMessage;
@@ -655,13 +597,18 @@ won.MessageBuilder = function MessageBuilder(messageType, content) {
     };
   }
   let graphNames = null;
+  const clone = obj => {
+    if (obj === undefined) return undefined;
+    else return JSON.parse(JSON.stringify(obj));
+  };
+
   if (content != null) {
-    this.data = won.clone(content);
+    this.data = clone(content);
     graphNames = won.JsonLdHelper.getGraphNames(this.data);
   } else {
     this.data = {
       "@graph": [],
-      "@context": won.clone(vocab.defaultContext),
+      "@context": clone(vocab.defaultContext),
     };
   }
   this.messageGraph = null;
@@ -677,7 +624,11 @@ won.MessageBuilder.prototype = {
       "@id": vocab.WONMSG.EnvelopeGraph,
       "@type": "@id",
     };
-    const regex = new RegExp(won.replaceRegExp(this.eventUriValue));
+    const replaceRegExp = string => {
+      return string.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
+    };
+
+    const regex = new RegExp(replaceRegExp(this.eventUriValue));
     won.visitDepthFirst(this.data, function(element, key, collection) {
       if (collection != null && key === "@id") {
         if (element) collection[key] = element.replace(regex, eventUri);

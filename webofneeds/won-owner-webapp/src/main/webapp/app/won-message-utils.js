@@ -27,6 +27,18 @@ export function isFetchMessageEffectsNeeded(wonMsg) {
   );
 }
 
+const reportError = function(message) {
+  if (arguments.length === 1) {
+    return function(reason) {
+      console.error(message, " reason: ", reason);
+    };
+  } else {
+    return function(reason) {
+      console.error("Error! reason: ", reason);
+    };
+  }
+};
+
 export function buildCloseMessage(socketUri, targetSocketUri) {
   const buildMessage = function() {
     return new won.MessageBuilder(vocab.WONMSG.closeMessage)
@@ -43,7 +55,7 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
   return validateEnvelopeDataForConnection(socketUri, targetSocketUri)
     .then(() => buildMessage())
     .catch(err => {
-      won.reportError("cannot close connection " + JSON.stringify(err));
+      reportError("cannot close connection " + JSON.stringify(err));
       throw err;
     });
 }
@@ -60,7 +72,7 @@ export function buildCloseAtomMessage(atomUri) {
 
   return validateEnvelopeDataForAtom(atomUri).then(
     () => buildMessage(),
-    () => won.reportError("cannot close atom " + atomUri)
+    () => reportError("cannot close atom " + atomUri)
   );
 }
 
@@ -77,7 +89,7 @@ export function buildDeleteAtomMessage(atomUri) {
 
   return validateEnvelopeDataForAtom(atomUri).then(
     () => buildMessage(),
-    () => won.reportError("cannot delete atom " + atomUri)
+    () => reportError("cannot delete atom " + atomUri)
   );
 }
 
@@ -94,7 +106,7 @@ export function buildOpenAtomMessage(atomUri) {
 
   return validateEnvelopeDataForAtom(atomUri).then(
     () => buildMessage(),
-    () => won.reportError("cannot close atom " + atomUri)
+    () => reportError("cannot close atom " + atomUri)
   );
 }
 

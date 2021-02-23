@@ -123,9 +123,43 @@ import vocab from "./vocab.js";
 
     //TODO in atom: links to both unsigned (plain pngs) and signed (in rdf)  attachments
 
+    /**
+     * Copies all arguments properties recursively into a
+     * new object and returns that.
+     */
+    function merge(/*args...*/) {
+      const o = {};
+      /*
+     * Recursively merge properties of several objects
+     * Copies all properties from the passed objects into the last one starting
+     * from the left (thus the further right, the higher the priority in
+     * case of name-clashes)
+     * You might prefer this function over won.merge for performance reasons
+     * (e.g. if you're copying into a very large object). Otherwise the former
+     * is recommended.
+     * @param args merges all passed objects onto the first passed
+     */
+      function mergeIntoLast(/*args...*/) {
+        let obj1;
+        for (const argument of arguments) {
+          obj1 = arguments[arguments.length - 1];
+          const obj2 = argument;
+          for (const p in obj2) {
+            obj1[p] = obj2[p];
+          }
+        }
+        return obj1;
+      }
+
+      for (const argument of arguments) {
+        mergeIntoLast(argument, o);
+      }
+      return o;
+    }
+
     return {
       "@graph": msgGraph,
-      "@context": won.merge(
+      "@context": merge(
         vocab.defaultContext,
         contentRdf["@context"],
         getTypesForContext()

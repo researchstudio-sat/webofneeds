@@ -20,7 +20,9 @@
 import vocab from "~/app/service/vocab";
 import won from "./won.js";
 
-import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
+import ldWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
+
+const linkedDataWorker = ldWorker();
 
 (function() {
   /**
@@ -29,7 +31,7 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
    * to get the connection-uris. Thus it's faster.
    */
   won.fetchAtom = (atomUri, requestCredentials) =>
-    linkedDataWorker().fetchAtom(atomUri, requestCredentials, vocab);
+    linkedDataWorker.fetchAtom(atomUri, requestCredentials, vocab);
 
   /**
    * Fetches all MetaConnections of the given connectionContainerUri
@@ -42,7 +44,7 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     connectionContainerUri,
     requestCredentials
   ) =>
-    linkedDataWorker().fetchConnectionUrisWithStateByAtomUri(
+    linkedDataWorker.fetchConnectionUrisWithStateByAtomUri(
       connectionContainerUri,
       requestCredentials,
       vocab
@@ -60,7 +62,7 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
    * @return {*} the connections predicates
    */
   won.fetchConnection = (connectionUri, fetchParams) =>
-    linkedDataWorker().fetchConnection(connectionUri, fetchParams, vocab);
+    linkedDataWorker.fetchConnection(connectionUri, fetchParams, vocab);
 
   /**
    * @param connectionUri
@@ -79,7 +81,7 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     messageContainerUri,
     fetchParams
   ) =>
-    linkedDataWorker()
+    linkedDataWorker
       .fetchMessagesOfConnection(
         connectionUri,
         messageContainerUri,
@@ -123,7 +125,7 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     targetSocketUri,
     fetchParams
   ) =>
-    linkedDataWorker().fetchConnectionUrisBySocket(
+    linkedDataWorker.fetchConnectionUrisBySocket(
       senderSocketUri,
       targetSocketUri,
       fetchParams,
@@ -147,7 +149,7 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     targetSocketUri,
     fetchParams
   ) =>
-    linkedDataWorker().fetchConnectionBySocket(
+    linkedDataWorker.fetchConnectionBySocket(
       senderSocketUri,
       targetSocketUri,
       fetchParams,
