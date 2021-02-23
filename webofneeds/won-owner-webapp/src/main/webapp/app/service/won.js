@@ -27,14 +27,9 @@ import {
   setDisclaimerAccepted,
 } from "../won-localstorage.js";
 import vocab from "./vocab.js";
-import jsonld from "jsonld/dist/jsonld.min.js";
 import * as jsonldUtils from "./jsonld-utils.js";
 
 import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
-
-import * as N3 from "n3";
-
-window.N34dbg = N3;
 
 let won = {};
 
@@ -404,67 +399,10 @@ won.wonMessageFromJsonLd = (rawMessageJsonLd, msgUri) =>
 window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
 
 /**
- * An wrapper for N3's writer that returns a promise
- * @param {*} quads list of quads following the rdfjs interface (http://rdf.js.org/)
- *   e.g.:
- * ```
- *  [ Quad {
- *      graph: DefaultGraph {id: ""}
- *      object: NamedNode {id: "http://example.org/cartoons#Cat"}
- *      predicate: NamedNode {id: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"}
- *      subject: NamedNode {id: "http://example.org/cartoons#Tom"}
- * }, Quad {...}, ...]
- * ```
- * See here for ways to create them using N3: https://www.npmjs.com/package/n3#creating-triplesquads
- * @param {*} writerArgs the arguments for intializing the writer.
- *   e.g. `{format: 'application/trig'}`. See the writer-documentation
- *   (https://github.com/RubenVerborgh/N3.js#writing) for more details.
- */
-won.n3Write = async function(quads, writerArgs) {
-  const writer = new N3.Writer(writerArgs);
-  return new Promise((resolve, reject) => {
-    writer.addQuads(quads);
-    writer.end((error, result) => {
-      if (error) reject(error);
-      else resolve(result);
-    });
-  });
-};
-
-/**
- * A wrapper for N3's parse that returns a promise
- * @param {*} rdf a rdf-string to be parsed
- * @param {*} parserArgs arguments for initializing the parser,
- *   e.g. `{format: 'application/n-quads'}` if you want to make
- *   parser stricter about what it accepts. See the parser-documentation
- *   (https://github.com/RubenVerborgh/N3.js#parsing) for more details.
- */
-won.n3Parse = function(rdf, parserArgs) {
-  const rdfParser = parserArgs ? new N3.Parser(parserArgs) : new N3.Parser();
-  return rdfParser.parse(rdf);
-};
-
-/**
  *
  * @param {string} rdf
- * @param {boolean} prependWonPrefixes
  */
-won.rdfToJsonLd = function(rdf) {
-  const parsedQuads = won.n3Parse(rdf);
-  return won
-    .n3Write(parsedQuads, { format: "application/n-quads" })
-    .then(quadString =>
-      jsonld.fromRDF(quadString, { format: "application/n-quads" })
-    )
-    .catch(e => {
-      e.message =
-        "error while parsing the following turtle:\n\n" +
-        rdf +
-        "\n\n----\n\n" +
-        e.message;
-      throw e;
-    });
-};
+won.rdfToJsonLd = rdf => linkedDataWorker().rdfToJsonLd(rdf);
 
 window.rdfToJsonLd4dbg = won.rdfToJsonLd;
 
@@ -475,7 +413,7 @@ window.rdfToJsonLd4dbg = won.rdfToJsonLd;
  * @param rawMessageJsonLd
  * @constructor
  */
-export function WonMessage(wonMessage) {
+function WonMessage(wonMessage) {
   if (!(this instanceof WonMessage)) {
     return new WonMessage(wonMessage);
   }

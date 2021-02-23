@@ -2,6 +2,7 @@ import urljoin from "url-join";
 import _ from "lodash";
 import { ownerBaseUrl } from "~/config/default.js";
 import jsonld from "jsonld";
+import * as N3 from "n3";
 
 export const fetchAtom = (atomUri, requestCredentials, vocab) =>
   fetchJsonLdDataset(atomUri, requestCredentials)
@@ -296,6 +297,62 @@ export const fetchConnection = (connectionUri, fetchParams, vocab) => {
       const msg = "Failed to get connection " + connectionUri + ".";
       e.message += msg;
       console.error(e.message);
+      throw e;
+    });
+};
+
+export const rdfToJsonLd = rdf => {
+  /**
+   * An wrapper for N3's writer that returns a promise
+   * @param {*} quads list of quads following the rdfjs interface (http://rdf.js.org/)
+   *   e.g.:
+   * ```
+   *  [ Quad {
+   *      graph: DefaultGraph {id: ""}
+   *      object: NamedNode {id: "http://example.org/cartoons#Cat"}
+   *      predicate: NamedNode {id: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"}
+   *      subject: NamedNode {id: "http://example.org/cartoons#Tom"}
+   * }, Quad {...}, ...]
+   * ```
+   * See here for ways to create them using N3: https://www.npmjs.com/package/n3#creating-triplesquads
+   * @param {*} writerArgs the arguments for intializing the writer.
+   *   e.g. `{format: 'application/trig'}`. See the writer-documentation
+   *   (https://github.com/RubenVerborgh/N3.js#writing) for more details.
+   */
+  const n3Write = async (quads, writerArgs) => {
+    const writer = new N3.Writer(writerArgs);
+    return new Promise((resolve, reject) => {
+      writer.addQuads(quads);
+      writer.end((error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      });
+    });
+  };
+
+  /**
+   * A wrapper for N3's parse that returns a promise
+   * @param {*} rdf a rdf-string to be parsed
+   * @param {*} parserArgs arguments for initializing the parser,
+   *   e.g. `{format: 'application/n-quads'}` if you want to make
+   *   parser stricter about what it accepts. See the parser-documentation
+   *   (https://github.com/RubenVerborgh/N3.js#parsing) for more details.
+   */
+  const n3Parse = (rdf, parserArgs) => {
+    const rdfParser = parserArgs ? new N3.Parser(parserArgs) : new N3.Parser();
+    return rdfParser.parse(rdf);
+  };
+
+  return n3Write(n3Parse(rdf), { format: "application/n-quads" })
+    .then(quadString =>
+      jsonld.fromRDF(quadString, { format: "application/n-quads" })
+    )
+    .catch(e => {
+      e.message =
+        "error while parsing the following turtle:\n\n" +
+        rdf +
+        "\n\n----\n\n" +
+        e.message;
       throw e;
     });
 };
