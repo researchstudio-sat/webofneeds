@@ -1,16 +1,17 @@
-@prefix :        <https://w3id.org/won/ext/schema#> .
-@prefix dc:      <http://purl.org/dc/elements/1.1/> .
-@prefix owl:     <http://www.w3.org/2002/07/owl#> .
-@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix won:     <https://w3id.org/won/core#> .
-@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
-@prefix prov:    <http://www.w3.org/ns/prov#> .
-@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix vann:    <http://purl.org/vocab/vann/> .
-@prefix schema:  <http://schema.org/> .
-@prefix dcterms: <http://purl.org/dc/terms/> .
-@prefix auth:    <https://w3id.org/won/auth#> .
-@base            <https://w3id.org/won/ext/schema#> .
+@prefix :           <https://w3id.org/won/ext/schema#> .
+@prefix dc:         <http://purl.org/dc/elements/1.1/> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:        <https://w3id.org/won/core#> .
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:       <http://www.w3.org/ns/prov#> .
+@prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann:       <http://purl.org/vocab/vann/> .
+@prefix schema:     <http://schema.org/> .
+@prefix dcterms:    <http://purl.org/dc/terms/> .
+@prefix wx-persona: <https://w3id.org/won/ext/persona#> .
+@prefix auth:       <https://w3id.org/won/auth#> .
+@base               <https://w3id.org/won/ext/schema#> .
 
 <https://w3id.org/won/ext/schema>
     rdf:type                      owl:Ontology ;
@@ -91,11 +92,11 @@ won:derivesAtomProperty
                                    "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:member B` when a Connection with an Atom B is established. Automatically generated from the [member](http://schema.org/member) Property of the http://schema.org vocabulary." ;
     won:compatibleSocketDefinition :MemberOfSocket ;
     won:compatibleSocketDefinition :OrganizationRoleOfSocket ;
-    auth:localAuth                 :grantAccessToGraphAndMemberAuth, :grantReadMemberViaMemberSocketAuth .
+    auth:localAuth                 :grantAccessToGraphAndMemberAuth .
 
 :grantAccessToGraphAndMemberAuth
     a            auth:Authorization ;
-    rdfs:label   "grantAccessToGraphAndMemberAuth" ;
+    rdfs:label   "GrantAccessToGraphAndMemberAuth" ;
     auth:grantee [ auth:socket [ auth:socketType :MemberSocket ;
                                  auth:connection [ auth:connectionState won:Connected, won:RequestSent ;
                                                    auth:targetAtom      [ ] ] ] ] ;
@@ -103,19 +104,11 @@ won:derivesAtomProperty
                                                         auth:expiresAfter 3600 ] ] ;
                    auth:graph     [ auth:graphType auth:contentGraph, auth:keyGraph, auth:sysinfoGraph ;
                                     auth:operation auth:opRead ] ;
-                   auth:socket    [ auth:socketType         :MemberSocket ;
-                                    auth:operation          auth:opRead ;
-                                    auth:connectionMessages [ auth:inherit false ] ] ] .
+                   auth:socket    [ auth:socketType  :MemberSocket ;
+                                    auth:connections [ auth:operation          auth:opRead ;
+                                                       auth:connectionState    won:Connected ;
+                                                       auth:connectionMessages [ auth:inherit false ] ] ] ] .
 
-:grantReadMemberViaMemberSocketAuth
-    a           auth:Authorization ;
-    rdfs:label  "grantReadMemberViaMemberSocketAuth" ;
-    auth:bearer [ auth:tokenScope :MemberSocket ;
-                  auth:issuer     [ auth:socket [ auth:socketType :MemberSocket ;
-                                                  auth:connection [ auth:targetAtom      [ ] ;
-                                                                    auth:connectionState won:Connected ] ] ] ] ;
-    auth:grant  [ auth:graph [ auth:graphType auth:contentGraph ;
-                               auth:operation auth:opRead ] ] .
 
 :AboutSocket
     a                              won:SocketDefinition ;
@@ -163,7 +156,23 @@ won:derivesAtomProperty
     rdfs:label                     "MemberOfSocket" ;
     rdfs:comment
                                    "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [memberOf](http://schema.org/memberOf) Property of the http://schema.org vocabulary." ;
-    won:compatibleSocketDefinition :MemberSocket .
+    won:compatibleSocketDefinition :MemberSocket ;
+    auth:localAuth                 :grantReadMemberAndExpertiseInterestViaMemberSocketAuth .
+
+
+:grantReadExpertiseAndInterestViaMemberSocketAuth
+    a           auth:Authorization ;
+    rdfs:label  "GrantReadExpertiseAndInterestViaMemberSocketAuth" ;
+    auth:bearer [ auth:tokenScope :MemberSocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType :MemberOfSocket ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph  [ auth:graphType auth:contentGraph ;
+                                auth:operation auth:opRead ] ;
+                  auth:socket [ auth:socketType  wx-persona:ExpertiseSocket, wx-persona:InterestSocket ;
+                                auth:connections [ auth:operation          auth:opRead ;
+                                                   auth:connectionState    won:Connected ;
+                                                   auth:connectionMessages [ auth:inherit false ] ] ] ] .
 
 :OrganizationRoleOfSocket
     a                              won:SocketDefinition ;
