@@ -40,8 +40,7 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
   };
 
   //fetch all datan needed
-  return won
-    .validateEnvelopeDataForConnection(socketUri, targetSocketUri)
+  return validateEnvelopeDataForConnection(socketUri, targetSocketUri)
     .then(() => buildMessage())
     .catch(err => {
       won.reportError("cannot close connection " + JSON.stringify(err));
@@ -59,12 +58,10 @@ export function buildCloseAtomMessage(atomUri) {
       .build();
   };
 
-  return won
-    .validateEnvelopeDataForAtom(atomUri)
-    .then(
-      () => buildMessage(),
-      () => won.reportError("cannot close atom " + atomUri)
-    );
+  return validateEnvelopeDataForAtom(atomUri).then(
+    () => buildMessage(),
+    () => won.reportError("cannot close atom " + atomUri)
+  );
 }
 
 export function buildDeleteAtomMessage(atomUri) {
@@ -78,12 +75,10 @@ export function buildDeleteAtomMessage(atomUri) {
       .build();
   };
 
-  return won
-    .validateEnvelopeDataForAtom(atomUri)
-    .then(
-      () => buildMessage(),
-      () => won.reportError("cannot delete atom " + atomUri)
-    );
+  return validateEnvelopeDataForAtom(atomUri).then(
+    () => buildMessage(),
+    () => won.reportError("cannot delete atom " + atomUri)
+  );
 }
 
 export function buildOpenAtomMessage(atomUri) {
@@ -97,12 +92,10 @@ export function buildOpenAtomMessage(atomUri) {
       .build();
   };
 
-  return won
-    .validateEnvelopeDataForAtom(atomUri)
-    .then(
-      () => buildMessage(),
-      () => won.reportError("cannot close atom " + atomUri)
-    );
+  return validateEnvelopeDataForAtom(atomUri).then(
+    () => buildMessage(),
+    () => won.reportError("cannot close atom " + atomUri)
+  );
 }
 
 /**
@@ -149,7 +142,7 @@ export function buildChatMessage({
     ? won.rdfToJsonLd(vocab.defaultTurtlePrefixes + "\n" + chatMessage)
     : Promise.resolve();
 
-  const envelopeDataP = won.validateEnvelopeDataForConnection(
+  const envelopeDataP = validateEnvelopeDataForConnection(
     socketUri,
     targetSocketUri
   );
@@ -362,3 +355,28 @@ function buildContentRdf(atomData, publishedContentUri) {
     socket: atomData.socket,
   });
 }
+
+const validateEnvelopeDataForAtom = atomUri => {
+  if (typeof atomUri === "undefined" || atomUri == null) {
+    throw {
+      message: "validateEnvelopeDataForAtom: atomUri must not be null",
+    };
+  }
+
+  return Promise.resolve();
+};
+
+const validateEnvelopeDataForConnection = (socketUri, targetSocketUri) => {
+  if (
+    typeof socketUri === "undefined" ||
+    socketUri == null ||
+    typeof targetSocketUri === "undefined" ||
+    targetSocketUri == null
+  ) {
+    throw {
+      message: "getEnvelopeDataforConnection: socketUris must not be null",
+    };
+  }
+
+  return Promise.resolve();
+};

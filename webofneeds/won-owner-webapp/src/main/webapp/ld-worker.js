@@ -110,6 +110,13 @@ export const fetchMessagesOfConnection = (
   fetchParams,
   vocab
 ) => {
+  if (!is("String", connectionUri)) {
+    throw new Error(
+      "Tried to request connection infos for sthg that isn't an uri: " +
+        connectionUri
+    );
+  }
+
   const connectionContainerPromise = messageContainerUri
     ? Promise.resolve(messageContainerUri)
     : fetchConnection(connectionUri, fetchParams, vocab).then(
@@ -127,6 +134,15 @@ export const fetchConnectionUrisBySocket = (
   fetchParams,
   vocab
 ) => {
+  if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
+    throw new Error(
+      "Tried to request connection infos for sthg that isn't an uri: " +
+        senderSocketUri +
+        " or " +
+        targetSocketUri
+    );
+  }
+
   fetchParams.socket = senderSocketUri;
   fetchParams.targetSocket = targetSocketUri;
 
@@ -150,6 +166,15 @@ export const fetchConnectionBySocket = (
   fetchParams,
   vocab
 ) => {
+  if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
+    throw new Error(
+      "Tried to request connection infos for sthg that isn't an uri: " +
+        senderSocketUri +
+        " or " +
+        targetSocketUri
+    );
+  }
+
   fetchParams.socket = senderSocketUri;
   fetchParams.targetSocket = targetSocketUri;
 
@@ -179,8 +204,14 @@ export const fetchConnectionBySocket = (
   );
 };
 
-export const fetchConnection = (connectionUri, fetchParams, vocab) =>
-  fetchJsonLdDataset(connectionUri, fetchParams)
+export const fetchConnection = (connectionUri, fetchParams, vocab) => {
+  if (!is("String", connectionUri)) {
+    throw new Error(
+      "Tried to request connection infos for sthg that isn't an uri: " +
+        connectionUri
+    );
+  }
+  return fetchJsonLdDataset(connectionUri, fetchParams)
     .then(jsonLdData =>
       jsonld.frame(jsonLdData, {
         "@id": connectionUri,
@@ -222,6 +253,7 @@ export const fetchConnection = (connectionUri, fetchParams, vocab) =>
       console.error(e.message);
       throw e;
     });
+};
 
 export const fetchJsonLdDataset = (
   uri,

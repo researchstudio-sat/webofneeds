@@ -17,8 +17,6 @@
 /**
  * Created by fkleedorfer on 05.09.2014.
  */
-import { is } from "../utils.js";
-
 import jsonld from "jsonld/dist/jsonld.min.js";
 import vocab from "~/app/service/vocab";
 import won from "./won.js";
@@ -33,31 +31,6 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
    */
   won.fetchAtom = (atomUri, requestCredentials) =>
     linkedDataWorker().fetchAtom(atomUri, requestCredentials, vocab);
-
-  won.validateEnvelopeDataForAtom = atomUri => {
-    if (typeof atomUri === "undefined" || atomUri == null) {
-      throw {
-        message: "validateEnvelopeDataForAtom: atomUri must not be null",
-      };
-    }
-
-    return Promise.resolve();
-  };
-
-  won.validateEnvelopeDataForConnection = (socketUri, targetSocketUri) => {
-    if (
-      typeof socketUri === "undefined" ||
-      socketUri == null ||
-      typeof targetSocketUri === "undefined" ||
-      targetSocketUri == null
-    ) {
-      throw {
-        message: "getEnvelopeDataforConnection: socketUris must not be null",
-      };
-    }
-
-    return Promise.resolve();
-  };
 
   /**
    * Fetches all MetaConnections of the given connectionContainerUri
@@ -87,20 +60,8 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
    *            it will return the second page of size N)
    * @return {*} the connections predicates
    */
-  won.fetchConnection = (connectionUri, fetchParams) => {
-    if (!is("String", connectionUri)) {
-      throw new Error(
-        "Tried to request connection infos for sthg that isn't an uri: " +
-          connectionUri
-      );
-    }
-
-    return linkedDataWorker().fetchConnection(
-      connectionUri,
-      fetchParams,
-      vocab
-    );
-  };
+  won.fetchConnection = (connectionUri, fetchParams) =>
+    linkedDataWorker().fetchConnection(connectionUri, fetchParams, vocab);
 
   /**
    * @param connectionUri
@@ -118,22 +79,14 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     connectionUri,
     messageContainerUri,
     fetchParams
-  ) => {
-    if (!is("String", connectionUri)) {
-      throw new Error(
-        "Tried to request connection infos for sthg that isn't an uri: " +
-          connectionUri
-      );
-    }
-
-    //TODO: MOVE THE SUBSEQUENT PROMISES TO ld-worker once we figured out how to parse a message within a worker with wonMessageFromJsonLd
-    return linkedDataWorker()
+  ) =>
+    linkedDataWorker()
       .fetchMessagesOfConnection(
         connectionUri,
         messageContainerUri,
         fetchParams,
         vocab
-      )
+      ) //TODO: MOVE THE SUBSEQUENT PROMISES TO ld-worker once we figured out how to parse a message within a worker with wonMessageFromJsonLd
       .then(responseObject =>
         jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
           const messages = {};
@@ -183,7 +136,6 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
         nextPage: nextPage,
         messages: messages,
       }));
-  };
 
   /**
    * @param senderSocketUri
@@ -201,23 +153,13 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     senderSocketUri,
     targetSocketUri,
     fetchParams
-  ) => {
-    if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
-      throw new Error(
-        "Tried to request connection infos for sthg that isn't an uri: " +
-          senderSocketUri +
-          " or " +
-          targetSocketUri
-      );
-    }
-
-    return linkedDataWorker().fetchConnectionUrisBySocket(
+  ) =>
+    linkedDataWorker().fetchConnectionUrisBySocket(
       senderSocketUri,
       targetSocketUri,
       fetchParams,
       vocab
     );
-  };
 
   /**
    * @param senderSocketUri
@@ -235,23 +177,13 @@ import linkedDataWorker from "workerize-loader?[name].[contenthash:8]!../../ld-w
     senderSocketUri,
     targetSocketUri,
     fetchParams
-  ) => {
-    if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
-      throw new Error(
-        "Tried to request connection infos for sthg that isn't an uri: " +
-          senderSocketUri +
-          " or " +
-          targetSocketUri
-      );
-    }
-
-    return linkedDataWorker().fetchConnectionBySocket(
+  ) =>
+    linkedDataWorker().fetchConnectionBySocket(
       senderSocketUri,
       targetSocketUri,
       fetchParams,
       vocab
     );
-  };
 })();
 
 window.jsonld4dbg = jsonld;
