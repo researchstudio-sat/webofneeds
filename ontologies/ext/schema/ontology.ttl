@@ -5975,7 +5975,7 @@
                          <https://w3id.org/won/core#SocketDefinition> ;
                 rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [memberOf](http://schema.org/memberOf) Property of the http://schema.org vocabulary." ;
                 rdfs:label "MemberOfSocket" ;
-                <https://w3id.org/won/auth#localAuth> :grantReadMemberAndExpertiseInterestViaMemberSocketAuth ;
+                <https://w3id.org/won/auth#localAuth> :grantReadExpertiseAndInterestViaMemberSocketAuth ;
                 <https://w3id.org/won/core#compatibleSocketDefinition> :MemberSocket ;
                 <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/memberOf> .
 

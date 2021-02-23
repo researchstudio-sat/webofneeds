@@ -9974,7 +9974,7 @@
     "@value" : "MemberOfSocket"
   } ],
   "https://w3id.org/won/auth#localAuth" : [ {
-    "@id" : "https://w3id.org/won/ext/schema#grantReadMemberAndExpertiseInterestViaMemberSocketAuth"
+    "@id" : "https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth"
   } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/schema#MemberSocket"

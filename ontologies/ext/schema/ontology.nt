@@ -5302,7 +5302,7 @@
 <https://w3id.org/won/ext/schema#MemberOfSocket> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/core#SocketDefinition> .
 <https://w3id.org/won/ext/schema#MemberOfSocket> <http://www.w3.org/2000/01/rdf-schema#comment> "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [memberOf](http://schema.org/memberOf) Property of the http://schema.org vocabulary." .
 <https://w3id.org/won/ext/schema#MemberOfSocket> <http://www.w3.org/2000/01/rdf-schema#label> "MemberOfSocket" .
-<https://w3id.org/won/ext/schema#MemberOfSocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/schema#grantReadMemberAndExpertiseInterestViaMemberSocketAuth> .
+<https://w3id.org/won/ext/schema#MemberOfSocket> <https://w3id.org/won/auth#localAuth> <https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth> .
 <https://w3id.org/won/ext/schema#MemberOfSocket> <https://w3id.org/won/core#compatibleSocketDefinition> <https://w3id.org/won/ext/schema#MemberSocket> .
 <https://w3id.org/won/ext/schema#MemberOfSocket> <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/memberOf> .
 # 

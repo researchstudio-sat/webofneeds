@@ -8692,7 +8692,7 @@
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
         <rdfs:comment>An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [memberOf](http://schema.org/memberOf) Property of the http://schema.org vocabulary.</rdfs:comment>
         <rdfs:label>MemberOfSocket</rdfs:label>
-        <auth:localAuth rdf:resource="https://w3id.org/won/ext/schema#grantReadMemberAndExpertiseInterestViaMemberSocketAuth"/>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth"/>
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/schema#MemberSocket"/>
         <core:derivesAtomProperty rdf:resource="http://schema.org/memberOf"/>
     </owl:NamedIndividual>
