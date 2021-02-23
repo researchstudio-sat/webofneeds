@@ -8,7 +8,7 @@ self.addEventListener("push", async event => {
     return client.focused;
   });
 
-  if (activeWindows.length == 0) {
+  if (activeWindows.length === 0) {
     switch (payload.type) {
       case "CONNECT":
         self.registration.showNotification("New Conversation!", {
@@ -63,7 +63,7 @@ async function openNotifiedPage(event) {
     const [, clientQuery] = client.url.split("?");
     const param = new URLSearchParams(clientQuery).get("connectionUri");
     console.log(param);
-    return param == connectionUri;
+    return param === connectionUri;
   });
   console.log(clientWindows.map(client => client.url));
   const inventoryWindows = clientWindows.filter(client => {
@@ -83,7 +83,7 @@ async function openNotifiedPage(event) {
 
   if (urlWindows.length > 0) {
     const activeWindows = urlWindows.filter(client => client.focused);
-    if (activeWindows.length == 0) {
+    if (activeWindows.length === 0) {
       urlWindows[0].focus();
     }
   } else if (inventoryWindows.length > 0) {

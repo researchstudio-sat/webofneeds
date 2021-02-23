@@ -1,21 +1,5 @@
 package won.owner.web.rest;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -46,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
-
 import won.owner.model.User;
 import won.owner.model.UserAtom;
 import won.owner.service.impl.WONUserDetailService;
@@ -54,6 +37,15 @@ import won.protocol.rest.LinkedDataRestBridge;
 import won.protocol.rest.RDFMediaType;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.uriresolver.WonMessageUriResolver;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * User: ypanchenko Date: 03.09.2015 This controller at Owner server-side serves
@@ -111,6 +103,10 @@ public class BridgeForLinkedDataController implements InitializingBean {
                     @RequestParam(value = "requester", required = false) String requesterWebId,
                     @RequestParam(value = "wonnode", required = false) String wonNodeUriString,
                     final HttpServletResponse response, final HttpServletRequest request) throws IOException {
+        long methodStart = System.currentTimeMillis();
+        if (logger.isDebugEnabled()) {
+            logger.debug("starting fetchResource {} with requesterWebId {}", resourceUriString, requesterWebId);
+        }
         // prepare restTestmplate that can deal with webID certificate
         RestTemplate restTemplate = null;
         // no webID requested? - don't use one!
@@ -133,6 +129,10 @@ public class BridgeForLinkedDataController implements InitializingBean {
                 restTemplate = linkedDataRestBridge.getRestTemplate();
             }
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("rest template prepared, {} since beginning of method",
+                            (System.currentTimeMillis() - methodStart));
+        }
         // prepare headers to be passed in request for linked data resource
         final HttpHeaders requestHeaders = extractLinkedDataRequestRelevantHeaders(request);
         // convert the URI if it's a message URI (the resolver will leave it as-is if
@@ -140,6 +140,11 @@ public class BridgeForLinkedDataController implements InitializingBean {
         Optional<URI> wonNodeUri = Optional.ofNullable(wonNodeUriString).map(s -> URI.create(s));
         URI resourceUri = wonMessageUriResolver.toLocalMessageURIForWonNode(URI.create(resourceUriString), wonNodeUri,
                         linkedDataSource);
+        if (logger.isDebugEnabled()) {
+            logger.debug("requesting data now, {} since beginning of method",
+                            (System.currentTimeMillis() - methodStart));
+        }
+        long requestStart = System.currentTimeMillis();
         restTemplate.execute(resourceUri, HttpMethod.valueOf(request.getMethod()), new RequestCallback() {
             @Override
             public void doWithRequest(final ClientHttpRequest request) throws IOException {
@@ -153,17 +158,23 @@ public class BridgeForLinkedDataController implements InitializingBean {
         }, new ResponseExtractor<Object>() {
             @Override
             public ClientHttpResponse extractData(final ClientHttpResponse originalResponse) throws IOException {
-                prepareBridgeResponseOutputStream(originalResponse, response);
+                prepareBridgeResponseOutputStream(originalResponse, response, methodStart, requestStart);
                 // we don't really need to return anything, so we don't
                 return null;
             }
         });
+        if (logger.isDebugEnabled()) {
+            long now = System.currentTimeMillis();
+            logger.debug("request executed, {} millis since request start ({} since beginning of method)",
+                            (now - requestStart),
+                            (now - methodStart));
+        }
         // by this point, the response is constructed and is ready to be returned to the
         // client
     }
 
     private void prepareBridgeResponseOutputStream(final ClientHttpResponse originalResponse,
-                    final HttpServletResponse response) throws IOException {
+                    final HttpServletResponse response, long methodStart, long requestStart) throws IOException {
         // create response headers
         MediaType originalResponseMediaType = originalResponse.getHeaders().getContentType();
         if (originalResponseMediaType == null) {
@@ -199,6 +210,12 @@ public class BridgeForLinkedDataController implements InitializingBean {
         }
         response.getOutputStream().flush();
         response.getOutputStream().close();
+        if (logger.isDebugEnabled()) {
+            long now = System.currentTimeMillis();
+            logger.debug("done writing response, {} millis since request start ({} since beginning of method)",
+                            (now - requestStart),
+                            (now - methodStart));
+        }
     }
 
     private void copyResponseBody(final ClientHttpResponse fromResponse, final HttpServletResponse toResponse)

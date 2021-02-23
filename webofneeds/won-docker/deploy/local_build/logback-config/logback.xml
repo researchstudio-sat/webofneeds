@@ -34,6 +34,10 @@
     <logger name="won.auth.WonAclEvaluator" level="info"/>
     <logger name="won.protocol.rest.LinkedDataRestClient" level="debug"/>
     <logger name="won.auth.WonAclInstanceFactory" level="debug"/>
+    <logger name="won.cryptography.service.CryptographyUtils" level="DEBUG"/>
+    <logger name="won.protocol.rest.LinkedDataRestBridge" level="DEBUG"/>
+    <logger name="won.node.service.linkeddata.generate.LinkedDataServiceImpl" level="DEBUG"/>
+
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

@@ -51,7 +51,7 @@ export default function WonAtomMap({
     const locationMarkers = locations.map((location, index) => {
       const lat = get(location, "lat");
       const lng = get(location, "lng");
-      if (lat != undefined && lng != undefined) {
+      if (lat !== undefined && lng !== undefined) {
         const locationTupel = [lat, lng];
         bounds.push(locationTupel);
         //We should use key here, but i do not know if we can find a unique key from the provided properties :-/

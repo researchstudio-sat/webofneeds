@@ -49,7 +49,7 @@ public class AclChecker extends AbstractCamelProcessor {
         URI sender = message.getSenderAtomURIRequired();
         URI senderNode = message.getSenderNodeURIRequired();
         WonMessageDirection direction = WonCamelHelper.getDirectionRequired(exchange);
-        if (direction.isFromExternal()) {
+        if (direction.isFromExternal() || direction.isFromSystem()) {
             if (signer.equals(senderNode)) {
                 // nodes are allowed to messages on behalf of an atom (for now)
                 return;
@@ -59,7 +59,7 @@ public class AclChecker extends AbstractCamelProcessor {
         Optional<Graph> aclGraph = atom.getAclGraph();
         if (aclGraph.isEmpty()) {
             // no checks if no acl present
-            if (sender != signer) {
+            if (!sender.equals(signer)) {
                 throw new IllegalMessageSignerException(
                                 String.format("%s must not be signer of %s message %s",
                                                 signer,
@@ -85,7 +85,7 @@ public class AclChecker extends AbstractCamelProcessor {
                         .setRequestor(requestor)
                         .build();
         if (message.getMessageType().isConnectionSpecificMessage()) {
-            if (direction.isFromOwner()) {
+            if (direction.isFromOwner() || direction.isFromSystem()) {
                 Optional<Socket> s = socketService.getSocket(message.getSenderSocketURIRequired());
                 operationRequest.setReqSocketType(s.get().getTypeURI());
                 operationRequest.setReqSocket(s.get().getSocketURI());
@@ -104,6 +104,10 @@ public class AclChecker extends AbstractCamelProcessor {
             operationRequest.setReqConnection(c.getConnectionURI());
             operationRequest.setReqConnectionTargetAtom(c.getTargetAtomURI());
             operationRequest.setReqConnectionState(AuthUtils.toAuthConnectionState(c.getState()));
+            // we already set these values, but now that we know we have a connection, make
+            // sure these values match the connection's
+            operationRequest.setReqSocketType(c.getTypeURI());
+            operationRequest.setReqSocket(c.getSocketURI());
         } else {
             operationRequest.setReqPosition(POSITION_SOCKET);
         }

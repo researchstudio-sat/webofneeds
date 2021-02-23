@@ -17,12 +17,11 @@ export default function WonFileDropzone(props) {
       readAsDataURL(file)
         .then(dataUrl => {
           const b64data = dataUrl.split("base64,")[1];
-          const fileData = {
+          return {
             name: file.name,
             encodingFormat: file.type,
             encoding: b64data,
           };
-          return fileData;
         })
         .then(fileData => {
           props.onFilePicked({ file: fileData });

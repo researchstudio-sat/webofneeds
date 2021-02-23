@@ -39,21 +39,15 @@ export const successfulReopenAtom = wonMessage => (dispatch, getState) => {
     //dispatch(actionCreators.connections__denied(wonMessage));
   }
 };
-export const failedCloseAtom = wonMessage => (dispatch, getState) => {
-  const atomUri = wonMessage.getAtom();
-
+export const failedCloseAtom = wonMessage => (dispatch, getState) =>
   stateStore
-    .fetchAtomAndDispatch(atomUri, dispatch, getState)
+    .fetchAtomAndDispatch(wonMessage.getAtom(), dispatch, getState)
     .then(() => dispatch({ type: actionTypes.messages.closeAtom.failed }));
-};
 
-export const failedReopenAtom = wonMessage => (dispatch, getState) => {
-  const atomUri = wonMessage.getAtom();
-
+export const failedReopenAtom = wonMessage => (dispatch, getState) =>
   stateStore
-    .fetchAtomAndDispatch(atomUri, dispatch, getState)
+    .fetchAtomAndDispatch(wonMessage.getAtom(), dispatch, getState)
     .then(() => dispatch({ type: actionTypes.messages.reopenAtom.failed }));
-};
 
 export const successfulCloseConnection = wonMessage => (dispatch, getState) => {
   const state = getState();
@@ -96,51 +90,47 @@ export const failedCreate = wonMessage => dispatch => {
   );
 };
 
-export const successfulCreate = wonMessage => dispatch => {
-  //const state = getState();
-  //TODO: if negative, use alternative atom URI and send again
-  //fetch atom data and store in local RDF store
-  //get URI of newly created atom from message
-
+export const successfulCreate = wonMessage => (dispatch, getState) => {
   //load the data into the local rdf store and publish AtomCreatedEvent when done
   const atomUri = wonMessage.getAtom();
-  // since we know that created Atoms are only dispatched for owned atoms we add the atomUri as the requesterWebId for the atom fetch
-  const requesterWebId = atomUri;
-
-  won
-    .fetchAtom(atomUri, { requesterWebId: requesterWebId })
-    .then(atom => {
-      const parsedAtom = parseAtom(atom);
-      if (parsedAtom) {
-        dispatch(
-          actionCreators.atoms__createSuccessful({
-            eventUri: wonMessage.getIsResponseTo(),
-            atomUri: atomUri,
-            atom: parsedAtom,
-          })
-        );
-      }
-    })
-    .catch(error => {
-      if (error.status && error.status === 410) {
-        dispatch({
-          type: actionTypes.atoms.delete,
-          payload: Immutable.fromJS({ uri: atomUri }),
-        });
-      } else {
-        dispatch({
-          type: actionTypes.atoms.storeUriFailed,
-          payload: Immutable.fromJS({
-            uri: atomUri,
-            status: {
-              code: error.status,
-              message: error.message,
-              requesterWebId: requesterWebId,
-            },
-          }),
-        });
-      }
-    });
+  stateStore
+    .determineRequestCredentials(getState(), atomUri, true)
+    .then(requestCredentials =>
+      won
+        .fetchAtom(atomUri, requestCredentials)
+        .then(atom => {
+          const parsedAtom = parseAtom(atom);
+          if (parsedAtom) {
+            dispatch(
+              actionCreators.atoms__createSuccessful({
+                eventUri: wonMessage.getIsResponseTo(),
+                atomUri: atomUri,
+                atom: parsedAtom,
+              })
+            );
+          }
+        })
+        .catch(error => {
+          if (error.status && error.status === 410) {
+            dispatch({
+              type: actionTypes.atoms.delete,
+              payload: Immutable.fromJS({ uri: atomUri }),
+            });
+          } else {
+            dispatch({
+              type: actionTypes.atoms.storeUriFailed,
+              payload: Immutable.fromJS({
+                uri: atomUri,
+                status: {
+                  code: error.status,
+                  message: error.message,
+                  requestCredentials: requestCredentials,
+                },
+              }),
+            });
+          }
+        })
+    );
 };
 
 export const failedEdit = wonMessage => dispatch => {
@@ -158,22 +148,22 @@ export const successfulEdit = wonMessage => (dispatch, getState) => {
   console.debug("Received success replace message:", wonMessage);
   //const state = getState();
   //load the edited data into the local rdf store and publish AtomEditEvent when done
-  const atomURI = wonMessage.getAtom();
+  const atomUri = wonMessage.getAtom();
 
   const processState = get(getState(), "process");
 
-  if (processUtils.isAtomLoading(processState, atomURI)) {
+  if (processUtils.isAtomLoading(processState, atomUri)) {
     console.debug(
       "successfulEdit: Atom is currently loading DO NOT FETCH AGAIN"
     );
   } else {
     stateStore
-      .fetchAtomAndDispatch(atomURI, dispatch, getState, true)
+      .fetchAtomAndDispatch(atomUri, dispatch, getState, true)
       .then(() => {
         dispatch(
           actionCreators.atoms__editSuccessful({
             eventUri: wonMessage.getIsResponseTo(),
-            atomUri: wonMessage.getAtom(),
+            atomUri: atomUri,
             //atom: atom,
           })
         );
@@ -519,7 +509,9 @@ export const connectSuccessOwn = wonMessage => (dispatch, getState) => {
       connUriPromise = stateStore.fetchConnectionUriBySocketUris(
         connectionUtils.getSocketUri(connection),
         connectionUtils.getTargetSocketUri(connection),
-        atomUri
+        {
+          requesterWebId: atomUri,
+        }
       );
     } else {
       connUriPromise = Promise.resolve(getUri(connection));
@@ -564,7 +556,9 @@ export const connectSuccessRemote = wonMessage => (dispatch, getState) => {
       connUriPromise = stateStore.fetchConnectionUriBySocketUris(
         targetSocketUri,
         senderSocketUri,
-        atomUri
+        {
+          requesterWebId: atomUri,
+        }
       );
     } else {
       connUriPromise = Promise.resolve(getUri(connection));
@@ -591,95 +585,90 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
   const recipientAtomUri = extractAtomUriBySocketUri(targetSocketUri);
 
   const senderAtomUri = extractAtomUriBySocketUri(senderSocketUri);
-
-  const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
-  const recipientAtom = generalSelectors.getAtom(recipientAtomUri)(state);
   const isOwnSenderAtom = generalSelectors.isAtomOwned(senderAtomUri)(state);
   const isOwnRecipientAtom = generalSelectors.isAtomOwned(recipientAtomUri)(
     state
   );
 
-  const receiverConnectionUri = getUri(
-    atomUtils.getConnectionBySocketUris(
-      recipientAtom,
-      targetSocketUri,
-      senderSocketUri
-    )
-  );
-  const senderConnectionUri = getUri(
-    atomUtils.getConnectionBySocketUris(
-      senderAtom,
-      senderSocketUri,
-      targetSocketUri
-    )
-  );
+  //FIXME: ProcessConnectMessage could fetch atoms/connections in a way that makes the atom unloadable
+  //e.g Atom is only accessible for Atoms with receivedRequests -> atom is fetched no connection is in the state yet so requesterWebId can't be found by a connection between the two
+  // Current solution is to assume that the connectMessage already grants the receiver or the sender access to the atom, so we just try that uri as requesterWebId instead and override the Credentials
 
-  let senderAtomP;
-  if (isOwnSenderAtom) {
-    //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-    senderAtomP = Promise.resolve(true);
-  } else {
-    senderAtomP = stateStore.fetchAtomAndDispatch(
-      senderAtomUri,
-      dispatch,
-      getState
-    );
-  }
+  //We know that all own atoms are already stored within the state, so we do not have to retrieve it
+  const senderAtomP = isOwnSenderAtom
+    ? Promise.resolve(true)
+    : stateStore.fetchAtomAndDispatch(
+        senderAtomUri,
+        dispatch,
+        getState,
+        false,
+        isOwnRecipientAtom ? { requesterWebId: recipientAtomUri } : undefined
+      );
 
-  let recipientAtomP;
-  if (isOwnRecipientAtom) {
-    //We know that all own atoms are already stored within the state, so we do not have to retrieve it
-    recipientAtomP = Promise.resolve(true);
-  } else {
-    recipientAtomP = stateStore.fetchAtomAndDispatch(
-      recipientAtomUri,
-      dispatch,
-      getState
-    );
-  }
+  //We know that all own atoms are already stored within the state, so we do not have to retrieve it
+  const recipientAtomP = isOwnRecipientAtom
+    ? Promise.resolve(true)
+    : stateStore.fetchAtomAndDispatch(
+        recipientAtomUri,
+        dispatch,
+        getState,
+        false,
+        isOwnSenderAtom ? { requesterWebId: senderAtomUri } : undefined
+      );
 
   Promise.all([senderAtomP, recipientAtomP]).then(() => {
     let senderCP;
     if (isOwnSenderAtom) {
-      if (!senderConnectionUri) {
-        senderCP = stateStore
-          .fetchActiveConnectionAndDispatchBySocketUris(
-            senderSocketUri,
-            targetSocketUri,
-            senderAtomUri,
-            dispatch
-          )
-          .then(() => true);
-      } else {
-        console.debug(
-          "senderConnection relevant and we already have it, resolve with true -> handle the connection"
-        );
-        senderCP = Promise.resolve(true);
-      }
-    } else {
-      console.debug(
-        "senderAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
+      const senderAtom = generalSelectors.getAtom(senderAtomUri)(state);
+
+      const senderConnectionUri = getUri(
+        atomUtils.getConnectionBySocketUris(
+          senderAtom,
+          senderSocketUri,
+          targetSocketUri
+        )
       );
+      senderCP = senderConnectionUri
+        ? Promise.resolve(true)
+        : stateStore
+            .fetchActiveConnectionAndDispatchBySocketUris(
+              senderSocketUri,
+              targetSocketUri,
+              {
+                requesterWebId: senderAtomUri,
+              },
+              dispatch
+            )
+            .then(() => true);
+    } else {
       senderCP = Promise.resolve(false);
     }
 
     let receiverCP;
     if (isOwnRecipientAtom) {
-      if (!receiverConnectionUri) {
-        receiverCP = stateStore
-          .fetchActiveConnectionAndDispatchBySocketUris(
-            targetSocketUri,
-            senderSocketUri,
-            recipientAtomUri,
-            dispatch
-          )
-          .then(() => true);
-      } else {
-        console.debug(
-          "targetConnection relevant and we already have it, resolve with true -> handle the connection"
-        );
-        receiverCP = Promise.resolve(true);
-      }
+      const recipientAtom = generalSelectors.getAtom(recipientAtomUri)(state);
+
+      const receiverConnectionUri = getUri(
+        atomUtils.getConnectionBySocketUris(
+          recipientAtom,
+          targetSocketUri,
+          senderSocketUri
+        )
+      );
+
+      receiverCP = receiverConnectionUri
+        ? Promise.resolve(true)
+        : stateStore
+            .determineRequestCredentials(state, recipientAtomUri, true)
+            .then(requestCredentials =>
+              won.fetchActiveConnectionAndDispatchBySocketUris(
+                targetSocketUri,
+                senderSocketUri,
+                requestCredentials,
+                dispatch
+              )
+            )
+            .then(() => true);
     } else {
       console.debug(
         "targetAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
@@ -690,10 +679,10 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
     //we have to retrieve the personas too
     Promise.all([senderCP, receiverCP]).then(
       ([senderConnectionRelevant, receiverConnectionRelevant]) => {
-        const newState = getState();
-
         if (receiverConnectionRelevant) {
-          const newRecipientAtom = getIn(newState, ["atoms", recipientAtomUri]);
+          const newRecipientAtom = generalSelectors.getAtom(recipientAtomUri)(
+            getState()
+          );
           const newReceiverConnection = atomUtils.getConnectionBySocketUris(
             newRecipientAtom,
             targetSocketUri,
@@ -717,7 +706,9 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
         }
 
         if (senderConnectionRelevant) {
-          const newSenderAtom = getIn(newState, ["atoms", senderAtomUri]);
+          const newSenderAtom = generalSelectors.getAtom(senderAtomUri)(
+            getState()
+          );
           const newSenderConnection = atomUtils.getConnectionBySocketUris(
             newSenderAtom,
             senderSocketUri,
@@ -745,41 +736,40 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
   });
 };
 
-export const updateMessageStatus = wonMessage => dispatch => {
-  const payload = {
-    messageUri: wonMessage.messageUri,
-    connectionUri: wonMessage.connectionUri,
-    atomUri: wonMessage.atomUri,
-    messageStatus: wonMessage.messageStatus,
-  };
-
+export const updateMessageStatus = wonMessage => dispatch =>
   dispatch({
     type: actionTypes.messages.updateMessageStatus,
-    payload: payload,
+    payload: {
+      messageUri: wonMessage.messageUri,
+      connectionUri: wonMessage.connectionUri,
+      atomUri: wonMessage.atomUri,
+      messageStatus: wonMessage.messageStatus,
+    },
   });
-};
 
 export const atomMessageReceived = wonMessage => (dispatch, getState) => {
   //first check if we really have the 'own' atom in the state - otherwise we'll ignore the hint
+  const state = getState();
   const targetAtomUri = extractAtomUriBySocketUri(wonMessage.getTargetSocket());
-  const atom = getState().getIn(["atoms", targetAtomUri]);
+  const atom = generalSelectors.getAtom(targetAtomUri)(state);
   if (!atom) {
     console.debug(
       "ignoring atomMessage for an atom that is not ours:",
       targetAtomUri
     );
+  } else {
+    dispatch({
+      type: actionTypes.messages.atomMessageReceived,
+      payload: {
+        atomUri: targetAtomUri,
+        humanReadable: atomUtils.getTitle(
+          atom,
+          generalSelectors.getExternalDataState(state)
+        ),
+        message: wonMessage.getTextMessage(),
+      },
+    });
   }
-  dispatch({
-    type: actionTypes.messages.atomMessageReceived,
-    payload: {
-      atomUri: targetAtomUri,
-      humanReadable: atomUtils.getTitle(
-        atom,
-        generalSelectors.getExternalDataState(getState())
-      ),
-      message: wonMessage.getTextMessage(),
-    },
-  });
 };
 
 export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
@@ -797,6 +787,7 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
       "ignoring hint for an atom that is not yet in the state (could be a targetAtom, or a non stored ownedAtom):",
       targetAtomUri
     );
+    return Promise.resolve(false);
   }
 
   const targetConnection = atomUtils.getConnectionBySocketUris(
@@ -806,33 +797,34 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
   );
   const targetConnectionUri = getUri(targetConnection);
 
-  if (!targetConnectionUri && isOwnTargetAtom) {
-    return stateStore
-      .fetchActiveConnectionAndDispatchBySocketUris(
-        targetSocketUri,
-        senderSocketUri,
-        targetAtomUri,
-        dispatch
-      )
-      .then(() => true);
-  } else if (!targetConnectionUri || !isOwnTargetAtom) {
+  if (targetConnection) {
     console.debug(
-      "receiverConnectionUri was null or recipientAtom is not ownedAtom, resolve promise with undefined -> ignore the connection"
-    );
-    return Promise.resolve(false);
-  } else if (targetConnection) {
-    console.debug(
-      "receiverConnection relevant, resolve with true -> handle the connection"
+      "receiverConnection already stored, resolve with true -> handle the connection"
     );
     return Promise.resolve(true);
+  } else if (!isOwnTargetAtom) {
+    console.debug(
+      "recipientAtom is not ownedAtom, resolve promise with false -> ignore the connection"
+    );
+    return Promise.resolve(false);
   } else {
     return stateStore
-      .fetchActiveConnectionAndDispatch(
-        targetConnectionUri,
-        targetAtomUri,
-        dispatch
-      )
-      .then(() => true);
+      .determineRequestCredentials(state, targetAtomUri, true)
+      .then(requestCredentials =>
+        (!targetConnectionUri
+          ? stateStore.fetchActiveConnectionAndDispatchBySocketUris(
+              targetSocketUri,
+              senderSocketUri,
+              requestCredentials,
+              dispatch
+            )
+          : stateStore.fetchActiveConnectionAndDispatch(
+              targetConnectionUri,
+              requestCredentials,
+              dispatch
+            )
+        ).then(() => true)
+      );
   }
 };
 
@@ -846,7 +838,6 @@ export const processAtomHintMessage = wonMessage =>
     const currentState = getState();
     const ownedAtom = getIn(currentState, ["atoms", ownedAtomUri]);
     const targetAtom = getIn(currentState, ["atoms", targetAtomUri]);
-
     const ownedConnectionUri = wonMessage.getRecipientConnection();
 
     if (!ownedAtom) {
@@ -870,9 +861,12 @@ export const processAtomHintMessage = wonMessage =>
           }
         })
         .then(() =>
+          stateStore.determineRequestCredentials(getState(), ownedAtomUri, true)
+        )
+        .then(requestCredentials =>
           stateStore.fetchActiveConnectionAndDispatch(
             ownedConnectionUri,
-            ownedAtomUri,
+            requestCredentials,
             dispatch
           )
         );

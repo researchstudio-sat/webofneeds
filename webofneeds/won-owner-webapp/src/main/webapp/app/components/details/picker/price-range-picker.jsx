@@ -211,7 +211,7 @@ export default class WonPriceRangePicker extends React.Component {
    */
   totalUnitCodeOnly() {
     const unitCode = this.props.detail && this.props.detail.unitCode;
-    return unitCode && unitCode.length == 1 && unitCode[0].value == "";
+    return unitCode && unitCode.length === 1 && unitCode[0].value === "";
   }
 
   getDefaultCurrency() {

@@ -3,5 +3,5 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 auth:customMessageOperation
-    a                    auth:MessageOperation ;
+    a                    auth:MessageOperationExpression ;
     auth:messageOnBehalf msg:ConnectionMessage, msg:CloseMessage .

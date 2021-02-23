@@ -30,9 +30,9 @@ export default class PokemonRaidbossPicker extends React.Component {
           key={pokemon.id + "-" + index}
           className={
             "prbp__pokemonlist__pokemon " +
-            (this.state.pokemonRaidBoss.id == pokemon.id &&
+            (this.state.pokemonRaidBoss.id === pokemon.id &&
             (!this.state.pokemonRaidBoss.form ||
-              this.state.pokemonRaidBoss.form == pokemon.form)
+              this.state.pokemonRaidBoss.form === pokemon.form)
               ? " prbp__pokemonlist__pokemon--selected "
               : "")
           }
@@ -202,7 +202,7 @@ export default class PokemonRaidbossPicker extends React.Component {
           .split(" ");
       if (filterArray && filterArray.length > 0) {
         for (const idx in filterArray) {
-          if (pokemon.id == filterArray[idx]) return true;
+          if (pokemon.id === filterArray[idx]) return true;
           if ("#" + pokemon.id === filterArray[idx]) return true;
           if (
             pokemon.form &&
@@ -216,9 +216,9 @@ export default class PokemonRaidbossPicker extends React.Component {
       }
     } else if (selectedId) {
       if (
-        (!selectedForm && selectedId == pokemon.id && !pokemon.form) ||
+        (!selectedForm && selectedId === pokemon.id && !pokemon.form) ||
         (selectedForm &&
-          selectedId == pokemon.id &&
+          selectedId === pokemon.id &&
           selectedForm === pokemon.form)
       ) {
         return true;
@@ -281,7 +281,7 @@ export default class PokemonRaidbossPicker extends React.Component {
   }
 
   formatPokemonJson(jsonList) {
-    if (!jsonList || jsonList.length == 0) {
+    if (!jsonList || jsonList.length === 0) {
       console.debug("jsonList is: " + jsonList);
       return this.props.detail.fullPokemonList;
     }
@@ -366,7 +366,7 @@ export default class PokemonRaidbossPicker extends React.Component {
 
   updatePokemon(id, form) {
     const _pokemonRaidBoss = this.state.pokemonRaidBoss;
-    if (_pokemonRaidBoss.id == id && _pokemonRaidBoss.form === form) {
+    if (_pokemonRaidBoss.id === id && _pokemonRaidBoss.form === form) {
       _pokemonRaidBoss.id = undefined;
       _pokemonRaidBoss.form = undefined;
     } else {

@@ -388,7 +388,7 @@ export const goodsTransportSearch = {
       };
     }
 
-    const generatedQuery = sparqlQuery({
+    return sparqlQuery({
       prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
@@ -400,7 +400,5 @@ export const goodsTransportSearch = {
         },
       ],
     });
-
-    return generatedQuery;
   },
 };

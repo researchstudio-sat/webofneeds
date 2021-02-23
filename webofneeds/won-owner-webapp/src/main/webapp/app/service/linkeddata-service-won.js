@@ -64,21 +64,21 @@ import vocab from "./vocab.js";
             " for atom ",
             atomUri
           );
-          return { "@context": flattenedAtomJsonLd["@context"] };
+          return {
+            atom: { "@context": flattenedAtomJsonLd["@context"] },
+            auth: authsJsonLd,
+          };
         }
-
-        // console.timeEnd("Atom parseTime for: " + atomUri);
         return { atom: flattenedAtomJsonLd, auth: authsJsonLd };
       })
       .catch(e => {
         const msg = "Failed to get atom " + atomUri + ".";
         e.message += msg;
         console.error(e.message);
-        // console.timeEnd("Atom parseTime for: " + atomUri);
         throw e;
       });
 
-  won.validateEnvelopeDataForAtom = function(atomUri) {
+  won.validateEnvelopeDataForAtom = atomUri => {
     if (typeof atomUri === "undefined" || atomUri == null) {
       throw {
         message: "validateEnvelopeDataForAtom: atomUri must not be null",
@@ -88,10 +88,7 @@ import vocab from "./vocab.js";
     return Promise.resolve();
   };
 
-  won.validateEnvelopeDataForConnection = async function(
-    socketUri,
-    targetSocketUri
-  ) {
+  won.validateEnvelopeDataForConnection = (socketUri, targetSocketUri) => {
     if (
       typeof socketUri === "undefined" ||
       socketUri == null ||
@@ -117,8 +114,15 @@ import vocab from "./vocab.js";
     connectionContainerUri,
     requestCredentials
   ) =>
-    won
-      .fetchJsonLdNode(connectionContainerUri, requestCredentials)
+    ownerApi
+      .fetchJsonLdDataset(connectionContainerUri, requestCredentials)
+      .then(jsonLdData =>
+        jsonld.frame(jsonLdData, {
+          "@id": connectionContainerUri,
+          "@context": won.defaultContext,
+          "@embed": "@always",
+        })
+      )
       .then(
         connectionContainer =>
           connectionContainer && connectionContainer["@id"]
@@ -171,7 +175,7 @@ import vocab from "./vocab.js";
    *            it will return the second page of size N)
    * @return {*} the connections predicates
    */
-  won.fetchConnection = function(connectionUri, fetchParams) {
+  won.fetchConnection = (connectionUri, fetchParams) => {
     if (!is("String", connectionUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -180,13 +184,20 @@ import vocab from "./vocab.js";
     }
 
     return (
-      won
-        //add the eventUris
-        .fetchJsonLdNode(connectionUri, fetchParams)
+      //add the eventUris
+      ownerApi
+        .fetchJsonLdDataset(connectionUri, fetchParams)
+        .then(jsonLdData =>
+          jsonld.frame(jsonLdData, {
+            "@id": connectionUri,
+            "@context": won.defaultContext,
+            "@embed": "@always",
+          })
+        )
         .then(jsonLdConnection => jsonld.expand(jsonLdConnection))
         .then(jsonLdConnection => {
           const connectionContentGraph = jsonLdConnection[0];
-          const connection = {
+          return {
             uri: connectionContentGraph["@id"],
             type: connectionContentGraph["@type"][0],
             modified:
@@ -213,8 +224,6 @@ import vocab from "./vocab.js";
               connectionContentGraph[vocab.WON.targetConnection][0]["@id"],
             hasEvents: [],
           };
-
-          return connection;
         })
         .catch(e => {
           const msg = "Failed to get connection " + connectionUri + ".";
@@ -227,7 +236,7 @@ import vocab from "./vocab.js";
 
   /**
    * @param connectionUri
-   * @param connectionContainerUri, if this parameter is present we do not fetch the connection at all, we fetch the containerUri directly
+   * @param messageContainerUri, if this parameter is present we do not fetch the connection at all, we fetch the containerUri directly
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
@@ -237,11 +246,11 @@ import vocab from "./vocab.js";
    *            it will return the second page of size N)
    * @return {nextPage: nextPageLink Object, messages: arrayOfMessages}
    */
-  won.fetchMessagesOfConnection = function(
+  won.fetchMessagesOfConnection = (
     connectionUri,
-    connectionContainerUri,
+    messageContainerUri,
     fetchParams
-  ) {
+  ) => {
     if (!is("String", connectionUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -249,19 +258,16 @@ import vocab from "./vocab.js";
       );
     }
 
-    const connectionContainerPromise = connectionContainerUri
-      ? ownerApi.fetchJsonLdDataset(connectionContainerUri, fetchParams, true)
+    const connectionContainerPromise = messageContainerUri
+      ? Promise.resolve(messageContainerUri)
       : won
           .fetchConnection(connectionUri)
-          .then(connection =>
-            ownerApi.fetchJsonLdDataset(
-              connection.messageContainer,
-              fetchParams,
-              true
-            )
-          );
+          .then(connection => connection.messageContainer);
 
     return connectionContainerPromise
+      .then(messageContainerUri =>
+        ownerApi.fetchJsonLdDataset(messageContainerUri, fetchParams, true)
+      )
       .then(responseObject =>
         jsonld.expand(responseObject.jsonLdData).then(jsonLdData => {
           const messages = {};
@@ -313,17 +319,6 @@ import vocab from "./vocab.js";
       }));
   };
 
-  window.fetchToken4dbg = won.fetchTokenForAtom;
-
-  won.fetchTokenForAtom = (atomUri, requesterCredentials, scopes) =>
-    ownerApi.fetchTokenForAtom(atomUri, {
-      ...requesterCredentials,
-      scopes: scopes,
-    });
-
-  won.fetchGrantsForAtom = (atomUri, requesterCredentials) =>
-    ownerApi.fetchGrantsForAtom(atomUri, requesterCredentials);
-
   /**
    * @param senderSocketUri
    * @param targetSocketUri
@@ -336,11 +331,11 @@ import vocab from "./vocab.js";
    *            it will return the second page of size N)
    * @return {*} the connections predicates along with the uris of associated events
    */
-  won.fetchConnectionUrisBySocket = function(
+  won.fetchConnectionUrisBySocket = (
     senderSocketUri,
     targetSocketUri,
     fetchParams
-  ) {
+  ) => {
     if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -358,22 +353,13 @@ import vocab from "./vocab.js";
         extractAtomUriBySocketUri(senderSocketUri) + "/c",
         fetchParams
       )
-      .then(jsonLdData => {
-        console.debug(
-          "Result when retrieving connection for socket(",
-          senderSocketUri,
-          ") - targetSocket(",
-          targetSocketUri,
-          ") => ",
-          jsonLdData
-        );
-
-        return jsonld.frame(jsonLdData, {
+      .then(jsonLdData =>
+        jsonld.frame(jsonLdData, {
           "@type": vocab.WON.Connection,
           "@context": won.defaultContext,
           "@embed": "@always",
-        });
-      })
+        })
+      )
       .then(jsonResp => jsonResp && jsonResp["@id"]);
   };
 
@@ -389,11 +375,11 @@ import vocab from "./vocab.js";
    *            it will return the second page of size N)
    * @return {*} the connections predicates
    */
-  won.fetchConnectionBySocket = function(
+  won.fetchConnectionBySocket = (
     senderSocketUri,
     targetSocketUri,
     fetchParams
-  ) {
+  ) => {
     if (!is("String", senderSocketUri) || !is("String", targetSocketUri)) {
       throw new Error(
         "Tried to request connection infos for sthg that isn't an uri: " +
@@ -412,22 +398,13 @@ import vocab from "./vocab.js";
           extractAtomUriBySocketUri(senderSocketUri) + "/c",
           fetchParams
         )
-        .then(jsonLdData => {
-          console.debug(
-            "Result when retrieving connection for socket(",
-            senderSocketUri,
-            ") - targetSocket(",
-            targetSocketUri,
-            ") => ",
-            jsonLdData
-          );
-
-          return jsonld.frame(jsonLdData, {
+        .then(jsonLdData =>
+          jsonld.frame(jsonLdData, {
             "@type": vocab.WON.Connection,
             "@context": won.defaultContext,
             "@embed": "@always",
-          });
-        })
+          })
+        )
         //add the eventUris
         .then(jsonResp => jsonResp && jsonResp["@id"])
         .then(connUri =>
@@ -435,39 +412,6 @@ import vocab from "./vocab.js";
             requesterWebId: fetchParams.requesterWebId,
           })
         )
-    );
-  };
-
-  /**
-   * Fetches the triples where URI is subject and add objects of those triples to the
-   * resulting structure by the localname of the predicate.
-   * The URI is added as property 'uri'.
-   *
-   * If a predicate occurs multiple times the objects (in the rdf sense) will be
-   * grouped as an array. This is usually the case for rdfs:member, to give an example.
-   *
-   * NOTE: Atm it ignores prefixes which might lead to clashes.
-   *
-   * @param uri
-   * @param fetchParams: optional paramters
-   *        * requesterWebId: the WebID used to access the ressource (used
-   *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ownerApi.js `queryString`
-   *        * pagingSize: if specified the server will return the first
-   *            page (unless e.g. `queryParams.p=2` is specified when
-   *            it will return the second page of size N)
-   */
-  won.fetchJsonLdNode = (uri, fetchParams) => {
-    if (!uri) {
-      return Promise.reject({ message: "getJsonLdNode: uri must not be null" });
-    }
-
-    return ownerApi.fetchJsonLdDataset(uri, fetchParams).then(jsonLdData =>
-      jsonld.frame(jsonLdData, {
-        "@id": uri,
-        "@context": won.defaultContext,
-        "@embed": "@always",
-      })
     );
   };
 })();

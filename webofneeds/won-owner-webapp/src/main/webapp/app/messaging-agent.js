@@ -410,7 +410,7 @@ export function runMessagingAgent(redux) {
   setInterval(checkHeartbeat, 30000); // heartbeats should arrive roughly every 30s
 
   document.addEventListener("visibilitychange", function() {
-    if (document.visibilityState == "visible") {
+    if (document.visibilityState === "visible") {
       onVisible();
     }
   });

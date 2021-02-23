@@ -176,7 +176,7 @@ export const goodsServiceSearch = {
 
     const concatenatedFilters = concatenateFilters(filters);
 
-    const query = sparqlQuery({
+    return sparqlQuery({
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
@@ -189,7 +189,5 @@ export const goodsServiceSearch = {
       where: concatenatedFilters.operations,
       orderBy: [{ order: "DESC", variable: "?score" }],
     });
-
-    return query;
   },
 };

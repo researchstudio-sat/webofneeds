@@ -62,7 +62,7 @@ export default class WonFilePicker extends React.Component {
       <won-file-picker>
         {(this.props.detail.multiSelect ||
           !this.state.addedFiles ||
-          this.state.addedFiles.length == 0) && (
+          this.state.addedFiles.length === 0) && (
           <WonFileDropzone
             onFilePicked={this.updateFiles.bind(this)}
             accepts={this.props.detail.accepts}

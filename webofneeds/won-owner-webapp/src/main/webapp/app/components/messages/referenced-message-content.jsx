@@ -112,7 +112,7 @@ export default function WonReferencedMessageContent({
               {label +
                 " " +
                 messagesArraySize +
-                (messagesArraySize == 1 ? " Message" : " Messages")}
+                (messagesArraySize === 1 ? " Message" : " Messages")}
             </div>
             <div
               className={

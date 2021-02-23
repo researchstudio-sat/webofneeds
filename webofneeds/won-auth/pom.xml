@@ -14,8 +14,14 @@
     <artifactId>won-auth</artifactId>
     <packaging>jar</packaging>
     <properties>
-            <shacl2java.generate-sources.outputDir>${project.basedir}/target/generated-sources/shacl2java</shacl2java.generate-sources.outputDir>
-        <shacl2java.generate-test-sources.outputDir>${project.basedir}/target/generated-test-sources/shacl2java</shacl2java.generate-test-sources.outputDir>
+        <shacl2java.generate-sources.outputDir>
+            ${project.basedir}/target/generated-sources/shacl2java
+        </shacl2java.generate-sources.outputDir>
+        <shacl2java.generate-test-sources.outputDir>
+            ${project.basedir}/target/generated-test-sources/shacl2java
+        </shacl2java.generate-test-sources.outputDir>
+        <won.ontology.dir>${project.basedir}/../won-vocab/src/main/resources/ontology</won.ontology.dir>
+        <won.ontology.copy.outputDir>${project.basedir}/target/generated-sources/ontology-copy</won.ontology.copy.outputDir>
     </properties>
 
     <dependencies>
@@ -118,6 +124,33 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <!-- copy auth ontology to resources folder -->
+                    <execution>
+                        <id>copy-auth-ontology</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>${won.ontology.copy.outputDir}/shacl</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${won.ontology.dir}</directory>
+                                    <includes>
+                                        <include>won-auth.ttl</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
@@ -131,7 +164,8 @@
                         </goals>
                         <configuration>
                             <mainClass>won.shacl2java.Shacl2JavaSrcGenCommand</mainClass>
-                            <commandlineArgs>-p won.auth.model -o ${shacl2java.generate-sources.outputDir} ${project.basedir}/src/main/resources/shacl/won-auth-shapes.ttl -vc https://w3id.org/won/auth#TreeExpressionShape</commandlineArgs>
+                            <commandlineArgs> -p won.auth.model -o ${shacl2java.generate-sources.outputDir} ${won.ontology.dir}/won-auth.ttl -vc https://w3id.org/won/auth#TreeExpressionShape</commandlineArgs>
+
                         </configuration>
                     </execution>
                     <execution>
@@ -144,7 +178,7 @@
                         </goals>
                         <configuration>
                             <mainClass>won.shacl2java.Shacl2JavaSrcGenCommand</mainClass>
-                            <commandlineArgs>-p won.auth.test.model -o ${shacl2java.generate-test-sources.outputDir} ${project.basedir}/src/main/resources/shacl/won-test-atom-shapes.ttl </commandlineArgs>
+                            <commandlineArgs>-p won.auth.test.model -o ${shacl2java.generate-test-sources.outputDir} ${project.basedir}/src/main/resources/shacl/won-test-atom-shapes.ttl</commandlineArgs>
                         </configuration>
                     </execution>
                 </executions>
@@ -163,6 +197,20 @@
                             <sources>
                                 <source>${shacl2java.generate-sources.outputDir}</source>
                             </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-resources-sources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${won.ontology.copy.outputDir}</directory>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                     <execution>

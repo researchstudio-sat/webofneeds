@@ -621,13 +621,17 @@ export const showLatestMessages = (connectionUri, numberOfEvents) => (
     return Promise.resolve(); //only load if not already started and connection itself not loading
   }
 
-  return stateStore.fetchMessages(
-    dispatch,
-    state,
-    connectionUri,
-    atomUri,
-    numberOfEvents
-  );
+  return stateStore
+    .determineRequestCredentials(state, atomUri, true)
+    .then(requestCredentials =>
+      stateStore.fetchMessages(
+        dispatch,
+        state,
+        connectionUri,
+        requestCredentials,
+        numberOfEvents
+      )
+    );
 };
 
 /**
@@ -663,15 +667,18 @@ export const showMoreMessages = (connectionUri, numberOfEvents) => (
     processState,
     connectionUri
   );
-
-  return stateStore.fetchMessages(
-    dispatch,
-    state,
-    connectionUri,
-    atomUri,
-    numberOfEvents,
-    resumeAfterUri
-  );
+  return stateStore
+    .determineRequestCredentials(getState(), atomUri, true)
+    .then(requestCredentials =>
+      stateStore.fetchMessages(
+        dispatch,
+        state,
+        connectionUri,
+        requestCredentials,
+        numberOfEvents,
+        resumeAfterUri
+      )
+    );
 };
 
 export const markAsRetracted = wonMessage => dispatch => {

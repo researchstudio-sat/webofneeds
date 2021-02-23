@@ -12,7 +12,7 @@
 <https://w3id.org/won/modification> rdf:type owl:Ontology ;
                                      owl:versionIRI <https://w3id.org/won/modification/1.0> ;
                                      owl:imports <https://w3id.org/won/message/1.0> ;
-                                     dc:abstract "Ontology extending the WoN Message Ontology with a property for retracting a message."@en ;
+                                     dcterms:abstract "Ontology extending the WoN Message Ontology with a property for retracting a message."@en ;
                                      dc:creator "Florian Kleedorfer" ;
                                      dcterms:created "2017-07-28"^^xsd:date ;
                                      dc:title "WoN Modification Ontology" ;
@@ -24,7 +24,7 @@
 #################################################################
 
 ###  http://purl.org/dc/elements/1.1/abstract
-dc:abstract rdf:type owl:AnnotationProperty .
+dcterms:abstract rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/elements/1.1/creator

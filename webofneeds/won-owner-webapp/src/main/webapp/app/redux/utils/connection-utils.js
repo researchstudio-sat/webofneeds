@@ -132,10 +132,10 @@ export function generateGroupChatMembersLabel(groupChatConnections) {
   ).size;
 
   const createPartOfLabel = (size, entitySingular, entityPlural) => {
-    if (size == 0) {
+    if (size === 0) {
       return "No " + entityPlural + " yet";
     }
-    if (size == 1) {
+    if (size === 1) {
       return size + " " + entitySingular;
     } else if (size > 1) {
       return size + " " + entityPlural;

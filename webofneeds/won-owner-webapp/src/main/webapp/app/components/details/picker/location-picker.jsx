@@ -102,8 +102,8 @@ export default class WonLocationPicker extends React.Component {
 
     let searchNotice;
     if (
-      this.state.searchTerm != "" &&
-      this.state.searchTerm != this.state.lastSearchedFor
+      this.state.searchTerm !== "" &&
+      this.state.searchTerm !== this.state.lastSearchedFor
     ) {
       searchNotice = (
         <div className="lp__loadingspinner">
@@ -113,8 +113,8 @@ export default class WonLocationPicker extends React.Component {
         </div>
       );
     } else if (
-      this.state.searchState == "DONE" &&
-      this.state.searchResults.length == 0
+      this.state.searchState === "DONE" &&
+      this.state.searchResults.length === 0
     ) {
       searchNotice = <div className="lp__noresults">No results found</div>;
     }

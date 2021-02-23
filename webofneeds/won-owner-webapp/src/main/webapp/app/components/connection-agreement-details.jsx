@@ -24,7 +24,7 @@ export default function WonConnectionAgreementDetails({ connection }) {
 
   if (
     lastAgreementDataset &&
-    lastAgreementDataset != previousAgreementDataset
+    lastAgreementDataset !== previousAgreementDataset
   ) {
     writer.addQuads(lastAgreementDataset);
     writer.end((error, result) => {

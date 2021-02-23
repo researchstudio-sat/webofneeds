@@ -68,7 +68,7 @@ export default function(allToasts = initialState, action = {}) {
     case actionTypes.account.loginFailed: {
       const loginError = getIn(action, ["payload", "loginError"]);
       const errorCode = loginError && loginError.get("code");
-      if (errorCode == won.RESPONSECODE.PRIVATEID_NOT_FOUND) {
+      if (errorCode === won.RESPONSECODE.PRIVATEID_NOT_FOUND) {
         //If there is a privateId Problem we push a toast
         return pushNewToast(
           allToasts,
@@ -128,6 +128,7 @@ export default function(allToasts = initialState, action = {}) {
       );
 
     case actionTypes.messages.atomMessageReceived: {
+      //payload also includes currently unused atomUri
       const humanReadable = action.payload.humanReadable;
       const message = action.payload.message;
       return pushNewToast(

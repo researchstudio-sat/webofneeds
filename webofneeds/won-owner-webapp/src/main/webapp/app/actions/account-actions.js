@@ -46,92 +46,89 @@ let _loginInProcessFor;
  * @param redirectToFeed def. false, whether or not to redirect to the feed after signing in (needs `redirects` to be true)
  * @returns {Function}
  */
-export function accountLogin(credentials) {
-  return (dispatch, getState) => {
-    const state = getState();
+export const accountLogin = credentials => (dispatch, getState) => {
+  const state = getState();
 
-    const { email } = wonUtils.parseCredentials(credentials);
+  const { email } = wonUtils.parseCredentials(credentials);
 
-    const accountState = generalSelectors.getAccountState(state);
-    const processState = generalSelectors.getProcessState(state);
-    const isLoggedIn = accountUtils.isLoggedIn(accountState);
-    const processingLoginForEmail =
-      processUtils.isProcessingLoginForEmail(processState) ||
-      _loginInProcessFor;
+  const accountState = generalSelectors.getAccountState(state);
+  const processState = generalSelectors.getProcessState(state);
+  const isLoggedIn = accountUtils.isLoggedIn(accountState);
+  const processingLoginForEmail =
+    processUtils.isProcessingLoginForEmail(processState) || _loginInProcessFor;
 
-    if (processingLoginForEmail) {
+  if (processingLoginForEmail) {
+    console.debug(
+      "Already logging in as ",
+      processingLoginForEmail,
+      ". Canceling redundant attempt."
+    );
+    return;
+  }
+
+  if (isLoggedIn && !processUtils.isProcessingInitialLoad(processState)) {
+    const loggedInEmail = accountUtils.getEmail(accountState);
+
+    if (credentials.email === loggedInEmail) {
       console.debug(
-        "Already logging in as ",
-        processingLoginForEmail,
-        ". Canceling redundant attempt."
+        "Already loggedIn with (" +
+          credentials.email +
+          "). Aborting login attempt."
       );
       return;
     }
+  }
 
-    if (isLoggedIn && !processUtils.isProcessingInitialLoad(processState)) {
-      const loggedInEmail = accountUtils.getEmail(accountState);
-
-      if (credentials.email === loggedInEmail) {
-        console.debug(
-          "Already loggedIn with (" +
-            credentials.email +
-            "). Aborting login attempt."
-        );
-        return;
-      }
-    }
-
-    return Promise.resolve()
-      .then(() => {
-        _loginInProcessFor = email;
-        return dispatch({
-          type: actionTypes.account.loginStarted,
-          payload: { email },
-        });
-      })
-      .then(() => {
-        if (isLoggedIn) {
-          return ownerApi.logout();
-        }
-      })
-      .then(() => ownerApi.login(credentials))
-      .then(data =>
-        dispatch({
-          type: actionTypes.account.store,
-          payload: Immutable.fromJS(data),
-        })
-      )
-      .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
-      .then(() => stateStore.fetchOwnedMetaData(dispatch, getState))
-      .then(() => dispatch({ type: actionTypes.account.loginFinished }))
-      .catch(error =>
-        error.response.json().then(loginError => {
-          return Promise.resolve()
-            .then(() => {
-              if (isLoggedIn) {
-                return dispatch({ type: actionTypes.account.reset });
-              }
-            })
-            .then(() => {
-              if (credentials.privateId) {
-                loginError = won.PRIVATEID_NOT_FOUND_ERROR;
-              }
-
-              return dispatch(
-                actionCreators.account__loginFailed({
-                  loginError: Immutable.fromJS(loginError),
-                  error,
-                  credentials,
-                })
-              );
-            });
-        })
-      )
-      .then(() => {
-        _loginInProcessFor = undefined;
+  return Promise.resolve()
+    .then(() => {
+      _loginInProcessFor = email;
+      return dispatch({
+        type: actionTypes.account.loginStarted,
+        payload: { email },
       });
-  };
-}
+    })
+    .then(() => {
+      if (isLoggedIn) {
+        return ownerApi.logout();
+      }
+    })
+    .then(() => ownerApi.login(credentials))
+    .then(data =>
+      dispatch({
+        type: actionTypes.account.store,
+        payload: Immutable.fromJS(data),
+      })
+    )
+    .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
+    .then(() => stateStore.fetchOwnedMetaData(dispatch, getState))
+    .then(() => dispatch({ type: actionTypes.account.loginFinished }))
+    .catch(error =>
+      error.response.json().then(loginError => {
+        return Promise.resolve()
+          .then(() => {
+            if (isLoggedIn) {
+              return dispatch({ type: actionTypes.account.reset });
+            }
+          })
+          .then(() => {
+            if (credentials.privateId) {
+              loginError = won.PRIVATEID_NOT_FOUND_ERROR;
+            }
+
+            return dispatch(
+              actionCreators.account__loginFailed({
+                loginError: Immutable.fromJS(loginError),
+                error,
+                credentials,
+              })
+            );
+          });
+      })
+    )
+    .then(() => {
+      _loginInProcessFor = undefined;
+    });
+};
 
 let _logoutInProcess;
 
@@ -139,180 +136,160 @@ let _logoutInProcess;
  * Processes logout
  * @returns {Function}
  */
-export function accountLogout(history) {
-  return (dispatch, getState) => {
-    const state = getState();
+export const accountLogout = history => (dispatch, getState) => {
+  const state = getState();
 
-    if (
-      processUtils.isProcessingLogout(
-        generalSelectors.getProcessState(state)
-      ) ||
-      _logoutInProcess
-    ) {
-      console.debug("Logout in process. Aborting redundant attempt.");
-      return;
-    }
-    _logoutInProcess = true;
+  if (
+    processUtils.isProcessingLogout(generalSelectors.getProcessState(state)) ||
+    _logoutInProcess
+  ) {
+    console.debug("Logout in process. Aborting redundant attempt.");
+    return;
+  }
+  _logoutInProcess = true;
 
-    return Promise.resolve()
-      .then(() => dispatch({ type: actionTypes.account.logoutStarted }))
-      .then(() => ownerApi.logout())
-      .catch(error => {
-        //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
-        console.error("Error while trying to log out: ", error);
-      })
-      .then(() => {
-        // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
-        const { privateId } = getQueryParams(history.location);
-        if (privateId) {
-          history.replace(getPathname(history.location));
-        }
-      })
-      .then(() => dispatch({ type: actionTypes.downgradeHttpSession }))
-      .then(() => dispatch({ type: actionTypes.account.reset }))
-      .then(() => {
-        _logoutInProcess = false;
-      })
-      .then(() => dispatch({ type: actionTypes.account.logoutFinished }));
-  };
-}
+  return Promise.resolve()
+    .then(() => dispatch({ type: actionTypes.account.logoutStarted }))
+    .then(() => ownerApi.logout())
+    .catch(error => {
+      //TODO: PRINT ERROR MESSAGE AND CHANGE STATE ACCORDINGLY
+      console.error("Error while trying to log out: ", error);
+    })
+    .then(() => {
+      // for the case that we've been logged in to an anonymous account, we need to remove the privateId here.
+      const { privateId } = getQueryParams(history.location);
+      if (privateId) {
+        history.replace(getPathname(history.location));
+      }
+    })
+    .then(() => dispatch({ type: actionTypes.downgradeHttpSession }))
+    .then(() => dispatch({ type: actionTypes.account.reset }))
+    .then(() => {
+      _logoutInProcess = false;
+    })
+    .then(() => dispatch({ type: actionTypes.account.logoutFinished }));
+};
 
 /**
  * @param credentials either {email, password} or {privateId}
  * @returns {Function}
  */
-export function accountRegister(credentials) {
-  return (dispatch, getState) =>
-    ownerApi
-      .registerAccount(credentials)
-      .then(() => accountLogin(credentials)(dispatch, getState))
-      .catch(error => {
-        //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
-        const registerError =
-          "Registration failed (E-Mail might already be used)";
-        console.error(registerError, error);
-        dispatch(
-          actionCreators.account__registerFailed({ registerError, error })
-        );
-      });
-}
+export const accountRegister = credentials => (dispatch, getState) =>
+  ownerApi
+    .registerAccount(credentials)
+    .then(() => accountLogin(credentials)(dispatch, getState))
+    .catch(error => {
+      //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
+      const registerError =
+        "Registration failed (E-Mail might already be used)";
+      console.error(registerError, error);
+      dispatch(
+        actionCreators.account__registerFailed({ registerError, error })
+      );
+    });
 
 /**
  * @param credentials {email, password, privateId}
  * @returns {Function}
  */
-export function accountTransfer(credentials) {
-  //FIXME: accountTransfer only works if we have the full privateId which we might not have anymore after the refactoring
-  return (dispatch, getState) =>
-    ownerApi
-      .transferPrivateAccount(credentials)
-      .then(() => {
-        credentials.privateId = undefined;
-        return accountLogin(credentials)(dispatch, getState);
-      })
-      .catch(error => {
-        //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
-        const registerError = "Account Transfer failed";
-        console.error(registerError, error);
-        dispatch(
-          actionCreators.account__registerFailed({ registerError, error })
-        );
-      });
-}
+//FIXME: accountTransfer only works if we have the full privateId which we might not have anymore after the refactoring
+export const accountTransfer = credentials => (dispatch, getState) =>
+  ownerApi
+    .transferPrivateAccount(credentials)
+    .then(() => {
+      credentials.privateId = undefined;
+      return accountLogin(credentials)(dispatch, getState);
+    })
+    .catch(error => {
+      //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
+      const registerError = "Account Transfer failed";
+      console.error(registerError, error);
+      dispatch(
+        actionCreators.account__registerFailed({ registerError, error })
+      );
+    });
 
 /**
  * @param credentials {email, oldPassword, newPassword}
  * @returns {Function}
  */
-export function accountChangePassword(credentials) {
-  return dispatch =>
-    ownerApi
-      .changePassword(credentials)
-      .then(() => {
-        dispatch({ type: actionTypes.account.changePasswordSuccess });
-      })
-      .catch(() => {
-        dispatch({ type: actionTypes.account.changePasswordFailed });
-      });
-}
+export const accountChangePassword = credentials => dispatch =>
+  ownerApi
+    .changePassword(credentials)
+    .then(() => {
+      dispatch({ type: actionTypes.account.changePasswordSuccess });
+    })
+    .catch(() => {
+      dispatch({ type: actionTypes.account.changePasswordFailed });
+    });
 
-export function accountAcceptDisclaimer() {
-  return dispatch => {
-    setDisclaimerAccepted();
-    dispatch({ type: actionTypes.account.acceptDisclaimerSuccess });
-  };
-}
+export const accountAcceptDisclaimer = () => dispatch => {
+  setDisclaimerAccepted();
+  dispatch({ type: actionTypes.account.acceptDisclaimerSuccess });
+};
 
-export function accountAcceptTermsOfService() {
-  return dispatch => {
-    dispatch({ type: actionTypes.account.acceptTermsOfServiceStarted });
-    ownerApi
-      .acceptTermsOfService()
-      .then(() => {
-        dispatch({ type: actionTypes.account.acceptTermsOfServiceSuccess });
-      })
-      .catch(() => {
-        dispatch({ type: actionTypes.account.acceptTermsOfServiceFailed });
-      });
-  };
-}
+export const accountAcceptTermsOfService = () => dispatch => {
+  dispatch({ type: actionTypes.account.acceptTermsOfServiceStarted });
+  ownerApi
+    .acceptTermsOfService()
+    .then(() => {
+      dispatch({ type: actionTypes.account.acceptTermsOfServiceSuccess });
+    })
+    .catch(() => {
+      dispatch({ type: actionTypes.account.acceptTermsOfServiceFailed });
+    });
+};
 
-export function accountVerifyEmailAddress(verificationToken) {
-  return dispatch => {
-    dispatch({ type: actionTypes.account.verifyEmailAddressStarted });
-    ownerApi
-      .confirmRegistration(verificationToken)
-      .then(() => {
-        dispatch({ type: actionTypes.account.verifyEmailAddressSuccess });
+export const accountVerifyEmailAddress = verificationToken => dispatch => {
+  dispatch({ type: actionTypes.account.verifyEmailAddressStarted });
+  ownerApi
+    .confirmRegistration(verificationToken)
+    .then(() => {
+      dispatch({ type: actionTypes.account.verifyEmailAddressSuccess });
+    })
+    .catch(error =>
+      dispatch({
+        type: actionTypes.account.verifyEmailAddressFailed,
+        payload: {
+          emailVerificationError: Immutable.fromJS(error.jsonResponse),
+        },
       })
-      .catch(error =>
-        dispatch({
-          type: actionTypes.account.verifyEmailAddressFailed,
-          payload: {
-            emailVerificationError: Immutable.fromJS(error.jsonResponse),
-          },
-        })
-      );
-  };
-}
+    );
+};
 
-export function accountResendVerificationEmail(email) {
-  return dispatch => {
-    dispatch({ type: actionTypes.account.resendVerificationEmailStarted });
-    ownerApi
-      .resendEmailVerification(email)
-      .then(() => {
-        dispatch({ type: actionTypes.account.resendVerificationEmailSuccess });
+export const accountResendVerificationEmail = email => dispatch => {
+  dispatch({ type: actionTypes.account.resendVerificationEmailStarted });
+  ownerApi
+    .resendEmailVerification(email)
+    .then(() => {
+      dispatch({ type: actionTypes.account.resendVerificationEmailSuccess });
+    })
+    .catch(error =>
+      dispatch({
+        type: actionTypes.account.resendVerificationEmailFailed,
+        payload: {
+          emailVerificationError: Immutable.fromJS(error.jsonResponse),
+        },
       })
-      .catch(error =>
-        dispatch({
-          type: actionTypes.account.resendVerificationEmailFailed,
-          payload: {
-            emailVerificationError: Immutable.fromJS(error.jsonResponse),
-          },
-        })
-      );
-  };
-}
+    );
+};
 
-export function accountSendAnonymousLinkEmail(email, privateId) {
-  return dispatch => {
-    dispatch({ type: actionTypes.account.sendAnonymousLinkEmailStarted });
-    ownerApi
-      .sendAnonymousLinkEmail(email, privateId)
-      .then(() => {
-        dispatch({ type: actionTypes.account.sendAnonymousLinkEmailSuccess });
+export const accountSendAnonymousLinkEmail = (email, privateId) => dispatch => {
+  dispatch({ type: actionTypes.account.sendAnonymousLinkEmailStarted });
+  ownerApi
+    .sendAnonymousLinkEmail(email, privateId)
+    .then(() => {
+      dispatch({ type: actionTypes.account.sendAnonymousLinkEmailSuccess });
+    })
+    .catch(error =>
+      dispatch({
+        type: actionTypes.account.sendAnonymousLinkEmailFailed,
+        payload: {
+          anonymousEmailError: Immutable.fromJS(error.jsonResponse),
+        },
       })
-      .catch(error =>
-        dispatch({
-          type: actionTypes.account.sendAnonymousLinkEmailFailed,
-          payload: {
-            anonymousEmailError: Immutable.fromJS(error.jsonResponse),
-          },
-        })
-      );
-  };
-}
+    );
+};
 
 export const reconnect = () => (dispatch, getState) => {
   dispatch({ type: actionTypes.reconnect.start });

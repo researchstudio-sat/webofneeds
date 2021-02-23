@@ -162,7 +162,7 @@ export const jobSearch = {
         optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
       }));
 
-    const query = sparqlQuery({
+    return sparqlQuery({
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
@@ -187,7 +187,5 @@ export const jobSearch = {
       ],
       orderBy: [{ order: "DESC", variable: "?score" }],
     });
-
-    return query;
   },
 };

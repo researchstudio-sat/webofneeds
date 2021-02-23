@@ -45,7 +45,7 @@ public class GrantedOperationsTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private static ResourceLoader loader;
-    @Value("classpath:/shacl/won-auth-shapes.ttl")
+    @Value("classpath:/shacl/won-auth.ttl")
     private Resource shapesDef;
     @Value("classpath:/shacl/won-test-atom-shapes.ttl")
     private Resource atomDataShapesDef;

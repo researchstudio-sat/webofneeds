@@ -42,7 +42,7 @@ public class AuthShapeTest {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
     private ResourceLoader loader;
-    @Value("classpath:/shacl/won-auth-shapes.ttl")
+    @Value("classpath:/shacl/won-auth.ttl")
     private Resource shapesDef;
     private String AUTH = "https://w3id.org/won/auth#";
 

@@ -1,3 +1,4 @@
+import { markUriAsDeleted } from "../../won-localstorage.js";
 import { parseMetaAtom } from "./parse-atom.js";
 import Immutable from "immutable";
 import { get, getIn, getUri } from "../../utils.js";
@@ -26,15 +27,18 @@ export function addAtom(allAtomsInState, parsedAtom) {
 }
 
 export function deleteAtom(allAtomsInState, deletedAtomUri) {
+  markUriAsDeleted(deletedAtomUri);
+
   return allAtomsInState.delete(deletedAtomUri).map(atom => {
     const removeConnections = atom => {
       return atom.update(
         "connections",
         connections =>
           connections &&
-          connections.filter(
-            conn => connectionUtils.getTargetAtomUri(conn) !== deletedAtomUri
-          )
+          connections.filter((conn, connUri) => {
+            markUriAsDeleted(connUri);
+            return connectionUtils.getTargetAtomUri(conn) !== deletedAtomUri;
+          })
       );
     };
 

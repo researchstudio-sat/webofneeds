@@ -72,7 +72,7 @@ export const sightseeingPlan = {
         optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
       }));
 
-    const query = sparqlQuery({
+    return sparqlQuery({
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
@@ -98,8 +98,6 @@ export const sightseeingPlan = {
       ],
       orderBy: [{ order: "DESC", variable: "?score" }],
     });
-
-    return query;
   },
 };
 
@@ -158,7 +156,7 @@ export const sightseeingInterest = {
         optional: true, // so counterparts without that detail don't get filtered out (just assigned a score of 0 via `coalesce`)
       }));
 
-    const query = sparqlQuery({
+    return sparqlQuery({
       prefixes: {
         won: won.defaultContext["won"],
         rdf: won.defaultContext["rdf"],
@@ -183,7 +181,5 @@ export const sightseeingInterest = {
       ],
       orderBy: [{ order: "DESC", variable: "?score" }],
     });
-
-    return query;
   },
 };

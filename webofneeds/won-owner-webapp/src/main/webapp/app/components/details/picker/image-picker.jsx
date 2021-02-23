@@ -80,7 +80,7 @@ export default class WonImagePicker extends React.Component {
       <won-image-picker>
         {(this.props.detail.multiSelect ||
           !this.state.addedImages ||
-          this.state.addedImages.length == 0) && (
+          this.state.addedImages.length === 0) && (
           <WonFileDropzone
             onFilePicked={this.updateImages.bind(this)}
             accepts={this.props.detail.accepts}
@@ -147,7 +147,7 @@ export default class WonImagePicker extends React.Component {
   updateImages({ file }) {
     if (this.isImage(file)) {
       const _addedImages = this.state.addedImages || [];
-      if (_addedImages.length == 0) {
+      if (_addedImages.length === 0) {
         file.default = true;
       }
       _addedImages.push(file);

@@ -297,7 +297,13 @@ const actionHierarchy = {
 
   view: {
     toggleRdf: INJ_DEFAULT,
-    toggleDebugMode: toggleDebugMode,
+    toggleDebugMode: () => dispatch => {
+      won.debugmode = !won.debugmode;
+      dispatch({
+        type: actionTypes.view.toggleDebugMode,
+        payload: won.debugmode,
+      });
+    },
 
     toggleClosedAtoms: INJ_DEFAULT,
 
@@ -343,7 +349,11 @@ const actionHierarchy = {
     init: configActions.configInit,
     update: configActions.update,
   },
-  tick: startTicking,
+  tick: () => dispatch =>
+    setInterval(
+      () => dispatch({ type: actionTypes.tick, payload: Date.now() }),
+      60000
+    ),
 };
 
 //****** SERVICE AND HELPER FUNCTIONS ********************
@@ -520,29 +530,3 @@ export const actionCreators = hierarchy2Creators(actionHierarchy);
 
 //as string constans, e.g. actionTypes.atoms.close === "atoms.close"
 export const actionTypes = tree2constants(actionHierarchy);
-
-/*
- * TODO deletme; for debugging
- */
-window.actionCreators4Dbg = actionCreators;
-window.actionTypes4Dbg = actionTypes;
-
-//////////// STUFF THAT SHOULD BE IN OTHER FILES BELOW //////////////////
-
-export function startTicking() {
-  return dispatch =>
-    setInterval(
-      () => dispatch({ type: actionTypes.tick, payload: Date.now() }),
-      60000
-    );
-}
-
-function toggleDebugMode() {
-  return dispatch => {
-    won.debugmode = !won.debugmode;
-    dispatch({
-      type: actionTypes.view.toggleDebugMode,
-      payload: won.debugmode,
-    });
-  };
-}

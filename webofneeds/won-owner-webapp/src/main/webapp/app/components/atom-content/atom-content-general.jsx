@@ -29,7 +29,7 @@ export default function WonAtomContentGeneral({ atom }) {
     creationDate && relativeTime(globalLastUpdateTime, creationDate);
   const friendlyModifiedDate =
     modifiedDate &&
-    modifiedDate != creationDate &&
+    modifiedDate !== creationDate &&
     relativeTime(globalLastUpdateTime, modifiedDate);
   const shouldShowRdf = viewUtils.showRdf(viewState);
 

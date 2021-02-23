@@ -209,7 +209,7 @@ export const rideShareOffer = {
       filter = concatenateFilters([baseFilter, timeFilter]);
     }
 
-    const generatedQuery = sparqlQuery({
+    return sparqlQuery({
       prefixes: filter.prefixes,
       distinct: true,
       variables: [resultName],
@@ -221,7 +221,5 @@ export const rideShareOffer = {
         },
       ],
     });
-
-    return generatedQuery;
   },
 };

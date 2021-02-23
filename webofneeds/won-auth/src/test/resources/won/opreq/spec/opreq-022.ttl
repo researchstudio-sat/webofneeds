@@ -1,0 +1,185 @@
+@base             <https://example.com/test/atom1> .
+@prefix ex:       <https://example.com/test/> .
+@prefix auth:     <https://w3id.org/won/auth#> .
+@prefix won:      <https://w3id.org/won/core#> .
+@prefix chat:     <https://w3id.org/won/ext/chat#> .
+@prefix wx-buddy:  <https://w3id.org/won/ext/buddy#> .
+@prefix wx-persona: <https://w3id.org/won/ext/persona#> .
+@prefix owl:      <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix atom1:    <http://example.org/test/atom1#> .
+@prefix atom2:    <http://example.org/test/atom2#> .
+@prefix atom3:    <http://example.org/test/atom3#> .
+@prefix atom4:    <http://example.org/test/atom4#> .
+@prefix msg:      <https://w3id.org/won/message#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg:     <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+ex:expectedResult1
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request1> ;
+    auth:issueToken         [ auth:tokenScope   wx-buddy:BuddySocket ;
+                              auth:tokenIss     ex:atom1 ;
+                              auth:tokenSub     ex:atom2 ;
+                              auth:tokenSig     ex:node ;
+                              auth:expiresAfter 3600 ] .
+
+ex:expectedResult2
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessDenied ;
+    auth:requestedOperation <#request2> .
+
+# Request token to see Expertises
+
+<#authorization>
+    a            auth:Authorization ;
+    auth:grantee [ auth:socket [ auth:socketType wx-buddy:BuddySocket ;
+                                 auth:connection [ auth:connectionState won:Connected ;
+                                                   auth:targetAtom      [ ] ] ] ] ;
+    auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   wx-buddy:BuddySocket ;
+                                                        auth:expiresAfter 3600 ] ] ;
+                   auth:graph     [ auth:graphType auth:contentGraph, auth:keyGraph, auth:sysinfoGraph ;
+                                    auth:operation auth:opRead ] ;
+                   auth:socket    [ auth:socketType         wx-persona:InterestSocket ;
+                                    auth:operation          auth:opRead ;
+                                    auth:connectionMessages [ auth:inherit false ] ] ] .
+
+<#request1>
+    a                auth:OperationRequest ;
+    auth:operation   [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
+    auth:requestor   ex:atom2 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionRoot .
+
+<#request2>
+    a                auth:OperationRequest ;
+    auth:operation   [ auth:requestToken [ auth:tokenScope wx-buddy:BuddySocket ] ] ;
+    auth:requestor   ex:atom3 ;
+    auth:reqAtom     ex:atom1 ;
+    auth:reqPosition auth:positionRoot .
+
+# Persona 1
+
+ex:atom1
+    a                    won:Atom ;
+    won:socket           atom1:buddySocket, atom1:interestSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
+
+
+atom1:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom1:buddySocketConnections .
+
+atom1:buddySocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom1:conn12 .
+
+atom1:conn12
+    a                   won:Connection ;
+    won:socket          atom1:buddySocket ;
+    won:targetAtom      ex:atom2 ;
+    won:connectionState won:Connected .
+
+atom1:interestSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-persona:InterestSocket ;
+    won:connections      atom1:interestSocketConnections .
+
+atom1:interestSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom1:conn13, atom1:conn14 .
+
+
+atom1:conn13
+    a                   won:Connection ;
+    won:socket          atom1:interestSocket ;
+    won:targetAtom      ex:atom3 ;
+    won:connectionState won:Connected .
+
+atom1:conn14
+    a                   won:Connection ;
+    won:socket          atom1:interestSocket ;
+    won:targetAtom      ex:atom4 ;
+    won:connectionState won:Closed .
+
+
+
+# Persona 2 - Buddy of Persona 1
+
+ex:atom2
+    a                    won:Atom ;
+    won:socket           atom2:buddySocket ;
+    won:state            won:Active ;
+    won:messageContainer atom2:msg ;
+    won:wonNode          ex:node .
+
+atom2:buddySocket
+    a                    won:Socket ;
+    won:socketDefinition wx-buddy:BuddySocket ;
+    won:connections      atom2:buddySocketConnections .
+
+atom2:buddySocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom2:conn21 .
+
+
+atom2:conn21
+    a                   won:Connection ;
+    won:socket          atom2:buddySocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+
+# Atom 3 - Expertise of Persona 1
+
+ex:atom3
+    a                    won:Atom ;
+    won:socket           atom3:interestOfSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom3:msg ;
+    won:wonNode          ex:node .
+
+atom3:interestOfSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-persona:InterestOfSocket ;
+    won:connections      atom3:groupSocketConnections .
+
+
+atom3:groupSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom3:conn31 .
+
+atom3:conn31
+    a                   won:Connection ;
+    won:socket          atom3:interestOfSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+# Closed Expertise of Persona 1
+
+ex:atom4
+    a                    won:Atom ;
+    won:socket           atom4:interestOfSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom4:msg ;
+    won:wonNode          ex:node .
+
+atom4:interestOfSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-persona:InterestOfSocket .
+
+atom4:chatSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom4:conn41 .
+
+atom4:conn41
+    a                   won:Connection ;
+    won:socket          atom4:interestOfSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Closed .
+

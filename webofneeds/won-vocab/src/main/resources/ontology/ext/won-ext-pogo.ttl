@@ -13,7 +13,7 @@
 <https://w3id.org/won/ext/pogo> rdf:type owl:Ontology ;
                                  owl:versionIRI <https://w3id.org/won/ext/pogo/1.0> ;
                                  owl:imports <https://w3id.org/won/core> ;
-                                 dc:abstract "Ontology for coordinating Pokémon GO raids."@en ;
+                                 dcterms:abstract "Ontology for coordinating Pokémon GO raids."@en ;
                                  dc:creator "Fabian Suda" ,
                                             "Florian Kleedorfer" ;
                                  dc:title "Web of Needs Pokémon GO Raid Extension" ;
@@ -26,7 +26,7 @@
 #################################################################
 
 ###  http://purl.org/dc/elements/1.1/abstract
-dc:abstract rdf:type owl:AnnotationProperty .
+dcterms:abstract rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/elements/1.1/creator

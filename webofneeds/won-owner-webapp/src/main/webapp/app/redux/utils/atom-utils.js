@@ -73,11 +73,10 @@ export function getTokenAuth(atom) {
         return (
           !!operations &&
           !is("String", operations) &&
-          operations.find(op => {
-            const isRequestToken =
-              !is("String", op) && !!get(op, vocab.AUTH.requestTokenCompacted);
-            return isRequestToken;
-          })
+          operations.find(
+            op =>
+              !is("String", op) && !!get(op, vocab.AUTH.requestTokenCompacted)
+          )
         );
       });
     })
@@ -102,15 +101,6 @@ export function getIdenticonSvg(atom) {
 
 export function getMatchedUseCaseIcon(atom) {
   return getIn(atom, ["matchedUseCase", "icon"]);
-}
-
-export function matchesDefinitions(atom, useCaseDefinitions) {
-  return (
-    !!useCaseDefinitions &&
-    !!useCaseDefinitions.find(useCaseDefinition =>
-      matchesDefinition(atom, useCaseDefinition)
-    )
-  );
 }
 
 export function matchesDefinition(atom, useCaseDefinition) {
@@ -472,14 +462,6 @@ export function hasHoldableSocket(atom) {
   return false;
 }
 
-export function hasExpertiseOfSocket(atom) {
-  return hasSocket(atom, vocab.WXPERSONA.ExpertiseOfSocketCompacted);
-}
-
-export function hasInterestOfSocket(atom) {
-  return hasSocket(atom, vocab.WXPERSONA.InterestOfSocketCompacted);
-}
-
 export function hasHolderSocket(atom) {
   return hasSocket(atom, vocab.HOLD.HolderSocketCompacted);
 }
@@ -523,12 +505,6 @@ export function getRequestReceivedConnections(atom, socketType) {
   );
 }
 
-export function hasUnreadSuggestedConnections(atom) {
-  return !!getConnections(atom).find(
-    conn => connectionUtils.isSuggested(conn) && connectionUtils.isUnread(conn)
-  );
-}
-
 export function hasUnreadConnections(atom, socketType, exclude) {
   return !!getConnections(atom, socketType, exclude).find(conn =>
     connectionUtils.isUnread(conn)
@@ -557,14 +533,14 @@ export function hasUnreadBuddyRequests(atom) {
  */
 export function generateFullFlagLabels(atomImm) {
   const flags = atomImm && atomImm.getIn(["content", "flags"]);
-  const flagsArray =
+  return (
     flags &&
     flags
       // use nicer socket labels if available
       // TODO: remove this to match RDF state?
       .map(wonLabelUtils.getFlagLabel)
-      .toArray();
-  return flagsArray;
+      .toArray()
+  );
 }
 
 /**
@@ -572,14 +548,14 @@ export function generateFullFlagLabels(atomImm) {
  */
 export function generateFullSocketLabels(atomImm) {
   const sockets = getSockets(atomImm);
-  const socketsArray =
+  return (
     sockets &&
     sockets
       // use nicer socket labels if available
       // TODO: remove this to match RDF state?
       .map(wonLabelUtils.getSocketLabel)
-      .toArray();
-  return socketsArray;
+      .toArray()
+  );
 }
 
 /**
@@ -602,15 +578,15 @@ export function generateTypeLabel(atomImm, defaultType) {
  */
 export function generateShortSocketLabels(atomImm) {
   const sockets = getSockets(atomImm);
-  const socketsArray =
+  return (
     sockets &&
     sockets
       // rename sockets
       // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
       .filter(socket => socket === vocab.GROUP.GroupSocketCompacted)
       .map(wonLabelUtils.getSocketLabel)
-      .toArray();
-  return socketsArray;
+      .toArray()
+  );
 }
 
 /**
@@ -618,7 +594,8 @@ export function generateShortSocketLabels(atomImm) {
  */
 export function generateShortFlagLabels(atomImm) {
   const flags = atomImm && atomImm.getIn(["content", "flags"]);
-  const flagsArray =
+
+  return (
     flags &&
     flags
 
@@ -630,8 +607,8 @@ export function generateShortFlagLabels(atomImm) {
           flag === vocab.WONMATCH.NoHintForMeCompacted
       )
       .map(wonLabelUtils.getFlagLabel)
-      .toArray();
-  return flagsArray;
+      .toArray()
+  );
 }
 
 export function getSockets(atomImm) {
@@ -712,19 +689,6 @@ export function getSeeksSocketsWithKeysReset(atomImm) {
 function getSocketKeysReset(socketsImm) {
   //TODO: Needs to be generic somehow, otherwise every socket that is added would not be able to be reset correctly
   return socketsImm.mapKeys(key => key.substr(key.lastIndexOf("#")));
-}
-
-/**
- * Return all non-closed connections of the given atom
- * @param atomImm immutable atom that stores connections
- * @param socketType compactedSocketType Uri (senderSocket)
- */
-export function getNonClosedConnections(atomImm, socketType) {
-  const connections = getConnections(atomImm, socketType);
-
-  return (
-    connections && connections.filter(conn => !connectionUtils.isClosed(conn))
-  );
 }
 
 export function getConnection(atomImm, connectionUri) {

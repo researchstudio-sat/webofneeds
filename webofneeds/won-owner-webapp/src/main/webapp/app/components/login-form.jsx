@@ -33,7 +33,7 @@ export default function WonLoginForm({ className }) {
     if (loginError) {
       dispatch(actionCreators.view__clearLoginError());
     }
-    if (event.keyCode == 13) {
+    if (event.keyCode === 13) {
       dispatch(
         actionCreators.account__login({
           email: email,

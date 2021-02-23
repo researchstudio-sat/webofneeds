@@ -18,7 +18,7 @@ EOF
 script_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 project_dir=${script_path}/../../../../../
 project_dir="$( cd ${project_dir} >/dev/null 2>&1 && pwd )"
-output_base=${project_dir}/target
+output_base=${project_dir}/target/site/ontologies
 if [[ $1 == "clean" ]]
 then
 	if [[ -d ${output_base} ]]
@@ -47,7 +47,7 @@ echo "(re)generating documentation for ontologies"
 echo "   ontologies folder:  ${ontology_root}"
 echo "   output folder    :  ${output_base}"
 
-onts=(core message agreement modification content matching workflow)
+onts=(core message auth agreement modification content matching workflow)
 ext_onts=(buddy chat group hold review schema demo pogo bot valueflows persona)
 
 rewrite_base="https://researchstudio-sat.github.io/webofneeds/ontologies"

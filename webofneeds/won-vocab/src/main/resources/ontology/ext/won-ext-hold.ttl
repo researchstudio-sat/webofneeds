@@ -15,7 +15,7 @@
     rdf:type                      owl:Ontology ;
     owl:versionIRI                <https://w3id.org/won/ext/hold/1.0> ;
     owl:imports                   <https://w3id.org/won/core> ;
-    dc:abstract
+    dcterms:abstract
                                   "This ontology contains the definition of the *HolderSocket* and the *HoldableSocket*, the *holds* and the *heldBy* properties. These express control relationships in WoN. The Atoms holding other atoms represent agents (users or programs) and can themselves not be held."@en ;
     dc:creator                    "Florian Kleedorfer" ;
     dc:date                       "2019-04-15"^^xsd:date ;
@@ -29,7 +29,7 @@
 
 ###  http://purl.org/dc/elements/1.1/abstract
 
-dc:abstract
+dcterms:abstract
     rdf:type owl:AnnotationProperty .
 
 
@@ -141,7 +141,7 @@ rdfs:labels
 
 :grantAccessToHolderAuth
     a            auth:Authorization ;
-    rdfs:label   "grantAccessToHolderAuth" ;
+    rdfs:label   "GrantAccessToHolderAuth" ;
     auth:grantee [ auth:socket [ auth:connection [ auth:connectionState won:Connected, won:RequestSent ;
                                                    auth:targetAtom      [ ] ] ] ] ;
     auth:grant   [ auth:socket    [ auth:socketType  :HoldableSocket ;

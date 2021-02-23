@@ -417,25 +417,6 @@ export function isMessageProposal(con, msg) {
 }
 
 /**
- * Determines if a given message is considered a claim
- * @param con
- * @param msg
- * @returns {*|boolean}
- */
-export function isMessageClaim(con, msg) {
-  return (
-    hasClaimsReferences(msg) &&
-    !(
-      isMessageAccepted(con, msg) ||
-      isMessageCancellationPending(con, msg) ||
-      isMessageCancelled(con, msg) ||
-      isMessageRejected(con, msg) ||
-      isMessageRetracted(con, msg)
-    )
-  );
-}
-
-/**
  * Determines if a given message is an agreement
  * @param con
  * @param msg

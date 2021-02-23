@@ -155,7 +155,7 @@ export function findUseCaseByAtom(atomImm) {
 
       const ucTypesSize = ucTypes ? ucTypes.size : 0;
 
-      if (typesSize != ucTypesSize) {
+      if (typesSize !== ucTypesSize) {
         return false;
       }
 
@@ -190,7 +190,7 @@ export function findUseCaseByAtom(atomImm) {
           const matchingEventObjectSize = draftEventObject.filter(
             object => atomEventObject && atomEventObject.includes(object)
           ).size;
-          return eventObjectSize == matchingEventObjectSize;
+          return eventObjectSize === matchingEventObjectSize;
         }
         return atomEventObject && atomEventObject.includes(draftEventObject);
       });
@@ -235,7 +235,7 @@ export function findUseCaseByAtom(atomImm) {
           const matchingEventObjectSize = draftEventObject.filter(
             object => atomEventObject && atomEventObject.includes(object)
           ).size;
-          return eventObjectSize == matchingEventObjectSize;
+          return eventObjectSize === matchingEventObjectSize;
         }
         return atomEventObject && atomEventObject.includes(draftEventObject);
       });
@@ -259,7 +259,7 @@ export function findUseCaseByAtom(atomImm) {
         " -> returning undefined"
       );
       return undefined;
-    } else if (matchingUseCases.size == 1) {
+    } else if (matchingUseCases.size === 1) {
       return matchingUseCases.first().toJS();
     } else {
       console.warn(
@@ -319,12 +319,7 @@ function initializeAllMessageDetails() {
       usecaseMessageDetails[detailKey] = allDetails[detailKey];
     }
   }
-  const allMessageDetails = Object.assign(
-    {},
-    messageDetails,
-    usecaseMessageDetails
-  );
-  return allMessageDetails;
+  return Object.assign({}, messageDetails, usecaseMessageDetails);
 }
 
 /**
@@ -472,46 +467,6 @@ export function getUseCaseGroupByIdentifierImm(groupIdentifier) {
   );
 }
 
-/**
- * return if the given useCase is displayable or not
- * @param useCase
- * @param visibleUseCasesArray => array of useCaseIdentifier that are visible
- * @returns {*}
- */
-export function isDisplayableUseCase(
-  useCase,
-  visibleUseCasesArray,
-  filterBySocketType
-) {
-  if (filterBySocketType) {
-    const sockets = getIn(useCase, ["draft", "content", "sockets"]);
-
-    if (sockets) {
-      let foundSocket = false;
-      for (const key in sockets) {
-        if (sockets[key] === filterBySocketType) {
-          foundSocket = true;
-          break;
-        }
-      }
-      if (!foundSocket) {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  return (
-    useCase &&
-    isInVisibleUseCaseArray(useCase, visibleUseCasesArray) &&
-    useCase.identifier &&
-    (filterBySocketType || !useCase.hidden) &&
-    (useCase.label || useCase.icon) &&
-    !useCase.subItems
-  );
-}
-
 function isDisplayableUseCaseImm(
   useCaseImm,
   visibleUseCasesArray,
@@ -598,13 +553,11 @@ function countDisplayableItemsInGroupImm(
 ) {
   const subItems = get(useCaseGroupImm, "subItems");
 
-  const size = subItems
+  return subItems
     ? subItems.filter(subItem =>
         isDisplayableItemImm(subItem, visibleUseCasesArray, filterBySocketType)
       ).size
     : 0;
-
-  return size;
 }
 
 /**
@@ -720,15 +673,14 @@ export function getUseCaseIcon(identifier) {
 function isInVisibleUseCaseArray(useCase, visibleUseCasesArray) {
   if (
     !visibleUseCasesArray ||
-    visibleUseCasesArray.size == 0 ||
+    visibleUseCasesArray.size === 0 ||
     visibleUseCasesArray.contains("*")
   ) {
     return true;
   } else {
-    const isUseCaseConfigured = !!visibleUseCasesArray.contains(
+    return !!visibleUseCasesArray.contains(
       get(useCase, "identifier") || useCase.identifier
     );
-    return isUseCaseConfigured;
   }
 }
 
