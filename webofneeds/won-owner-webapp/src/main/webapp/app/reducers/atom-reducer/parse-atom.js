@@ -4,119 +4,92 @@ import * as useCaseUtils from "../../usecase-utils.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import {
   generateHexColor,
-  generateRgbColorArray,
   generateFakePersonaName,
   get,
-  getIn,
   getUri,
 } from "../../utils.js";
 import shajs from "sha.js";
-import Identicon from "identicon.js";
 
-export function parseAtom(jsonldAtomAndAuth) {
-  const jsonldAtomAndAuthImm = Immutable.fromJS(jsonldAtomAndAuth);
-  const jsonldAtomImm = get(jsonldAtomAndAuthImm, "atom");
-  const jsonldAuthImm = get(jsonldAtomAndAuthImm, "auth");
+export function parseAtomContent(partiallyParsedAtom) {
+  if (partiallyParsedAtom) {
+    let partiallyParsedAtomImm = Immutable.fromJS(partiallyParsedAtom);
 
-  const atomUri = get(jsonldAtomImm, "@id");
-  if (atomUri) {
-    const detailsToParse = useCaseUtils.getAllDetails();
+    const jsonldAtomImm = get(partiallyParsedAtomImm, "jsonLdAtom");
 
-    let parsedAtom = {
-      uri: atomUri,
-      identiconSvg: generateIdenticon(atomUri),
-      nodeUri: getIn(jsonldAtomImm, [vocab.WON.wonNodeCompacted, "@id"]),
-      connectionContainerUri: getIn(jsonldAtomImm, [
-        vocab.WON.connectionsCompacted,
-        "@id",
-      ]),
-      state: extractState(jsonldAtomImm),
-      content: generateContent(jsonldAtomImm, detailsToParse),
-      seeks: generateContent(get(jsonldAtomImm, "match:seeks"), detailsToParse),
-      creationDate: extractCreationDate(jsonldAtomImm),
-      lastUpdateDate: extractCreationDate(jsonldAtomImm), //Used for sorting/updates (e.g. if connection comes in etc...)
-      modifiedDate: extractLastModifiedDate(jsonldAtomImm), //Used as a flag if the atom itself has changed (e.g. atom edit)
-      humanReadable: undefined, //can only be determined after we generated The Content
-      fakePersonaName: generateFakePersonaName(atomUri),
-      matchedUseCase: {
-        identifier: undefined,
-        icon: undefined,
-        reactions: undefined,
-      },
-      auth: extractAuthList(jsonldAuthImm),
-      background: generateBackground(atomUri),
-      unread: false,
-      isBeingCreated: false,
-      connections: Immutable.Map(),
-    };
+    if (jsonldAtomImm) {
+      const detailsToParse = useCaseUtils.getAllDetails();
 
-    if (!parsedAtom.creationDate || !parsedAtom.lastUpdateDate) {
-      console.error(
-        "Cant parse atom, creationDate or lastUpdateDate not set",
-        jsonldAtomImm && jsonldAtomImm.toJS()
-      );
-      return undefined;
-    }
-
-    let parsedAtomImm = Immutable.fromJS(parsedAtom);
-    const matchingUseCase = useCaseUtils.findUseCaseByAtom(parsedAtomImm);
-
-    if (matchingUseCase) {
-      parsedAtomImm = parsedAtomImm
-        .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
-        .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
-        .setIn(
-          ["matchedUseCase", "reactions"],
-          matchingUseCase.reactions
-            ? Immutable.fromJS(matchingUseCase.reactions)
-            : Immutable.Map()
+      partiallyParsedAtomImm = partiallyParsedAtomImm
+        .set(
+          "content",
+          Immutable.fromJS(generateContent(jsonldAtomImm, detailsToParse))
+        )
+        .set(
+          "seeks",
+          Immutable.fromJS(
+            generateContent(get(jsonldAtomImm, "match:seeks"), detailsToParse)
+          )
         );
-    }
 
-    parsedAtomImm = parsedAtomImm.set(
-      "humanReadable",
-      getHumanReadableStringFromAtom(parsedAtomImm, detailsToParse)
-    );
+      const matchingUseCase = useCaseUtils.findUseCaseByAtom(
+        partiallyParsedAtomImm
+      );
 
-    //Sort content details
-    const atomContent = get(parsedAtomImm, "content");
-    const atomSeeksContent = get(parsedAtomImm, "seeks");
-
-    const sortContentDetailsImm = (_, contentIdentifier) => {
-      if (
-        contentIdentifier === "title" ||
-        contentIdentifier === "personaName"
-      ) {
-        return "1";
-      }
-      if (contentIdentifier === "description") {
-        return "2";
+      if (matchingUseCase) {
+        partiallyParsedAtomImm = partiallyParsedAtomImm
+          .setIn(["matchedUseCase", "identifier"], matchingUseCase.identifier)
+          .setIn(["matchedUseCase", "icon"], matchingUseCase.icon)
+          .setIn(
+            ["matchedUseCase", "reactions"],
+            matchingUseCase.reactions
+              ? Immutable.fromJS(matchingUseCase.reactions)
+              : Immutable.Map()
+          );
       }
 
-      return get(detailsToParse[contentIdentifier], "label");
-    };
-
-    if (atomContent) {
-      parsedAtomImm = parsedAtomImm.set(
-        "content",
-        atomContent.toOrderedMap().sortBy(sortContentDetailsImm)
+      partiallyParsedAtomImm = partiallyParsedAtomImm.set(
+        "humanReadable",
+        getHumanReadableStringFromAtom(partiallyParsedAtomImm, detailsToParse)
       );
-    }
-    if (atomSeeksContent) {
-      parsedAtomImm = parsedAtomImm.set(
-        "seeks",
-        atomSeeksContent.toOrderedMap().sortBy(sortContentDetailsImm)
-      );
-    }
 
-    return parsedAtomImm;
-  } else {
-    console.error(
-      "Cant parse atom, data is an invalid atom-object: ",
-      jsonldAtomImm && jsonldAtomImm.toJS()
-    );
-    return undefined;
+      //Sort content details
+      const atomContent = get(partiallyParsedAtomImm, "content");
+      const atomSeeksContent = get(partiallyParsedAtomImm, "seeks");
+
+      const sortContentDetailsImm = (_, contentIdentifier) => {
+        if (
+          contentIdentifier === "title" ||
+          contentIdentifier === "personaName"
+        ) {
+          return "1";
+        }
+        if (contentIdentifier === "description") {
+          return "2";
+        }
+
+        return get(detailsToParse[contentIdentifier], "label");
+      };
+
+      if (atomContent) {
+        partiallyParsedAtomImm = partiallyParsedAtomImm.set(
+          "content",
+          atomContent.toOrderedMap().sortBy(sortContentDetailsImm)
+        );
+      }
+      if (atomSeeksContent) {
+        partiallyParsedAtomImm = partiallyParsedAtomImm.set(
+          "seeks",
+          atomSeeksContent.toOrderedMap().sortBy(sortContentDetailsImm)
+        );
+      }
+      return partiallyParsedAtomImm.delete("jsonLdAtom");
+    }
   }
+  console.error(
+    "Cant parse atom, data is an invalid atom-object: ",
+    partiallyParsedAtom
+  );
+  return undefined;
 }
 
 /**
@@ -309,39 +282,6 @@ function generateContent(contentJsonLd, detailsToParse) {
   return content;
 }
 
-function extractAuthList(authList) {
-  const auths = get(authList, "@graph");
-  return auths ? auths.map(auth => auth.delete("@type")) : Immutable.List();
-}
-
-function extractState(atomJsonLd) {
-  // we use to check for active
-  // state and everything else
-  // will be inactive
-  return getIn(atomJsonLd, [vocab.WON.atomStateCompacted, "@id"]) ===
-    vocab.WON.ActiveCompacted
-    ? vocab.WON.ActiveCompacted
-    : vocab.WON.InactiveCompacted;
-}
-
-function generateIdenticon(atomUri) {
-  if (!atomUri) {
-    return;
-  }
-  // quick extra hash here as identicon.js only uses first 15
-  // chars (which aren't very unique for our uris due to the base-url):
-  const hash = new shajs.sha512().update(atomUri).digest("hex");
-  const rgbColorArray = generateRgbColorArray(hash);
-  const idc = new Identicon(hash, {
-    size: 100,
-    foreground: [255, 255, 255, 255], // rgba white
-    background: [...rgbColorArray, 255], // rgba
-    margin: 0.2,
-    format: "svg",
-  });
-  return idc.toString();
-}
-
 function generateBackground(atomUri) {
   if (!atomUri) {
     return;
@@ -349,26 +289,6 @@ function generateBackground(atomUri) {
 
   const hash = new shajs.sha512().update(atomUri).digest("hex");
   return generateHexColor(hash);
-}
-
-function extractCreationDate(atomJsonLd) {
-  const creationDate =
-    get(atomJsonLd, "dct:created") ||
-    get(atomJsonLd, "http://purl.org/dc/terms/created");
-  if (creationDate) {
-    return new Date(get(creationDate, "@value"));
-  }
-  return undefined;
-}
-
-function extractLastModifiedDate(atomJsonLd) {
-  const lastModifiedDate =
-    get(atomJsonLd, "dct:modified") ||
-    get(atomJsonLd, "http://purl.org/dc/terms/modified");
-  if (lastModifiedDate) {
-    return new Date(get(lastModifiedDate, "@value"));
-  }
-  return undefined;
 }
 
 function getHumanReadableStringFromAtom(atomImm, detailsToParse) {

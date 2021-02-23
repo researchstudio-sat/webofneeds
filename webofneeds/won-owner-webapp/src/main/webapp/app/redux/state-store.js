@@ -10,7 +10,7 @@ import * as useCaseUtils from "~/app/usecase-utils";
 import { isUriDeleted } from "~/app/won-localstorage";
 import {
   parseMetaAtom,
-  parseAtom,
+  parseAtomContent,
 } from "../reducers/atom-reducer/parse-atom.js";
 import {
   extractAtomUriFromConnectionUri,
@@ -477,24 +477,18 @@ export const fetchAtomAndDispatch = (
       .then(requestCredentials =>
         won
           .fetchAtom(atomUri, requestCredentials)
-          .then(atom => {
-            parseAtomWorker()
-              .parse(atom, fakeNames, vocab)
-              .then(res => console.debug(res))
-              .catch(err => console.error(err));
-            return atom;
-          })
-          .then(atom => {
-            const parsedAtom = parseAtom(atom);
-            if (parsedAtom) {
+          .then(atom => parseAtomWorker().parse(atom, fakeNames, vocab))
+          .then(partiallyParsedAtom => {
+            const parsedAtomImm = parseAtomContent(partiallyParsedAtom);
+            if (parsedAtomImm) {
               dispatch({
                 type: actionTypes.atoms.store,
                 payload: Immutable.fromJS({
-                  atoms: { [atomUri]: parsedAtom },
+                  atoms: { [atomUri]: parsedAtomImm },
                 }),
               });
             }
-            return parsedAtom;
+            return parsedAtomImm;
           })
           .catch(error => {
             if (error.status && error.status === 410) {
