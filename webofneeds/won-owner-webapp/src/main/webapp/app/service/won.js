@@ -395,24 +395,46 @@ won.wonMessageFromJsonLd = function(rawMessageJsonLd, msgUri) {
         new WonMessage(framedMessageJsonLd, rawMessageJsonLd)
     )
     .then(wonMessage => {
-      return Promise.resolve()
-        .then(
-          () =>
-            //Only generate compactedFramedMessage if it is not a response or not from Owner
-            wonMessage.isResponse() ||
-            (wonMessage.isFromOwner() &&
-              wonMessage.generateCompactedFramedMessage())
-        )
-        .then(() => wonMessage)
-        .catch(e => {
-          console.error(
-            "Error in wonMessageFromJsonLd: rawMessage: ",
-            rawMessageJsonLd,
-            " wonMessage: ",
-            wonMessage
-          );
-          rethrow(e);
-        });
+      //Only generate compactedFramedMessage if it is not a response or not from Owner
+      if (wonMessage.isResponse() || wonMessage.isFromOwner()) {
+        if (wonMessage.compactFramedMessage) {
+          return wonMessage;
+        }
+        if (wonMessage.framedMessage && wonMessage.rawMessage) {
+          return Promise.all([
+            jsonld
+              .compact(wonMessage.framedMessage, vocab.defaultContext)
+              .then(
+                compactFramedMessage =>
+                  (wonMessage.compactFramedMessage = compactFramedMessage)
+              ),
+            jsonld
+              .compact(wonMessage.rawMessage, vocab.defaultContext)
+              .then(
+                compactRawMessage =>
+                  (wonMessage.compactRawMessage = compactRawMessage)
+              ),
+          ])
+            .catch(e =>
+              console.error(
+                "Failed to generate jsonld for message " +
+                  wonMessage.getMessageUri() +
+                  "\n\n" +
+                  e.message +
+                  "\n\n" +
+                  e.stack
+              )
+            )
+            .then(() => wonMessage);
+        }
+      }
+    })
+    .catch(e => {
+      console.error(
+        "Error in wonMessageFromJsonLd: rawMessage: ",
+        rawMessageJsonLd
+      );
+      rethrow(e);
     });
 };
 
@@ -511,36 +533,6 @@ WonMessage.prototype = {
 
   getMessageDirection: function() {
     return this.messageStructure && this.messageStructure.messageDirection;
-  },
-  generateCompactedFramedMessage: async function() {
-    //TODO: change it so it returns all the contentgraphscontent
-    if (this.compactFramedMessage) {
-      return this.compactFramedMessage;
-    }
-    if (this.framedMessage && this.rawMessage) {
-      try {
-        this.compactFramedMessage = await jsonld.compact(
-          this.framedMessage,
-          vocab.defaultContext
-        );
-
-        this.compactRawMessage = await jsonld.compact(
-          this.rawMessage,
-          vocab.defaultContext
-        );
-
-        return this.compactFramedMessage;
-      } catch (e) {
-        console.error(
-          "Failed to generate jsonld for message " +
-            this.getMessageUri() +
-            "\n\n" +
-            e.message +
-            "\n\n" +
-            e.stack
-        );
-      }
-    }
   },
   getProperty: function(property) {
     let val = jsonldUtils.getProperty(this.framedMessage, property);
