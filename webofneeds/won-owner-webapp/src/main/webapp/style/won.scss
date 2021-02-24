@@ -68,6 +68,14 @@ body {
           )
           1fr;
       }
+
+      > main.signup,
+      > main.about {
+        grid-area: list;
+        @media (min-width: $responsivenessBreakPoint) {
+          grid-column: 1 / -1;
+        }
+      }
     }
 
     > won-topnav {
