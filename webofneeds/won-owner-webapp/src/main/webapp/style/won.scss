@@ -2,6 +2,7 @@
 @import "text";
 @import "flex-layout";
 @import "reset";
+@import "elevation";
 
 body {
   --headerHeight: 3.3rem;
@@ -102,7 +103,7 @@ body {
       z-index: 999;
 
       @media (min-width: $responsivenessBreakPoint) {
-        box-shadow: 0 0 5px 5px var(--won-line-gray);
+        @include defaultMenuElevation();
       }
 
       &.won-menu--show-mobile {
@@ -111,9 +112,9 @@ body {
         top: var(--headerHeight);
         width: 80vw;
         max-width: 80vw;
-        transition: max-width linear 0.25s;
+        transition: max-width 0.25s linear, top 0s 0.25s linear;
         overflow-y: hidden;
-        box-shadow: 0 0 5px 5px var(--won-line-gray);
+        @include defaultMenuElevation();
       }
 
       &:not(.won-menu--show-mobile) {
@@ -127,7 +128,7 @@ body {
           transition: max-width linear 0.25s;
           overflow-y: hidden;
           border-right: 0;
-          box-shadow: 0;
+          box-shadow: none;
         }
       }
     }
