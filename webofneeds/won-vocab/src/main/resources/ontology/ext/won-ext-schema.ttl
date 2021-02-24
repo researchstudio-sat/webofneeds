@@ -3784,7 +3784,22 @@ won:derivesAtomProperty
     rdfs:label                     "EventSocket" ;
     rdfs:comment
                                    "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:event B` when a Connection with an Atom B is established. Automatically generated from the [event](http://schema.org/event) Property of the http://schema.org vocabulary." ;
-    won:compatibleSocketDefinition :EventInverseSocket .
+    won:compatibleSocketDefinition :EventInverseSocket ;
+    auth:localAuth                 :grantAccessToGraphAndEventSocketForMemberAuth .
+
+:grantAccessToEventSocketForMemberAuth
+    a            auth:Authorization ;
+    rdfs:label   "GrantAccessToGraphAndEventSocketForMemberAuth" ;
+    auth:grantee [ auth:socket [ auth:socketType :MemberSocket ;
+                                 auth:connection [ auth:connectionState won:Connected ;
+                                                   auth:targetAtom      [ ] ] ] ] ;
+    auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   :MemberSocket ;
+                                                        auth:expiresAfter 3600 ] ] ;
+                   auth:socket    [ auth:socketType  :EventSocket ;
+                                    auth:connections [ auth:operation          auth:opRead ;
+                                                       auth:connectionState    won:Connected ;
+                                                       auth:connectionMessages [ auth:inherit false ] ] ] ] .
+
 
 :EventInverseSocket
     a                              won:SocketDefinition ;
@@ -3792,7 +3807,31 @@ won:derivesAtomProperty
     rdfs:label                     "EventInverseSocket" ;
     rdfs:comment
                                    "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `B schema:event A` when a Connection with an Atom B is established. Automatically generated from the [event](http://schema.org/event) Property of the http://schema.org vocabulary." ;
-    won:compatibleSocketDefinition :EventSocket .
+    won:compatibleSocketDefinition :EventSocket ;
+    auth:localAuth                 :grantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth .
+
+
+:grantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth
+    a           auth:Authorization ;
+    rdfs:label  "GrantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth" ;
+    auth:bearer [ auth:tokenScope :MemberSocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType :EventInverseSocket ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph  [ auth:graphType auth:contentGraph ;
+                                auth:operation auth:opRead ] ;
+                  auth:socket [ auth:socketType  :AttendeeSocket ;
+                                auth:operation   auth:opConnectClose ;
+                                auth:connections [ auth:inherit false ] ] ;
+                  auth:socket [ auth:socketType  :EventInverseSocket ;
+                                auth:connections [ auth:operation          auth:opRead ;
+                                                   auth:connectionState    won:Connected ;
+                                                   auth:connectionMessages [ auth:inherit false ] ] ] ;
+                  auth:socket [ auth:socketType  wx-persona:HoldableSocket ;
+                                auth:connections [ auth:operation          auth:opRead ;
+                                                   auth:connectionState    won:Connected ;
+                                                   auth:connectionMessages [ auth:inherit false ] ] ] ] .
+
 
 :EventStatusSocket
     a                              won:SocketDefinition ;
