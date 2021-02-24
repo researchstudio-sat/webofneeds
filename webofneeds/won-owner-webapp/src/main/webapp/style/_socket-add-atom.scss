@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "elevation";
 
 won-socket-add-atom {
   //TODO: Style
@@ -36,14 +37,10 @@ won-socket-add-atom {
     > .wsaa__content__create,
     > a.won-atom-header,
     > won-atom-header {
+      @include defaultItemActionElevation();
       padding: 0.5rem;
       border: $thinGrayBorder;
       background-color: $won-light-gray;
-
-      &:hover {
-        background: $won-lighter-gray;
-        cursor: pointer;
-      }
     }
 
     .wsaa__content__create {

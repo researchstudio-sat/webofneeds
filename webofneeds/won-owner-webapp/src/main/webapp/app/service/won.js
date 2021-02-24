@@ -359,7 +359,11 @@ function WonMessage(wonMessage) {
 }
 
 won.createWonMessage = message => {
-  return new WonMessage(message);
+  if (message) {
+    return new WonMessage(message);
+  } else {
+    return undefined;
+  }
 };
 
 WonMessage.prototype = {
