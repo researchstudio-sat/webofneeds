@@ -374,7 +374,15 @@ export const fetchConnectionsContainerAndDispatch = (
             )
         )
         .catch(error => {
-          if (error.status && error.status === 410) {
+          //FIXME: we somehow lose the status info of the error from the webworker, lets try and parse the message as a json
+          let errorParsed;
+          try {
+            errorParsed = JSON.parse(error.message);
+          } catch {
+            errorParsed = {};
+          }
+
+          if (errorParsed.status && errorParsed.status === 410) {
             dispatch({
               type: actionTypes.atoms.delete,
               payload: Immutable.fromJS({ uri: atomUri }),
@@ -385,8 +393,9 @@ export const fetchConnectionsContainerAndDispatch = (
               payload: Immutable.fromJS({
                 uri: atomUri,
                 status: {
-                  code: error.status,
-                  message: error.message,
+                  code: errorParsed.status,
+                  params: errorParsed.params || {},
+                  message: errorParsed.message || error.message,
                   requestCredentials: requestCredentials,
                 },
               }),
@@ -493,7 +502,17 @@ export const fetchAtomAndDispatch = (
             return parsedAtomImm;
           })
           .catch(error => {
-            if (error.status && error.status === 410) {
+            //FIXME: we somehow lose the status info of the error from the webworker, lets try and parse the message as a json
+            let errorParsed;
+            try {
+              errorParsed = JSON.parse(error.message);
+            } catch {
+              errorParsed = {};
+            }
+            if (
+              (errorParsed.status && errorParsed.status === 410) ||
+              (errorParsed.message && errorParsed.message.startsWith("410"))
+            ) {
               dispatch({
                 type: actionTypes.atoms.delete,
                 payload: Immutable.fromJS({ uri: atomUri }),
@@ -504,8 +523,9 @@ export const fetchAtomAndDispatch = (
                 payload: Immutable.fromJS({
                   uri: atomUri,
                   status: {
-                    code: error.status,
-                    message: error.message,
+                    code: errorParsed.status,
+                    params: errorParsed.params || {},
+                    message: errorParsed.message,
                     requestCredentials: requestCredentials,
                   },
                 }),
