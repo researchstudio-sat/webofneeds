@@ -203,7 +203,9 @@ export const registerAccount = credentials => {
       password: password,
       privateId: credentials.privateId,
     }),
-  }).then(checkHttpStatus(url));
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.json());
 };
 
 /**
