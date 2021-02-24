@@ -37,7 +37,12 @@ ex:expectedResult3
 ex:expectedResult4
     a                       auth:ExpectedAclEvalResult ;
     auth:decision           auth:accessGranted ;
-    auth:requestedOperation <#request3> .
+    auth:requestedOperation <#request4> .
+
+ex:expectedResult5
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request5> .
 
 
 # See EventAtom with MemberSocket token
@@ -52,16 +57,17 @@ ex:expectedResult4
                                 auth:operation auth:opRead ] ;
                   auth:socket [ auth:socketType  wx-schema:AttendeeSocket ;
                                 auth:operation   auth:opConnectClose ;
-                                auth:connections [ auth:inherit false ] ] ;
+                                auth:connections [ auth:operation          auth:opRead ;
+                                                   auth:connectionState    won:Connected ;
+                                                   auth:connectionMessages [ auth:inherit false ] ] ] ;
                   auth:socket [ auth:socketType  wx-schema:EventInverseSocket ;
                                 auth:connections [ auth:operation          auth:opRead ;
                                                    auth:connectionState    won:Connected ;
                                                    auth:connectionMessages [ auth:inherit false ] ] ] ;
-                  auth:socket [ auth:socketType  wx-persona:HoldableSocket ;
+                  auth:socket [ auth:socketType  wx-hold:HoldableSocket ;
                                 auth:connections [ auth:operation          auth:opRead ;
                                                    auth:connectionState    won:Connected ;
                                                    auth:connectionMessages [ auth:inherit false ] ] ] ] .
-
 
 <#request1>
     a                auth:OperationRequest ;
@@ -100,6 +106,14 @@ ex:token1
     auth:operation     auth:opRead ;
     auth:reqAtom       ex:eventAtom ;
     auth:reqConnection eventAtom:connE4 ;
+    auth:reqPosition   auth:positionConnection ;
+    auth:bearsToken    ex:token2 .
+
+<#request5>
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:reqAtom       ex:eventAtom ;
+    auth:reqConnection eventAtom:connE5 ;
     auth:reqPosition   auth:positionConnection ;
     auth:bearsToken    ex:token2 .
 
@@ -185,8 +199,18 @@ eventAtom:connE4
 
 eventAtom:attendeeSocket
     a                    won:Socket ;
-    won:socketDefinition wx-schema:AttendeeSocket .
+    won:socketDefinition wx-schema:AttendeeSocket ;
+    rdfs:member          eventAtom:attendeeSocketConnections .
 
+eventAtom:attendeeSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member eventAtom:connE5 .
+
+eventAtom:connE5
+    a                   won:Connection ;
+    won:socket          eventAtom:attendeeSocket ;
+    won:targetAtom      ex:atom5 ;
+    won:connectionState won:Connected .
 
 eventAtom:eventInverseSocket
     a                    won:Socket ;
@@ -312,28 +336,28 @@ atom4:conn41
     won:targetAtom      ex:atom1 ;
     won:connectionState won:Closed .
 
-# Atom 5 - Expertise of Atom 2
+# Atom 5 - Attendee of Event
 
 ex:atom5
     a                    won:Atom ;
-    won:socket           atom5:interestOfSocket ;
+    won:socket           atom5:attendeeInverseSocket ;
     won:state            won:Active ;
     won:messageContainer atom5:msg ;
     won:wonNode          ex:node .
 
-atom5:interestOfSocket
+atom5:attendeeInverseSocket
     a                    won:Socket ;
-    won:socketDefinition wx-persona:InterestOfSocket ;
-    won:connections      atom5:interestOfSocketConnections .
+    won:socketDefinition wx-schema:AttendeeInverseSocket ;
+    won:connections      atom5:attendeeInverseSocketConnections .
 
 
-atom5:interestOfSocketConnections
+atom5:attendeeInverseSocketConnections
     a           won:ConnectionContainer ;
-    rdfs:member atom5:conn52 .
+    rdfs:member atom5:conn5E .
 
-atom5:conn52
+atom5:conn5E
     a                   won:Connection ;
-    won:socket          atom5:interestOfSocket ;
-    won:targetAtom      ex:atom2 ;
+    won:socket          atom5:attendeeInverseSocket ;
+    won:targetAtom      ex:eventAtom ;
     won:connectionState won:Connected .
 

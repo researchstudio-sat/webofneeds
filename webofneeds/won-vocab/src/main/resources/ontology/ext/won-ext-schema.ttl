@@ -10,6 +10,7 @@
 @prefix schema:     <http://schema.org/> .
 @prefix dcterms:    <http://purl.org/dc/terms/> .
 @prefix wx-persona: <https://w3id.org/won/ext/persona#> .
+@prefix wx-hold:    <https://w3id.org/won/ext/hold#> .
 @prefix auth:       <https://w3id.org/won/auth#> .
 @base               <https://w3id.org/won/ext/schema#> .
 
@@ -3822,12 +3823,14 @@ won:derivesAtomProperty
                                 auth:operation auth:opRead ] ;
                   auth:socket [ auth:socketType  :AttendeeSocket ;
                                 auth:operation   auth:opConnectClose ;
-                                auth:connections [ auth:inherit false ] ] ;
+                                auth:connections [ auth:operation          auth:opRead ;
+                                                   auth:connectionState    won:Connected ;
+                                                   auth:connectionMessages [ auth:inherit false ] ] ] ;
                   auth:socket [ auth:socketType  :EventInverseSocket ;
                                 auth:connections [ auth:operation          auth:opRead ;
                                                    auth:connectionState    won:Connected ;
                                                    auth:connectionMessages [ auth:inherit false ] ] ] ;
-                  auth:socket [ auth:socketType  wx-persona:HoldableSocket ;
+                  auth:socket [ auth:socketType  wx-hold:HoldableSocket ;
                                 auth:connections [ auth:operation          auth:opRead ;
                                                    auth:connectionState    won:Connected ;
                                                    auth:connectionMessages [ auth:inherit false ] ] ] ] .
