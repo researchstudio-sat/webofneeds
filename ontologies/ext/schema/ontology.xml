@@ -4819,7 +4819,7 @@
         <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
         <rdfs:comment>An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:event B` when a Connection with an Atom B is established. Automatically generated from the [event](http://schema.org/event) Property of the http://schema.org vocabulary.</rdfs:comment>
         <rdfs:label>EventSocket</rdfs:label>
-        <auth:localAuth rdf:resource="https://w3id.org/won/ext/schema#grantAccessToGraphAndEventSocketForMemberAuth"/>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/schema#grantAccessToEventSocketForMemberAuth"/>
         <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/schema#EventInverseSocket"/>
         <core:derivesAtomProperty rdf:resource="http://schema.org/event"/>
     </owl:NamedIndividual>
@@ -14341,7 +14341,7 @@
 
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/schema#grantAccessToEventSocketForMemberAuth">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
-        <rdfs:label>GrantAccessToGraphAndEventSocketForMemberAuth</rdfs:label>
+        <rdfs:label>GrantAccessToEventSocketForMemberAuth</rdfs:label>
         <auth:grant rdf:nodeID="genid1"/>
         <auth:grantee>
             <rdf:Description>
@@ -14466,8 +14466,8 @@
     <rdf:Description rdf:nodeID="genid27">
         <auth:graph rdf:nodeID="genid28"/>
         <auth:socket rdf:nodeID="genid29"/>
-        <auth:socket rdf:nodeID="genid31"/>
-        <auth:socket rdf:nodeID="genid34"/>
+        <auth:socket rdf:nodeID="genid32"/>
+        <auth:socket rdf:nodeID="genid35"/>
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid24">
         <auth:connection rdf:nodeID="genid25"/>
@@ -14478,6 +14478,14 @@
         <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid29">
+        <auth:connections rdf:nodeID="genid30"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#HoldableSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid32">
+        <auth:connections rdf:nodeID="genid33"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/schema#EventInverseSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid35">
         <auth:connections>
             <rdf:Description>
                 <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
@@ -14486,21 +14494,13 @@
         <auth:operation rdf:resource="https://w3id.org/won/auth#opConnectClose"/>
         <auth:socketType rdf:resource="https://w3id.org/won/ext/schema#AttendeeSocket"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid31">
-        <auth:connections rdf:nodeID="genid32"/>
-        <auth:socketType rdf:resource="https://w3id.org/won/ext/schema#EventInverseSocket"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid34">
-        <auth:connections rdf:nodeID="genid35"/>
-        <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#HoldableSocket"/>
-    </rdf:Description>
     <rdf:Description rdf:nodeID="genid25">
         <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
         <auth:targetAtom>
             <rdf:Description/>
         </auth:targetAtom>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid32">
+    <rdf:Description rdf:nodeID="genid30">
         <auth:connectionMessages>
             <rdf:Description>
                 <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
@@ -14509,7 +14509,7 @@
         <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
         <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid35">
+    <rdf:Description rdf:nodeID="genid33">
         <auth:connectionMessages>
             <rdf:Description>
                 <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>

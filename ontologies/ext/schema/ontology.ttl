@@ -3294,7 +3294,7 @@
                       <https://w3id.org/won/core#SocketDefinition> ;
              rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:event B` when a Connection with an Atom B is established. Automatically generated from the [event](http://schema.org/event) Property of the http://schema.org vocabulary." ;
              rdfs:label "EventSocket" ;
-             <https://w3id.org/won/auth#localAuth> :grantAccessToGraphAndEventSocketForMemberAuth ;
+             <https://w3id.org/won/auth#localAuth> :grantAccessToEventSocketForMemberAuth ;
              <https://w3id.org/won/core#compatibleSocketDefinition> :EventInverseSocket ;
              <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/event> .
 
@@ -9888,7 +9888,7 @@
 ###  https://w3id.org/won/ext/schema#grantAccessToEventSocketForMemberAuth
 :grantAccessToEventSocketForMemberAuth rdf:type owl:NamedIndividual ,
                                                 <https://w3id.org/won/auth#Authorization> ;
-                                       rdfs:label "GrantAccessToGraphAndEventSocketForMemberAuth" ;
+                                       rdfs:label "GrantAccessToEventSocketForMemberAuth" ;
                                        <https://w3id.org/won/auth#grant> _:genid1 ;
                                        <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> _:genid8
                                                                            ] .
@@ -9965,8 +9965,8 @@ _:genid22 <https://w3id.org/won/auth#issuer> [ <https://w3id.org/won/auth#socket
 
 _:genid27 <https://w3id.org/won/auth#graph> _:genid28 ;
            <https://w3id.org/won/auth#socket> _:genid29 ,
-                                              _:genid31 ,
-                                              _:genid34 .
+                                              _:genid32 ,
+                                              _:genid35 .
 
 _:genid24 <https://w3id.org/won/auth#connection> _:genid25 ;
            <https://w3id.org/won/auth#socketType> :EventInverseSocket .
@@ -9974,26 +9974,26 @@ _:genid24 <https://w3id.org/won/auth#connection> _:genid25 ;
 _:genid28 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ;
            <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
-_:genid29 <https://w3id.org/won/auth#connections> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+_:genid29 <https://w3id.org/won/auth#connections> _:genid30 ;
+           <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#HoldableSocket> .
+
+_:genid32 <https://w3id.org/won/auth#connections> _:genid33 ;
+           <https://w3id.org/won/auth#socketType> :EventInverseSocket .
+
+_:genid35 <https://w3id.org/won/auth#connections> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
                                                    ] ;
            <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> ;
            <https://w3id.org/won/auth#socketType> :AttendeeSocket .
 
-_:genid31 <https://w3id.org/won/auth#connections> _:genid32 ;
-           <https://w3id.org/won/auth#socketType> :EventInverseSocket .
-
-_:genid34 <https://w3id.org/won/auth#connections> _:genid35 ;
-           <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#HoldableSocket> .
-
 _:genid25 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
            <https://w3id.org/won/auth#targetAtom> [ ] .
 
-_:genid32 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+_:genid30 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
                                                           ] ;
            <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
            <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
-_:genid35 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+_:genid33 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
                                                           ] ;
            <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
            <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .

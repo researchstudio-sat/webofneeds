@@ -133,9 +133,9 @@
   "https://w3id.org/won/auth#socket" : [ {
     "@id" : "_:genid29"
   }, {
-    "@id" : "_:genid31"
+    "@id" : "_:genid32"
   }, {
-    "@id" : "_:genid34"
+    "@id" : "_:genid35"
   } ]
 }, {
   "@id" : "_:genid28",
@@ -150,11 +150,8 @@
   "https://w3id.org/won/auth#connections" : [ {
     "@id" : "_:genid30"
   } ],
-  "https://w3id.org/won/auth#operation" : [ {
-    "@id" : "https://w3id.org/won/auth#opConnectClose"
-  } ],
   "https://w3id.org/won/auth#socketType" : [ {
-    "@id" : "https://w3id.org/won/ext/schema#AttendeeSocket"
+    "@id" : "https://w3id.org/won/ext/persona#HoldableSocket"
   } ]
 }, {
   "@id" : "_:genid3",
@@ -167,22 +164,33 @@
   } ]
 }, {
   "@id" : "_:genid30",
+  "https://w3id.org/won/auth#connectionMessages" : [ {
+    "@id" : "_:genid31"
+  } ],
+  "https://w3id.org/won/auth#connectionState" : [ {
+    "@id" : "https://w3id.org/won/core#Connected"
+  } ],
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "https://w3id.org/won/auth#opRead"
+  } ]
+}, {
+  "@id" : "_:genid31",
   "https://w3id.org/won/auth#inherit" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
     "@value" : "false"
   } ]
 }, {
-  "@id" : "_:genid31",
+  "@id" : "_:genid32",
   "https://w3id.org/won/auth#connections" : [ {
-    "@id" : "_:genid32"
+    "@id" : "_:genid33"
   } ],
   "https://w3id.org/won/auth#socketType" : [ {
     "@id" : "https://w3id.org/won/ext/schema#EventInverseSocket"
   } ]
 }, {
-  "@id" : "_:genid32",
+  "@id" : "_:genid33",
   "https://w3id.org/won/auth#connectionMessages" : [ {
-    "@id" : "_:genid33"
+    "@id" : "_:genid34"
   } ],
   "https://w3id.org/won/auth#connectionState" : [ {
     "@id" : "https://w3id.org/won/core#Connected"
@@ -191,29 +199,21 @@
     "@id" : "https://w3id.org/won/auth#opRead"
   } ]
 }, {
-  "@id" : "_:genid33",
+  "@id" : "_:genid34",
   "https://w3id.org/won/auth#inherit" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
     "@value" : "false"
   } ]
 }, {
-  "@id" : "_:genid34",
-  "https://w3id.org/won/auth#connections" : [ {
-    "@id" : "_:genid35"
-  } ],
-  "https://w3id.org/won/auth#socketType" : [ {
-    "@id" : "https://w3id.org/won/ext/persona#HoldableSocket"
-  } ]
-}, {
   "@id" : "_:genid35",
-  "https://w3id.org/won/auth#connectionMessages" : [ {
+  "https://w3id.org/won/auth#connections" : [ {
     "@id" : "_:genid36"
   } ],
-  "https://w3id.org/won/auth#connectionState" : [ {
-    "@id" : "https://w3id.org/won/core#Connected"
-  } ],
   "https://w3id.org/won/auth#operation" : [ {
-    "@id" : "https://w3id.org/won/auth#opRead"
+    "@id" : "https://w3id.org/won/auth#opConnectClose"
+  } ],
+  "https://w3id.org/won/auth#socketType" : [ {
+    "@id" : "https://w3id.org/won/ext/schema#AttendeeSocket"
   } ]
 }, {
   "@id" : "_:genid36",
@@ -5691,7 +5691,7 @@
     "@value" : "EventSocket"
   } ],
   "https://w3id.org/won/auth#localAuth" : [ {
-    "@id" : "https://w3id.org/won/ext/schema#grantAccessToGraphAndEventSocketForMemberAuth"
+    "@id" : "https://w3id.org/won/ext/schema#grantAccessToEventSocketForMemberAuth"
   } ],
   "https://w3id.org/won/core#compatibleSocketDefinition" : [ {
     "@id" : "https://w3id.org/won/ext/schema#EventInverseSocket"
@@ -16692,7 +16692,7 @@
   "@id" : "https://w3id.org/won/ext/schema#grantAccessToEventSocketForMemberAuth",
   "@type" : [ "http://www.w3.org/2002/07/owl#NamedIndividual", "https://w3id.org/won/auth#Authorization" ],
   "http://www.w3.org/2000/01/rdf-schema#label" : [ {
-    "@value" : "GrantAccessToGraphAndEventSocketForMemberAuth"
+    "@value" : "GrantAccessToEventSocketForMemberAuth"
   } ],
   "https://w3id.org/won/auth#grant" : [ {
     "@id" : "_:genid1"
