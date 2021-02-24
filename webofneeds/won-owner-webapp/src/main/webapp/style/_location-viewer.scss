@@ -1,6 +1,5 @@
 @import "won-config";
 @import "sizing-utils";
-@import "animate";
 @import "detail-viewer-mixin";
 
 won-location-viewer {
@@ -27,7 +26,6 @@ won-location-viewer {
 
     won-atom-map {
       display: block;
-      @include slideWithOpacityAnimation(0.5s, linear, 20rem);
 
       .atom-map__mapmount {
         width: 100%;

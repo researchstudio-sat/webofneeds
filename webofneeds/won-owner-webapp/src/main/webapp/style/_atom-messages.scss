@@ -1,6 +1,5 @@
 @import "sizing-utils";
 @import "won-config";
-@import "animate";
 
 won-atom-messages {
   display: grid;
@@ -95,16 +94,6 @@ won-atom-messages {
       z-index: 10;
       margin-bottom: 0.5rem;
       margin-left: 0.5rem;
-
-      @include slideWithOpacityAnimationFixedHorizontal(
-        0.5s,
-        linear,
-        3rem,
-        0,
-        0,
-        0,
-        0.5rem
-      );
 
       &__content {
         height: 3rem;

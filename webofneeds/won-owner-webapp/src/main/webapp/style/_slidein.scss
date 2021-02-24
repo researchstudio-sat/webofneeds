@@ -2,7 +2,6 @@
 @import "button";
 @import "icon";
 @import "responsiveness-utils";
-@import "animate";
 
 @mixin slide-in() {
   grid-column: 2;
@@ -62,8 +61,6 @@
 }
 
 won-slide-in {
-  @include slideAnimationFixedHorizontal(0.5s, ease-in-out, 100vh);
-
   display: grid;
   $maxSlideInWidth: $maxContentWidth;
   grid-template-columns: 1fr minmax(min-content, $maxSlideInWidth) 1fr;

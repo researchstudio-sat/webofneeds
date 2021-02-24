@@ -2,6 +2,7 @@
 @import "animate";
 @import "sizing-utils";
 @import "textfield";
+@import "elevation";
 
 won-usecase-picker {
   display: grid;
@@ -73,6 +74,8 @@ won-usecase-picker {
       display: grid;
       grid-template-columns: min-content 1fr;
       grid-template-areas: "ucpi__icon ucpi__label";
+
+      @include defaultFilledButtonElevation();
 
       align-items: center;
       padding: 0.5rem;
