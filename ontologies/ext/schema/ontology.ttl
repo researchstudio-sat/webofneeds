@@ -9,10 +9,10 @@
 <https://w3id.org/won/ext/schema> rdf:type owl:Ontology ;
                                    owl:versionIRI <https://w3id.org/won/ext/schema/1.0> ;
                                    owl:imports <https://w3id.org/won/core/1.0> ;
-                                   <http://purl.org/dc/elements/1.1/abstract> "This ontology contains a pair of Socket definitions automatically generated for each object property in schema.org. These sockets allow Atoms to connect to each other and thereby establish the respective relationship."@en ;
                                    <http://purl.org/dc/elements/1.1/creator> "Florian Kleedorfer" ;
                                    <http://purl.org/dc/elements/1.1/date> "2019-05-03"^^xsd:date ;
                                    <http://purl.org/dc/elements/1.1/title> "Web of Needs Schema Extension" ;
+                                   <http://purl.org/dc/terms/abstract> "This ontology contains a pair of Socket definitions automatically generated for each object property in schema.org. These sockets allow Atoms to connect to each other and thereby establish the respective relationship."@en ;
                                    <http://purl.org/dc/terms/license> <https://creativecommons.org/licenses/by/4.0/> ;
                                    <http://purl.org/vocab/vann/preferredNamespacePrefix> "wx-schema" ;
                                    <http://www.w3.org/ns/prov#wasDerivedFrom> <http://schema.org> .
@@ -20,10 +20,6 @@
 #################################################################
 #    Annotation properties
 #################################################################
-
-###  http://purl.org/dc/elements/1.1/abstract
-<http://purl.org/dc/elements/1.1/abstract> rdf:type owl:AnnotationProperty .
-
 
 ###  http://purl.org/dc/elements/1.1/creator
 <http://purl.org/dc/elements/1.1/creator> rdf:type owl:AnnotationProperty .
@@ -39,6 +35,10 @@
 
 ###  http://purl.org/dc/elements/1.1/title
 <http://purl.org/dc/elements/1.1/title> rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/abstract
+<http://purl.org/dc/terms/abstract> rdf:type owl:AnnotationProperty .
 
 
 ###  http://purl.org/dc/terms/license
@@ -67,6 +67,10 @@
 
 ###  https://w3id.org/won/auth#connectionState
 <https://w3id.org/won/auth#connectionState> rdf:type owl:AnnotationProperty .
+
+
+###  https://w3id.org/won/auth#connections
+<https://w3id.org/won/auth#connections> rdf:type owl:AnnotationProperty .
 
 
 ###  https://w3id.org/won/auth#expiresAfter
@@ -3280,6 +3284,7 @@
                              <https://w3id.org/won/core#SocketDefinition> ;
                     rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `B schema:event A` when a Connection with an Atom B is established. Automatically generated from the [event](http://schema.org/event) Property of the http://schema.org vocabulary." ;
                     rdfs:label "EventInverseSocket" ;
+                    <https://w3id.org/won/auth#localAuth> :grantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth ;
                     <https://w3id.org/won/core#compatibleSocketDefinition> :EventSocket ;
                     <https://w3id.org/won/core#derivesInverseAtomProperty> <http://schema.org/event> .
 
@@ -3289,6 +3294,7 @@
                       <https://w3id.org/won/core#SocketDefinition> ;
              rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:event B` when a Connection with an Atom B is established. Automatically generated from the [event](http://schema.org/event) Property of the http://schema.org vocabulary." ;
              rdfs:label "EventSocket" ;
+             <https://w3id.org/won/auth#localAuth> :grantAccessToGraphAndEventSocketForMemberAuth ;
              <https://w3id.org/won/core#compatibleSocketDefinition> :EventInverseSocket ;
              <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/event> .
 
@@ -5971,6 +5977,7 @@
                          <https://w3id.org/won/core#SocketDefinition> ;
                 rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:memberOf B` when a Connection with an Atom B is established. Automatically generated from the [memberOf](http://schema.org/memberOf) Property of the http://schema.org vocabulary." ;
                 rdfs:label "MemberOfSocket" ;
+                <https://w3id.org/won/auth#localAuth> :grantReadExpertiseAndInterestViaMemberSocketAuth ;
                 <https://w3id.org/won/core#compatibleSocketDefinition> :MemberSocket ;
                 <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/memberOf> .
 
@@ -5980,8 +5987,7 @@
                        <https://w3id.org/won/core#SocketDefinition> ;
               rdfs:comment "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:member B` when a Connection with an Atom B is established. Automatically generated from the [member](http://schema.org/member) Property of the http://schema.org vocabulary." ;
               rdfs:label "MemberSocket" ;
-              <https://w3id.org/won/auth#localAuth> :grantAccessToGraphAndMemberAuth ,
-                                                    :grantReadMemberViaMemberSocketAuth ;
+              <https://w3id.org/won/auth#localAuth> :grantAccessToGraphAndMemberAuth ;
               <https://w3id.org/won/core#compatibleSocketDefinition> :MemberOfSocket ,
                                                                      :OrganizationRoleOfSocket ;
               <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/member> .
@@ -9879,60 +9885,151 @@
                 <https://w3id.org/won/core#derivesAtomProperty> <http://schema.org/worksFor> .
 
 
-###  https://w3id.org/won/ext/schema#grantAccessToGraphAndMemberAuth
-:grantAccessToGraphAndMemberAuth rdf:type owl:NamedIndividual ,
-                                          <https://w3id.org/won/auth#Authorization> ;
-                                 rdfs:label "grantAccessToGraphAndMemberAuth" ;
-                                 <https://w3id.org/won/auth#grant> _:genid1 ;
-                                 <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> _:genid8
-                                                                     ] .
+###  https://w3id.org/won/ext/schema#grantAccessToEventSocketForMemberAuth
+:grantAccessToEventSocketForMemberAuth rdf:type owl:NamedIndividual ,
+                                                <https://w3id.org/won/auth#Authorization> ;
+                                       rdfs:label "GrantAccessToGraphAndEventSocketForMemberAuth" ;
+                                       <https://w3id.org/won/auth#grant> _:genid1 ;
+                                       <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> _:genid8
+                                                                           ] .
 
-_:genid1 <https://w3id.org/won/auth#graph> _:genid2 ;
-          <https://w3id.org/won/auth#operation> [ <https://w3id.org/won/auth#requestToken> _:genid4
+_:genid1 <https://w3id.org/won/auth#operation> [ <https://w3id.org/won/auth#requestToken> _:genid3
                                                 ] ;
-          <https://w3id.org/won/auth#socket> _:genid5 .
+          <https://w3id.org/won/auth#socket> _:genid4 .
 
 _:genid8 <https://w3id.org/won/auth#connection> _:genid9 ;
           <https://w3id.org/won/auth#socketType> :MemberSocket .
 
-_:genid2 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ,
-                                                <https://w3id.org/won/auth#keyGraph> ,
-                                                <https://w3id.org/won/auth#sysinfoGraph> ;
-          <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
-
-_:genid4 <https://w3id.org/won/auth#expiresAfter> 3600 ;
+_:genid3 <https://w3id.org/won/auth#expiresAfter> 3600 ;
           <https://w3id.org/won/auth#tokenScope> :MemberSocket .
+
+_:genid4 <https://w3id.org/won/auth#connections> _:genid5 ;
+          <https://w3id.org/won/auth#socketType> :EventSocket .
+
+_:genid9 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+          <https://w3id.org/won/auth#targetAtom> [ ] .
 
 _:genid5 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
                                                          ] ;
-          <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> ;
-          <https://w3id.org/won/auth#socketType> :MemberSocket .
-
-_:genid9 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ,
-                                                      <https://w3id.org/won/core#RequestSent> ;
-          <https://w3id.org/won/auth#targetAtom> [ ] .
+          <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+          <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
 
-###  https://w3id.org/won/ext/schema#grantReadMemberViaMemberSocketAuth
-:grantReadMemberViaMemberSocketAuth rdf:type owl:NamedIndividual ,
-                                             <https://w3id.org/won/auth#Authorization> ;
-                                    rdfs:label "grantReadMemberViaMemberSocketAuth" ;
-                                    <https://w3id.org/won/auth#bearer> _:genid11 ;
-                                    <https://w3id.org/won/auth#grant> [ <https://w3id.org/won/auth#graph> _:genid17
-                                                                      ] .
+###  https://w3id.org/won/ext/schema#grantAccessToGraphAndMemberAuth
+:grantAccessToGraphAndMemberAuth rdf:type owl:NamedIndividual ,
+                                          <https://w3id.org/won/auth#Authorization> ;
+                                 rdfs:label "GrantAccessToGraphAndMemberAuth" ;
+                                 <https://w3id.org/won/auth#grant> _:genid11 ;
+                                 <https://w3id.org/won/auth#grantee> [ <https://w3id.org/won/auth#socket> _:genid19
+                                                                     ] .
 
-_:genid11 <https://w3id.org/won/auth#issuer> [ <https://w3id.org/won/auth#socket> _:genid13
+_:genid11 <https://w3id.org/won/auth#graph> _:genid12 ;
+           <https://w3id.org/won/auth#operation> [ <https://w3id.org/won/auth#requestToken> _:genid14
+                                                 ] ;
+           <https://w3id.org/won/auth#socket> _:genid15 .
+
+_:genid19 <https://w3id.org/won/auth#connection> _:genid20 ;
+           <https://w3id.org/won/auth#socketType> :MemberSocket .
+
+_:genid12 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ,
+                                                 <https://w3id.org/won/auth#keyGraph> ,
+                                                 <https://w3id.org/won/auth#sysinfoGraph> ;
+           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+
+_:genid14 <https://w3id.org/won/auth#expiresAfter> 3600 ;
+           <https://w3id.org/won/auth#tokenScope> :MemberSocket .
+
+_:genid15 <https://w3id.org/won/auth#connections> _:genid16 ;
+           <https://w3id.org/won/auth#socketType> :MemberSocket .
+
+_:genid20 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ,
+                                                       <https://w3id.org/won/core#RequestSent> ;
+           <https://w3id.org/won/auth#targetAtom> [ ] .
+
+_:genid16 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+                                                          ] ;
+           <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+
+
+###  https://w3id.org/won/ext/schema#grantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth
+:grantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth rdf:type owl:NamedIndividual ,
+                                                                                <https://w3id.org/won/auth#Authorization> ;
+                                                                       rdfs:label "GrantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth" ;
+                                                                       <https://w3id.org/won/auth#bearer> _:genid22 ;
+                                                                       <https://w3id.org/won/auth#grant> _:genid27 .
+
+_:genid22 <https://w3id.org/won/auth#issuer> [ <https://w3id.org/won/auth#socket> _:genid24
                                               ] ;
            <https://w3id.org/won/auth#tokenScope> :MemberSocket .
 
-_:genid17 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ;
+_:genid27 <https://w3id.org/won/auth#graph> _:genid28 ;
+           <https://w3id.org/won/auth#socket> _:genid29 ,
+                                              _:genid31 ,
+                                              _:genid34 .
+
+_:genid24 <https://w3id.org/won/auth#connection> _:genid25 ;
+           <https://w3id.org/won/auth#socketType> :EventInverseSocket .
+
+_:genid28 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ;
            <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
-_:genid13 <https://w3id.org/won/auth#connection> _:genid14 ;
-           <https://w3id.org/won/auth#socketType> :MemberSocket .
+_:genid29 <https://w3id.org/won/auth#connections> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+                                                   ] ;
+           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> ;
+           <https://w3id.org/won/auth#socketType> :AttendeeSocket .
 
-_:genid14 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+_:genid31 <https://w3id.org/won/auth#connections> _:genid32 ;
+           <https://w3id.org/won/auth#socketType> :EventInverseSocket .
+
+_:genid34 <https://w3id.org/won/auth#connections> _:genid35 ;
+           <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#HoldableSocket> .
+
+_:genid25 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
            <https://w3id.org/won/auth#targetAtom> [ ] .
+
+_:genid32 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+                                                          ] ;
+           <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+
+_:genid35 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+                                                          ] ;
+           <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+
+
+###  https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth
+:grantReadExpertiseAndInterestViaMemberSocketAuth rdf:type owl:NamedIndividual ,
+                                                           <https://w3id.org/won/auth#Authorization> ;
+                                                  rdfs:label "GrantReadExpertiseAndInterestViaMemberSocketAuth" ;
+                                                  <https://w3id.org/won/auth#bearer> _:genid37 ;
+                                                  <https://w3id.org/won/auth#grant> _:genid42 .
+
+_:genid37 <https://w3id.org/won/auth#issuer> [ <https://w3id.org/won/auth#socket> _:genid39
+                                              ] ;
+           <https://w3id.org/won/auth#tokenScope> :MemberSocket .
+
+_:genid42 <https://w3id.org/won/auth#graph> _:genid43 ;
+           <https://w3id.org/won/auth#socket> _:genid44 .
+
+_:genid39 <https://w3id.org/won/auth#connection> _:genid40 ;
+           <https://w3id.org/won/auth#socketType> :MemberOfSocket .
+
+_:genid43 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> ;
+           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+
+_:genid44 <https://w3id.org/won/auth#connections> _:genid45 ;
+           <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#ExpertiseSocket> ,
+                                                  <https://w3id.org/won/ext/persona#InterestSocket> .
+
+_:genid40 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+           <https://w3id.org/won/auth#targetAtom> [ ] .
+
+_:genid45 <https://w3id.org/won/auth#connectionMessages> [ <https://w3id.org/won/auth#inherit> "false"^^xsd:boolean
+                                                          ] ;
+           <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> ;
+           <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 
 
 ###  Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/
