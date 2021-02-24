@@ -1,4 +1,5 @@
 @import "sizing-utils";
+@import "elevation";
 
 @mixin flat-button-color($color, $bg_color) {
   color: $color;
@@ -125,6 +126,7 @@
 /* style adapted from http://cssdeck.com/labs/beautiful-flat-buttons */
 @mixin won-button--filled($color: "", $bgColor: "") {
   @include won-button;
+  @include defaultFilledButtonElevation();
 
   @if $color != "" {
     @if $bgColor != "" {

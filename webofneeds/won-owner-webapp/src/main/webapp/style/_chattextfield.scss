@@ -21,16 +21,6 @@ chat-textfield {
     $local-margin-bottom: 0.5rem;
     $local-height: 15rem;
 
-    @include slideAnimationFixedHorizontal(
-      0.5s,
-      linear,
-      $local-height,
-      0,
-      0,
-      0,
-      $local-margin-bottom
-    );
-
     margin-bottom: $local-margin-bottom;
     @include speech-bubble-bottom(
       $won-light-gray,

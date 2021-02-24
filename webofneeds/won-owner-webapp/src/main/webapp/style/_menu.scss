@@ -42,7 +42,7 @@
 
     &--anon {
       &:not(.pinnedatoms__pinnedatom--active) {
-        transition: all linear 0.2s;
+        transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
         transform: scale(0.75);
 
         .pinnedatoms__pinnedatom__anonicon {
@@ -50,7 +50,7 @@
         }
 
         &:hover {
-          transition: all linear 0.2s;
+          transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
           transform: scale(0.9);
 
           .pinnedatoms__pinnedatom__anonicon {
@@ -74,15 +74,18 @@
     @include square-image($feedIconSize);
 
     &:not(.pinnedatoms__pinnedatom--active):not(.pinnedatoms__pinnedatom--anon) {
-      transition: all linear 0.2s;
+      transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
       transform: scale(0.75);
 
       won-atom-icon {
         opacity: 0.75;
+        > .image {
+          box-shadow: none;
+        }
       }
 
       &:hover {
-        transition: all linear 0.2s;
+        transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
         transform: scale(0.9);
 
         won-atom-icon {
@@ -92,9 +95,9 @@
     }
 
     &--active {
-      transition: all linear 0.2s;
+      transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
       .pinnedatoms__pinnedatom__anonicon,
-      .image {
+      > won-atom-icon > .image {
         box-shadow: 0 0 5px 5px var(--won-secondary-text-color);
       }
 

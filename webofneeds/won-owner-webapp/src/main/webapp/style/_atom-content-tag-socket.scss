@@ -12,10 +12,6 @@ won-atom-content-tag-socket {
 
     & > won-socket-add-button {
       border: $thinGrayBorder;
-
-      &:hover {
-        border-color: $won-primary-color;
-      }
     }
 
     & > .actsocket__empty {

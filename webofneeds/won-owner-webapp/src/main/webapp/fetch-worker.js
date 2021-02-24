@@ -1067,6 +1067,7 @@ export const wonMessageFromJsonLd = (rawMessageJsonLd, msgUri, vocab) =>
             .then(() => wonMessage);
         }
       }
+      return wonMessage;
     });
 
 export const fetchJsonLdDataset = (

@@ -1,6 +1,7 @@
 @import "won-config";
 @import "sizing-utils";
 @import "fonts";
+@import "elevation";
 
 won-how-to {
   display: block;
@@ -56,6 +57,8 @@ won-how-to {
       }
 
       &__icon {
+        @include howtoIconElevationAndScale();
+        border-radius: 100%;
         --local-primary: #{$won-primary-color};
         @include fixed-square(var(--iconSize));
         margin-bottom: 1rem;
@@ -67,6 +70,7 @@ won-how-to {
       }
 
       &__stepcount {
+        @include howtoIconElevationAndScale();
         @include fixed-square(var(--stepIndicatorSize));
         text-align: center;
         border-radius: 100%;

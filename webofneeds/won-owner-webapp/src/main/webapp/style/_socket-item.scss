@@ -1,8 +1,10 @@
 @import "won-config";
 @import "sizing-utils";
 @import "animate";
+@import "elevation";
 
 .si {
+  @include defaultCardElevation();
   border: $thinGrayBorder;
   background: $won-light-gray;
 

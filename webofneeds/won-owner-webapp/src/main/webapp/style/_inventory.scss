@@ -2,6 +2,7 @@
 @import "sizing-utils";
 @import "fonts";
 @import "flex-layout";
+@import "elevation";
 
 main.ownerwelcome {
   box-sizing: border-box;
@@ -137,10 +138,13 @@ main.ownerinventory {
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
 
     > won-atom-card {
+      @include defaultCardElevation();
       border: $thinGrayBorder;
     }
 
     > a.won-create-card {
+      @include defaultCardActionButtonElevation();
+
       border: $thinGrayBorder;
       background: $won-light-gray;
       padding: 0.5rem;
@@ -153,11 +157,6 @@ main.ownerinventory {
       justify-items: center;
       grid-template-rows: min-content min-content;
       box-sizing: border-box;
-
-      &:hover {
-        border-color: $won-secondary-color;
-        background: rgba(white, 0.5);
-      }
 
       > .createcard__label {
         font-size: $mediumFontSize;

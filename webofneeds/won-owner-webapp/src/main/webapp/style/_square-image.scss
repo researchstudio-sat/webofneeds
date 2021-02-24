@@ -1,4 +1,5 @@
 @import "sizing-utils";
+@import "elevation";
 
 @mixin square-image($size, $margin: 0) {
   > won-atom-icon {
@@ -18,6 +19,7 @@
     }
 
     & .image {
+      @include defaultIconElevation();
       &--isPersona {
         border-radius: 100%;
       }
@@ -45,6 +47,7 @@
     }
 
     & .holderIcon {
+      @include defaultIconElevation();
       background: white;
       position: absolute;
       @include fixed-square($size/2);

@@ -92,19 +92,12 @@ const fetchWorker = fWorker();
         const promiseArray = [];
         for (const idx in messages) {
           const message = messages[idx];
-          if (message && message.wonMessage && message.msgUri) {
-            promiseArray.push(
-              Promise.resolve({
-                msgUri: message.msgUri,
-                wonMessage: won.createWonMessage(message.wonMessage),
-              })
-            );
-          } else {
-            console.warn(
-              "message does not contain a wonMessage, we will ignore this uri: ",
-              message
-            );
-          }
+          promiseArray.push(
+            Promise.resolve({
+              msgUri: message.msgUri,
+              wonMessage: won.createWonMessage(message.wonMessage),
+            })
+          );
         }
 
         return Promise.all([nextPage, Promise.all(promiseArray)]);

@@ -3,10 +3,13 @@
 @import "icon";
 @import "positioning-utils";
 @import "square-image";
+@import "elevation";
 
 won-topnav {
   border-bottom: $thinBorderWidth solid $won-line-gray;
   background: white;
+
+  @include defaultTopNavElevation();
 
   nav.topnav {
     display: grid;

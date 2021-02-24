@@ -1,5 +1,6 @@
 @import "won-config";
 @import "sizing-utils";
+@import "elevation";
 
 won-socket-add-button {
   background: $won-light-gray;
@@ -13,6 +14,10 @@ won-socket-add-button {
   box-sizing: border-box;
   min-width: 0;
 
+  &:not(.won-socket-add-button--big) {
+    @include defaultItemActionElevation();
+  }
+
   .socketadd__label {
     color: $won-secondary-color;
     text-overflow: ellipsis;
@@ -23,11 +28,6 @@ won-socket-add-button {
   .socketadd__icon {
     @include fixed-square($postIconSize);
     --local-primary: #{$won-secondary-color};
-  }
-
-  &:hover {
-    background: rgba(white, 0.5);
-    cursor: pointer;
   }
 
   &.won-socket-add-button--tag {
@@ -41,6 +41,8 @@ won-socket-add-button {
   }
 
   &.won-socket-add-button--big {
+    @include defaultCardActionButtonElevation();
+
     grid-template-areas: "icon" "main";
     grid-template-columns: 1fr;
     justify-content: center;

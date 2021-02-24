@@ -77,10 +77,6 @@ won-atom-content-members {
 
       & > won-socket-add-button {
         border: $thinGrayBorder;
-
-        &:hover {
-          border-color: $won-primary-color;
-        }
       }
 
       & > .acm__empty {

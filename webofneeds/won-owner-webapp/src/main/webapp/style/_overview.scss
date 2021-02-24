@@ -2,7 +2,7 @@
 @import "sizing-utils";
 @import "fonts";
 @import "flex-layout";
-@import "animate";
+@import "elevation";
 
 main.owneroverview {
   padding: 0;
@@ -135,15 +135,9 @@ main.owneroverview {
         grid-gap: 1rem;
 
         grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-        @include slideAnimationFixedHorizontal(
-          0.25s,
-          ease-in-out,
-          100vh,
-          1rem,
-          1rem
-        );
 
         > won-atom-card {
+          @include defaultCardElevation();
           border: $thinGrayBorder;
         }
       }
