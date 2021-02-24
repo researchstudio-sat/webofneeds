@@ -8852,7 +8852,7 @@ _:genid30 <https://w3id.org/won/auth#connectionMessages> _:genid31 .
 _:genid31 <https://w3id.org/won/auth#inherit> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 _:genid30 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
 _:genid30 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
-_:genid29 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#HoldableSocket> .
+_:genid29 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/hold#HoldableSocket> .
 _:genid27 <https://w3id.org/won/auth#socket> _:genid32 .
 _:genid32 <https://w3id.org/won/auth#connections> _:genid33 .
 _:genid33 <https://w3id.org/won/auth#connectionMessages> _:genid34 .
@@ -8862,7 +8862,10 @@ _:genid33 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRea
 _:genid32 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/schema#EventInverseSocket> .
 _:genid27 <https://w3id.org/won/auth#socket> _:genid35 .
 _:genid35 <https://w3id.org/won/auth#connections> _:genid36 .
-_:genid36 <https://w3id.org/won/auth#inherit> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+_:genid36 <https://w3id.org/won/auth#connectionMessages> _:genid37 .
+_:genid37 <https://w3id.org/won/auth#inherit> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+_:genid36 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
+_:genid36 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 _:genid35 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
 _:genid35 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/schema#AttendeeSocket> .
 # 
@@ -8870,25 +8873,25 @@ _:genid35 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/schem
 <https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
 <https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth> <http://www.w3.org/2000/01/rdf-schema#label> "GrantReadExpertiseAndInterestViaMemberSocketAuth" .
-<https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth> <https://w3id.org/won/auth#bearer> _:genid37 .
-_:genid37 <https://w3id.org/won/auth#issuer> _:genid38 .
-_:genid38 <https://w3id.org/won/auth#socket> _:genid39 .
-_:genid39 <https://w3id.org/won/auth#connection> _:genid40 .
-_:genid40 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
-_:genid40 <https://w3id.org/won/auth#targetAtom> _:genid41 .
-_:genid39 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/schema#MemberOfSocket> .
-_:genid37 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/schema#MemberSocket> .
-<https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth> <https://w3id.org/won/auth#grant> _:genid42 .
-_:genid42 <https://w3id.org/won/auth#graph> _:genid43 .
-_:genid43 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
-_:genid43 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
-_:genid42 <https://w3id.org/won/auth#socket> _:genid44 .
-_:genid44 <https://w3id.org/won/auth#connections> _:genid45 .
-_:genid45 <https://w3id.org/won/auth#connectionMessages> _:genid46 .
-_:genid46 <https://w3id.org/won/auth#inherit> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-_:genid45 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
-_:genid45 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
-_:genid44 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#ExpertiseSocket> .
-_:genid44 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#InterestSocket> .
+<https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth> <https://w3id.org/won/auth#bearer> _:genid38 .
+_:genid38 <https://w3id.org/won/auth#issuer> _:genid39 .
+_:genid39 <https://w3id.org/won/auth#socket> _:genid40 .
+_:genid40 <https://w3id.org/won/auth#connection> _:genid41 .
+_:genid41 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
+_:genid41 <https://w3id.org/won/auth#targetAtom> _:genid42 .
+_:genid40 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/schema#MemberOfSocket> .
+_:genid38 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/ext/schema#MemberSocket> .
+<https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth> <https://w3id.org/won/auth#grant> _:genid43 .
+_:genid43 <https://w3id.org/won/auth#graph> _:genid44 .
+_:genid44 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
+_:genid44 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+_:genid43 <https://w3id.org/won/auth#socket> _:genid45 .
+_:genid45 <https://w3id.org/won/auth#connections> _:genid46 .
+_:genid46 <https://w3id.org/won/auth#connectionMessages> _:genid47 .
+_:genid47 <https://w3id.org/won/auth#inherit> "false"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+_:genid46 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
+_:genid46 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+_:genid45 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#ExpertiseSocket> .
+_:genid45 <https://w3id.org/won/auth#socketType> <https://w3id.org/won/ext/persona#InterestSocket> .
 # 
 # Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/

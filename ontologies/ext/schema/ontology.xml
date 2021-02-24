@@ -14479,18 +14479,14 @@
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid29">
         <auth:connections rdf:nodeID="genid30"/>
-        <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#HoldableSocket"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/hold#HoldableSocket"/>
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid32">
         <auth:connections rdf:nodeID="genid33"/>
         <auth:socketType rdf:resource="https://w3id.org/won/ext/schema#EventInverseSocket"/>
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid35">
-        <auth:connections>
-            <rdf:Description>
-                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
-            </rdf:Description>
-        </auth:connections>
+        <auth:connections rdf:nodeID="genid36"/>
         <auth:operation rdf:resource="https://w3id.org/won/auth#opConnectClose"/>
         <auth:socketType rdf:resource="https://w3id.org/won/ext/schema#AttendeeSocket"/>
     </rdf:Description>
@@ -14518,6 +14514,15 @@
         <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
         <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
     </rdf:Description>
+    <rdf:Description rdf:nodeID="genid36">
+        <auth:connectionMessages>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connectionMessages>
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
     
 
 
@@ -14527,41 +14532,41 @@
     <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/schema#grantReadExpertiseAndInterestViaMemberSocketAuth">
         <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
         <rdfs:label>GrantReadExpertiseAndInterestViaMemberSocketAuth</rdfs:label>
-        <auth:bearer rdf:nodeID="genid37"/>
-        <auth:grant rdf:nodeID="genid42"/>
+        <auth:bearer rdf:nodeID="genid38"/>
+        <auth:grant rdf:nodeID="genid43"/>
     </owl:NamedIndividual>
-    <rdf:Description rdf:nodeID="genid37">
+    <rdf:Description rdf:nodeID="genid38">
         <auth:issuer>
             <rdf:Description>
-                <auth:socket rdf:nodeID="genid39"/>
+                <auth:socket rdf:nodeID="genid40"/>
             </rdf:Description>
         </auth:issuer>
         <auth:tokenScope rdf:resource="https://w3id.org/won/ext/schema#MemberSocket"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid42">
-        <auth:graph rdf:nodeID="genid43"/>
-        <auth:socket rdf:nodeID="genid44"/>
+    <rdf:Description rdf:nodeID="genid43">
+        <auth:graph rdf:nodeID="genid44"/>
+        <auth:socket rdf:nodeID="genid45"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid39">
-        <auth:connection rdf:nodeID="genid40"/>
+    <rdf:Description rdf:nodeID="genid40">
+        <auth:connection rdf:nodeID="genid41"/>
         <auth:socketType rdf:resource="https://w3id.org/won/ext/schema#MemberOfSocket"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid43">
+    <rdf:Description rdf:nodeID="genid44">
         <auth:graphType rdf:resource="https://w3id.org/won/auth#contentGraph"/>
         <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid44">
-        <auth:connections rdf:nodeID="genid45"/>
+    <rdf:Description rdf:nodeID="genid45">
+        <auth:connections rdf:nodeID="genid46"/>
         <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#ExpertiseSocket"/>
         <auth:socketType rdf:resource="https://w3id.org/won/ext/persona#InterestSocket"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid40">
+    <rdf:Description rdf:nodeID="genid41">
         <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
         <auth:targetAtom>
             <rdf:Description/>
         </auth:targetAtom>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid45">
+    <rdf:Description rdf:nodeID="genid46">
         <auth:connectionMessages>
             <rdf:Description>
                 <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>

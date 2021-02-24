@@ -151,7 +151,7 @@
     "@id" : "_:genid30"
   } ],
   "https://w3id.org/won/auth#socketType" : [ {
-    "@id" : "https://w3id.org/won/ext/persona#HoldableSocket"
+    "@id" : "https://w3id.org/won/ext/hold#HoldableSocket"
   } ]
 }, {
   "@id" : "_:genid3",
@@ -217,30 +217,33 @@
   } ]
 }, {
   "@id" : "_:genid36",
+  "https://w3id.org/won/auth#connectionMessages" : [ {
+    "@id" : "_:genid37"
+  } ],
+  "https://w3id.org/won/auth#connectionState" : [ {
+    "@id" : "https://w3id.org/won/core#Connected"
+  } ],
+  "https://w3id.org/won/auth#operation" : [ {
+    "@id" : "https://w3id.org/won/auth#opRead"
+  } ]
+}, {
+  "@id" : "_:genid37",
   "https://w3id.org/won/auth#inherit" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
     "@value" : "false"
   } ]
 }, {
-  "@id" : "_:genid37",
+  "@id" : "_:genid38",
   "https://w3id.org/won/auth#issuer" : [ {
-    "@id" : "_:genid38"
+    "@id" : "_:genid39"
   } ],
   "https://w3id.org/won/auth#tokenScope" : [ {
     "@id" : "https://w3id.org/won/ext/schema#MemberSocket"
   } ]
 }, {
-  "@id" : "_:genid38",
-  "https://w3id.org/won/auth#socket" : [ {
-    "@id" : "_:genid39"
-  } ]
-}, {
   "@id" : "_:genid39",
-  "https://w3id.org/won/auth#connection" : [ {
+  "https://w3id.org/won/auth#socket" : [ {
     "@id" : "_:genid40"
-  } ],
-  "https://w3id.org/won/auth#socketType" : [ {
-    "@id" : "https://w3id.org/won/ext/schema#MemberOfSocket"
   } ]
 }, {
   "@id" : "_:genid4",
@@ -252,22 +255,30 @@
   } ]
 }, {
   "@id" : "_:genid40",
+  "https://w3id.org/won/auth#connection" : [ {
+    "@id" : "_:genid41"
+  } ],
+  "https://w3id.org/won/auth#socketType" : [ {
+    "@id" : "https://w3id.org/won/ext/schema#MemberOfSocket"
+  } ]
+}, {
+  "@id" : "_:genid41",
   "https://w3id.org/won/auth#connectionState" : [ {
     "@id" : "https://w3id.org/won/core#Connected"
   } ],
   "https://w3id.org/won/auth#targetAtom" : [ {
-    "@id" : "_:genid41"
-  } ]
-}, {
-  "@id" : "_:genid42",
-  "https://w3id.org/won/auth#graph" : [ {
-    "@id" : "_:genid43"
-  } ],
-  "https://w3id.org/won/auth#socket" : [ {
-    "@id" : "_:genid44"
+    "@id" : "_:genid42"
   } ]
 }, {
   "@id" : "_:genid43",
+  "https://w3id.org/won/auth#graph" : [ {
+    "@id" : "_:genid44"
+  } ],
+  "https://w3id.org/won/auth#socket" : [ {
+    "@id" : "_:genid45"
+  } ]
+}, {
+  "@id" : "_:genid44",
   "https://w3id.org/won/auth#graphType" : [ {
     "@id" : "https://w3id.org/won/auth#contentGraph"
   } ],
@@ -275,9 +286,9 @@
     "@id" : "https://w3id.org/won/auth#opRead"
   } ]
 }, {
-  "@id" : "_:genid44",
+  "@id" : "_:genid45",
   "https://w3id.org/won/auth#connections" : [ {
-    "@id" : "_:genid45"
+    "@id" : "_:genid46"
   } ],
   "https://w3id.org/won/auth#socketType" : [ {
     "@id" : "https://w3id.org/won/ext/persona#ExpertiseSocket"
@@ -285,9 +296,9 @@
     "@id" : "https://w3id.org/won/ext/persona#InterestSocket"
   } ]
 }, {
-  "@id" : "_:genid45",
+  "@id" : "_:genid46",
   "https://w3id.org/won/auth#connectionMessages" : [ {
-    "@id" : "_:genid46"
+    "@id" : "_:genid47"
   } ],
   "https://w3id.org/won/auth#connectionState" : [ {
     "@id" : "https://w3id.org/won/core#Connected"
@@ -296,7 +307,7 @@
     "@id" : "https://w3id.org/won/auth#opRead"
   } ]
 }, {
-  "@id" : "_:genid46",
+  "@id" : "_:genid47",
   "https://w3id.org/won/auth#inherit" : [ {
     "@type" : "http://www.w3.org/2001/XMLSchema#boolean",
     "@value" : "false"
@@ -16731,9 +16742,9 @@
     "@value" : "GrantReadExpertiseAndInterestViaMemberSocketAuth"
   } ],
   "https://w3id.org/won/auth#bearer" : [ {
-    "@id" : "_:genid37"
+    "@id" : "_:genid38"
   } ],
   "https://w3id.org/won/auth#grant" : [ {
-    "@id" : "_:genid42"
+    "@id" : "_:genid43"
   } ]
 } ]
