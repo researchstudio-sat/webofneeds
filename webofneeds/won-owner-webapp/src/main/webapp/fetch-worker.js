@@ -660,12 +660,6 @@ export const fetchAtom = (atomUri, requestCredentials, vocab) =>
         };
       }
       return { atom: flattenedAtomJsonLd, auth: authsJsonLd };
-    })
-    .catch(e => {
-      const msg = "Failed to get atom " + atomUri + ".";
-      e.message += msg;
-      console.error(e.message);
-      throw e;
     });
 
 export const fetchConnectionUrisWithStateByAtomUri = (
@@ -909,9 +903,7 @@ export const fetchConnection = (connectionUri, fetchParams, vocab) => {
       };
     })
     .catch(e => {
-      const msg = "Failed to get connection " + connectionUri + ".";
-      e.message += msg;
-      console.error(e.message);
+      console.error("Failed to get connection " + connectionUri + ".");
       throw e;
     });
 };
@@ -1127,15 +1119,21 @@ const checkHttpStatus = (uri, params = {}) => response => {
   ) {
     return response;
   } else {
-    let error = new Error(
-      `${response.status} - ${
+    console.error(
+      `ERROR for request: ${response.status} - ${
         response.statusText
       } for request ${uri}, ${JSON.stringify(params)}`
     );
+    const errorPayload = {
+      response: response,
+      status: response.status,
+      params: params,
+      message: `ERROR for request: ${response.status} - ${
+        response.statusText
+      } for request ${uri}`,
+    };
 
-    error.response = response;
-    error.status = response.status;
-    throw error;
+    throw new Error(JSON.stringify(errorPayload));
   }
 };
 
