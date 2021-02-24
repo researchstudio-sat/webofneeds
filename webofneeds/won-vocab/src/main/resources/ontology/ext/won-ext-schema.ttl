@@ -3785,11 +3785,11 @@ won:derivesAtomProperty
     rdfs:comment
                                    "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:event B` when a Connection with an Atom B is established. Automatically generated from the [event](http://schema.org/event) Property of the http://schema.org vocabulary." ;
     won:compatibleSocketDefinition :EventInverseSocket ;
-    auth:localAuth                 :grantAccessToGraphAndEventSocketForMemberAuth .
+    auth:localAuth                 :grantAccessToEventSocketForMemberAuth .
 
 :grantAccessToEventSocketForMemberAuth
     a            auth:Authorization ;
-    rdfs:label   "GrantAccessToGraphAndEventSocketForMemberAuth" ;
+    rdfs:label   "GrantAccessToEventSocketForMemberAuth" ;
     auth:grantee [ auth:socket [ auth:socketType :MemberSocket ;
                                  auth:connection [ auth:connectionState won:Connected ;
                                                    auth:targetAtom      [ ] ] ] ] ;
