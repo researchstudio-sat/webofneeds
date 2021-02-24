@@ -1,0 +1,339 @@
+@base               <https://example.com/test/atom1> .
+@prefix ex:         <https://example.com/test/> .
+@prefix auth:       <https://w3id.org/won/auth#> .
+@prefix won:        <https://w3id.org/won/core#> .
+@prefix chat:       <https://w3id.org/won/ext/chat#> .
+@prefix wx-schema:  <https://w3id.org/won/ext/schema#> .
+@prefix wx-persona: <https://w3id.org/won/ext/persona#> .
+@prefix wx-hold:    <https://w3id.org/won/ext/hold#> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+@prefix atom1:      <http://example.org/test/atom1#> .
+@prefix atom2:      <http://example.org/test/atom2#> .
+@prefix atom3:      <http://example.org/test/atom3#> .
+@prefix atom4:      <http://example.org/test/atom4#> .
+@prefix atom5:      <http://example.org/test/atom5#> .
+@prefix eventAtom:  <http://example.org/test/eventAtom#> .
+@prefix msg:        <https://w3id.org/won/message#> .
+@prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdfg:       <http://www.w3.org/2004/04/trix/rdfg-1/> .
+@prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+ex:expectedResult1
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request1> .
+
+ex:expectedResult2
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request2> .
+
+ex:expectedResult3
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request3> .
+
+ex:expectedResult4
+    a                       auth:ExpectedAclEvalResult ;
+    auth:decision           auth:accessGranted ;
+    auth:requestedOperation <#request3> .
+
+
+# See EventAtom with MemberSocket token
+
+<#authorization>
+    a           auth:Authorization ;
+    auth:bearer [ auth:tokenScope wx-schema:MemberSocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType wx-schema:EventInverseSocket ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph  [ auth:graphType auth:contentGraph ;
+                                auth:operation auth:opRead ] ;
+                  auth:socket [ auth:socketType  wx-schema:AttendeeSocket ;
+                                auth:operation   auth:opConnectClose ;
+                                auth:connections [ auth:inherit false ] ] ;
+                  auth:socket [ auth:socketType  wx-schema:EventInverseSocket ;
+                                auth:connections [ auth:operation          auth:opRead ;
+                                                   auth:connectionState    won:Connected ;
+                                                   auth:connectionMessages [ auth:inherit false ] ] ] ;
+                  auth:socket [ auth:socketType  wx-persona:HoldableSocket ;
+                                auth:connections [ auth:operation          auth:opRead ;
+                                                   auth:connectionState    won:Connected ;
+                                                   auth:connectionMessages [ auth:inherit false ] ] ] ] .
+
+
+<#request1>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opRead ;
+    auth:reqAtom     ex:eventAtom ;
+    auth:reqPosition auth:positionAtomGraph ;
+    auth:bearsToken  ex:token1 .
+
+ex:token1
+    a               auth:AuthToken ;
+    auth:tokenScope wx-schema:MemberSocket ;
+    auth:tokenIss   ex:atom1 ;
+    auth:tokenSub   ex:atom2 ;
+    auth:tokenSig   ex:node ;
+    auth:tokenIat   "2020-12-03T22:30:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T23:30:00"^^xsd:dateTime .
+
+<#request2>
+    a                auth:OperationRequest ;
+    auth:operation   auth:opConnectClose ;
+    auth:reqAtom     ex:eventAtom ;
+    auth:reqSocket   eventAtom:attendeeSocket ;
+    auth:reqPosition auth:positionSocket ;
+    auth:bearsToken  ex:token2 .
+
+<#request3>
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:reqAtom       ex:eventAtom ;
+    auth:reqConnection eventAtom:connE1 ;
+    auth:reqPosition   auth:positionConnection ;
+    auth:bearsToken    ex:token2 .
+
+<#request4>
+    a                  auth:OperationRequest ;
+    auth:operation     auth:opRead ;
+    auth:reqAtom       ex:eventAtom ;
+    auth:reqConnection eventAtom:connE4 ;
+    auth:reqPosition   auth:positionConnection ;
+    auth:bearsToken    ex:token2 .
+
+ex:token2
+    a               auth:AuthToken ;
+    auth:tokenScope wx-schema:MemberSocket ;
+    auth:tokenIss   ex:atom1 ;
+    auth:tokenSub   ex:atom3 ;
+    auth:tokenSig   ex:node ;
+    auth:tokenIat   "2020-12-03T22:30:00"^^xsd:dateTime ;
+    auth:tokenExp   "2020-12-03T23:30:00"^^xsd:dateTime .
+
+# Organization 1
+
+ex:atom1
+    a                    won:Atom ;
+    won:socket           atom1:memberSocket, atom1:eventSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom1:msg ;
+    won:wonNode          ex:node .
+
+atom1:eventSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-schema:EventSocket ;
+    won:connections      atom1:eventSocketConnections .
+
+atom1:eventSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom1:conn1E .
+
+atom1:conn1E
+    a                   won:Connection ;
+    won:socket          atom1:eventSocket ;
+    won:targetAtom      ex:eventAtom ;
+    won:connectionState won:Connected .
+
+atom1:memberSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-schema:MemberSocket ;
+    won:connections      atom1:memberSocketConnections .
+
+atom1:memberSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom1:conn12, atom1:conn13, atom1:conn14 .
+
+atom1:conn12
+    a                   won:Connection ;
+    won:socket          atom1:memberSocket ;
+    won:targetAtom      ex:atom2 ;
+    won:connectionState won:Connected .
+
+atom1:conn13
+    a                   won:Connection ;
+    won:socket          atom1:memberSocket ;
+    won:targetAtom      ex:atom3 ;
+    won:connectionState won:Connected .
+
+atom1:conn14
+    a                   won:Connection ;
+    won:socket          atom1:memberSocket ;
+    won:targetAtom      ex:atom4 ;
+    won:connectionState won:Closed .
+
+# Event of Organization - atom1
+
+ex:eventAtom
+    a                    won:Atom ;
+    won:socket           eventAtom:eventInverseSocket, eventAtom:attendeeSocket, eventAtom:holdableSocket ;
+    won:state            won:Active ;
+    won:messageContainer eventAtom:msg ;
+    won:wonNode          ex:node .
+
+eventAtom:holdableSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HoldableSocket ;
+    rdfs:member          eventAtom:connE4 .
+
+eventAtom:connE4
+    a                   won:Connection ;
+    won:socket          eventAtom:holdableSocket ;
+    won:targetAtom      ex:atom4 ;
+    won:connectionState won:Connected .
+
+eventAtom:attendeeSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-schema:AttendeeSocket .
+
+
+eventAtom:eventInverseSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-schema:EventInverseSocket ;
+    won:connections      eventAtom:eventInverseSocketConnections .
+
+eventAtom:eventInverseSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member eventAtom:connE1 .
+
+eventAtom:connE1
+    a                   won:Connection ;
+    won:socket          eventAtom:eventInverseSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+
+# Atom 2 - Persona - Connected to Member
+
+ex:atom2
+    a                    won:Atom ;
+    won:socket           atom2:memberOfSocket, atom2:interestSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom2:msg ;
+    won:wonNode          ex:node .
+
+atom2:interestSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-persona:InterestSocket ;
+    won:connections      atom2:interestSocketConnections .
+
+atom2:interestSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom2:conn25 .
+
+
+atom2:conn25
+    a                   won:Connection ;
+    won:socket          atom2:interestSocket ;
+    won:targetAtom      ex:atom5 ;
+    won:connectionState won:Connected .
+
+atom2:memberOfSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-schema:MemberOfSocket ;
+    won:connections      atom2:memberOfSocketConnections .
+
+atom2:memberOfSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom2:conn21 .
+
+
+atom2:conn21
+    a                   won:Connection ;
+    won:socket          atom2:memberOfSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+
+# Atom 3 - Persona - In Member
+
+ex:atom3
+    a                    won:Atom ;
+    won:socket           atom3:memberOfSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom3:msg ;
+    won:wonNode          ex:node .
+
+atom3:memberOfSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-schema:MemberOfSocket ;
+    won:connections      atom3:memberOfSocketConnections .
+
+
+atom3:memberOfSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom3:conn31 .
+
+atom3:conn31
+    a                   won:Connection ;
+    won:socket          atom3:memberOfSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Connected .
+
+# Atom 4 - Persona - Not in Member but holder of Event
+
+ex:atom4
+    a                    won:Atom ;
+    won:socket           atom4:memberOfSocket, atom4:holderSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom4:msg ;
+    won:wonNode          ex:node .
+
+atom4:holderSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-hold:HolderSocket ;
+    won:connections      atom4:holderSocketConnections .
+
+
+atom4:holderSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom4:conn4E .
+
+atom4:conn4E
+    a                   won:Connection ;
+    won:socket          atom4:holderSocket ;
+    won:targetAtom      ex:eventAtom ;
+    won:connectionState won:Connected .
+
+atom4:memberOfSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-schema:MemberOfSocket ;
+    won:connections      atom4:memberOfSocketConnections .
+
+
+atom4:memberOfSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom4:conn41 .
+
+atom4:conn41
+    a                   won:Connection ;
+    won:socket          atom4:memberOfSocket ;
+    won:targetAtom      ex:atom1 ;
+    won:connectionState won:Closed .
+
+# Atom 5 - Expertise of Atom 2
+
+ex:atom5
+    a                    won:Atom ;
+    won:socket           atom5:interestOfSocket ;
+    won:state            won:Active ;
+    won:messageContainer atom5:msg ;
+    won:wonNode          ex:node .
+
+atom5:interestOfSocket
+    a                    won:Socket ;
+    won:socketDefinition wx-persona:InterestOfSocket ;
+    won:connections      atom5:interestOfSocketConnections .
+
+
+atom5:interestOfSocketConnections
+    a           won:ConnectionContainer ;
+    rdfs:member atom5:conn52 .
+
+atom5:conn52
+    a                   won:Connection ;
+    won:socket          atom5:interestOfSocket ;
+    won:targetAtom      ex:atom2 ;
+    won:connectionState won:Connected .
+
