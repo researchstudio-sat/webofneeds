@@ -4,6 +4,621 @@ import { ownerBaseUrl } from "~/config/default.js";
 import jsonld from "jsonld";
 import * as N3 from "n3";
 
+export const fetchDefaultNodeUri = () => {
+  /* this allows the owner-app-server to dynamically switch default nodes. */
+  return fetch(/*relativePathToConfig=*/ "appConfig/getDefaultWonNodeUri")
+    .then(checkHttpStatus("appConfig/getDefaultWonNodeUri"))
+    .then(resp => resp.json())
+    .catch((/*err*/) => {
+      const defaultNodeUri = `${location.protocol}://${
+        location.host
+      }/won/resource`;
+      console.warn(
+        "Failed to fetch default node uri at the relative path `",
+        "appConfig/getDefaultWonNodeUri",
+        "` (is the API endpoint there up and reachable?) -> falling back to the default ",
+        defaultNodeUri
+      );
+      return defaultNodeUri;
+    });
+};
+
+/**
+ * Resend the verification mail.
+ *
+ */
+export const resendEmailVerification = email => {
+  const url = urljoin(ownerBaseUrl, "/rest/users/resendVerificationEmail");
+  return fetch(url, {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: email,
+    }),
+  })
+    .then(checkHttpStatus(url))
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error =>
+      error.response.json().then(errorMessage => {
+        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
+        const resendError = new Error();
+        resendError.jsonResponse = errorMessage;
+        throw resendError;
+      })
+    );
+};
+
+/**
+ * Send Anonymous Link Email
+ *
+ */
+export const sendAnonymousLinkEmail = (email, privateId) => {
+  const url = urljoin(ownerBaseUrl, "/rest/users/sendAnonymousLinkEmail");
+  return fetch(url, {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      email: email,
+      privateId: privateId,
+    }),
+  })
+    .then(checkHttpStatus(url))
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error =>
+      error.response.json().then(errorMessage => {
+        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
+        const sendError = new Error();
+        sendError.jsonResponse = errorMessage;
+        throw sendError;
+      })
+    );
+};
+
+/**
+ * Change the password of the user currently logged in.
+ * @param credentials { email, oldPassword, newPassword }
+ * @returns {*}
+ */
+export const changePassword = credentials => {
+  const { email, oldPassword, newPassword } = credentials;
+
+  return fetch("/owner/rest/users/changePassword", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    }),
+  }).then(checkHttpStatus("/owner/rest/users/changePassword"));
+};
+
+/**
+ * @param credentials either {email, password} or {privateId}
+ * @returns {*}
+ */
+export const login = credentials => {
+  const { email, password, rememberMe, privateId } = parseCredentials(
+    credentials
+  );
+  const loginUrl = urljoin(ownerBaseUrl, "/rest/users/signin");
+  const params =
+    "username=" +
+    encodeURIComponent(email) +
+    "&password=" +
+    encodeURIComponent(password) +
+    (rememberMe ? "&remember-me=true" : "") +
+    (privateId ? "&privateId=" + privateId : "");
+
+  return fetch(loginUrl, {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    },
+    body: params,
+    credentials: "include",
+  })
+    .then(checkHttpStatus(loginUrl))
+    .then(resp => resp.json());
+};
+
+export const logout = () => {
+  const url = urljoin(ownerBaseUrl, "/rest/users/signout");
+  return fetch(url, {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({}),
+  }).then(checkHttpStatus(url));
+};
+
+export const exportAccount = dataEncryptionPassword => {
+  const url = urljoin(
+    ownerBaseUrl,
+    `/rest/users/exportAccount?keyStorePassword=${dataEncryptionPassword}`
+  );
+  return fetch(url, {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  }).then(checkHttpStatus(url));
+};
+
+/**
+ * Checks whether the user has a logged-in session.
+ * Returns a promise with the user-object if successful
+ * or a failing promise if an error has occured.
+ *
+ * @returns {*}
+ */
+export const checkLoginStatus = () => {
+  return fetch("rest/users/isSignedIn", { credentials: "include" })
+    .then(checkHttpStatus("rest/users/isSignedIn")) // will reject if not logged in
+    .then(resp => resp.json());
+};
+
+/**
+ * Registers the account with the server.
+ * The returned promise fails if something went
+ * wrong during creation.
+ *
+ * @param credentials either {email, password} or {privateId}
+ * @returns {*}
+ */
+export const registerAccount = credentials => {
+  const { email, password } = parseCredentials(credentials);
+  const url = urljoin(ownerBaseUrl, "/rest/users/");
+
+  return fetch(url, {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      password: password,
+      privateId: credentials.privateId,
+    }),
+  }).then(checkHttpStatus(url));
+};
+
+/**
+ * Accept the Terms Of Service
+ */
+export const acceptTermsOfService = () =>
+  fetch(urljoin(ownerBaseUrl, "/rest/users/acceptTermsOfService"), {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  })
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error => {
+      return error.json();
+    });
+
+/**
+ * Confirm the Registration with the verificationToken-link provided in the registration-email
+ */
+export const confirmRegistration = verificationToken => {
+  const url = urljoin(ownerBaseUrl, "/rest/users/confirmRegistration");
+  return fetch(url, {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      token: verificationToken,
+    }),
+  })
+    .then(checkHttpStatus(url))
+    .then(resp => {
+      return resp.json();
+    })
+    .catch(error =>
+      error.response.json().then(errorMessage => {
+        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
+        const verificationError = new Error();
+        verificationError.jsonResponse = errorMessage;
+        throw verificationError;
+      })
+    );
+};
+
+/**
+ * Transfer an existing privateId User,
+ * to a non existing User
+ * @param credentials {email, password, privateId}
+ * @returns {*}
+ */
+export const transferPrivateAccount = credentials => {
+  const { email, password, privateId } = credentials;
+  const privateUsername = privateId2Credentials(privateId).email;
+  const privatePassword = privateId2Credentials(privateId).password;
+
+  return fetch("/owner/rest/users/transfer", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      password: password,
+      privateUsername: privateUsername,
+      privatePassword: privatePassword,
+    }),
+  }).then(checkHttpStatus("/owner/rest/users/transfer"));
+};
+
+/**
+ * Change the password of the user currently logged in.
+ * @param credentials { email, oldPassword, newPassword }
+ * @returns {*}
+ */
+export const resetPassword = credentials => {
+  const { email, recoveryKey, newPassword } = credentials;
+
+  return fetch("/owner/rest/users/resetPassword", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      recoveryKey: recoveryKey,
+      newPassword: newPassword,
+      verificationToken: "",
+    }),
+  }).then(checkHttpStatus("/owner/rest/users/resetPassword"));
+};
+
+export const serverSideConnect = (
+  socketUri1,
+  socketUri2,
+  pending1 = false,
+  pending2 = false
+) => {
+  return fetch("rest/action/connect", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify([
+      {
+        pending: pending1,
+        socket: socketUri1,
+      },
+      {
+        pending: pending2,
+        socket: socketUri2,
+      },
+    ]),
+    credentials: "include",
+  });
+};
+
+/**
+ * Returns all stored Atoms including MetaData (e.g. type, creationDate, location, state) as a Map
+ * @param state either "ACTIVE" or "INACTIVE"
+ * @returns {*}
+ */
+export const fetchOwnedMetaAtoms = state => {
+  let paramString = "";
+  if (state === "ACTIVE" || state === "INACTIVE") {
+    paramString = "?state=" + state;
+  }
+  const url = urljoin(ownerBaseUrl, "/rest/atoms" + paramString);
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.json());
+};
+
+//FIXME: This might be a problem if messages from non owned atoms are fetched (only requesterWebId is used not token)
+export const fetchMessage = (atomUri, messageUri) => {
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/linked-data/",
+    `?requester=${encodeURIComponent(atomUri)}`,
+    `&uri=${encodeURIComponent(messageUri)}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.json());
+};
+
+export const fetchAllMetaAtoms = (
+  createdAfterDate,
+  state = "ACTIVE",
+  limit = 600
+) => {
+  return fetchMetaAtoms(
+    undefined,
+    createdAfterDate,
+    state,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    limit
+  );
+};
+
+export const fetchAllActiveMetaPersonas = vocab => {
+  return fetchMetaAtoms(
+    undefined,
+    undefined,
+    "ACTIVE",
+    vocab.BUDDY.BuddySocket,
+    vocab.WON.Persona,
+    undefined,
+    undefined,
+    undefined
+  );
+};
+
+export const fetchAllMetaAtomsNear = (
+  createdAfterDate,
+  location,
+  maxDistance = 5000,
+  limit = 500,
+  state = "ACTIVE"
+) => {
+  if (location && location.lat && location.lng) {
+    return fetchMetaAtoms(
+      undefined,
+      createdAfterDate,
+      state,
+      undefined,
+      undefined,
+      location,
+      maxDistance,
+      limit
+    );
+  } else {
+    return Promise.reject();
+  }
+};
+
+export const fetchTokenForAtom = (atomUri, params) =>
+  fetch(generateLinkedDataQueryString(atomUri + "/token", params), {
+    method: "get",
+    credentials: "same-origin",
+    headers: {
+      // cachePolicy: "network-only",
+      Authorization: params.token ? "Bearer " + params.token : undefined,
+      Accept: "application/json",
+    },
+  })
+    .then(checkHttpStatus(atomUri + "/token", params))
+    .then(response => response.json());
+
+export const fetchGrantsForAtom = (atomUri, params) =>
+  fetch(generateLinkedDataQueryString(atomUri + "/grants", params), {
+    method: "get",
+    credentials: "same-origin",
+    headers: {
+      // cachePolicy: "network-only",
+      Authorization: params.token ? "Bearer " + params.token : undefined,
+      Accept: "application/ld+json",
+    },
+  })
+    .then(checkHttpStatus(atomUri + "/grants", params))
+    .then(response => response.json());
+
+const fetchMetaAtoms = (
+  modifiedAfterDate,
+  createdAfterDate,
+  state,
+  filterBySocketTypeUri,
+  filterByAtomTypeUri,
+  location,
+  maxDistance,
+  limit
+) => {
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/atoms/all?" +
+      (state ? "state=" + state + "&" : "") +
+      (limit ? "limit=" + limit + "&" : "") +
+      (modifiedAfterDate
+        ? "modifiedafter=" + modifiedAfterDate.toISOString() + "&"
+        : "") +
+      (createdAfterDate
+        ? "createdAfterDate=" + createdAfterDate.toISOString() + "&"
+        : "") +
+      (filterBySocketTypeUri
+        ? "filterBySocketTypeUri=" +
+          encodeURIComponent(filterBySocketTypeUri) +
+          "&"
+        : "") +
+      (filterByAtomTypeUri
+        ? "filterByAtomTypeUri=" + encodeURIComponent(filterByAtomTypeUri) + "&"
+        : "") +
+      (location &&
+      location.lat &&
+      location.lng &&
+      (maxDistance || maxDistance === 0)
+        ? "latitude=" + location.lat + "&"
+        : "") +
+      (location &&
+      location.lat &&
+      location.lng &&
+      (maxDistance || maxDistance === 0)
+        ? "longitude=" + location.lng + "&"
+        : "") +
+      (location &&
+      location.lat &&
+      location.lng &&
+      (maxDistance || maxDistance === 0)
+        ? "maxDistance=" + maxDistance + "&"
+        : "")
+  );
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(),
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.json());
+};
+
+export const fetchMessageEffects = (connectionUri, messageUri) => {
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/agreement/getMessageEffects",
+    `?connectionUri=${connectionUri}`,
+    `&messageUri=${messageUri}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.json());
+};
+
+export const fetchAgreementProtocolUris = connectionUri => {
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/agreement/getAgreementProtocolUris",
+    `?connectionUri=${connectionUri}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.json());
+};
+
+export const fetchAgreementProtocolDataset = connectionUri => {
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/agreement/getAgreementProtocolDataset",
+    `?connectionUri=${connectionUri}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/trig",
+      "Content-Type": "application/trig",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.text())
+    .then(textResponse => {
+      const trigParser = new N3.Parser({ format: "application/trig" });
+
+      return trigParser.parse(textResponse);
+    });
+};
+
+/**
+ * Send a message to the endpoint and return a promise with a json payload with messageUri and message as props
+ * @param msg
+ * @returns {*}
+ */
+export const sendMessage = msg => {
+  return fetch("/owner/rest/messages/send", {
+    body: JSON.stringify(msg),
+    method: "POST",
+    headers: new Headers({
+      "Content-Type": "application/ld+json;charset=UTF-8",
+    }),
+    credentials: "include",
+  })
+    .then(checkHttpStatus("/owner/rest/messages/send"))
+    .then(response => response.json())
+    .then(jsonResponse => ({
+      messageUri: jsonResponse.messageUri,
+      message: msg,
+    }));
+};
+
+export const fetchPetriNetUris = connectionUri => {
+  const url = urljoin(
+    ownerBaseUrl,
+    "/rest/petrinet/getPetriNetUris",
+    `?connectionUri=${connectionUri}`
+  );
+
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/ld+json",
+      "Content-Type": "application/ld+json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
+    .then(response => response.json());
+};
+
 export const fetchAtom = (atomUri, requestCredentials, vocab) =>
   fetchJsonLdDataset(atomUri, requestCredentials)
     .then(jsonLdData =>
@@ -662,4 +1277,29 @@ function parseHeaderLinks(linkHeaderString) {
 function is(type, obj) {
   const clas = Object.prototype.toString.call(obj).slice(8, -1);
   return obj !== undefined && obj !== null && clas === type;
+}
+
+/**
+ * @param credentials either {email, password} or {privateId}
+ * @returns {email, password}
+ */
+function parseCredentials(credentials) {
+  return credentials.privateId
+    ? privateId2Credentials(credentials.privateId)
+    : credentials;
+}
+
+/**
+ * Parses a given privateId into a fake email address and a password.
+ * @param privateId
+ * @returns {{email: string, password: *}}
+ */
+function privateId2Credentials(privateId) {
+  const [usernameFragment, password] = privateId.split("-");
+  const email = usernameFragment + "@matchat.org";
+  return {
+    email,
+    password,
+    privateId,
+  };
 }

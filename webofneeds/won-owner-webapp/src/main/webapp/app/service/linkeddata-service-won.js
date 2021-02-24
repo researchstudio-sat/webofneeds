@@ -20,9 +20,9 @@
 import vocab from "~/app/service/vocab";
 import won from "./won.js";
 
-import ldWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
+import fWorker from "workerize-loader?[name].[contenthash:8]!../../fetch-worker.js";
 
-const linkedDataWorker = ldWorker();
+const fetchWorker = fWorker();
 
 (function() {
   /**
@@ -31,7 +31,7 @@ const linkedDataWorker = ldWorker();
    * to get the connection-uris. Thus it's faster.
    */
   won.fetchAtom = (atomUri, requestCredentials) =>
-    linkedDataWorker.fetchAtom(atomUri, requestCredentials, vocab);
+    fetchWorker.fetchAtom(atomUri, requestCredentials, vocab);
 
   /**
    * Fetches all MetaConnections of the given connectionContainerUri
@@ -44,7 +44,7 @@ const linkedDataWorker = ldWorker();
     connectionContainerUri,
     requestCredentials
   ) =>
-    linkedDataWorker.fetchConnectionUrisWithStateByAtomUri(
+    fetchWorker.fetchConnectionUrisWithStateByAtomUri(
       connectionContainerUri,
       requestCredentials,
       vocab
@@ -55,14 +55,14 @@ const linkedDataWorker = ldWorker();
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ld-worker.js `queryString`
+   *        * queryParams: GET-params as documented for fetch-worker.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
    * @return {*} the connections predicates
    */
   won.fetchConnection = (connectionUri, fetchParams) =>
-    linkedDataWorker.fetchConnection(connectionUri, fetchParams, vocab);
+    fetchWorker.fetchConnection(connectionUri, fetchParams, vocab);
 
   /**
    * @param connectionUri
@@ -70,7 +70,7 @@ const linkedDataWorker = ldWorker();
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ld-worker.js `queryString`
+   *        * queryParams: GET-params as documented for fetch-worker.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
@@ -81,7 +81,7 @@ const linkedDataWorker = ldWorker();
     messageContainerUri,
     fetchParams
   ) =>
-    linkedDataWorker
+    fetchWorker
       .fetchMessagesOfConnection(
         connectionUri,
         messageContainerUri,
@@ -114,7 +114,7 @@ const linkedDataWorker = ldWorker();
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ld-worker.js `queryString`
+   *        * queryParams: GET-params as documented for fetch-worker.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
@@ -125,7 +125,7 @@ const linkedDataWorker = ldWorker();
     targetSocketUri,
     fetchParams
   ) =>
-    linkedDataWorker.fetchConnectionUrisBySocket(
+    fetchWorker.fetchConnectionUrisBySocket(
       senderSocketUri,
       targetSocketUri,
       fetchParams,
@@ -138,7 +138,7 @@ const linkedDataWorker = ldWorker();
    * @param fetchParams: optional paramters
    *        * requesterWebId: the WebID used to access the ressource (used
    *            by the owner-server to pick the right key-pair)
-   *        * queryParams: GET-params as documented for ld-worker.js `queryString`
+   *        * queryParams: GET-params as documented for fetch-worker.js `queryString`
    *        * pagingSize: if specified the server will return the first
    *            page (unless e.g. `queryParams.p=2` is specified when
    *            it will return the second page of size N)
@@ -149,7 +149,7 @@ const linkedDataWorker = ldWorker();
     targetSocketUri,
     fetchParams
   ) =>
-    linkedDataWorker.fetchConnectionBySocket(
+    fetchWorker.fetchConnectionBySocket(
       senderSocketUri,
       targetSocketUri,
       fetchParams,

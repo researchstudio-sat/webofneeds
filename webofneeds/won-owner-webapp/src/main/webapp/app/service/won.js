@@ -29,7 +29,7 @@ import {
 import vocab from "./vocab.js";
 import * as jsonldUtils from "./jsonld-utils.js";
 
-import ldWorker from "workerize-loader?[name].[contenthash:8]!../../ld-worker.js";
+import fWorker from "workerize-loader?[name].[contenthash:8]!../../fetch-worker.js";
 
 let won = {};
 
@@ -38,7 +38,7 @@ let won = {};
  *
  */
 
-const linkedDataWorker = ldWorker();
+const fetchWorker = fWorker();
 
 won.debugmode = false; //if you set this to true, the created atoms will get flagged as debug atoms in order to get matches and requests from the debugbot
 
@@ -320,7 +320,7 @@ won.newGraph = function(hashFragement) {
 };
 
 won.wonMessageFromJsonLd = (rawMessageJsonLd, msgUri) =>
-  linkedDataWorker
+  fetchWorker
     .wonMessageFromJsonLd(rawMessageJsonLd, msgUri, vocab)
     .then(wonMessage => new WonMessage(wonMessage))
     .catch(e => {
@@ -337,7 +337,7 @@ window.wonMessageFromJsonLd4dbg = won.wonMessageFromJsonLd;
  *
  * @param {string} rdf
  */
-won.rdfToJsonLd = rdf => linkedDataWorker.rdfToJsonLd(rdf);
+won.rdfToJsonLd = rdf => fetchWorker.rdfToJsonLd(rdf);
 
 window.rdfToJsonLd4dbg = won.rdfToJsonLd;
 

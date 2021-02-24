@@ -85,7 +85,7 @@ function generateQueryString(path, params = {}) {
   }
 }
 
-export function generateQueryParamsString(params) {
+function generateQueryParamsString(params) {
   if (params) {
     const keyValueArray = [];
 
