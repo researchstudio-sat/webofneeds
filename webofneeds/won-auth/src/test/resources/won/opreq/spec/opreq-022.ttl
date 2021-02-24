@@ -43,8 +43,9 @@ ex:expectedResult2
                    auth:graph     [ auth:graphType auth:contentGraph, auth:keyGraph, auth:sysinfoGraph ;
                                     auth:operation auth:opRead ] ;
                    auth:socket    [ auth:socketType         wx-persona:InterestSocket ;
-                                    auth:operation          auth:opRead ;
-                                    auth:connectionMessages [ auth:inherit false ] ] ] .
+                                    auth:connections [ auth:operation          auth:opRead ;
+                                                       auth:connectionState    won:Connected ;
+                                                       auth:connectionMessages [ auth:inherit false ] ] ] ] .
 
 <#request1>
     a                auth:OperationRequest ;
