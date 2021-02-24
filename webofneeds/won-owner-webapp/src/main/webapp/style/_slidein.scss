@@ -2,6 +2,7 @@
 @import "button";
 @import "icon";
 @import "responsiveness-utils";
+@import "elevation";
 
 @mixin slide-in() {
   grid-column: 2;
@@ -62,6 +63,7 @@
 
 won-slide-in {
   display: grid;
+  @include defaultSlideInElevation();
   $maxSlideInWidth: $maxContentWidth;
   grid-template-columns: 1fr minmax(min-content, $maxSlideInWidth) 1fr;
   grid-auto-flow: column;
