@@ -6,7 +6,6 @@ import {
   mergeInEmptyDraft,
   defaultReactions,
 } from "../detail-definitions.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
@@ -46,12 +45,12 @@ export const taxiOffer = {
       filter = {
         // to select seeks-branch
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
-          xsd: won.defaultContext["xsd"],
-          demo: won.defaultContext["demo"],
-          match: won.defaultContext["match"],
-          con: won.defaultContext["con"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
+          xsd: vocab.defaultContext["xsd"],
+          demo: vocab.defaultContext["demo"],
+          match: vocab.defaultContext["match"],
+          con: vocab.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -88,8 +87,8 @@ export const taxiOffer = {
       filter = {
         // to select seeks-branch
         prefixes: {
-          won: won.defaultContext["won"],
-          demo: won.defaultContext["demo"],
+          won: vocab.defaultContext["won"],
+          demo: vocab.defaultContext["demo"],
         },
         operations: [
           `${resultName} a won:Atom.`,

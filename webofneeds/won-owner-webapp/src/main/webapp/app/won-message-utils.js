@@ -27,6 +27,18 @@ export function isFetchMessageEffectsNeeded(wonMsg) {
   );
 }
 
+const reportError = function(message) {
+  if (arguments.length === 1) {
+    return function(reason) {
+      console.error(message, " reason: ", reason);
+    };
+  } else {
+    return function(reason) {
+      console.error("Error! reason: ", reason);
+    };
+  }
+};
+
 export function buildCloseMessage(socketUri, targetSocketUri) {
   const buildMessage = function() {
     return new won.MessageBuilder(vocab.WONMSG.closeMessage)
@@ -40,11 +52,10 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
   };
 
   //fetch all datan needed
-  return won
-    .validateEnvelopeDataForConnection(socketUri, targetSocketUri)
+  return validateEnvelopeDataForConnection(socketUri, targetSocketUri)
     .then(() => buildMessage())
     .catch(err => {
-      won.reportError("cannot close connection " + JSON.stringify(err));
+      reportError("cannot close connection " + JSON.stringify(err));
       throw err;
     });
 }
@@ -59,12 +70,10 @@ export function buildCloseAtomMessage(atomUri) {
       .build();
   };
 
-  return won
-    .validateEnvelopeDataForAtom(atomUri)
-    .then(
-      () => buildMessage(),
-      () => won.reportError("cannot close atom " + atomUri)
-    );
+  return validateEnvelopeDataForAtom(atomUri).then(
+    () => buildMessage(),
+    () => reportError("cannot close atom " + atomUri)
+  );
 }
 
 export function buildDeleteAtomMessage(atomUri) {
@@ -78,12 +87,10 @@ export function buildDeleteAtomMessage(atomUri) {
       .build();
   };
 
-  return won
-    .validateEnvelopeDataForAtom(atomUri)
-    .then(
-      () => buildMessage(),
-      () => won.reportError("cannot delete atom " + atomUri)
-    );
+  return validateEnvelopeDataForAtom(atomUri).then(
+    () => buildMessage(),
+    () => reportError("cannot delete atom " + atomUri)
+  );
 }
 
 export function buildOpenAtomMessage(atomUri) {
@@ -97,12 +104,10 @@ export function buildOpenAtomMessage(atomUri) {
       .build();
   };
 
-  return won
-    .validateEnvelopeDataForAtom(atomUri)
-    .then(
-      () => buildMessage(),
-      () => won.reportError("cannot close atom " + atomUri)
-    );
+  return validateEnvelopeDataForAtom(atomUri).then(
+    () => buildMessage(),
+    () => reportError("cannot close atom " + atomUri)
+  );
 }
 
 /**
@@ -145,136 +150,130 @@ export function buildChatMessage({
   socketUri,
   targetSocketUri,
 }) {
-  let jsonldGraphPayloadP = isRDF
-    ? won.rdfToJsonLd(won.defaultTurtlePrefixes + "\n" + chatMessage)
-    : Promise.resolve();
+  return Promise.all([
+    validateEnvelopeDataForConnection(socketUri, targetSocketUri),
+    isRDF
+      ? won.rdfToJsonLd(vocab.defaultTurtlePrefixes + "\n" + chatMessage)
+      : Promise.resolve(),
+  ]).then(([envelopeData, graphPayload]) => {
+    envelopeData; //TODO remove this
 
-  const envelopeDataP = won.validateEnvelopeDataForConnection(
-    socketUri,
-    targetSocketUri
-  );
-
-  return Promise.all([envelopeDataP, jsonldGraphPayloadP]).then(
-    ([envelopeData, graphPayload]) => {
-      envelopeData; //TODO remove this
-
-      /*
+    /*
              * Build the json-ld message that's signed on the owner-server
              * and then send to the won-node.
              */
-      const wonMessageBuilder = new won.MessageBuilder(
-        vocab.WONMSG.connectionMessage
-      )
-        .protocolVersion("1.0")
-        .ownerDirection()
-        .senderSocket(socketUri)
-        .targetSocket(targetSocketUri)
-        .timestamp(new Date().getTime().toString());
+    const wonMessageBuilder = new won.MessageBuilder(
+      vocab.WONMSG.connectionMessage
+    )
+      .protocolVersion("1.0")
+      .ownerDirection()
+      .senderSocket(socketUri)
+      .targetSocket(targetSocketUri)
+      .timestamp(new Date().getTime().toString());
 
-      if (isRDF && graphPayload) {
-        wonMessageBuilder.mergeIntoContentGraph(graphPayload);
-      } else if (
-        !isRDF &&
-        (chatMessage || additionalContent || referencedContentUris)
-      ) {
-        //add the chatMessage as normal text message
-        if (chatMessage) {
-          wonMessageBuilder.addContentGraphData(vocab.WONCON.text, chatMessage);
-        }
+    if (isRDF && graphPayload) {
+      wonMessageBuilder.mergeIntoContentGraph(graphPayload);
+    } else if (
+      !isRDF &&
+      (chatMessage || additionalContent || referencedContentUris)
+    ) {
+      //add the chatMessage as normal text message
+      if (chatMessage) {
+        wonMessageBuilder.addContentGraphData(vocab.WONCON.text, chatMessage);
+      }
 
-        if (additionalContent) {
-          const contentNode = wonMessageBuilder.getContentGraphNode();
-          const contentNodes = wonMessageBuilder.getContentGraphNodes();
-          const detailList = useCaseUtils.getAllDetails();
-          additionalContent.forEach((value, key) => {
-            const detail = detailList[key];
-            const detailRDF =
-              detail &&
-              detail.parseToRDF({
-                value: value,
-                identifier: detail.identifier,
-                contentUri: vocab.WONMSG.uriPlaceholder.event,
-              });
+      if (additionalContent) {
+        const contentNode = wonMessageBuilder.getContentGraphNode();
+        const contentNodes = wonMessageBuilder.getContentGraphNodes();
+        const detailList = useCaseUtils.getAllDetails();
+        additionalContent.forEach((value, key) => {
+          const detail = detailList[key];
+          const detailRDF =
+            detail &&
+            detail.parseToRDF({
+              value: value,
+              identifier: detail.identifier,
+              contentUri: vocab.WONMSG.uriPlaceholder.event,
+            });
 
-            if (detailRDF) {
-              const detailRDFArray = Array.isArray(detailRDF)
-                ? detailRDF
-                : [detailRDF];
+          if (detailRDF) {
+            const detailRDFArray = Array.isArray(detailRDF)
+              ? detailRDF
+              : [detailRDF];
 
-              for (const i in detailRDFArray) {
-                const detailRDFToAdd = detailRDFArray[i];
+            for (const i in detailRDFArray) {
+              const detailRDFToAdd = detailRDFArray[i];
 
-                if (detailRDFToAdd["@id"]) {
-                  contentNodes.push(detailRDFToAdd);
-                } else {
-                  for (const key in detailRDFToAdd) {
-                    //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
-                    if (contentNode[key]) {
-                      if (!Array.isArray(contentNode[key]))
-                        contentNode[key] = Array.of(contentNode[key]);
+              if (detailRDFToAdd["@id"]) {
+                contentNodes.push(detailRDFToAdd);
+              } else {
+                for (const key in detailRDFToAdd) {
+                  //if contentNode[key] and detailRDF[key] both have values we ommit adding new content (until we implement a merge function)
+                  if (contentNode[key]) {
+                    if (!Array.isArray(contentNode[key]))
+                      contentNode[key] = Array.of(contentNode[key]);
 
-                      contentNode[key] = contentNode[key].concat(
-                        detailRDFToAdd[key]
-                      );
-                    } else {
-                      contentNode[key] = detailRDFToAdd[key];
-                    }
+                    contentNode[key] = contentNode[key].concat(
+                      detailRDFToAdd[key]
+                    );
+                  } else {
+                    contentNode[key] = detailRDFToAdd[key];
                   }
                 }
               }
             }
-          });
-        }
-
-        if (referencedContentUris) {
-          const contentNode = wonMessageBuilder.getContentGraphNode();
-          referencedContentUris.forEach((uris, key) => {
-            if (uris && uris.length > 0) {
-              switch (key) {
-                case "retracts":
-                  contentNode[vocab.MOD.retracts] = uris;
-                  break;
-                case "rejects":
-                  contentNode[vocab.AGR.rejects] = uris;
-                  break;
-                case "proposes":
-                  contentNode[vocab.AGR.proposes] = uris;
-                  break;
-                case "claims":
-                  contentNode[vocab.AGR.claims] = uris;
-                  break;
-                case "proposesToCancel":
-                  contentNode[vocab.AGR.proposesToCancel] = uris;
-                  break;
-                case "accepts":
-                  contentNode[vocab.AGR.accepts] = uris;
-                  break;
-                default:
-                  console.error(
-                    "key[",
-                    key,
-                    "] is not a valid reference omitting uris[",
-                    uris,
-                    "] in message"
-                  );
-                  break;
-              }
-            }
-          });
-        }
-      } else {
-        throw new Error(
-          "No textmessage or valid graph as payload of chat message:" +
-            JSON.stringify(chatMessage) +
-            " " +
-            JSON.stringify(graphPayload)
-        );
+          }
+        });
       }
 
-      wonMessageBuilder.eventURI(vocab.WONMSG.uriPlaceholder.event); // replace placeholders with proper event-uri
-      return wonMessageBuilder.build();
+      if (referencedContentUris) {
+        const contentNode = wonMessageBuilder.getContentGraphNode();
+        referencedContentUris.forEach((uris, key) => {
+          if (uris && uris.length > 0) {
+            switch (key) {
+              case "retracts":
+                contentNode[vocab.MOD.retracts] = uris;
+                break;
+              case "rejects":
+                contentNode[vocab.AGR.rejects] = uris;
+                break;
+              case "proposes":
+                contentNode[vocab.AGR.proposes] = uris;
+                break;
+              case "claims":
+                contentNode[vocab.AGR.claims] = uris;
+                break;
+              case "proposesToCancel":
+                contentNode[vocab.AGR.proposesToCancel] = uris;
+                break;
+              case "accepts":
+                contentNode[vocab.AGR.accepts] = uris;
+                break;
+              default:
+                console.error(
+                  "key[",
+                  key,
+                  "] is not a valid reference omitting uris[",
+                  uris,
+                  "] in message"
+                );
+                break;
+            }
+          }
+        });
+      }
+    } else {
+      throw new Error(
+        "No textmessage or valid graph as payload of chat message:" +
+          JSON.stringify(chatMessage) +
+          " " +
+          JSON.stringify(graphPayload)
+      );
     }
-  );
+
+    wonMessageBuilder.eventURI(vocab.WONMSG.uriPlaceholder.event); // replace placeholders with proper event-uri
+    return wonMessageBuilder.build();
+  });
 }
 
 export function buildEditMessage(editedAtomData, oldAtom) {
@@ -362,3 +361,28 @@ function buildContentRdf(atomData, publishedContentUri) {
     socket: atomData.socket,
   });
 }
+
+const validateEnvelopeDataForAtom = atomUri => {
+  if (typeof atomUri === "undefined" || atomUri == null) {
+    throw {
+      message: "validateEnvelopeDataForAtom: atomUri must not be null",
+    };
+  }
+
+  return Promise.resolve();
+};
+
+const validateEnvelopeDataForConnection = (socketUri, targetSocketUri) => {
+  if (
+    typeof socketUri === "undefined" ||
+    socketUri == null ||
+    typeof targetSocketUri === "undefined" ||
+    targetSocketUri == null
+  ) {
+    throw {
+      message: "getEnvelopeDataforConnection: socketUris must not be null",
+    };
+  }
+
+  return Promise.resolve();
+};

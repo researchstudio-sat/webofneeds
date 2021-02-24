@@ -5,7 +5,7 @@ import Immutable from "immutable";
 import { details, abstractDetails } from "../detail-definitions.js";
 
 import { is, isValidNumber, get } from "../../app/utils.js";
-import won from "../../app/won-es6.js";
+import vocab from "../../app/service/vocab";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import ico36_detail_floorsize from "../../images/won-icons/ico36_detail_floorsize.svg";
 import ico36_detail_feature from "../../images/won-icons/ico36_detail_feature.svg";
@@ -56,7 +56,7 @@ export const realEstateFloorSizeDetail = {
     const unit = jsonLdUtils.getInFromJsonLd(
       jsonLDImm,
       ["s:floorSize", "s:unitCode"],
-      won.defaultContext
+      vocab.defaultContext
     );
     if (!fs) {
       return undefined;
@@ -134,7 +134,7 @@ export const realEstateNumberOfRoomsRangeDetail = {
     let properties = jsonLdUtils.getFromJsonLd(
       jsonLDImm,
       "sh:property",
-      won.defaultContext
+      vocab.defaultContext
     );
     if (!properties) return undefined;
 
@@ -146,18 +146,18 @@ export const realEstateNumberOfRoomsRangeDetail = {
         jsonLdUtils.getInFromJsonLd(
           property,
           ["sh:path", "@id"],
-          won.defaultContext
+          vocab.defaultContext
         ) === "s:numberOfRooms"
     );
     const minNumberOfRooms = jsonLdUtils.getFromJsonLd(
       numberOfRooms,
       "sh:minInclusive",
-      won.defaultContext
+      vocab.defaultContext
     );
     const maxNumberOfRooms = jsonLdUtils.getFromJsonLd(
       numberOfRooms,
       "sh:maxInclusive",
-      won.defaultContext
+      vocab.defaultContext
     );
 
     if (minNumberOfRooms || maxNumberOfRooms) {
@@ -209,7 +209,7 @@ export const realEstateFloorSizeRangeDetail = {
     let properties = jsonLdUtils.getFromJsonLd(
       jsonLDImm,
       "sh:property",
-      won.defaultContext
+      vocab.defaultContext
     );
     if (!properties) return undefined;
 
@@ -221,19 +221,19 @@ export const realEstateFloorSizeRangeDetail = {
         jsonLdUtils.getInFromJsonLd(
           property,
           ["sh:path", "@id"],
-          won.defaultContext
+          vocab.defaultContext
         ) === "s:floorSize"
     );
 
     const minFloorSize = jsonLdUtils.getFromJsonLd(
       floorSize,
       "sh:minInclusive",
-      won.defaultContext
+      vocab.defaultContext
     );
     const maxFloorSize = jsonLdUtils.getFromJsonLd(
       floorSize,
       "sh:maxInclusive",
-      won.defaultContext
+      vocab.defaultContext
     );
 
     if (minFloorSize || maxFloorSize) {

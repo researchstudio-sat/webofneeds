@@ -6,10 +6,11 @@ import * as atomUtils from "./utils/atom-utils.js";
 import * as connectionUtils from "./utils/connection-utils.js";
 import * as accountUtils from "./utils/account-utils.js";
 import * as processUtils from "./utils/process-utils.js";
+import * as useCaseUtils from "~/app/usecase-utils";
 import { isUriDeleted } from "~/app/won-localstorage";
 import {
   parseMetaAtom,
-  parseAtom,
+  parseAtomContent,
 } from "../reducers/atom-reducer/parse-atom.js";
 import {
   extractAtomUriFromConnectionUri,
@@ -23,7 +24,10 @@ import vocab from "../service/vocab.js";
 import { fetchWikiData } from "~/app/api/wikidata-api";
 import cf from "clownface";
 import { actionCreators } from "../actions/actions";
-import * as useCaseUtils from "~/app/usecase-utils";
+import paWorker from "workerize-loader?[name].[contenthash:8]!../../parseAtom-worker.js";
+import fakeNames from "~/app/fakeNames.json";
+
+const parseAtomWorker = paWorker();
 
 export const fetchOwnedMetaData = dispatch =>
   ownerApi.fetchOwnedMetaAtoms().then(metaAtoms => {
@@ -475,17 +479,18 @@ export const fetchAtomAndDispatch = (
       .then(requestCredentials =>
         won
           .fetchAtom(atomUri, requestCredentials)
-          .then(atom => {
-            const parsedAtom = parseAtom(atom);
-            if (parsedAtom) {
+          .then(atom => parseAtomWorker.parse(atom, fakeNames, vocab))
+          .then(partiallyParsedAtom => {
+            const parsedAtomImm = parseAtomContent(partiallyParsedAtom);
+            if (parsedAtomImm) {
               dispatch({
                 type: actionTypes.atoms.store,
                 payload: Immutable.fromJS({
-                  atoms: { [atomUri]: parsedAtom },
+                  atoms: { [atomUri]: parsedAtomImm },
                 }),
               });
             }
-            return parsedAtom;
+            return parsedAtomImm;
           })
           .catch(error => {
             if (error.status && error.status === 410) {

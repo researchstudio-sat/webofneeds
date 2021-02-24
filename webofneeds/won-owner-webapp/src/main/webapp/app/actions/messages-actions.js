@@ -8,7 +8,7 @@ import { getIn, getUri, get, extractAtomUriBySocketUri } from "../utils.js";
 
 import Immutable from "immutable";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
-import { parseAtom } from "../reducers/atom-reducer/parse-atom.js";
+import { parseAtomContent } from "../reducers/atom-reducer/parse-atom.js";
 
 import { isFetchMessageEffectsNeeded } from "../won-message-utils.js";
 import * as stateStore from "../redux/state-store.js";
@@ -16,6 +16,11 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as processUtils from "../redux/utils/process-utils";
+import paWorker from "workerize-loader?[name].[contenthash:8]!../../parseAtom-worker.js";
+import fakeNames from "~/app/fakeNames.json";
+import vocab from "~/app/service/vocab";
+
+const parseAtomWorker = paWorker();
 
 export const successfulCloseAtom = wonMessage => (dispatch, getState) => {
   //TODO MAYBE DELETE THIS FUNCTION, I THINK IT SERVES NO PURPOSE
@@ -98,14 +103,15 @@ export const successfulCreate = wonMessage => (dispatch, getState) => {
     .then(requestCredentials =>
       won
         .fetchAtom(atomUri, requestCredentials)
-        .then(atom => {
-          const parsedAtom = parseAtom(atom);
-          if (parsedAtom) {
+        .then(atom => parseAtomWorker.parse(atom, fakeNames, vocab))
+        .then(partiallyParsedAtom => {
+          const parsedAtomImm = parseAtomContent(partiallyParsedAtom);
+          if (parsedAtomImm) {
             dispatch(
               actionCreators.atoms__createSuccessful({
                 eventUri: wonMessage.getIsResponseTo(),
                 atomUri: atomUri,
-                atom: parsedAtom,
+                atom: parsedAtomImm,
               })
             );
           }

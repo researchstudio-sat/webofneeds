@@ -7,7 +7,6 @@ import {
   vicinityScoreSubQuery,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
@@ -58,9 +57,9 @@ export const cyclingPlan = {
       bindScoreAs: "?location_geoScore",
       pathToGeoCoords: "s:location/s:geo",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        con: won.defaultContext["con"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        con: vocab.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -74,14 +73,14 @@ export const cyclingPlan = {
 
     return sparqlQuery({
       prefixes: {
-        won: won.defaultContext["won"],
-        rdf: won.defaultContext["rdf"],
-        buddy: won.defaultContext["buddy"],
-        hold: won.defaultContext["hold"],
-        s: won.defaultContext["s"],
-        demo: won.defaultContext["demo"],
-        match: won.defaultContext["match"],
-        "wx-persona": won.defaultContext["wx-persona"],
+        won: vocab.defaultContext["won"],
+        rdf: vocab.defaultContext["rdf"],
+        buddy: vocab.defaultContext["buddy"],
+        hold: vocab.defaultContext["hold"],
+        s: vocab.defaultContext["s"],
+        demo: vocab.defaultContext["demo"],
+        match: vocab.defaultContext["match"],
+        "wx-persona": vocab.defaultContext["wx-persona"],
       },
       distinct: true,
       variables: [resultName, "?score"],
@@ -142,10 +141,10 @@ export const cyclingInterest = {
       bindScoreAs: "?location_geoScore",
       pathToGeoCoords: "s:location/s:geo",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        con: won.defaultContext["con"],
-        demo: won.defaultContext["demo"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        con: vocab.defaultContext["con"],
+        demo: vocab.defaultContext["demo"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -159,11 +158,11 @@ export const cyclingInterest = {
 
     return sparqlQuery({
       prefixes: {
-        won: won.defaultContext["won"],
-        buddy: won.defaultContext["buddy"],
-        hold: won.defaultContext["hold"],
-        rdf: won.defaultContext["rdf"],
-        s: won.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        buddy: vocab.defaultContext["buddy"],
+        hold: vocab.defaultContext["hold"],
+        rdf: vocab.defaultContext["rdf"],
+        s: vocab.defaultContext["s"],
       },
       distinct: true,
       variables: [resultName, "?score"],

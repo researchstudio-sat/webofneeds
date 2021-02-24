@@ -3,7 +3,7 @@
  * NOTE: This is a super-hacky/-fragile approach and should be replaced by a proper lib / ast-utils
  */
 
-import won from "./won-es6.js";
+import vocab from "./service/vocab.js";
 import {
   isValidNumber,
   isValidDate,
@@ -205,8 +205,8 @@ export function vicinityScoreSubQuery({
   return sparqlQuery({
     prefixes: {
       ...prefixesInPath,
-      s: won.defaultContext["s"],
-      won: won.defaultContext["won"],
+      s: vocab.defaultContext["s"],
+      won: vocab.defaultContext["won"],
       geo: "http://www.bigdata.com/rdf/geospatial#",
       geoliteral: "http://www.bigdata.com/rdf/geospatial/literals/v1#",
     },
@@ -293,7 +293,7 @@ export function tagOverlapScoreSubQuery({
   // outer query that calculates jaccard-index (see https://en.wikipedia.org/wiki/Jaccard_index)
   return sparqlQuery({
     prefixes: {
-      s: won.defaultContext["s"],
+      s: vocab.defaultContext["s"],
     },
     variables: [resultName, bindScoreAs],
     distinct: true,
@@ -336,7 +336,7 @@ export function textSearchSubQuery({
   return sparqlQuery({
     prefixes: {
       ...prefixesInPath,
-      won: won.defaultContext["won"],
+      won: vocab.defaultContext["won"],
       bds: "http://www.bigdata.com/rdf/search#",
     },
     variables: [resultName, bindScoreAs],
@@ -377,8 +377,8 @@ export function filterAboutTime(
 
     return wellFormedFilter({
       prefixes: {
-        s: won.defaultContext["s"],
-        xsd: won.defaultContext["xsd"],
+        s: vocab.defaultContext["s"],
+        xsd: vocab.defaultContext["xsd"],
       },
       operations: [
         `FILTER (${rootSubject} >= "${minStr}"^^xsd:dateTime )`,
@@ -391,7 +391,7 @@ export function filterAboutTime(
 export function filterFloorSizeRange(rootSubject, min, max) {
   const operations = [];
   const prefixes = {
-    s: won.defaultContext["s"],
+    s: vocab.defaultContext["s"],
   };
   const minIsNum = isValidNumber(min);
   const maxIsNum = isValidNumber(max);
@@ -426,7 +426,7 @@ export function filterNumericProperty(
   sparqlVarPrefix
 ) {
   const prefixes = {
-    s: won.defaultContext["s"],
+    s: vocab.defaultContext["s"],
   };
   let operations = [];
   const isNum = isValidNumber(number);
@@ -464,7 +464,7 @@ export function filterNumericProperty(
 
 export function filterNumOfRoomsRange(rootSubject, min, max) {
   const prefixes = {
-    s: won.defaultContext["s"],
+    s: vocab.defaultContext["s"],
   };
   const operations = [];
   const minIsNum = isValidNumber(min);
@@ -484,7 +484,7 @@ export function filterNumOfRoomsRange(rootSubject, min, max) {
 
 export function filterPriceRange(rootSubject, min, max, currency) {
   const prefixes = {
-    s: won.defaultContext["s"],
+    s: vocab.defaultContext["s"],
   };
   let operations = [];
   const minIsNum = isValidNumber(min);
@@ -515,7 +515,7 @@ export function filterPriceRange(rootSubject, min, max, currency) {
  */
 export function filterPrice(rootSubject, rent, currency, sparqlVarPrefix) {
   const prefixes = {
-    s: won.defaultContext["s"],
+    s: vocab.defaultContext["s"],
   };
   let operations = [];
   const rentIsNum = isValidNumber(rent);

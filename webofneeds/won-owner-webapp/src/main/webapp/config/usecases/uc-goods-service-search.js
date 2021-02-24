@@ -7,7 +7,6 @@ import {
   mergeInEmptyDraft,
   defaultReactions,
 } from "../detail-definitions.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn, is } from "../../app/utils.js";
 import {
@@ -75,7 +74,7 @@ export const goodsServiceSearch = {
           bindScoreAs: "?title_" + keyword + "_index",
           pathToText: "dc:title",
           prefixesInPath: {
-            dc: won.defaultContext["dc"],
+            dc: vocab.defaultContext["dc"],
           },
           keyword: keyword,
         });
@@ -90,7 +89,7 @@ export const goodsServiceSearch = {
           bindScoreAs: "?description_" + keyword + "_index",
           pathToText: "dc:description",
           prefixesInPath: {
-            dc: won.defaultContext["dc"],
+            dc: vocab.defaultContext["dc"],
           },
           keyword: keyword,
         });
@@ -131,8 +130,8 @@ export const goodsServiceSearch = {
       bindScoreAs: "?location_geoScore",
       pathToGeoCoords: "s:location/s:geo",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        con: won.defaultContext["con"],
+        s: vocab.defaultContext["s"],
+        con: vocab.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["seeks", "location"]),
     });
@@ -152,9 +151,9 @@ export const goodsServiceSearch = {
     const filters = [
       {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
-          rdf: won.defaultContext["rdf"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
+          rdf: vocab.defaultContext["rdf"],
         },
         operations: [
           `${resultName} rdf:type won:Atom.`,
@@ -178,10 +177,10 @@ export const goodsServiceSearch = {
 
     return sparqlQuery({
       prefixes: {
-        won: won.defaultContext["won"],
-        rdf: won.defaultContext["rdf"],
-        dc: won.defaultContext["dc"],
-        s: won.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        rdf: vocab.defaultContext["rdf"],
+        dc: vocab.defaultContext["dc"],
+        s: vocab.defaultContext["s"],
       },
       distinct: true,
       variables: [resultName],

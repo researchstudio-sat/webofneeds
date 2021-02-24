@@ -43,13 +43,14 @@ function config(env, argv): Configuration {
       },
       minimize: true,
       minimizer: [
-        new TerserPlugin({ sourceMap: true}),
+        new TerserPlugin({ sourceMap: true }),
         new OptimizeCSSAssetsPlugin(),
       ],
     },
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash].js",
+      globalObject: "self",
     },
     resolve: {
       alias: {
@@ -62,7 +63,22 @@ function config(env, argv): Configuration {
         {
           test: /\.jsx?$/,
           exclude: [/node_modules/],
-          loader: ["babel-loader", "eslint-loader"],
+          loader: [
+            {
+              loader: "babel-loader",
+              options: {
+                presets: [
+                  [
+                    "@babel/preset-env",
+                    {
+                      modules: false,
+                    },
+                  ],
+                ],
+              },
+            },
+            "eslint-loader",
+          ],
         },
         {
           test: /\.s?css$/,

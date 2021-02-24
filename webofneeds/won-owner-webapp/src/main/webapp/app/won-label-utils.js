@@ -6,7 +6,7 @@ export const rdfTextfieldHelpText =
   `<${vocab.WONMSG.uriPlaceholder.event}> will ` +
   "be replaced by the uri generated for this message. " +
   "Use it, so your TTL can be found when parsing the messages. " +
-  "See `won.defaultTurtlePrefixes` " +
+  "See `vocab.defaultTurtlePrefixes` " +
   "for prefixes that will be added automatically. E.g." +
   `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
 

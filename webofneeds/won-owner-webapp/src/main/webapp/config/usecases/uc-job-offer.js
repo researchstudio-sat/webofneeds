@@ -16,7 +16,6 @@ import {
   tagOverlapScoreSubQuery,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 
 import { getIn } from "../../app/utils.js";
@@ -91,8 +90,8 @@ export const jobOffer = {
       bindScoreAs: "?skills_jaccardIndex",
       pathToTags: "s:knowsAbout",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
       },
       tagLikes: getIn(draft, ["seeks", "skills"]),
     });
@@ -103,9 +102,9 @@ export const jobOffer = {
       bindScoreAs: "?organizationName_jaccardIndex",
       pathToTags: "match:seeks/s:hiringOrganization/s:name",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        match: won.defaultContext["match"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        match: vocab.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "organizationNames"]),
     });
@@ -116,9 +115,9 @@ export const jobOffer = {
       bindScoreAs: "?employmentTypes_jaccardIndex",
       pathToTags: "match:seeks/s:employmentType",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        match: won.defaultContext["match"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        match: vocab.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "employmentTypes"]),
     });
@@ -129,9 +128,9 @@ export const jobOffer = {
       bindScoreAs: "?industry_jaccardIndex",
       pathToTags: "match:seeks/s:industry",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        match: won.defaultContext["match"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        match: vocab.defaultContext["match"],
       },
       tagLikes: getIn(draft, ["content", "industry"]),
     });
@@ -141,10 +140,10 @@ export const jobOffer = {
       bindScoreAs: "?jobLocation_geoScore",
       pathToGeoCoords: "match:seeks/s:jobLocation/s:geo",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        match: won.defaultContext["match"],
-        con: won.defaultContext["con"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        match: vocab.defaultContext["match"],
+        con: vocab.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "jobLocation"]),
     });
@@ -164,9 +163,9 @@ export const jobOffer = {
 
     return sparqlQuery({
       prefixes: {
-        won: won.defaultContext["won"],
-        rdf: won.defaultContext["rdf"],
-        s: won.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        rdf: vocab.defaultContext["rdf"],
+        s: vocab.defaultContext["s"],
       },
       distinct: true,
       variables: [resultName, "?score"],

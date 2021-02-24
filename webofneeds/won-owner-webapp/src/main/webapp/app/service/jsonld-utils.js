@@ -8,7 +8,7 @@ import {
 } from "../utils.js";
 import Immutable from "immutable";
 
-import won from "./won.js";
+import vocab from "./vocab.js";
 
 /**
  * Traverses the `path` into the json-ld object and then tries to
@@ -18,10 +18,10 @@ import won from "./won.js";
  * @param {*} jsonld
  * @param {*} path
  * @param {*} type optional (see getFromJsonLd for details)
- * @param {*} context defaults to `won.defaultContext`
+ * @param {*} context defaults to `vocab.defaultContext`
  * @return the value at the path
  */
-export function parseFrom(jsonld, path, type, context = won.defaultContext) {
+export function parseFrom(jsonld, path, type, context = vocab.defaultContext) {
   return parseJsonldLeaf(getInFromJsonLd(jsonld, path, context), type);
 }
 
@@ -33,14 +33,14 @@ export function parseFrom(jsonld, path, type, context = won.defaultContext) {
  * @param {*} jsonld
  * @param {*} path
  * @param {*} type optional (see getFromJsonLd for details)
- * @param {*} context defaults to `won.defaultContext`
+ * @param {*} context defaults to `vocab.defaultContext`
  * @return the list at the path
  */
 export function parseListFrom(
   jsonld,
   path,
   type,
-  context = won.defaultContext
+  context = vocab.defaultContext
 ) {
   try {
     return parseJsonldLeafsImm(getInFromJsonLd(jsonld, path, context), type);
@@ -224,7 +224,7 @@ export function findLatestIntervallEndInJsonLdOrNowAndAddMillis(
  * @param context a standard json-ld style context. Note, that
  * only prefix-definitions will be minded.
  */
-export function getFromJsonLd(obj, predicate, context = won.defaultContext) {
+export function getFromJsonLd(obj, predicate, context = vocab.defaultContext) {
   if (!obj) {
     return undefined;
   } else {
@@ -262,7 +262,7 @@ export function getFromJsonLd(obj, predicate, context = won.defaultContext) {
  * @param context a standard json-ld style context. Note, that
  * only prefix-definitions will be minded.
  */
-export function getInFromJsonLd(obj, path, context = won.defaultContext) {
+export function getInFromJsonLd(obj, path, context = vocab.defaultContext) {
   if (!path || !obj || path.length === 0) {
     return undefined;
   } else {
@@ -342,7 +342,7 @@ function parseJsonldLeafsImm(val, type) {
  *
  */
 function parseJsonldLeaf(val, type) {
-  const sval = getFromJsonLd(val, "s:value", won.defaultContext);
+  const sval = getFromJsonLd(val, "s:value", vocab.defaultContext);
   if (sval) {
     /* in schema.org's `s:PropertyValue`s and `s:QuantitativeValue`s
      * can be nested. We need to go in a level deeper.

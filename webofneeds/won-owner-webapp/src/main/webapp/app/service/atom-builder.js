@@ -202,7 +202,7 @@ import { Generator } from "sparqljs";
     return {
       "@graph": graph,
       "@context": {
-        ...won.defaultContext, // needed for the arbitrary rdf
+        ...vocab.defaultContext, // needed for the arbitrary rdf
       },
     };
   };
