@@ -1151,7 +1151,7 @@ auth:AseBranchProperty
 
 auth:inherit
     rdfs:isDefinedBy   auth: ;
-    rdfs:subPropertyOf auth:AseLeafObjectProperty ;
+    rdfs:subPropertyOf auth:AseLeafDatatypeProperty ;
     a                  owl:DatatypeProperty ;
     rdfs:range         xsd:boolean ;
     rdfs:label         "inherit" ;
@@ -1195,7 +1195,7 @@ auth:atomState
 
 auth:tokenScope
     rdfs:isDefinedBy auth: ;
-    a                owl:ObjectProperty ;
+    a                owl:DatatypeProperty ;
     rdfs:domain      [ a           owl:Class ;
                        owl:unionOf ( auth:AuthToken auth:TokenShape auth:TokenSpecification ) ] ;
     rdfs:range       [ a           owl:Class ;
@@ -1301,7 +1301,7 @@ auth:connectionMessages
     rdfs:domain        [ a           owl:Class ;
                          owl:unionOf ( auth:AseRoot auth:SocketExpression auth:ConnectionsExpression
                                        auth:ConnectionExpression ) ] ;
-    rdfs:range         auth:ConnectionMessagesExpression ;
+    rdfs:range         auth:ConnectionMessagesExpression ;pu
     rdfs:label         "connectionMessages" ;
     rdfs:comment       """Used in the ASE root, socket, connections, or connection expressions to specify
     a auth:ConnectionMessagesExpression. The connection containers directly or transitively reachable from all target nodes 
@@ -1334,7 +1334,17 @@ auth:bearer
     rdfs:range       auth:TokenShape ;
     rdfs:label       "bearer" ;
     rdfs:comment
-                     """Used in an Authorization to define constraints for tokens that if fulfilled, make their bearer a grantee."""@en .
+                     """Used in an authorization to define constraints for tokens that if fulfilled, make their bearer a grantee."""@en .
+
+auth:provideAuthInfo
+    rdfs:isDefinedBy auth: ;
+    a                owl:ObjectProperty ;
+    rdfs:domain      auth:Authorization ;
+    rdfs:range       auth:AseRoot ;
+    rdfs:label       "provideAuthInfo" ;
+    rdfs:comment
+                     """Used in an authorization to define an ASE tree with operations for which authorization info
+                     is provided if the grantee of __this__ authorization is denied that operation."""@en .
 
 auth:operation
     rdfs:isDefinedBy   auth: ;
