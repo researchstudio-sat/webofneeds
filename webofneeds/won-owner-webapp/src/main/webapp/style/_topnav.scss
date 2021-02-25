@@ -43,7 +43,6 @@ won-topnav {
     .topnav__logo {
       display: grid;
       grid-area: nav_logo;
-      margin-right: 0.5rem;
       position: relative;
 
       @include square-image($bigiconSize);
@@ -71,7 +70,7 @@ won-topnav {
       grid-auto-flow: column;
       cursor: pointer;
       align-self: center;
-      margin-right: 0.5rem;
+      margin-left: 0.5rem;
 
       > .topnav__slideintoggle__icon {
         @include fixed-square(1.5rem);
@@ -97,7 +96,7 @@ won-topnav {
     .topnav__title {
       grid-area: nav_title;
       color: $won-primary-color;
-      margin-right: 0.5rem;
+      margin-left: 0.5rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -122,14 +121,18 @@ won-topnav {
 
     .topnav__loading {
       grid-area: nav_loading;
-      margin-right: 0.5rem;
+      margin-left: 0.5rem;
+
+      &--hidden {
+        display: none;
+      }
     }
 
     .topnav__signupbtn {
       grid-area: nav_signup;
       padding-left: 1rem;
       padding-right: 1rem;
-      margin-right: 0.5rem;
+      margin-left: 0.5rem;
     }
 
     won-account-menu {

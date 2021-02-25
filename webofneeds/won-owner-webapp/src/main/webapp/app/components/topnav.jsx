@@ -191,13 +191,16 @@ export default function WonTopnav({ pageTitle }) {
             </React.Fragment>
           )}
         </div>
-        {showLoadingIndicator && (
-          <div className="topnav__loading">
-            <svg className="topnav__loading__spinner hspinner">
-              <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
-            </svg>
-          </div>
-        )}
+        <div
+          className={
+            "topnav__loading " +
+            (showLoadingIndicator ? "" : "topnav__loading--hidden")
+          }
+        >
+          <svg className="topnav__loading__spinner hspinner">
+            <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+          </svg>
+        </div>
         {hasSlideIns && (
           <div className="topnav__slideintoggle" onClick={toggleSlideIns}>
             <svg className="topnav__slideintoggle__icon">

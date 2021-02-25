@@ -290,8 +290,7 @@ textarea {
 }
 
 .hspinner {
-  max-width: 2.25rem;
-  max-height: 2.25rem;
+  @include fixed-square(2.25rem);
   --local-primary: #{$won-primary-color};
   --local-secondary: #{$won-secondary-color};
 }
