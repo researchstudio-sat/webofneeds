@@ -7,13 +7,8 @@
 }
 
 @mixin desktopMenu() {
-  justify-content: center;
+  justify-content: stretch;
   padding: 0.5rem 0;
-  max-width: 20rem;
-
-  .menu__user > .menu__user__pinnedatom > .menu__user__caption {
-    min-width: 10rem;
-  }
 }
 
 @mixin pinnedatomMenu() {
@@ -159,7 +154,7 @@
   .menu__user {
     display: grid;
     grid-template-columns: 1fr;
-    padding: 0 1rem 0.5rem 1rem;
+    padding: 0.5rem;
     border-bottom: $thinGrayBorder;
     box-sizing: border-box;
     align-items: center;

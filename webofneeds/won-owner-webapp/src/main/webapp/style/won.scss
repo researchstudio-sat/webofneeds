@@ -106,27 +106,29 @@ body {
         @include defaultMenuElevation();
       }
 
+      height: calc(100vh - var(--headerHeight));
+      top: var(--headerHeight);
+
       &.won-menu--show-mobile {
         position: fixed;
-        height: calc(100vh - var(--headerHeight));
-        top: var(--headerHeight);
         width: 80vw;
         max-width: 80vw;
         transition: max-width 0.25s linear, top 0s 0.25s linear;
-        overflow-y: hidden;
+        overflow-y: auto;
         @include defaultMenuElevation();
       }
 
       &:not(.won-menu--show-mobile) {
         position: sticky;
-
+        width: 22rem;
+        max-width: 22rem;
         @media (max-width: $responsivenessBreakPoint) {
           position: fixed;
           height: calc(100vh - var(--headerHeight));
-          width: 80vw;
+          width: 22rem;
           max-width: 0;
           transition: max-width linear 0.25s;
-          overflow-y: hidden;
+          overflow-y: auto;
           border-right: 0;
           box-shadow: none;
         }
