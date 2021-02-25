@@ -101,6 +101,7 @@ body {
       box-sizing: border-box;
       border-right: $thinGrayBorder;
       z-index: 999;
+      overflow-y: auto;
 
       @media (min-width: $responsivenessBreakPoint) {
         @include defaultMenuElevation();
@@ -114,7 +115,6 @@ body {
         width: 80vw;
         max-width: 80vw;
         transition: max-width 0.25s linear, top 0s 0.25s linear;
-        overflow-y: auto;
         @include defaultMenuElevation();
       }
 
@@ -128,7 +128,6 @@ body {
           width: 22rem;
           max-width: 0;
           transition: max-width linear 0.25s;
-          overflow-y: auto;
           border-right: 0;
           box-shadow: none;
         }
