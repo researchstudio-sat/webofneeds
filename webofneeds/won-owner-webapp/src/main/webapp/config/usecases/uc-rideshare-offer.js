@@ -6,7 +6,6 @@ import {
   mergeInEmptyDraft,
   defaultReactions,
 } from "../detail-definitions.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn, isValidDate } from "../../app/utils.js";
 import {
@@ -66,12 +65,12 @@ export const rideShareOffer = {
     ) {
       const baseFilter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
-          match: won.defaultContext["match"],
-          con: won.defaultContext["con"],
+          match: vocab.defaultContext["match"],
+          con: vocab.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -115,12 +114,12 @@ export const rideShareOffer = {
     } else if (fromLocation && fromLocation.lat && fromLocation.lng) {
       const baseFilter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
-          match: won.defaultContext["match"],
-          con: won.defaultContext["con"],
+          match: vocab.defaultContext["match"],
+          con: vocab.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -152,12 +151,12 @@ export const rideShareOffer = {
     } else if (toLocation && toLocation.lat && toLocation.lng) {
       const baseFilter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
-          match: won.defaultContext["match"],
-          con: won.defaultContext["con"],
+          match: vocab.defaultContext["match"],
+          con: vocab.defaultContext["con"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -189,9 +188,9 @@ export const rideShareOffer = {
     } else {
       const baseFilter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
-          match: won.defaultContext["match"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
+          match: vocab.defaultContext["match"],
         },
         operations: [
           `${resultName} a won:Atom.`,

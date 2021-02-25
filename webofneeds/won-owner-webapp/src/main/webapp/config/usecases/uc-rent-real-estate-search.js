@@ -20,7 +20,6 @@ import {
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import ico36_uc_realestate from "../../images/won-icons/ico36_uc_realestate.svg";
@@ -73,10 +72,10 @@ export const rentRealEstateSearch = {
         {
           // to select is-branch
           prefixes: {
-            s: won.defaultContext["s"],
-            won: won.defaultContext["won"],
-            xsd: won.defaultContext["xsd"],
-            demo: won.defaultContext["demo"],
+            s: vocab.defaultContext["s"],
+            won: vocab.defaultContext["won"],
+            xsd: vocab.defaultContext["xsd"],
+            demo: vocab.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
@@ -125,9 +124,9 @@ export const rentRealEstateSearch = {
         {
           // to select is-branch
           prefixes: {
-            won: won.defaultContext["won"],
-            s: won.defaultContext["s"],
-            demo: won.defaultContext["demo"],
+            won: vocab.defaultContext["won"],
+            s: vocab.defaultContext["s"],
+            demo: vocab.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,

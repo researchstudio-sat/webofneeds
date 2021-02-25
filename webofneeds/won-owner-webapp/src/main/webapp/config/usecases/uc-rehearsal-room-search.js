@@ -10,7 +10,6 @@ import {
   realEstateFeaturesDetail,
   realEstateFloorSizeRangeDetail,
 } from "../details/real-estate.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { perHourRentRangeDetail } from "../details/musician.js";
 import {
@@ -72,13 +71,13 @@ export const rehearsalRoomSearch = {
         {
           // to select is-branch
           prefixes: {
-            won: won.defaultContext["won"],
-            rdf: won.defaultContext["rdf"],
-            sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
-            s: won.defaultContext["s"],
+            won: vocab.defaultContext["won"],
+            rdf: vocab.defaultContext["rdf"],
+            sh: vocab.defaultContext["sh"], //needed for the filterNumericProperty calls
+            s: vocab.defaultContext["s"],
             geo: "http://www.bigdata.com/rdf/geospatial#",
-            xsd: won.defaultContext["xsd"],
-            demo: won.defaultContext["demo"],
+            xsd: vocab.defaultContext["xsd"],
+            demo: vocab.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
@@ -120,9 +119,9 @@ export const rehearsalRoomSearch = {
         {
           // to select is-branch
           prefixes: {
-            won: won.defaultContext["won"],
-            rdf: won.defaultContext["rdf"],
-            demo: won.defaultContext["demo"],
+            won: vocab.defaultContext["won"],
+            rdf: vocab.defaultContext["rdf"],
+            demo: vocab.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,

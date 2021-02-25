@@ -5,7 +5,6 @@ import {
   defaultReactions,
 } from "../detail-definitions.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 
@@ -92,7 +91,7 @@ export const goodsTransportSearch = {
         const unit = jsonLdUtils.getInFromJsonLd(
           jsonLDImm,
           ["s:weight", "s:unitCode"],
-          won.defaultContext
+          vocab.defaultContext
         );
 
         if (!w) {
@@ -143,7 +142,7 @@ export const goodsTransportSearch = {
         const unit = jsonLdUtils.getInFromJsonLd(
           jsonLDImm,
           ["s:length", "s:unitCode"],
-          won.defaultContext
+          vocab.defaultContext
         );
 
         if (!l) {
@@ -194,7 +193,7 @@ export const goodsTransportSearch = {
         const unit = jsonLdUtils.getInFromJsonLd(
           jsonLDImm,
           ["s:width", "s:unitCode"],
-          won.defaultContext
+          vocab.defaultContext
         );
 
         if (!w) {
@@ -245,7 +244,7 @@ export const goodsTransportSearch = {
         const unit = jsonLdUtils.getInFromJsonLd(
           jsonLDImm,
           ["s:height", "s:unitCode"],
-          won.defaultContext
+          vocab.defaultContext
         );
 
         if (!h) {
@@ -293,8 +292,8 @@ export const goodsTransportSearch = {
     ) {
       filter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
@@ -327,8 +326,8 @@ export const goodsTransportSearch = {
     } else if (fromLocation && fromLocation.lat && fromLocation.lng) {
       filter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
@@ -353,8 +352,8 @@ export const goodsTransportSearch = {
     } else if (toLocation && toLocation.lat && toLocation.lng) {
       filter = {
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
         },
@@ -379,7 +378,7 @@ export const goodsTransportSearch = {
     } else {
       filter = {
         prefixes: {
-          won: won.defaultContext["won"],
+          won: vocab.defaultContext["won"],
         },
         operations: [
           `${resultName} a won:Atom.`,

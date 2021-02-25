@@ -6,7 +6,6 @@ import {
   mergeInEmptyDraft,
   defaultReactions,
 } from "../detail-definitions.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { genresDetail, instrumentsDetail } from "../details/musician.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
@@ -67,8 +66,8 @@ export const bandSearch = {
       bindScoreAs: "?genres_jaccardIndex",
       pathToTags: "demo:genre",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
       },
       tagLikes: getIn(draft, ["seeks", "genre"]),
     });
@@ -79,8 +78,8 @@ export const bandSearch = {
       bindScoreAs: "?instruments_jaccardIndex",
       pathToTags: "match:seeks/demo:instrument",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
       },
       tagLikes: getIn(draft, ["content", "instrument"]),
     });
@@ -90,9 +89,9 @@ export const bandSearch = {
       bindScoreAs: "?location_geoScore",
       pathToGeoCoords: "s:location/s:geo",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        con: won.defaultContext["con"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        con: vocab.defaultContext["con"],
       },
 
       geoCoordinates: getIn(draft, ["seeks", "location"]),
@@ -107,9 +106,9 @@ export const bandSearch = {
 
     return sparqlQuery({
       prefixes: {
-        won: won.defaultContext["won"],
-        rdf: won.defaultContext["rdf"],
-        s: won.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        rdf: vocab.defaultContext["rdf"],
+        s: vocab.defaultContext["s"],
       },
       distinct: true,
       variables: [resultName],

@@ -20,7 +20,6 @@ import {
   concatenateFilters,
   sparqlQuery,
 } from "../../app/sparql-builder-utils.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_uc_realestate from "../../images/won-icons/ico36_uc_realestate.svg";
 
@@ -88,14 +87,14 @@ export const rentRealEstateOffer = {
         {
           // to select is-branch
           prefixes: {
-            won: won.defaultContext["won"],
-            rdf: won.defaultContext["rdf"],
-            sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
-            s: won.defaultContext["s"],
+            won: vocab.defaultContext["won"],
+            rdf: vocab.defaultContext["rdf"],
+            sh: vocab.defaultContext["sh"], //needed for the filterNumericProperty calls
+            s: vocab.defaultContext["s"],
             geo: "http://www.bigdata.com/rdf/geospatial#",
             xsd: "http://www.w3.org/2001/XMLSchema#",
-            demo: won.defaultContext["demo"],
-            match: won.defaultContext["match"],
+            demo: vocab.defaultContext["demo"],
+            match: vocab.defaultContext["match"],
           },
           operations: [
             `${resultName} a won:Atom.`,
@@ -135,9 +134,9 @@ export const rentRealEstateOffer = {
         {
           // to select is-branch
           prefixes: {
-            won: won.defaultContext["won"],
-            sh: won.defaultContext["sh"], //needed for the filterNumericProperty calls
-            demo: won.defaultContext["demo"],
+            won: vocab.defaultContext["won"],
+            sh: vocab.defaultContext["sh"], //needed for the filterNumericProperty calls
+            demo: vocab.defaultContext["demo"],
           },
           operations: [
             `${resultName} a won:Atom.`,
