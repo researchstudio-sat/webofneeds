@@ -1,11 +1,11 @@
 package won.matcher.service.crawler.actor;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
+import akka.actor.ActorRef;
+import akka.actor.UntypedActor;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.Lock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
-
-import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
-import akka.cluster.pubsub.DistributedPubSub;
-import akka.cluster.pubsub.DistributedPubSubMediator;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.Cause;
 import won.matcher.service.common.service.sparql.SparqlService;
@@ -39,6 +32,12 @@ import won.protocol.util.AtomModelWrapper;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSourceBase;
 import won.protocol.vocabulary.WON;
+
+import java.net.URI;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Actor requests linked data URI using HTTP and saves it to a triple store
@@ -188,6 +187,11 @@ public class WorkerCrawlerActor extends UntypedActor {
             if (cause instanceof HttpClientErrorException
                             && Objects.equals(((HttpClientErrorException) cause).getStatusCode(), HttpStatus.GONE)) {
                 log.debug("Uri used to exist, but has been deleted, marking uri as done");
+                sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
+            } else if (cause instanceof HttpClientErrorException
+                            && Objects.equals(((HttpClientErrorException) cause).getStatusCode(),
+                                            HttpStatus.FORBIDDEN)) {
+                log.debug("Not allowed to access uri, marking as done");
                 sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
             } else {
                 throw new CrawlWrapperException(e, uriMsg);
