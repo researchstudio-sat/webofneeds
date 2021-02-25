@@ -132,7 +132,7 @@ export const fetchAllMetaAtomsNear = (
   limit = 500,
   state = "ACTIVE"
 ) =>
-  fetchWorker.fetchAllAtomMetaAtomsNear(
+  fetchWorker.fetchAllMetaAtomsNear(
     createdAfterDate,
     location,
     maxDistance,
