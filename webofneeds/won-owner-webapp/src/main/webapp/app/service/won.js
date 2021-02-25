@@ -23,6 +23,7 @@ import { is } from "../utils.js";
 import {
   clearDisclaimerAccepted,
   clearReadUris,
+  clearDeletedUris,
   isDisclaimerAccepted,
   setDisclaimerAccepted,
 } from "../won-localstorage.js";
@@ -43,6 +44,7 @@ const fetchWorker = fWorker();
 won.debugmode = false; //if you set this to true, the created atoms will get flagged as debug atoms in order to get matches and requests from the debugbot
 
 won.clearReadUris = clearReadUris;
+won.clearDeletedUris = clearDeletedUris;
 won.isDisclaimerAccepted = isDisclaimerAccepted;
 won.clearDisclaimerAccepted = clearDisclaimerAccepted;
 won.setDisclaimerAccepted = setDisclaimerAccepted;

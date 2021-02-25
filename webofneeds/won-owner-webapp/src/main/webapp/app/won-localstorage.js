@@ -76,6 +76,11 @@ export function clearReadUris() {
   localStorage.removeItem(READ_URIS);
 }
 
+export function clearDeletedUris() {
+  deletedUrisCache = undefined;
+  localStorage.removeItem(DELETED_URIS);
+}
+
 export function isDisclaimerAccepted() {
   if (!disclaimerAcceptedCache) {
     disclaimerAcceptedCache = !!localStorage.getItem(DISCLAIMER_ACCEPTED);
