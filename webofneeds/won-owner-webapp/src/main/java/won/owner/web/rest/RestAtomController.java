@@ -81,8 +81,6 @@ public class RestAtomController {
     public Map<URI, AtomPojo> getAllAtomsOfUser(@RequestParam(value = "state", required = false) AtomState state) {
         User user = getCurrentUser();
         Set<UserAtom> userAtoms = user.getUserAtoms();
-        Map<URI, AtomPojo> atomMap = new HashMap<>();
-
         return userAtoms.parallelStream().map(userAtom -> {
             try {
                 return new AtomPojo(WonLinkedDataUtils.getDataForResource(userAtom.getUri(), linkedDataSource));
