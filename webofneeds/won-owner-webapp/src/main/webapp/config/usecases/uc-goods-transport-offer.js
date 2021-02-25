@@ -4,7 +4,6 @@ import {
   defaultReactions,
 } from "../detail-definitions.js";
 import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
-import won from "../../app/service/won.js";
 import vocab from "../../app/service/vocab.js";
 import { getIn } from "../../app/utils.js";
 import { sparqlQuery } from "../../app/sparql-builder-utils.js";
@@ -47,12 +46,12 @@ export const goodsTransportOffer = {
       filter = {
         // to select seeks-branch
         prefixes: {
-          won: won.defaultContext["won"],
-          s: won.defaultContext["s"],
+          won: vocab.defaultContext["won"],
+          s: vocab.defaultContext["s"],
           geo: "http://www.bigdata.com/rdf/geospatial#",
           xsd: "http://www.w3.org/2001/XMLSchema#",
-          con: won.defaultContext["con"],
-          match: won.defaultContext["match"],
+          con: vocab.defaultContext["con"],
+          match: vocab.defaultContext["match"],
         },
         operations: [
           `${resultName} a won:Atom.`,
@@ -89,7 +88,7 @@ export const goodsTransportOffer = {
       filter = {
         // to select seeks-branch
         prefixes: {
-          won: won.defaultContext["won"],
+          won: vocab.defaultContext["won"],
         },
         operations: [
           `${resultName} a won:Atom.`,

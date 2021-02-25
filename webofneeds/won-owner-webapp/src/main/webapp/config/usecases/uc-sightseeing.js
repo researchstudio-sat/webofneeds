@@ -11,7 +11,6 @@ import ico36_uc_sightseeing from "../../images/won-icons/ico36_uc_sightseeing.sv
 import ico36_detail_datetime from "~/images/won-icons/ico36_detail_datetime.svg";
 import vocab from "~/app/service/vocab";
 import { sparqlQuery, vicinityScoreSubQuery } from "~/app/sparql-builder-utils";
-import won from "~/app/service/won";
 import { getIn } from "~/app/utils";
 
 export const sightseeingPlan = {
@@ -58,9 +57,9 @@ export const sightseeingPlan = {
       bindScoreAs: "?location_geoScore",
       pathToGeoCoords: "s:location/s:geo",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        con: won.defaultContext["con"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        con: vocab.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -74,14 +73,14 @@ export const sightseeingPlan = {
 
     return sparqlQuery({
       prefixes: {
-        won: won.defaultContext["won"],
-        rdf: won.defaultContext["rdf"],
-        buddy: won.defaultContext["buddy"],
-        hold: won.defaultContext["hold"],
-        s: won.defaultContext["s"],
-        match: won.defaultContext["match"],
-        demo: won.defaultContext["demo"],
-        "wx-persona": won.defaultContext["wx-persona"],
+        won: vocab.defaultContext["won"],
+        rdf: vocab.defaultContext["rdf"],
+        buddy: vocab.defaultContext["buddy"],
+        hold: vocab.defaultContext["hold"],
+        s: vocab.defaultContext["s"],
+        match: vocab.defaultContext["match"],
+        demo: vocab.defaultContext["demo"],
+        "wx-persona": vocab.defaultContext["wx-persona"],
       },
       distinct: true,
       variables: [resultName, "?score"],
@@ -142,9 +141,9 @@ export const sightseeingInterest = {
       bindScoreAs: "?location_geoScore",
       pathToGeoCoords: "s:location/s:geo",
       prefixesInPath: {
-        s: won.defaultContext["s"],
-        won: won.defaultContext["won"],
-        con: won.defaultContext["con"],
+        s: vocab.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        con: vocab.defaultContext["con"],
       },
       geoCoordinates: getIn(draft, ["content", "location"]),
     });
@@ -158,11 +157,11 @@ export const sightseeingInterest = {
 
     return sparqlQuery({
       prefixes: {
-        won: won.defaultContext["won"],
-        rdf: won.defaultContext["rdf"],
-        buddy: won.defaultContext["buddy"],
-        hold: won.defaultContext["hold"],
-        s: won.defaultContext["s"],
+        won: vocab.defaultContext["won"],
+        rdf: vocab.defaultContext["rdf"],
+        buddy: vocab.defaultContext["buddy"],
+        hold: vocab.defaultContext["hold"],
+        s: vocab.defaultContext["s"],
       },
       distinct: true,
       variables: [resultName, "?score"],

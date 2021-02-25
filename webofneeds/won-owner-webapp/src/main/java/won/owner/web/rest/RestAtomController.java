@@ -15,12 +15,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
@@ -86,27 +82,17 @@ public class RestAtomController {
         User user = getCurrentUser();
         Set<UserAtom> userAtoms = user.getUserAtoms();
         Map<URI, AtomPojo> atomMap = new HashMap<>();
-        for (UserAtom userAtom : userAtoms) {
-            if (state == null || state.equals(userAtom.getState())) {
-                try {
-                    Dataset atomDataset = WonLinkedDataUtils.getDataForResource(userAtom.getUri(), linkedDataSource); // FIXME:
-                                                                                                                      // SOMEHOW
-                                                                                                                      // DerivedData
-                                                                                                                      // is
-                                                                                                                      // not
-                                                                                                                      // retrieved
-                                                                                                                      // with
-                                                                                                                      // getDataForResource...
-                    AtomPojo atom = new AtomPojo(atomDataset);
-                    atomMap.put(atom.getUri(), atom);
-                } catch (Exception e) {
-                    // we catch all exceptions here as we want to be more robust against
-                    // unforseen error conditions down the stack
-                    logger.debug("Could not retrieve atom<" + userAtom.getUri() + "> cause: " + e.getMessage());
-                }
+
+        return userAtoms.parallelStream().map(userAtom -> {
+            try {
+                return new AtomPojo(WonLinkedDataUtils.getDataForResource(userAtom.getUri(), linkedDataSource));
+            } catch (Exception e) {
+                // we catch all exceptions here as we want to be more robust against
+                // unforseen error conditions down the stack
+                logger.debug("Could not retrieve atom<" + userAtom.getUri() + "> cause: " + e.getMessage());
+                return null;
             }
-        }
-        return atomMap;
+        }).filter(Objects::nonNull).collect(Collectors.toMap(AtomPojo::getUri, atomPojo -> atomPojo));
     }
 
     /**
