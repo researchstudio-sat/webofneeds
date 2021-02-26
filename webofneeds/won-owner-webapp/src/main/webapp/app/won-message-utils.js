@@ -43,7 +43,7 @@ export function buildCloseMessage(socketUri, targetSocketUri) {
   const buildMessage = function() {
     return new won.MessageBuilder(vocab.WONMSG.closeMessage)
       .protocolVersion("1.0")
-      .eventURI(vocab.WONMSG.uriPlaceholder.event)
+      .messageURI(vocab.WONMSG.uriPlaceholder.message)
       .senderSocket(socketUri)
       .targetSocket(targetSocketUri)
       .ownerDirection()
@@ -64,7 +64,7 @@ export function buildCloseAtomMessage(atomUri) {
     return new won.MessageBuilder(vocab.WONMSG.closeAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
-      .eventURI(vocab.WONMSG.uriPlaceholder.event)
+      .messageURI(vocab.WONMSG.uriPlaceholder.message)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
@@ -81,7 +81,7 @@ export function buildDeleteAtomMessage(atomUri) {
     return new won.MessageBuilder(vocab.WONMSG.deleteAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
-      .eventURI(vocab.WONMSG.uriPlaceholder.event)
+      .messageURI(vocab.WONMSG.uriPlaceholder.message)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
@@ -98,7 +98,7 @@ export function buildOpenAtomMessage(atomUri) {
     return new won.MessageBuilder(vocab.WONMSG.activateAtomMessage)
       .protocolVersion("1.0")
       .atom(atomUri)
-      .eventURI(vocab.WONMSG.uriPlaceholder.event)
+      .messageURI(vocab.WONMSG.uriPlaceholder.message)
       .ownerDirection()
       .timestamp(new Date().getTime().toString())
       .build();
@@ -127,7 +127,7 @@ export function buildConnectMessage({
 
   const messageBuilder = new won.MessageBuilder(vocab.WONMSG.connectMessage)
     .protocolVersion("1.0")
-    .eventURI(vocab.WONMSG.uriPlaceholder.event)
+    .messageURI(vocab.WONMSG.uriPlaceholder.message)
     .senderSocket(socketUri)
     .targetSocket(targetSocketUri)
     .ownerDirection()
@@ -193,7 +193,7 @@ export function buildChatMessage({
             detail.parseToRDF({
               value: value,
               identifier: detail.identifier,
-              contentUri: vocab.WONMSG.uriPlaceholder.event,
+              contentUri: vocab.WONMSG.uriPlaceholder.message,
             });
 
           if (detailRDF) {
@@ -271,7 +271,7 @@ export function buildChatMessage({
       );
     }
 
-    wonMessageBuilder.eventURI(vocab.WONMSG.uriPlaceholder.event); // replace placeholders with proper event-uri
+    wonMessageBuilder.messageURI(vocab.WONMSG.uriPlaceholder.message); // replace placeholders with proper event-uri
     return wonMessageBuilder.build();
   });
 }
@@ -284,7 +284,7 @@ export function buildEditMessage(editedAtomData, oldAtom) {
     {
       msgType: vocab.WONMSG.replaceMessage, //mandatory
       publishedContentUri: atomUriToEdit, //mandatory
-      msgUri: vocab.WONMSG.uriPlaceholder.event,
+      msgUri: vocab.WONMSG.uriPlaceholder.message,
       acl: editedAtomData.acl,
     }
   );
@@ -329,7 +329,7 @@ export function buildCreateMessage(atomData, wonNodeUri) {
       atom: publishedContentUri, //mandatory
       msgType: vocab.WONMSG.createMessage, //mandatory
       publishedContentUri: publishedContentUri, //mandatory
-      msgUri: vocab.WONMSG.uriPlaceholder.event,
+      msgUri: vocab.WONMSG.uriPlaceholder.message,
       acl: atomData.acl,
     }
   );

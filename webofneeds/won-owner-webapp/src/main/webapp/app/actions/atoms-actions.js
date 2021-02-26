@@ -54,7 +54,7 @@ export const close = atomUri => (dispatch, getState) => {
     .then(jsonResp => {
       dispatch(
         actionCreators.messages__send({
-          eventUri: jsonResp.messageUri,
+          messageUri: jsonResp.messageUri,
           message: jsonResp.message,
         })
       );
@@ -83,7 +83,7 @@ export const open = atomUri => dispatch => {
     .then(jsonResp => {
       dispatch(
         actionCreators.messages__send({
-          eventUri: jsonResp.messageUri,
+          messageUri: jsonResp.messageUri,
           message: jsonResp.message,
         })
       );
@@ -127,7 +127,7 @@ export const deleteAtom = atomUri => dispatch => {
     .then(jsonResp => {
       dispatch(
         actionCreators.messages__send({
-          eventUri: jsonResp.messageUri,
+          messageUri: jsonResp.messageUri,
           message: jsonResp.message,
         })
       );
@@ -150,7 +150,7 @@ export const edit = (draft, oldAtom, callback) => (dispatch, getState) =>
       dispatch({
         type: actionTypes.atoms.edit,
         payload: {
-          eventUri: jsonResp.messageUri,
+          messageUri: jsonResp.messageUri,
           message: jsonResp.message,
           atomUri: atomUri,
           atom: draft,
@@ -174,7 +174,7 @@ export const createAtomFromDraftAndDispatch = (
       dispatch({
         type: actionTypes.atoms.create,
         payload: {
-          eventUri: jsonResp.messageUri,
+          messageUri: jsonResp.messageUri,
           message: jsonResp.message,
           atomUri: atomUri,
           atom: atomDraft,

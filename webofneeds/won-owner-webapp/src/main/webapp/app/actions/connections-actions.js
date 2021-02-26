@@ -50,13 +50,13 @@ export const connectionsChatMessageClaimOnSuccess = (
       return won
         .wonMessageFromJsonLd(
           jsonResp.message,
-          vocab.WONMSG.uriPlaceholder.event
+          vocab.WONMSG.uriPlaceholder.message
         )
         .then(wonMessage => {
           dispatch({
             type: actionTypes.connections.sendChatMessage,
             payload: {
-              eventUri: jsonResp.messageUri,
+              messageUri: jsonResp.messageUri,
               message: jsonResp.message,
               optimisticEvent: wonMessage,
               senderSocketUri: senderSocketUri,
@@ -90,7 +90,7 @@ export const connectionsChatMessageClaimOnSuccess = (
               won
                 .wonMessageFromJsonLd(
                   jsonResp.message,
-                  vocab.WONMSG.uriPlaceholder.event
+                  vocab.WONMSG.uriPlaceholder.message
                 )
                 .then(wonMessage =>
                   dispatch({
@@ -99,7 +99,7 @@ export const connectionsChatMessageClaimOnSuccess = (
                           .sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
                       : actionTypes.connections.sendChatMessage,
                     payload: {
-                      eventUri: jsonResp.messageUri,
+                      messageUri: jsonResp.messageUri,
                       message: jsonResp.message,
                       wonMessage,
                       senderSocketUri: senderSocketUri,
@@ -238,7 +238,7 @@ export const connectionsChatMessage = (
       won
         .wonMessageFromJsonLd(
           jsonResp.message,
-          vocab.WONMSG.uriPlaceholder.event
+          vocab.WONMSG.uriPlaceholder.message
         )
         .then(wonMessage =>
           dispatch({
@@ -246,7 +246,7 @@ export const connectionsChatMessage = (
               ? actionTypes.connections.sendChatMessageRefreshDataOnSuccess //If there are references in the message we need to Refresh the Data from the backend on msg success
               : actionTypes.connections.sendChatMessage,
             payload: {
-              eventUri: jsonResp.messageUri,
+              messageUri: jsonResp.messageUri,
               message: jsonResp.message,
               optimisticEvent: wonMessage,
               senderSocketUri: senderSocketUri,
@@ -343,13 +343,13 @@ export const connectAtomSockets = (
         won
           .wonMessageFromJsonLd(
             jsonResp.message,
-            vocab.WONMSG.uriPlaceholder.event
+            vocab.WONMSG.uriPlaceholder.message
           )
           .then(wonMessage =>
             dispatch({
               type: actionTypes.atoms.connectSockets,
               payload: {
-                eventUri: jsonResp.messageUri,
+                messageUri: jsonResp.messageUri,
                 message: jsonResp.message,
                 optimisticEvent: wonMessage,
                 senderSocketUri: senderSocketUri,
@@ -546,7 +546,7 @@ export const connectionsClose = connectionUri => (dispatch, getState) => {
         type: actionTypes.connections.close,
         payload: {
           connectionUri: connectionUri,
-          eventUri: jsonResp.messageUri,
+          messageUri: jsonResp.messageUri,
           message: jsonResp.message,
         },
       });
@@ -564,7 +564,7 @@ export const connectionsCloseRemote = message =>
       .then(jsonResp => {
         dispatch(
           actionCreators.messages__send({
-            eventUri: jsonResp.messageUri,
+            messageUri: jsonResp.messageUri,
             message: jsonResp.message,
           })
         );

@@ -23,15 +23,18 @@ export function addMessage(
   allAtomsInState,
   wonMessage,
   alreadyProcessed = false,
-  eventUriOverride = undefined
+  messageUriOverride = undefined
 ) {
   if (!wonMessage.isResponse()) {
     let parsedMessage = parseMessage(wonMessage, alreadyProcessed, false);
 
     if (parsedMessage) {
-      if (eventUriOverride) {
+      if (messageUriOverride) {
         // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
-        parsedMessage = parsedMessage.setIn(["data", "uri"], eventUriOverride);
+        parsedMessage = parsedMessage.setIn(
+          ["data", "uri"],
+          messageUriOverride
+        );
       }
       const parsedMessageUri = getIn(parsedMessage, ["data", "uri"]);
       const senderSocketUri = wonMessage.getSenderSocket();
@@ -318,9 +321,12 @@ export function addMessage(
       if (connections && connections.size > 0) {
         const forwardMessage = parseMessage(wonMessage, alreadyProcessed, true);
         let forwardMessageData = get(forwardMessage, "data");
-        if (eventUriOverride) {
+        if (messageUriOverride) {
           // In Some cases (like if we send a message) we need to override the messageUri in the wonMessage with the correct one
-          forwardMessageData = forwardMessageData.set("uri", eventUriOverride);
+          forwardMessageData = forwardMessageData.set(
+            "uri",
+            messageUriOverride
+          );
         }
         const forwardMessageUri = getUri(forwardMessageData);
 
