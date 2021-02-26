@@ -813,7 +813,7 @@ export const fetchConnectionBySocket = (
           "@embed": "@always",
         })
       )
-      //add the eventUris
+      //add the messageUris
       .then(jsonResp => jsonResp && jsonResp["@id"])
       .then(connUri =>
         fetchConnection(

@@ -3,12 +3,12 @@ import vocab from "./service/vocab.js";
 
 export const rdfTextfieldHelpText =
   "Expects valid turtle. " +
-  `<${vocab.WONMSG.uriPlaceholder.event}> will ` +
+  `<${vocab.WONMSG.uriPlaceholder.message}> will ` +
   "be replaced by the uri generated for this message. " +
   "Use it, so your TTL can be found when parsing the messages. " +
   "See `vocab.defaultTurtlePrefixes` " +
   "for prefixes that will be added automatically. E.g." +
-  `\`<${vocab.WONMSG.uriPlaceholder.event}> con:text "hello world!". \``;
+  `\`<${vocab.WONMSG.uriPlaceholder.message}> con:text "hello world!". \``;
 
 export const noParsableContentPlaceholder =
   "«This message couldn't be displayed as it didn't contain," +

@@ -516,7 +516,7 @@ vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted =
 
 // UTILS
 vocab.WONMSG.uriPlaceholder = Object.freeze({
-  event: "wm:/SELF",
+  message: "wm:/SELF",
 });
 
 vocab.WON.contentNodeBlankUri = Object.freeze({

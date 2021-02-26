@@ -277,12 +277,12 @@ won.addContentGraphReferencesToMessageGraph = function(
  */
 won.addMessageGraph = function(builder, graphURIs, messageType) {
   let graphs = builder.data["@graph"];
-  let unsetMessageGraphUri = vocab.WONMSG.uriPlaceholder.event + "#envelope";
+  let unsetMessageGraphUri = vocab.WONMSG.uriPlaceholder.message + "#envelope";
   //create the message graph, containing the message type
   const messageGraph = {
     "@graph": [
       {
-        "@id": vocab.WONMSG.uriPlaceholder.event,
+        "@id": vocab.WONMSG.uriPlaceholder.message,
         "msg:messageType": {
           "@id": messageType,
         },
@@ -314,7 +314,7 @@ won.newGraph = function(hashFragement) {
   return {
     "@graph": [
       {
-        "@id": vocab.WONMSG.uriPlaceholder.event + "#" + hashFragement,
+        "@id": vocab.WONMSG.uriPlaceholder.message + "#" + hashFragement,
         "@graph": [],
       },
     ],
@@ -618,14 +618,14 @@ won.MessageBuilder = function MessageBuilder(messageType, content) {
     };
   }
   this.messageGraph = null;
-  this.eventUriValue = vocab.WONMSG.uriPlaceholder.event;
+  this.messageUriValue = vocab.WONMSG.uriPlaceholder.message;
   won.addMessageGraph(this, graphNames, messageType);
 };
 
 won.MessageBuilder.prototype = {
   constructor: won.MessageBuilder,
 
-  eventURI: function(eventUri) {
+  messageURI: function(messageUri) {
     this.getContext()[vocab.WONMSG.EnvelopeGraphCompacted] = {
       "@id": vocab.WONMSG.EnvelopeGraph,
       "@type": "@id",
@@ -634,13 +634,13 @@ won.MessageBuilder.prototype = {
       return string.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
     };
 
-    const regex = new RegExp(replaceRegExp(this.eventUriValue));
+    const regex = new RegExp(replaceRegExp(this.messageUriValue));
     won.visitDepthFirst(this.data, function(element, key, collection) {
       if (collection != null && key === "@id") {
-        if (element) collection[key] = element.replace(regex, eventUri);
+        if (element) collection[key] = element.replace(regex, messageUri);
       }
     });
-    this.eventUriValue = eventUri;
+    this.messageUriValue = messageUri;
     return this;
   },
   getContext: function() {
@@ -744,7 +744,7 @@ won.MessageBuilder.prototype = {
    */
   getContentGraph: function() {
     const graphs = this.data["@graph"];
-    const contentGraphUri = this.eventUriValue + "#content";
+    const contentGraphUri = this.messageUriValue + "#content";
     for (let key in graphs) {
       const graph = graphs[key];
       if (graph["@id"] === contentGraphUri) {
@@ -753,10 +753,10 @@ won.MessageBuilder.prototype = {
     }
     //none found: create it
     const contentGraph = {
-      "@id": this.eventUriValue + "#content",
+      "@id": this.messageUriValue + "#content",
       "@graph": [
         {
-          "@id": this.eventUriValue,
+          "@id": this.messageUriValue,
         },
       ],
     };

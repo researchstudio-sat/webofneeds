@@ -89,7 +89,7 @@ export const failedCreate = wonMessage => dispatch => {
 
   dispatch(
     actionCreators.atoms__createFailure({
-      eventUri: wonMessage.getIsResponseTo(),
+      messageUri: wonMessage.getIsResponseTo(),
       uri: wonMessage.getAtom(),
     })
   );
@@ -109,7 +109,7 @@ export const successfulCreate = wonMessage => (dispatch, getState) => {
           if (parsedAtomImm) {
             dispatch(
               actionCreators.atoms__createSuccessful({
-                eventUri: wonMessage.getIsResponseTo(),
+                messageUri: wonMessage.getIsResponseTo(),
                 atomUri: atomUri,
                 atom: parsedAtomImm,
               })
@@ -144,7 +144,7 @@ export const failedEdit = wonMessage => dispatch => {
 
   dispatch(
     actionCreators.atoms__editFailure({
-      eventUri: wonMessage.getIsResponseTo(),
+      messageUri: wonMessage.getIsResponseTo(),
       uri: wonMessage.getAtom(),
     })
   );
@@ -168,7 +168,7 @@ export const successfulEdit = wonMessage => (dispatch, getState) => {
       .then(() => {
         dispatch(
           actionCreators.atoms__editSuccessful({
-            eventUri: wonMessage.getIsResponseTo(),
+            messageUri: wonMessage.getIsResponseTo(),
             atomUri: atomUri,
             //atom: atom,
           })

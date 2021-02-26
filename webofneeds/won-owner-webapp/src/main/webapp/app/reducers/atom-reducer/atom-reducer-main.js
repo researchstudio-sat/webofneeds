@@ -126,7 +126,7 @@ export default function(allAtomsInState = initialState, action = {}) {
 
     case actionTypes.atoms.edit: {
       // No optimistic change here since we do not know if the edit is going to be successful or not
-      // action.payload = {eventUri, message, atomUri, atom: draft, oldAtom}"
+      // action.payload = {messageUri, message, atomUri, atom: draft, oldAtom}"
       return allAtomsInState;
     }
 
@@ -193,7 +193,7 @@ export default function(allAtomsInState = initialState, action = {}) {
       );
 
     case actionTypes.atoms.connectSockets: {
-      const messageUri = action.payload.eventUri;
+      const messageUri = action.payload.messageUri;
       const wonMessage = action.payload.optimisticEvent;
       const senderSocketUri = action.payload.senderSocketUri;
       const targetSocketUri = action.payload.targetSocketUri;
@@ -683,18 +683,18 @@ export default function(allAtomsInState = initialState, action = {}) {
     case actionTypes.connections.sendChatMessage:
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess: {
-      //const messageUri = action.payload.eventUri;
+      //const messageUri = action.payload.messageUri;
 
       let state = addMessage(
         allAtomsInState,
         action.payload.optimisticEvent,
         false,
-        action.payload.eventUri
+        action.payload.messageUri
       );
       if (action.payload.claimed) {
         return markMessageAsClaimed(
           state,
-          action.payload.eventUri,
+          action.payload.messageUri,
           action.payload.connectionUri,
           action.payload.atomUri,
           action.payload.claimed

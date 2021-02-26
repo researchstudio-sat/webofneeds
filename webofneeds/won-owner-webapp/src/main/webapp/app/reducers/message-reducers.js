@@ -24,7 +24,7 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.atoms.connectSockets:
     case actionTypes.atoms.create: {
       return messages.setIn(
-        ["waitingForAnswer", action.payload.eventUri],
+        ["waitingForAnswer", action.payload.messageUri],
         action.payload.message
       );
     }
@@ -35,27 +35,27 @@ export function messagesReducer(messages = initialState, action = {}) {
     case actionTypes.atoms.createFailure:
     case actionTypes.messages.chatMessage.failure:
     case actionTypes.messages.chatMessage.success:
-      return messages.removeIn(["waitingForAnswer", action.payload.eventUri]);
+      return messages.removeIn(["waitingForAnswer", action.payload.messageUri]);
 
     case actionTypes.connections.sendChatMessageRefreshDataOnSuccess:
       return messages
         .setIn(
-          ["waitingForAnswer", action.payload.eventUri],
+          ["waitingForAnswer", action.payload.messageUri],
           action.payload.message
         )
         .setIn(
-          ["refreshDataOnSuccess", action.payload.eventUri],
+          ["refreshDataOnSuccess", action.payload.messageUri],
           action.payload.message
         );
 
     case actionTypes.connections.sendChatMessageClaimOnSuccess:
       return messages
         .setIn(
-          ["waitingForAnswer", action.payload.eventUri],
+          ["waitingForAnswer", action.payload.messageUri],
           action.payload.message
         )
         .setIn(
-          ["claimOnSuccess", action.payload.eventUri],
+          ["claimOnSuccess", action.payload.messageUri],
           action.payload.message
         );
 
