@@ -4,6 +4,7 @@
 
 import won from "../won-es6.js";
 import vocab from "../service/vocab.js";
+import { createAtomFromDraftAndDispatch } from "~/app/actions/atoms-actions";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as connectionUtils from "../redux/utils/connection-utils.js";
@@ -19,7 +20,6 @@ import { ensureLoggedIn } from "./account-actions";
 import { actionTypes, actionCreators } from "./actions.js";
 
 import {
-  buildCreateMessage,
   buildCloseMessage,
   buildChatMessage,
   buildConnectMessage,
@@ -284,6 +284,84 @@ export const connectionsConnectReactionAtom = (
     getState
   ); // moved to separate function to make transpilation work properly
 
+/**
+ * Sends a connect and creates a connectMessage from senderSocketUri to targetSocketUri
+ * if isTargetOwned is set to true, the connect will be made serverside (open connection on both ends)
+ * if isSenderPending is set to true, we know that the senderAtom might not be created yet, and thus
+ * wait 2000ms before sending the connectMessage to the node (this only happens in the case of !isTargetAtomOwned
+ * @param senderSocketUri
+ * @param targetSocketUri
+ * @param connectMessage
+ * @param isTargetOwned
+ * @param dispatch
+ * @param isSenderPending
+ * @returns {Promise<unknown>|*}
+ */
+export const connectAtomSockets = (
+  senderSocketUri,
+  targetSocketUri,
+  connectMessage,
+  isTargetOwned,
+  dispatch,
+  isSenderPending = false
+) => {
+  if (!senderSocketUri) {
+    throw new Error("SenderSocketUri not present");
+  }
+
+  if (!targetSocketUri) {
+    throw new Error("TargetSocketUri not present");
+  }
+
+  if (isTargetOwned) {
+    return ownerApi
+      .serverSideConnect(
+        targetSocketUri,
+        senderSocketUri,
+        isSenderPending,
+        true
+      )
+      .then(async response => {
+        if (!response.ok) {
+          const errorMsg = await response.text();
+          throw new Error(
+            `Could not connect sockets(${senderSocketUri}<->${targetSocketUri}): ${errorMsg}`
+          );
+        }
+      });
+  } else {
+    // establish connection
+    const cnctMsg = buildConnectMessage({
+      connectMessage: connectMessage,
+      socketUri: senderSocketUri,
+      targetSocketUri: targetSocketUri,
+    });
+    //TODO: DELAY WORKAROUND TO FIX CONNECT ISSUES
+
+    return (isSenderPending ? delay(2000) : Promise.resolve()).then(() =>
+      ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+        won
+          .wonMessageFromJsonLd(
+            jsonResp.message,
+            vocab.WONMSG.uriPlaceholder.event
+          )
+          .then(wonMessage =>
+            dispatch({
+              type: actionTypes.atoms.connectSockets,
+              payload: {
+                eventUri: jsonResp.messageUri,
+                message: jsonResp.message,
+                optimisticEvent: wonMessage,
+                senderSocketUri: senderSocketUri,
+                targetSocketUri: targetSocketUri,
+              },
+            })
+          )
+      )
+    );
+  }
+};
+
 const connectReactionAtom = (
   connectToAtomUri,
   atomDraft,
@@ -292,131 +370,63 @@ const connectReactionAtom = (
   atomDraftSocketType,
   dispatch,
   getState
-) =>
-  ensureLoggedIn(dispatch, getState).then(async () => {
-    const state = getState();
-    const connectToAtom = generalSelectors.getAtom(connectToAtomUri)(state);
+) => {
+  const state = getState();
+  const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
-    const nodeUri = generalSelectors.getDefaultNodeUri(state);
+  const holder = generalSelectors.getAtom(personaUri)(state);
 
-    // create new atom
-    const { message, atomUri } = buildCreateMessage(atomDraft, nodeUri);
+  if (personaUri && !holder) {
+    console.warn(
+      "Could not find holder with Uri: ",
+      personaUri,
+      ", holder not be stored in the state"
+    );
+  }
 
-    // create the new atom
-    ownerApi
-      .sendMessage(message)
-      .then(jsonResp => {
-        dispatch({
-          type: actionTypes.atoms.create, // TODO custom action
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            atomUri: atomUri,
-            atom: atomDraft,
-          },
-        });
-      })
-      .then(() => {
-        // add persona if present
-        if (personaUri) {
-          const persona = generalSelectors.getAtom(personaUri)(state);
-          const senderSocketUri = atomUtils.getSocketUri(
-            persona,
-            vocab.HOLD.HolderSocketCompacted
-          );
-          const targetSocketUri = `${atomUri}#holdableSocket`;
-          ownerApi
-            .serverSideConnect(senderSocketUri, targetSocketUri, false, true)
-            .then(async response => {
-              if (!response.ok) {
-                const errorMsg = await response.text();
-                throw new Error(`Could not connect identity: ${errorMsg}`);
-              }
-            });
+  const getSocketStringFromDraft = atomDraft => {
+    const draftContent = atomDraft["content"];
+    const draftSockets = draftContent["sockets"];
+
+    if (draftSockets && atomDraftSocketType) {
+      for (let socketKey in draftSockets) {
+        if (draftSockets[socketKey] === atomDraftSocketType) {
+          return socketKey;
         }
+      }
+    }
+  };
 
-        const getSocketStringFromDraft = atomDraft => {
-          const draftContent = atomDraft["content"];
-          const draftSockets = draftContent["sockets"];
+  const connectToSocketUri = atomUtils.getSocketUri(
+    generalSelectors.getAtom(connectToAtomUri)(state),
+    connectToSocketType
+  );
 
-          if (draftSockets && atomDraftSocketType) {
-            for (let socketKey in draftSockets) {
-              if (draftSockets[socketKey] === atomDraftSocketType) {
-                return socketKey;
-              }
-            }
-          }
-        };
-
-        const atomDraftSocketTypeString = getSocketStringFromDraft(atomDraft);
-
-        const targetSocketUri = atomUtils.getSocketUri(
-          connectToAtom,
-          connectToSocketType
-        );
-        const senderSocketUri =
-          atomDraftSocketTypeString && `${atomUri}${atomDraftSocketTypeString}`;
-
-        if (senderSocketUri && targetSocketUri) {
-          if (generalSelectors.isAtomOwned(connectToAtomUri)(state)) {
-            ownerApi
-              .serverSideConnect(targetSocketUri, senderSocketUri, false, true)
-              .then(async response => {
-                if (!response.ok) {
-                  const errorMsg = await response.text();
-                  throw new Error(`Could not connect owned atoms: ${errorMsg}`);
-                }
-              });
-          } else {
-            // establish connection
-            const cnctMsg = buildConnectMessage({
-              connectMessage: "",
-              socketUri: senderSocketUri,
-              targetSocketUri: targetSocketUri,
-            });
-            //TODO: DELAY WORKAROUND TO FIX CONNECT ISSUES
-            delay(2000)
-              .then(() => ownerApi.sendMessage(cnctMsg))
-              .then(jsonResp =>
-                // connect action to be dispatched when the
-                // ad hoc atom has been created:
-
-                won
-                  .wonMessageFromJsonLd(
-                    jsonResp.message,
-                    vocab.WONMSG.uriPlaceholder.event
-                  )
-                  .then(wonMessage =>
-                    dispatch({
-                      type: actionTypes.atoms.connectSockets,
-                      payload: {
-                        eventUri: jsonResp.messageUri,
-                        message: jsonResp.message,
-                        optimisticEvent: wonMessage,
-                        senderSocketUri: senderSocketUri,
-                        targetSocketUri: targetSocketUri,
-                      },
-                    })
-                  )
-              );
-          }
-        } else {
-          throw new Error(
-            `Could not connect owned atoms did not find necessary sockets`
-          );
-        }
-      });
-  });
+  return ensureLoggedIn(dispatch, getState).then(() =>
+    createAtomFromDraftAndDispatch(atomDraft, nodeUri, dispatch)
+      .then(atomUri => connectHolderToCreatedAtomUri(holder, atomUri))
+      .then(atomUri =>
+        connectAtomSockets(
+          `${atomUri}${getSocketStringFromDraft(atomDraft)}`,
+          connectToSocketUri,
+          "",
+          generalSelectors.isAtomOwned(connectToAtomUri)(state),
+          dispatch,
+          true
+        )
+      )
+  );
+};
 
 export const connectionsConnectAdHoc = (
-  targetSocketUri,
+  connectToSocketUri,
   connectMessage,
   adHocUseCaseIdentifier,
   targetAtom,
   personaUriForAdHocAtom
 ) => (dispatch, getState) =>
   connectAdHoc(
-    targetSocketUri,
+    connectToSocketUri,
     connectMessage,
     adHocUseCaseIdentifier,
     targetAtom,
@@ -425,129 +435,100 @@ export const connectionsConnectAdHoc = (
     getState
   ); // moved to separate function to make transpilation work properly
 
+/**
+ * Connect a given holderAtom to the atomUri for an atom that has
+ * been created or is in the process of creation
+ * @param holder
+ * @param atomUri
+ * @returns {*}
+ */
+export const connectHolderToCreatedAtomUri = (holder, atomUri) => {
+  const personaHolderSocketUri = atomUtils.getSocketUri(
+    holder,
+    vocab.HOLD.HolderSocketCompacted
+  );
+
+  return personaHolderSocketUri
+    ? ownerApi
+        .serverSideConnect(
+          personaHolderSocketUri,
+          `${atomUri}#holdableSocket`,
+          false,
+          true
+        )
+        .then(async response => {
+          if (!response.ok) {
+            const errorMsg = await response.text();
+            throw new Error(`Could not connect identity: ${errorMsg}`);
+          }
+        })
+        .then(() => atomUri)
+    : atomUri;
+};
+
 const connectAdHoc = (
-  targetSocketUri,
+  connectToSocketUri,
   connectMessage,
   adHocUseCaseIdentifier,
   targetAtom,
   personaUriForAdHocAtom,
   dispatch,
   getState
-) =>
-  ensureLoggedIn(dispatch, getState).then(async () => {
-    const theirAtomUri = extractAtomUriBySocketUri(targetSocketUri);
+) => {
+  const state = getState();
+  const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
-    const state = getState();
-    const adHocDraft = useCaseUtils.getUseCase(adHocUseCaseIdentifier).draft;
+  const holder = generalSelectors.getAtom(personaUriForAdHocAtom)(getState());
 
-    if (targetAtom) {
-      // For some special create cases we move some content of the fromAtom to the createAtomDraft
-      const contentTypes =
-        getIn(targetAtom, ["content", "type"]) &&
-        getIn(targetAtom, ["content", "type"])
-          .toSet()
-          .remove(vocab.WON.AtomCompacted);
+  if (personaUriForAdHocAtom && !holder) {
+    console.warn(
+      "Could not find holder with Uri: ",
+      personaUriForAdHocAtom,
+      ", holder not be stored in the state"
+    );
+  }
 
-      if (
-        contentTypes.includes("s:PlanAction") ||
-        contentTypes.includes(vocab.WXPERSONA.InterestCompacted) ||
-        contentTypes.includes(vocab.WXPERSONA.ExpertiseCompacted)
-      ) {
-        const eventObjectAboutUris = getIn(targetAtom, [
-          "content",
-          "eventObjectAboutUris",
-        ]);
-        if (eventObjectAboutUris) {
-          adHocDraft.content.eventObjectAboutUris = eventObjectAboutUris.toArray();
-        }
+  const atomDraft = useCaseUtils.getUseCase(adHocUseCaseIdentifier).draft;
+
+  if (targetAtom) {
+    // For some special create cases we move some content of the fromAtom to the createAtomDraft
+    const contentTypes =
+      getIn(targetAtom, ["content", "type"]) &&
+      getIn(targetAtom, ["content", "type"])
+        .toSet()
+        .remove(vocab.WON.AtomCompacted);
+
+    if (
+      contentTypes.includes("s:PlanAction") ||
+      contentTypes.includes(vocab.WXPERSONA.InterestCompacted) ||
+      contentTypes.includes(vocab.WXPERSONA.ExpertiseCompacted)
+    ) {
+      const eventObjectAboutUris = getIn(targetAtom, [
+        "content",
+        "eventObjectAboutUris",
+      ]);
+      if (eventObjectAboutUris) {
+        atomDraft.content.eventObjectAboutUris = eventObjectAboutUris.toArray();
       }
     }
-    const nodeUri = generalSelectors.getDefaultNodeUri(state);
+  }
+  const connectToAtomUri = extractAtomUriBySocketUri(connectToSocketUri);
 
-    // build create message for new atom
-    const { message, atomUri } = buildCreateMessage(adHocDraft, nodeUri);
-
-    // create the new atom
-    ownerApi
-      .sendMessage(message)
-      .then(jsonResp => {
-        dispatch({
-          type: actionTypes.atoms.create, // TODO custom action
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            atomUri: atomUri,
-            atom: adHocDraft,
-          },
-        });
-      })
-      .then(() => {
-        const persona = generalSelectors.getAtom(personaUriForAdHocAtom)(state);
-        if (persona) {
-          const senderSocketUri = atomUtils.getSocketUri(
-            persona,
-            vocab.HOLD.HolderSocketCompacted
-          );
-          const targetSocketUri = `${atomUri}#holdableSocket`;
-
-          return ownerApi
-            .serverSideConnect(senderSocketUri, targetSocketUri, false, true)
-            .then(async response => {
-              if (!response.ok) {
-                const errorMsg = await response.text();
-                throw new Error(`Could not connect identity: ${errorMsg}`);
-              }
-            });
-        }
-      })
-      .then(() => {
-        // set default socketUri
-        let senderSocketUri = `${atomUri}#chatSocket`;
-
-        if (generalSelectors.isAtomOwned(theirAtomUri)(state)) {
-          ownerApi
-            .serverSideConnect(senderSocketUri, targetSocketUri, true, false)
-            .then(async response => {
-              if (!response.ok) {
-                const errorMsg = await response.text();
-                throw new Error(
-                  `Could not connect sockets(${senderSocketUri}<->${targetSocketUri}): ${errorMsg}`
-                );
-              }
-            });
-        } else {
-          // establish connection
-          const cnctMsg = buildConnectMessage({
-            connectMessage: connectMessage,
-            socketUri: senderSocketUri,
-            targetSocketUri: targetSocketUri,
-          });
-
-          //TODO: DELAY WORKAROUND TO FIX CONNECT ISSUES
-          delay(2000)
-            .then(() => ownerApi.sendMessage(cnctMsg))
-            .then(jsonResp =>
-              won
-                .wonMessageFromJsonLd(
-                  jsonResp.message,
-                  vocab.WONMSG.uriPlaceholder.event
-                )
-                .then(wonMessage =>
-                  dispatch({
-                    type: actionTypes.atoms.connectSockets,
-                    payload: {
-                      eventUri: jsonResp.messageUri,
-                      message: jsonResp.message,
-                      optimisticEvent: wonMessage,
-                      senderSocketUri: senderSocketUri,
-                      targetSocketUri: targetSocketUri,
-                    },
-                  })
-                )
-            );
-        }
-      });
-  });
+  return ensureLoggedIn(dispatch, getState).then(() =>
+    createAtomFromDraftAndDispatch(atomDraft, nodeUri, dispatch)
+      .then(atomUri => connectHolderToCreatedAtomUri(holder, atomUri))
+      .then(atomUri =>
+        connectAtomSockets(
+          `${atomUri}#chatSocket`,
+          connectToSocketUri,
+          connectMessage,
+          generalSelectors.isAtomOwned(connectToAtomUri)(getState()),
+          dispatch,
+          true
+        )
+      )
+  );
+};
 
 export const connectionsClose = connectionUri => (dispatch, getState) => {
   const ownedAtom = generalSelectors.getAtomByConnectionUri(connectionUri)(

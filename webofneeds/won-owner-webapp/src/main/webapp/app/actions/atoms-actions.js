@@ -1,21 +1,20 @@
 /**
  * Created by ksinger on 19.02.2016.
  */
-
-import won from "../won-es6.js";
-import vocab from "../service/vocab.js";
-
 import { actionTypes, actionCreators } from "./actions.js";
 import Immutable from "immutable";
 
 import {
-  buildConnectMessage,
   buildCloseAtomMessage,
   buildOpenAtomMessage,
   buildDeleteAtomMessage,
   buildCreateMessage,
   buildEditMessage,
 } from "../won-message-utils.js";
+import {
+  connectHolderToCreatedAtomUri,
+  connectAtomSockets,
+} from "~/app/actions/connections-actions";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -37,72 +36,17 @@ export const connectSockets = (
   senderSocketUri,
   targetSocketUri,
   connectMessage
-) => (dispatch, getState) => {
-  if (!senderSocketUri) {
-    throw new Error("SenderSocketUri not present");
-  }
-
-  if (!targetSocketUri) {
-    throw new Error("TargetSocketUri not present");
-  }
-
-  const accountState = generalSelectors.getAccountState(getState());
-  if (
+) => (dispatch, getState) =>
+  connectAtomSockets(
+    senderSocketUri,
+    targetSocketUri,
+    connectMessage,
     accountUtils.isAtomOwned(
-      accountState,
-      extractAtomUriBySocketUri(senderSocketUri)
-    ) &&
-    accountUtils.isAtomOwned(
-      accountState,
+      generalSelectors.getAccountState(getState()),
       extractAtomUriBySocketUri(targetSocketUri)
-    )
-  ) {
-    if (!senderSocketUri) {
-      throw new Error("SenderSocketUri not present");
-    }
-
-    if (!targetSocketUri) {
-      throw new Error("TargetSocketUri not present");
-    }
-
-    return ownerApi
-      .serverSideConnect(senderSocketUri, targetSocketUri)
-      .then(async response => {
-        if (!response.ok) {
-          const errorMsg = await response.text();
-          throw new Error(
-            `Could not connect sockets(${senderSocketUri}<->${targetSocketUri}): ${errorMsg}`
-          );
-        }
-      });
-  } else {
-    const cnctMsg = buildConnectMessage({
-      connectMessage: connectMessage,
-      socketUri: senderSocketUri,
-      targetSocketUri: targetSocketUri,
-    });
-
-    return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-      won
-        .wonMessageFromJsonLd(
-          jsonResp.message,
-          vocab.WONMSG.uriPlaceholder.event
-        )
-        .then(wonMessage =>
-          dispatch({
-            type: actionTypes.atoms.connectSockets,
-            payload: {
-              eventUri: jsonResp.messageUri,
-              message: jsonResp.message,
-              optimisticEvent: wonMessage,
-              senderSocketUri: senderSocketUri,
-              targetSocketUri: targetSocketUri,
-            },
-          })
-        )
-    );
-  }
-};
+    ),
+    dispatch
+  );
 
 export const close = atomUri => (dispatch, getState) => {
   buildCloseAtomMessage(atomUri)
@@ -217,6 +161,29 @@ export const edit = (draft, oldAtom, callback) => (dispatch, getState) =>
     });
   });
 
+export const createAtomFromDraftAndDispatch = (
+  atomDraft,
+  nodeUri,
+  dispatch
+) => {
+  const { message, atomUri } = buildCreateMessage(atomDraft, nodeUri);
+
+  return ownerApi
+    .sendMessage(message)
+    .then(jsonResp => {
+      dispatch({
+        type: actionTypes.atoms.create,
+        payload: {
+          eventUri: jsonResp.messageUri,
+          message: jsonResp.message,
+          atomUri: atomUri,
+          atom: atomDraft,
+        },
+      });
+    })
+    .then(() => atomUri);
+};
+
 export const create = (draft, personaUri, nodeUri) => (dispatch, getState) => {
   const state = getState();
 
@@ -224,40 +191,19 @@ export const create = (draft, personaUri, nodeUri) => (dispatch, getState) => {
     nodeUri = generalSelectors.getDefaultNodeUri(state);
   }
 
+  const holder = generalSelectors.getAtom(personaUri)(getState());
+
+  if (personaUri && !holder) {
+    console.warn(
+      "Could not find holder with Uri: ",
+      personaUri,
+      ", holder not be stored in the state"
+    );
+  }
+
   return ensureLoggedIn(dispatch, getState).then(() => {
-    const { message, atomUri } = buildCreateMessage(draft, nodeUri);
-
-    return ownerApi
-      .sendMessage(message)
-      .then(jsonResp => {
-        dispatch({
-          type: actionTypes.atoms.create,
-          payload: {
-            eventUri: jsonResp.messageUri,
-            message: jsonResp.message,
-            atomUri: atomUri,
-            atom: draft,
-          },
-        });
-      })
-      .then(() => {
-        const persona = generalSelectors.getAtom(personaUri)(state);
-        if (persona) {
-          const senderSocketUri = atomUtils.getSocketUri(
-            persona,
-            vocab.HOLD.HolderSocketCompacted
-          );
-          const targetSocketUri = `${atomUri}#holdableSocket`;
-
-          return ownerApi
-            .serverSideConnect(senderSocketUri, targetSocketUri, false, true)
-            .then(async response => {
-              if (!response.ok) {
-                const errorMsg = await response.text();
-                throw new Error(`Could not connect identity: ${errorMsg}`);
-              }
-            });
-        }
-      });
+    return createAtomFromDraftAndDispatch(draft, nodeUri, dispatch).then(
+      atomUri => connectHolderToCreatedAtomUri(holder, atomUri)
+    );
   });
 };
