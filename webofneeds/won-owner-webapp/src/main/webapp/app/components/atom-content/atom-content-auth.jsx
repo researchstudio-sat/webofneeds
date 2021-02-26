@@ -13,6 +13,8 @@ export default function WonAtomContentAuth({ atom }) {
   const authorizations = authImm && authImm.toJS();
   window.auth4dg = authorizations;
 
+  //TODO: Also display vocab.AUTH.bearer vocab.AUTH.provideAuthInfo and vocab.AUTH.requestedBy
+
   return (
     <won-atom-content-auth>
       {authorizations && authorizations.length > 0 ? (
