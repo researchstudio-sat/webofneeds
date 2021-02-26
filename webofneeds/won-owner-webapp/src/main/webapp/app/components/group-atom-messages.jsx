@@ -64,6 +64,36 @@ export default function WonGroupAtomMessages({
       .filter(msg => !messageUtils.isAtomHintMessage(msg)) //FILTER OUT ALL HINT MESSAGES
       .filter(msg => !messageUtils.isSocketHintMessage(msg));
 
+  const allUnreadForwardMessages =
+    allChatMessages &&
+    allChatMessages
+      .filter(messageUtils.hasForwardsReferences)
+      .filter(messageUtils.isMessageUnread);
+
+  /* Since we are not displaying forwardMessages in the group-chat we might run into the problem that some forwardedMessages will not get marked As Read
+  * and therefore will always show up as unread
+  *
+  * for debug info you can use this console command to list all unread messages currently stored in the state (add .toJS() after the command to print as json):
+  * store4dbg.getState().get("atoms").flatMap(atom => atom.get("connections").flatMap(conn => conn.get("messages"))).filter(msg => msg.get("unread"))
+  * */
+  useEffect(
+    () => {
+      if (allUnreadForwardMessages && allUnreadForwardMessages.size > 0) {
+        allUnreadForwardMessages.mapKeys(msgUri => {
+          dispatch(
+            actionCreators.messages__markAsRead({
+              messageUri: msgUri,
+              connectionUri: connectionUri,
+              atomUri: senderAtomUri,
+              read: true,
+            })
+          );
+        });
+      }
+    },
+    [allUnreadForwardMessages]
+  );
+
   const processState = useSelector(generalSelectors.getProcessState);
   const hasConnectionMessagesToLoad = processUtils.hasMessagesToLoad(
     processState,
