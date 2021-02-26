@@ -645,3 +645,20 @@ export function generateFakePersonaName(atomUri) {
     fakeNames.animals[animalHash % fakeNames.animals.length]
   );
 }
+
+/**
+ * This is just seen as a workaround for our fetchWorker since workers can only exchange strings and the error objects are not able to be enriched
+ * we store a stringified version within the error message, this method parses the error payload back to the way we wanted it
+ * @param error
+ * @returns {{}|any}
+ */
+export function parseWorkerError(error) {
+  //FIXME: we somehow lose the status info of the error from the webworker, lets try and parse the message as a json
+
+  try {
+    return JSON.parse(error.message);
+  } catch {
+    console.error("Could not parse error from worker, return nothing: ", error);
+    return {};
+  }
+}

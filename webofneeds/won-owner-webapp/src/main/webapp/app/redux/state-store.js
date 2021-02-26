@@ -18,6 +18,7 @@ import {
   is,
   getUri,
   getIn,
+  parseWorkerError,
 } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
@@ -374,13 +375,7 @@ export const fetchConnectionsContainerAndDispatch = (
             )
         )
         .catch(error => {
-          //FIXME: we somehow lose the status info of the error from the webworker, lets try and parse the message as a json
-          let errorParsed;
-          try {
-            errorParsed = JSON.parse(error.message);
-          } catch {
-            errorParsed = {};
-          }
+          let errorParsed = parseWorkerError(error);
 
           if (errorParsed.status && errorParsed.status === 410) {
             dispatch({
@@ -396,6 +391,7 @@ export const fetchConnectionsContainerAndDispatch = (
                   code: errorParsed.status,
                   params: errorParsed.params || {},
                   message: errorParsed.message || error.message,
+                  response: errorParsed.response,
                   requestCredentials: requestCredentials,
                 },
               }),
@@ -502,13 +498,8 @@ export const fetchAtomAndDispatch = (
             return parsedAtomImm;
           })
           .catch(error => {
-            //FIXME: we somehow lose the status info of the error from the webworker, lets try and parse the message as a json
-            let errorParsed;
-            try {
-              errorParsed = JSON.parse(error.message);
-            } catch {
-              errorParsed = {};
-            }
+            let errorParsed = parseWorkerError(error);
+
             if (
               (errorParsed.status && errorParsed.status === 410) ||
               (errorParsed.message && errorParsed.message.startsWith("410"))

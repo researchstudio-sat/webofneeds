@@ -14,7 +14,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import { getPathname, getQueryParams, delay } from "../utils";
+import { getPathname, getQueryParams, delay, parseWorkerError } from "../utils";
 
 /**
  * Makes sure user is either logged in
@@ -102,29 +102,29 @@ export const accountLogin = credentials => (dispatch, getState) => {
     .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
     .then(() => stateStore.fetchOwnedMetaData(dispatch, getState))
     .then(() => dispatch({ type: actionTypes.account.loginFinished }))
-    .catch(error =>
-      error.response.json().then(loginError => {
-        return Promise.resolve()
-          .then(() => {
-            if (isLoggedIn) {
-              return dispatch({ type: actionTypes.account.reset });
-            }
-          })
-          .then(() => {
-            if (credentials.privateId) {
-              loginError = won.PRIVATEID_NOT_FOUND_ERROR;
-            }
+    .catch(error => {
+      let errorParsed = parseWorkerError(error);
 
-            return dispatch(
-              actionCreators.account__loginFailed({
-                loginError: Immutable.fromJS(loginError),
-                error,
-                credentials,
-              })
-            );
-          });
-      })
-    )
+      let loginError = errorParsed.response;
+
+      return Promise.resolve()
+        .then(() => {
+          if (isLoggedIn) {
+            return dispatch({ type: actionTypes.account.reset });
+          }
+        })
+        .then(() => {
+          if (credentials.privateId) {
+            loginError = won.PRIVATEID_NOT_FOUND_ERROR;
+          }
+
+          return dispatch(
+            actionCreators.account__loginFailed({
+              loginError: Immutable.fromJS(loginError),
+            })
+          );
+        });
+    })
     .then(() => {
       _loginInProcessFor = undefined;
     });
@@ -247,14 +247,16 @@ export const accountVerifyEmailAddress = verificationToken => dispatch => {
     .then(() => {
       dispatch({ type: actionTypes.account.verifyEmailAddressSuccess });
     })
-    .catch(error =>
+    .catch(error => {
+      let errorParsed = parseWorkerError(error);
+
       dispatch({
         type: actionTypes.account.verifyEmailAddressFailed,
         payload: {
-          emailVerificationError: Immutable.fromJS(error.jsonResponse),
+          emailVerificationError: Immutable.fromJS(errorParsed.response),
         },
-      })
-    );
+      });
+    });
 };
 
 export const accountResendVerificationEmail = email => dispatch => {
@@ -264,14 +266,16 @@ export const accountResendVerificationEmail = email => dispatch => {
     .then(() => {
       dispatch({ type: actionTypes.account.resendVerificationEmailSuccess });
     })
-    .catch(error =>
+    .catch(error => {
+      let errorParsed = parseWorkerError(error);
+
       dispatch({
         type: actionTypes.account.resendVerificationEmailFailed,
         payload: {
-          emailVerificationError: Immutable.fromJS(error.jsonResponse),
+          emailVerificationError: Immutable.fromJS(errorParsed.response),
         },
-      })
-    );
+      });
+    });
 };
 
 export const accountSendAnonymousLinkEmail = (email, privateId) => dispatch => {
@@ -281,14 +285,16 @@ export const accountSendAnonymousLinkEmail = (email, privateId) => dispatch => {
     .then(() => {
       dispatch({ type: actionTypes.account.sendAnonymousLinkEmailSuccess });
     })
-    .catch(error =>
+    .catch(error => {
+      let errorParsed = parseWorkerError(error);
+
       dispatch({
         type: actionTypes.account.sendAnonymousLinkEmailFailed,
         payload: {
-          anonymousEmailError: Immutable.fromJS(error.jsonResponse),
+          anonymousEmailError: Immutable.fromJS(errorParsed.response),
         },
-      })
-    );
+      });
+    });
 };
 
 export const reconnect = () => (dispatch, getState) => {

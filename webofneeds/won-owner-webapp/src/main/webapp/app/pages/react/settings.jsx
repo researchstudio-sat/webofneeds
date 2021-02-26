@@ -8,6 +8,7 @@ import WonGenericPage from "~/app/pages/genericPage";
 
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
 import "~/style/_settings.scss";
+import { parseWorkerError } from "~/app/utils";
 
 const MINPW_LENGTH = 6;
 
@@ -78,41 +79,38 @@ export default function PageSettings() {
         setPasswordChanged(true);
       })
       .catch(error => {
-        const response = error && error.response;
-        if (response) {
-          response.json().then(jsonResponse => {
-            if (jsonResponse.code) {
-              switch (jsonResponse.code) {
-                case won.RESPONSECODE.PASSWORDCHANGE_USER_NOT_FOUND:
-                  setChangePasswordError(
-                    "Password change failed, User was not found"
-                  );
-                  break;
-                case won.RESPONSECODE.PASSWORDCHANGE_BAD_PASSWORD:
-                  setChangePasswordError(
-                    "Password change failed, New Password is not valid"
-                  );
-                  break;
-                case won.RESPONSECODE.PASSWORDCHANGE_KEYSTORE_PROBLEM:
-                  setChangePasswordError(
-                    "Password change failed, there was a Problem with the Keystore"
-                  );
-                  break;
-                case won.RESPONSECODE.PASSWORDCHANGE_WRONG_OLD_PASSWORD:
-                  setChangePasswordError(
-                    "Password change failed, Current Password was not correct"
-                  );
-                  break;
-                default:
-                  setChangePasswordError(
-                    `Password change failed, Unknown Response: ${JSON.stringify(
-                      jsonResponse
-                    )}`
-                  );
-                  break;
-              }
-            }
-          });
+        let errorParsed = parseWorkerError(error);
+
+        if (errorParsed.response && errorParsed.response.code) {
+          switch (errorParsed.response.code) {
+            case won.RESPONSECODE.PASSWORDCHANGE_USER_NOT_FOUND:
+              setChangePasswordError(
+                "Password change failed, User was not found"
+              );
+              break;
+            case won.RESPONSECODE.PASSWORDCHANGE_BAD_PASSWORD:
+              setChangePasswordError(
+                "Password change failed, New Password is not valid"
+              );
+              break;
+            case won.RESPONSECODE.PASSWORDCHANGE_KEYSTORE_PROBLEM:
+              setChangePasswordError(
+                "Password change failed, there was a Problem with the Keystore"
+              );
+              break;
+            case won.RESPONSECODE.PASSWORDCHANGE_WRONG_OLD_PASSWORD:
+              setChangePasswordError(
+                "Password change failed, Current Password was not correct"
+              );
+              break;
+            default:
+              setChangePasswordError(
+                `Password change failed, Unknown Response: ${JSON.stringify(
+                  errorParsed.response
+                )}`
+              );
+              break;
+          }
         }
       });
   };

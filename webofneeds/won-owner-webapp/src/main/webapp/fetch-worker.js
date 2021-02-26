@@ -40,17 +40,7 @@ export const resendEmailVerification = email => {
     }),
   })
     .then(checkHttpStatus(url))
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error =>
-      error.response.json().then(errorMessage => {
-        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
-        const resendError = new Error();
-        resendError.jsonResponse = errorMessage;
-        throw resendError;
-      })
-    );
+    .then(resp => resp.json());
 };
 
 /**
@@ -72,17 +62,7 @@ export const sendAnonymousLinkEmail = (email, privateId) => {
     }),
   })
     .then(checkHttpStatus(url))
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error =>
-      error.response.json().then(errorMessage => {
-        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
-        const sendError = new Error();
-        sendError.jsonResponse = errorMessage;
-        throw sendError;
-      })
-    );
+    .then(resp => resp.json());
 };
 
 /**
@@ -220,12 +200,8 @@ export const acceptTermsOfService = () =>
     },
     credentials: "include",
   })
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error => {
-      return error.json();
-    });
+    .then(resp => resp.json())
+    .catch(error => error.json());
 
 /**
  * Confirm the Registration with the verificationToken-link provided in the registration-email
@@ -243,17 +219,7 @@ export const confirmRegistration = verificationToken => {
     }),
   })
     .then(checkHttpStatus(url))
-    .then(resp => {
-      return resp.json();
-    })
-    .catch(error =>
-      error.response.json().then(errorMessage => {
-        //FIXME: MOVE THIS ERROR HANDLINNG INTO THE ACTION
-        const verificationError = new Error();
-        verificationError.jsonResponse = errorMessage;
-        throw verificationError;
-      })
-    );
+    .then(resp => resp.json());
 };
 
 /**
@@ -1126,16 +1092,33 @@ const checkHttpStatus = (uri, params = {}) => response => {
         response.statusText
       } for request ${uri}, ${JSON.stringify(params)}`
     );
-    const errorPayload = {
-      response: response,
-      status: response.status,
-      params: params,
-      message: `ERROR for request: ${response.status} - ${
-        response.statusText
-      } for request ${uri}`,
-    };
 
-    throw new Error(JSON.stringify(errorPayload));
+    try {
+      return response.json().then(jsonResponse => {
+        const errorPayload = {
+          response: jsonResponse,
+          status: response.status,
+          params: params,
+          message: `ERROR for request: ${response.status} - ${
+            response.statusText
+          } for request ${uri}`,
+        };
+
+        throw new Error(JSON.stringify(errorPayload));
+      });
+    } catch {
+      console.warn("error response did not have a json as response", response);
+      const errorPayload = {
+        response: {},
+        status: response.status,
+        params: params,
+        message: `ERROR for request: ${response.status} - ${
+          response.statusText
+        } for request ${uri}`,
+      };
+
+      throw new Error(JSON.stringify(errorPayload));
+    }
   }
 };
 
