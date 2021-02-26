@@ -497,6 +497,19 @@ const processMessageEffectsAndMessage = (
   return Promise.all([petriNetPromise, messageEffectsPromise]);
 };
 
+export const connectFailure = wonMessage => dispatch => {
+  console.error(
+    "connectFailure received, contents of wonMessage: ",
+    wonMessage
+  );
+  dispatch({
+    type: actionTypes.messages.connect.failure,
+    payload: Immutable.fromJS({
+      message: wonMessage,
+    }),
+  });
+};
+
 export const connectSuccessOwn = wonMessage => (dispatch, getState) => {
   const state = getState();
   const atomUri = extractAtomUriBySocketUri(wonMessage.getSenderSocket());

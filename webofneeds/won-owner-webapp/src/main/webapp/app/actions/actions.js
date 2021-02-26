@@ -201,7 +201,7 @@ const actionHierarchy = {
       //success: messages.successfulConnect,
       successRemote: messages.connectSuccessRemote, //2nd successResponse
       successOwn: messages.connectSuccessOwn, //1st successResponse
-      failure: INJ_DEFAULT,
+      failure: messages.connectFailure,
     },
     chatMessage: {
       //success: messages.successfulChatMessage,
