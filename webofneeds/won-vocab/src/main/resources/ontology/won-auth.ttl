@@ -402,10 +402,6 @@ auth:relativeAtomExpressionShape
                            auth:authorizationRequestor
                            auth:anyAtom ) .
 
-# Definition 18 (operation expression)
-
-# TODO: Update definition of operation expression
-
 auth:messageOperationExpressionShape
     rdfs:isDefinedBy     auth: ;
     a                    sh:NodeShape, auth:OperationExpressionShape ;
@@ -1151,7 +1147,7 @@ auth:AseBranchProperty
 
 auth:inherit
     rdfs:isDefinedBy   auth: ;
-    rdfs:subPropertyOf auth:AseLeafDatatypeProperty ;
+    rdfs:subPropertyOf auth:AseLeafObjectProperty ;
     a                  owl:DatatypeProperty ;
     rdfs:range         xsd:boolean ;
     rdfs:label         "inherit" ;
@@ -1195,7 +1191,7 @@ auth:atomState
 
 auth:tokenScope
     rdfs:isDefinedBy auth: ;
-    a                owl:DatatypeProperty ;
+    a                owl:ObjectProperty ;
     rdfs:domain      [ a           owl:Class ;
                        owl:unionOf ( auth:AuthToken auth:TokenShape auth:TokenSpecification ) ] ;
     rdfs:range       [ a           owl:Class ;
@@ -1301,7 +1297,7 @@ auth:connectionMessages
     rdfs:domain        [ a           owl:Class ;
                          owl:unionOf ( auth:AseRoot auth:SocketExpression auth:ConnectionsExpression
                                        auth:ConnectionExpression ) ] ;
-    rdfs:range         auth:ConnectionMessagesExpression ;pu
+    rdfs:range         auth:ConnectionMessagesExpression ;
     rdfs:label         "connectionMessages" ;
     rdfs:comment       """Used in the ASE root, socket, connections, or connection expressions to specify
     a auth:ConnectionMessagesExpression. The connection containers directly or transitively reachable from all target nodes 
@@ -1334,7 +1330,7 @@ auth:bearer
     rdfs:range       auth:TokenShape ;
     rdfs:label       "bearer" ;
     rdfs:comment
-                     """Used in an authorization to define constraints for tokens that if fulfilled, make their bearer a grantee."""@en .
+                     """Used in a [auth:Authorization] to define constraints for [auth:AuthToken]s that if fulfilled, make their bearer a grantee."""@en .
 
 auth:provideAuthInfo
     rdfs:isDefinedBy auth: ;
@@ -1343,8 +1339,8 @@ auth:provideAuthInfo
     rdfs:range       auth:AseRoot ;
     rdfs:label       "provideAuthInfo" ;
     rdfs:comment
-                     """Used in an authorization to define an ASE tree with operations for which authorization info
-                     is provided if the grantee of __this__ authorization is denied that operation."""@en .
+                     """Used in an Authorization to define a set of [auth:Operation]s for which the [won:Node] provides authorization information in case of a negative authorization decision."""@en .
+
 
 auth:operation
     rdfs:isDefinedBy   auth: ;
@@ -1362,10 +1358,10 @@ auth:messageOnBehalf
     rdfs:range       [ a           owl:Class ;
                        owl:unionOf ( msg:MessageType auth:MessageTypeSet ) ] ;
     rdfs:label       "messageOnBehalf" ;
-    rdfs:comment     """Allows an auth:MessageOperationExpression to specify msg:MessageTypes that the grantee of the operation may
+    rdfs:comment     """Allows an [auth:MessageOperationExpression] to specify [msg:MessageTypes] that the grantee of the operation may
      send __on behalf__ of the actual atom owner, at the operation's position in the atom's tree structure. The message
      types are either listed as objects of auth:messageOnBealf or defined
-     transitively. In the latter case, the object of auth:messageOnBehalf is an auth:MessageTypeSet, which in turn lists
+     transitively. In the latter case, the object of [auth:messageOnBehalf] is an [auth:MessageTypeSet], which in turn lists
      message types.
         """@en .
 
@@ -1446,6 +1442,14 @@ auth:expiresAfter
                        owl:unionOf ( xsd:int xsd:integer xsd:long ) ] ;
     rdfs:label       "expiresAfter" ;
     rdfs:comment     "Specifies the lifetime of a token in seconds."@en .
+
+auth:nodeSigned
+    rdfs:isDefinedBy auth: ;
+    a                owl:DatatypeProperty ;
+    rdfs:domain      [ a owl:Class ; owl:unionOf (auth:TokenSpecification auth:TokenShape ) ];
+    rdfs:range       xsd:boolean ;
+    rdfs:label       "nodeSigned" ;
+    rdfs:comment     "If `true` or missing in an [auth:TokenSpecification], tokens are issued on behalf of [won:Atom]s by the [won:Node], and signed with the node's key. If `false`, tokens issued by an atom have to be signed using the atom's key. The latter is a much more complex process as the atom's key is only known to the owner applications controlling that atom; such tokens cannot be produced by the WoN node alone. If used in an [auth:TokenShape]the property instructs the token verification algorithm on which key to verify the signature against. By default, i.e., if this property is not used, tokens are assumed to be signed by the WoN node."@en .
 
 auth:tokenIss
     rdfs:isDefinedBy auth: ;
