@@ -92,17 +92,19 @@ export const resetPassword = credentials =>
   fetchWorker.resetPassword(credentials);
 
 export const serverSideConnect = (
-  socketUri1,
-  socketUri2,
-  pending1 = false,
-  pending2 = false,
+  fromSocketUri,
+  toSocketUri,
+  fromPending = false,
+  toPending = false,
+  autoOpen = false,
   message
 ) =>
   fetchWorker.serverSideConnect(
-    socketUri1,
-    socketUri2,
-    pending1,
-    pending2,
+    fromSocketUri,
+    toSocketUri,
+    fromPending,
+    toPending,
+    autoOpen,
     message
   );
 

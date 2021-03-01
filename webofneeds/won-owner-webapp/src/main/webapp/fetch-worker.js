@@ -274,10 +274,11 @@ export const resetPassword = credentials => {
 };
 
 export const serverSideConnect = (
-  socketUri1,
-  socketUri2,
-  pending1 = false,
-  pending2 = false,
+  fromSocketUri,
+  toSocketUri,
+  fromPending = false,
+  toPending = false,
+  autoOpen = false,
   message
 ) => {
   return fetch("rest/action/connect", {
@@ -285,18 +286,14 @@ export const serverSideConnect = (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify([
-      {
-        pending: pending1,
-        socket: socketUri1,
-        message: message,
-      },
-      {
-        pending: pending2,
-        socket: socketUri2,
-        message: message,
-      },
-    ]),
+    body: JSON.stringify({
+      fromSocket: fromSocketUri,
+      toSocket: toSocketUri,
+      fromPending: fromPending,
+      toPending: toPending,
+      autoOpen: autoOpen,
+      message: message,
+    }),
     credentials: "include",
   });
 };
