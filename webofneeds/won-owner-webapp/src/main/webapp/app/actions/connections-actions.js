@@ -313,13 +313,14 @@ export const connectAtomSockets = (
     throw new Error("TargetSocketUri not present");
   }
 
-  if (isTargetOwned) {
+  if (isTargetOwned || isSenderPending) {
     return ownerApi
       .serverSideConnect(
-        targetSocketUri,
         senderSocketUri,
+        targetSocketUri,
         isSenderPending,
-        true
+        false,
+        connectMessage
       )
       .then(async response => {
         if (!response.ok) {
