@@ -32,6 +32,7 @@ export default function WonAtomHeaderBig({
   ownedConnection,
   showActions,
   toggleActions,
+  disableActions,
 }) {
   const dispatch = useDispatch();
   const storedAtoms = useSelector(generalSelectors.getAtoms);
@@ -212,7 +213,7 @@ export default function WonAtomHeaderBig({
         return (
           <won-toggle-actions>
             <button
-              onClick={() => toggleActions(!showActions)}
+              onClick={() => toggleActions && toggleActions(!showActions)}
               className={
                 "won-toggle-actions__button " +
                 (showActions
@@ -304,8 +305,12 @@ export default function WonAtomHeaderBig({
             {holderNameElement}
           </div>
         )}
-        {buddyActionElement}
-        {generateAtomActionButton()}
+        {!disableActions && (
+          <React.Fragment>
+            {buddyActionElement}
+            {generateAtomActionButton()}
+          </React.Fragment>
+        )}
         {atomDuration && (
           <a
             href={atomUtils.generateIcalDownloadLink(atom)}
@@ -323,8 +328,12 @@ export default function WonAtomHeaderBig({
             </svg>
           </a>
         )}
-        <WonShareDropdown atom={atom} />
-        <WonAtomContextDropdown atom={atom} />
+        {!disableActions && (
+          <React.Fragment>
+            <WonShareDropdown atom={atom} />
+            <WonAtomContextDropdown atom={atom} />
+          </React.Fragment>
+        )}
       </React.Fragment>
     );
   }
@@ -351,6 +360,7 @@ WonAtomHeaderBig.propTypes = {
   atom: PropTypes.object,
   ownedConnectionUri: PropTypes.string,
   ownedConnection: PropTypes.object,
-  showActions: PropTypes.bool.isRequired,
-  toggleActions: PropTypes.func.isRequired,
+  showActions: PropTypes.bool,
+  toggleActions: PropTypes.func,
+  disableActions: PropTypes.bool,
 };
