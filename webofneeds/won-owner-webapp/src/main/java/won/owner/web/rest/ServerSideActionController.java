@@ -1,5 +1,6 @@
 package won.owner.web.rest;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,16 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
-import won.owner.pojo.SocketToConnect;
+import won.owner.pojo.ServerSideConnectPayload;
 import won.owner.repository.UserAtomRepository;
 import won.owner.service.impl.UserService;
 import won.owner.web.service.ServerSideActionService;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/rest/action")
@@ -33,7 +30,7 @@ public class ServerSideActionController {
 
     // rsponses: 204 (no content) or 409 (conflict)
     @RequestMapping(value = "/connect", method = RequestMethod.POST)
-    public ResponseEntity connectSockets(@RequestBody(required = true) SocketToConnect[] connectAction) {
+    public ResponseEntity connectSockets(@RequestBody(required = true) ServerSideConnectPayload connectAction) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
         // this session atom,
@@ -42,27 +39,26 @@ public class ServerSideActionController {
         if (user == null) {
             return new ResponseEntity("Cannot process connect action: not logged in.", HttpStatus.FORBIDDEN);
         }
-        List<SocketToConnect> sockets = Arrays.asList(connectAction);
-        if (sockets == null || sockets.isEmpty()) {
-            return new ResponseEntity("Cannot process connect action: no sockets specified to be connected.",
+        if (StringUtils.isEmpty(connectAction.getFromSocket())) {
+            return new ResponseEntity("Cannot process connect action: from socket not specified.",
                             HttpStatus.CONFLICT);
         }
-        if (sockets.size() > 2) {
-            return new ResponseEntity("Cannot process connect action: too many sockets specified to be connected.",
+        if (StringUtils.isEmpty(connectAction.getToSocket())) {
+            return new ResponseEntity("Cannot process connect action: to socket not specified.",
                             HttpStatus.CONFLICT);
         }
         Set<UserAtom> atoms = user.getUserAtoms();
-        List<SocketToConnect> socketsWithOwnership = sockets.stream().map(socket -> {
-            // return false (not problematic) if the socket is pending (i.e., the atom it
-            // belongs to is expected to be created shortly)
-            if (socket.isPending()) {
-                socket.setNonOwned(false);
-            } else if (!atoms.stream().anyMatch(atom -> socket.getSocket().startsWith(atom.getUri().toString()))) {
-                socket.setNonOwned(true);
-            }
-            return socket;
-        }).collect(Collectors.toList());
-        serverSideActionService.connect(socketsWithOwnership, SecurityContextHolder.getContext().getAuthentication());
+        if (!(connectAction.isFromPending() || atoms.stream()
+                        .anyMatch(atom -> connectAction.getFromSocket().startsWith(atom.getUri().toString())))) {
+            return new ResponseEntity("Cannot process connect action: from atom is not owned nor in pending.",
+                            HttpStatus.CONFLICT);
+        }
+        if (connectAction.isAutoOpen() && !(connectAction.isToPending() || atoms.stream()
+                        .anyMatch(atom -> connectAction.getToSocket().startsWith(atom.getUri().toString())))) {
+            return new ResponseEntity("Cannot process connect autoOpen action: to atom is not owned nor in pending.",
+                            HttpStatus.CONFLICT);
+        }
+        serverSideActionService.connect(connectAction, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

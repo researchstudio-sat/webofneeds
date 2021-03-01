@@ -320,6 +320,7 @@ export const connectAtomSockets = (
         targetSocketUri,
         isSenderPending,
         false,
+        isTargetOwned, //if target is Owned we set autoOpen to true
         connectMessage
       )
       .then(async response => {
@@ -455,7 +456,8 @@ export const connectHolderToCreatedAtomUri = (holder, atomUri) => {
           personaHolderSocketUri,
           `${atomUri}#holdableSocket`,
           false,
-          true
+          true,
+          true //we set autoopen to true since we know that the holder and created atom both belong to the user
         )
         .then(async response => {
           if (!response.ok) {
