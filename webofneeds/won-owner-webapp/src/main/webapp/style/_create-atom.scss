@@ -4,10 +4,14 @@
 
 won-create-atom {
   display: grid;
-  grid-template-areas: "header" "main" "footer";
-  grid-template-rows: min-content minmax($minimalGridRows, 1fr) min-content;
+  grid-template-areas: "fromAtom" "header" "main" "footer";
+  grid-template-rows: min-content min-content minmax($minimalGridRows, 1fr) min-content;
   grid-row-gap: $gridRowGap;
   box-sizing: border-box;
+
+  won-atom-header-big {
+    grid-area: fromAtom;
+  }
 
   .cp__header {
     margin: $gridRowGap;

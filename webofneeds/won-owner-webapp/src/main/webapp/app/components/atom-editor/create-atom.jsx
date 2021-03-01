@@ -24,6 +24,8 @@ import { actionCreators } from "../../actions/actions";
 
 import "~/style/_create-atom.scss";
 import "~/style/_responsiveness-utils.scss";
+import WonAtomHeaderBig from "~/app/components/atom-header-big";
+import * as wonLabelUtils from "~/app/won-label-utils";
 
 export default function WonCreateAtom({
   fromAtom,
@@ -49,6 +51,9 @@ export default function WonCreateAtom({
       accountUtils.isAtomOwned(accountState, holderUri) &&
       atomUtils.hasHolderSocket(generalSelectors.getAtom(holderUri)(state))
   );
+
+  const fromAtomUri = getUri(fromAtom);
+  const isFromAtomOwned = accountUtils.isAtomOwned(accountState, fromAtomUri);
 
   let useCaseImm;
 
@@ -177,8 +182,6 @@ export default function WonCreateAtom({
 
     if (connect) {
       executeFunction = () => {
-        const fromAtomUri = getUri(fromAtom);
-
         dispatch(
           actionCreators.connections__connectReactionAtom(
             fromAtomUri,
@@ -266,6 +269,20 @@ export default function WonCreateAtom({
           {"Duplicate from '" + useCaseLabel + "'"}
         </span>
       );
+    } else if (connect && fromAtom) {
+      headerTitleElement = (
+        <span className="cp__header__title">
+          {isFromAtomOwned
+            ? `Add New ${wonLabelUtils.getSocketItemLabel(
+                targetSocketType,
+                senderSocketType
+              )}`
+            : `Connect New ${wonLabelUtils.getSocketItemLabel(
+                targetSocketType,
+                senderSocketType
+              )}`}
+        </span>
+      );
     } else {
       headerTitleElement = (
         <span className="cp__header__title">{useCaseLabel}</span>
@@ -299,6 +316,15 @@ export default function WonCreateAtom({
 
     return (
       <won-create-atom>
+        {connect && fromAtom ? (
+          <WonAtomHeaderBig
+            atomUri={fromAtomUri}
+            atom={fromAtom}
+            disableActions={true}
+          />
+        ) : (
+          undefined
+        )}
         <div className="cp__header">
           {headerIconElement}
           {headerTitleElement}
