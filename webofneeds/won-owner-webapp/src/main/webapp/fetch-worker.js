@@ -281,21 +281,25 @@ export const serverSideConnect = (
   autoOpen = false,
   message
 ) => {
+  const params = {
+    fromSocket: fromSocketUri,
+    toSocket: toSocketUri,
+    fromPending: fromPending,
+    toPending: toPending,
+    autoOpen: autoOpen,
+    message: message,
+  };
+
   return fetch("rest/action/connect", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      fromSocket: fromSocketUri,
-      toSocket: toSocketUri,
-      fromPending: fromPending,
-      toPending: toPending,
-      autoOpen: autoOpen,
-      message: message,
-    }),
+    body: JSON.stringify(params),
     credentials: "include",
-  });
+  })
+    .then(checkHttpStatus("rest/action/connect", params))
+    .then(() => ({ ok: true }));
 };
 
 /**

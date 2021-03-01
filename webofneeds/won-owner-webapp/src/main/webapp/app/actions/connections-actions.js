@@ -13,7 +13,12 @@ import * as useCaseUtils from "../usecase-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
-import { getIn, getUri, extractAtomUriBySocketUri } from "../utils.js";
+import {
+  getIn,
+  getUri,
+  extractAtomUriBySocketUri,
+  parseWorkerError,
+} from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -323,13 +328,9 @@ export const connectAtomSockets = (
         isTargetOwned, //if target is Owned we set autoOpen to true
         connectMessage
       )
-      .then(async response => {
-        if (!response.ok) {
-          const errorMsg = await response.text();
-          throw new Error(
-            `Could not connect sockets(${senderSocketUri}<->${targetSocketUri}): ${errorMsg}`
-          );
-        }
+      .catch(err => {
+        const error = parseWorkerError(err);
+        console.error("ServerSideConnect failed", error);
       });
   } else {
     // establish connection
@@ -456,11 +457,9 @@ export const connectHolderToCreatedAtomUri = (holder, atomUri) => {
           true,
           true //we set autoopen to true since we know that the holder and created atom both belong to the user
         )
-        .then(async response => {
-          if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(`Could not connect identity: ${errorMsg}`);
-          }
+        .catch(err => {
+          const error = parseWorkerError(err);
+          console.error("ServerSideConnect failed", error);
         })
         .then(() => atomUri)
     : atomUri;
