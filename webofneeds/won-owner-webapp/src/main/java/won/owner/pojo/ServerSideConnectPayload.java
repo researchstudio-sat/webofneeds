@@ -1,22 +1,37 @@
 package won.owner.pojo;
 
 /**
- * Used for the server side connect action (describes post payload) fromSocket:
- * String representation of senderSocketUri toSocket: String representation of
- * targetSocketUri fromPending: if atom to connect from is currently in creation
- * (e.g. socket is still pending/not available) toPending: if atom to connect to
- * is currently in creation (e.g. socket is still pending/not available)
- * message: message that is used within the connect message (see default value)
- * autoOpen: if set to true, a successful connect from the one side will be
- * answered with another connect (only possible if both atoms belong to the
- * user)
+ * Data transfer object for the server side connect action.
  */
 public class ServerSideConnectPayload {
+    /**
+     * String representation of senderSocketUri.
+     */
     String fromSocket;
+    /**
+     * String representation of targetSocketUri.
+     */
     String toSocket;
+    /**
+     * Set to <code>true</code> if the atom to connect <i>from</i> is currently in
+     * creation (e.g. socket is still pending/not available).
+     */
     boolean fromPending = false;
+    /**
+     * Set to <code>true</code> if the atom to connect <i>to</i> is currently in
+     * creation (e.g. socket is still pending/not available).
+     */
     boolean toPending = false;
+    /**
+     * If set to <code>true</code>, a successful connect from the one side will be
+     * answered with another connect (only possible if both atoms belong to the
+     * user).
+     */
     boolean autoOpen = false;
+    /**
+     * Message to use as the connect message's <code>textMessage</code> (see default
+     * value).
+     */
     String message = "Connect message automatically sent by a server-side action";
 
     public ServerSideConnectPayload() {
