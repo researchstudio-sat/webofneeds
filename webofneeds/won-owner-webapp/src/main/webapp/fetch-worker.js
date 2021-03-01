@@ -1087,12 +1087,6 @@ const checkHttpStatus = (uri, params = {}) => response => {
   ) {
     return response;
   } else {
-    console.error(
-      `ERROR for request: ${response.status} - ${
-        response.statusText
-      } for request ${uri}, ${JSON.stringify(params)}`
-    );
-
     try {
       return response.json().then(jsonResponse => {
         const errorPayload = {
