@@ -14,14 +14,17 @@ won-atom-content-auth {
     border: $thinGrayBorder;
     padding: 0.5rem;
     grid-template-areas:
-      "grid-item-label grid-item-label"
-      "grid-item-granteelabel grid-item-grantlabel"
-      "grid-item-grantee grid-item-grant";
-    grid-template-columns: min-content 1fr;
+      "grid-item-label grid-item-label grid-item-label grid-item-label grid-item-label"
+      "grid-item-granteelabel grid-item-bearerlabel grid-item-grantlabel grid-item-requestedBylabel grid-item-provideAuthInfolabel"
+      "grid-item-grantee grid-item-bearer grid-item-grant grid-item-requestedBy grid-item-provideAuthInfo";
+    grid-template-columns: min-content min-content min-content min-content min-content;
     grid-gap: 0.25rem;
 
     &__grantlabel,
     &__granteelabel,
+    &__bearerlabel,
+    &__provideAuthInfolabel,
+    &__requestedBylabel,
     &__label {
       font-weight: bold;
     }
@@ -36,7 +39,19 @@ won-atom-content-auth {
     &__granteelabel {
       grid-area: grid-item-granteelabel;
     }
+    &__bearerlabel {
+      grid-area: grid-item-bearerlabel;
+    }
+    &__requestedBylabel {
+      grid-area: grid-item-requestedBylabel;
+    }
+    &__provideAuthInfolabel {
+      grid-area: grid-item-provideAuthInfolabel;
+    }
 
+    &__provideAuthInfo,
+    &__bearer,
+    &__requestedBy,
     &__grantee,
     &__grant {
       font-family: monospace;
@@ -47,6 +62,15 @@ won-atom-content-auth {
     }
     &__grant {
       grid-area: grid-item-grant;
+    }
+    &__bearer {
+      grid-area: grid-item-bearer;
+    }
+    &__requestedBy {
+      grid-area: grid-item-requestedBy;
+    }
+    &__provideAuthInfo {
+      grid-area: grid-item-provideAuthInfo;
     }
   }
 }
