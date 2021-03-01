@@ -67,6 +67,7 @@ won-slide-in {
   $maxSlideInWidth: $maxContentWidth;
   grid-template-columns: 1fr minmax(min-content, $maxSlideInWidth) 1fr;
   grid-auto-flow: column;
+  z-index: 2;
 
   background: black; //Fallback in case the browser does not support css variables
   background: $won-secondary-color;
