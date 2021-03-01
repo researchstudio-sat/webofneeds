@@ -49,7 +49,10 @@ public class ServerSideActionService implements WonMessageProcessor {
         final AtomicInteger atomCounter = new AtomicInteger(0);
         final AtomicBoolean connectSent = new AtomicBoolean(false);
         final URI fromSocket = URI.create(sockets.get(0).getSocket());
+        final String fromMessage = sockets.get(0).getMessage();
+        final boolean isToSocketNonOwned = sockets.get(1).isNonOwned();
         final URI toSocket = URI.create(sockets.get(1).getSocket());
+        final String toMessage = sockets.get(1).getMessage();
         // count the pending sockets
         int atoms = (int) sockets.stream().filter(f -> !f.isPending()).count();
         atomCounter.set(atoms);
@@ -68,7 +71,7 @@ public class ServerSideActionService implements WonMessageProcessor {
                     if (connectSent.compareAndSet(false, true)) {
                         // we haven't sent the connect yet, do it now and register a new action
                         // waiting for the connect on the receiving end.
-                        sendConnect(fromSocket, toSocket, authentication);
+                        sendConnect(fromSocket, toSocket, fromMessage, authentication);
                         return Arrays.asList(new EventTriggeredAction<WonMessage>(
                                         String.format("Connect %s and %s: Expecting incoming connect from %s for %s",
                                                         fromSocket, toSocket, fromSocket, toSocket),
@@ -76,8 +79,8 @@ public class ServerSideActionService implements WonMessageProcessor {
                     } else {
                         // we have sent the connect, check if we're processing the connect on the
                         // receiving end. If so, send an open.
-                        if (isConnectFromSocketForSocket(msg.get(), fromSocket, toSocket)) {
-                            reactWithConnect(msg.get(), authentication);
+                        if (!isToSocketNonOwned && isConnectFromSocketForSocket(msg.get(), fromSocket, toSocket)) {
+                            reactWithConnect(msg.get(), toMessage, authentication);
                             // that's it - don't register any more actions
                         }
                     }
@@ -123,11 +126,11 @@ public class ServerSideActionService implements WonMessageProcessor {
                         && msg.getRecipientSocketURI() != null && receiver.equals(msg.getRecipientSocketURI());
     }
 
-    private void sendConnect(URI fromSocket, URI toSocket, Authentication authentication) {
+    private void sendConnect(URI fromSocket, URI toSocket, String message, Authentication authentication) {
         WonMessage msgToSend = WonMessageBuilder
                         .connect()
                         .sockets().sender(fromSocket).recipient(toSocket)
-                        .content().text("Connect message automatically sent by a server-side action")
+                        .content().text(message)
                         .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);
@@ -138,11 +141,11 @@ public class ServerSideActionService implements WonMessageProcessor {
         }
     }
 
-    private void reactWithConnect(WonMessage connectMessageToReactTo, Authentication authentication) {
+    private void reactWithConnect(WonMessage connectMessageToReactTo, String message, Authentication authentication) {
         WonMessage msgToSend = WonMessageBuilder
                         .connect()
                         .sockets().reactingTo(connectMessageToReactTo)
-                        .content().text("Open message automatically sent by a server-side action")
+                        .content().text(message)
                         .build();
         try {
             AuthenticationThreadLocal.setAuthentication(authentication);

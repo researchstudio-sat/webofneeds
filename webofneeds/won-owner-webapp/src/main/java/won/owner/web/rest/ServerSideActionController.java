@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/rest/action")
@@ -51,21 +52,17 @@ public class ServerSideActionController {
                             HttpStatus.CONFLICT);
         }
         Set<UserAtom> atoms = user.getUserAtoms();
-        // keep sockets we can't process:
-        Optional<SocketToConnect> problematicSocket = sockets.stream().filter(socket -> {
+        List<SocketToConnect> socketsWithOwnership = sockets.stream().map(socket -> {
             // return false (not problematic) if the socket is pending (i.e., the atom it
             // belongs to is expected to be created shortly)
             if (socket.isPending()) {
-                return false;
+                socket.setNonOwned(false);
+            } else if (!atoms.stream().anyMatch(atom -> socket.getSocket().startsWith(atom.getUri().toString()))) {
+                socket.setNonOwned(true);
             }
-            // return true (=problematic) if we don't find an atom the socket belongs to
-            return !atoms.stream().anyMatch(atom -> socket.getSocket().startsWith(atom.getUri().toString()));
-        }).findFirst();
-        if (problematicSocket.isPresent()) {
-            return new ResponseEntity("Cannot process connect action: socket " + problematicSocket.get().getSocket()
-                            + " does not belong to any of the user's atoms.", HttpStatus.CONFLICT);
-        }
-        serverSideActionService.connect(sockets, SecurityContextHolder.getContext().getAuthentication());
+            return socket;
+        }).collect(Collectors.toList());
+        serverSideActionService.connect(socketsWithOwnership, SecurityContextHolder.getContext().getAuthentication());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

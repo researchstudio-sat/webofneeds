@@ -95,8 +95,16 @@ export const serverSideConnect = (
   socketUri1,
   socketUri2,
   pending1 = false,
-  pending2 = false
-) => fetchWorker.serverSideConnect(socketUri1, socketUri2, pending1, pending2);
+  pending2 = false,
+  message
+) =>
+  fetchWorker.serverSideConnect(
+    socketUri1,
+    socketUri2,
+    pending1,
+    pending2,
+    message
+  );
 
 /**
  * Returns all stored Atoms including MetaData (e.g. type, creationDate, location, state) as a Map

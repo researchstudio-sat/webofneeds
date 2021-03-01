@@ -277,7 +277,8 @@ export const serverSideConnect = (
   socketUri1,
   socketUri2,
   pending1 = false,
-  pending2 = false
+  pending2 = false,
+  message
 ) => {
   return fetch("rest/action/connect", {
     method: "POST",
@@ -288,10 +289,12 @@ export const serverSideConnect = (
       {
         pending: pending1,
         socket: socketUri1,
+        message: message,
       },
       {
         pending: pending2,
         socket: socketUri2,
+        message: message,
       },
     ]),
     credentials: "include",
