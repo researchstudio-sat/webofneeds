@@ -45,6 +45,7 @@ export default function WonSocketAddAtom({
   const history = useHistory();
   const addToAtomUri = getUri(addToAtom);
   const addToAtomSocketUri = atomUtils.getSocketUri(addToAtom, addToSocketType);
+  const addToUseCase = atomUtils.getMatchedUseCaseIdentifier(addToAtom);
   const isAddToAtomOwned = accountUtils.isAtomOwned(accountState, addToAtomUri);
   const externalDataState = useSelector(generalSelectors.getExternalDataState);
 
@@ -168,15 +169,13 @@ export default function WonSocketAddAtom({
               <div className="wsaa__content__create__right">
                 <div className="wsaa__content__create__right__topline">
                   <div className="wsaa__content__create__right__topline__notitle">
-                    {isAddToAtomOwned
-                      ? `Add New ${wonLabelUtils.getSocketItemLabel(
-                          addToSocketType,
-                          socketType
-                        )}`
-                      : `Connect New ${wonLabelUtils.getSocketItemLabel(
-                          addToSocketType,
-                          socketType
-                        )}`}
+                    {wonLabelUtils.getAddNewSocketItemLabel(
+                      isAddToAtomOwned,
+                      addToUseCase,
+                      addToSocketType,
+                      ucIdentifier,
+                      socketType
+                    )}
                   </div>
                 </div>
                 <div className="wsaa__content__create__right__subtitle">

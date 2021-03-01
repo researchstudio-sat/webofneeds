@@ -54,6 +54,7 @@ export default function WonCreateAtom({
 
   const fromAtomUri = getUri(fromAtom);
   const isFromAtomOwned = accountUtils.isAtomOwned(accountState, fromAtomUri);
+  const fromAtomUseCase = atomUtils.getMatchedUseCaseIdentifier(fromAtom);
 
   let useCaseImm;
 
@@ -272,15 +273,13 @@ export default function WonCreateAtom({
     } else if (connect && fromAtom) {
       headerTitleElement = (
         <span className="cp__header__title">
-          {isFromAtomOwned
-            ? `Add New ${wonLabelUtils.getSocketItemLabel(
-                targetSocketType,
-                senderSocketType
-              )}`
-            : `Connect New ${wonLabelUtils.getSocketItemLabel(
-                targetSocketType,
-                senderSocketType
-              )}`}
+          {wonLabelUtils.getAddNewSocketItemLabel(
+            isFromAtomOwned,
+            fromAtomUseCase,
+            targetSocketType,
+            useCaseIdentifier,
+            senderSocketType
+          )}
         </span>
       );
     } else {
