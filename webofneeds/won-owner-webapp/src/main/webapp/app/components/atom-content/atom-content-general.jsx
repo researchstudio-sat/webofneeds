@@ -18,10 +18,7 @@ export default function WonAtomContentGeneral({ atom }) {
   const modifiedDate = atomUtils.getModifiedDate(atom);
 
   const typeLabel = atom && atomUtils.generateTypeLabel(atom);
-  const fullFlagLabels = atom && atomUtils.generateFullFlagLabels(atom);
-  const shortFlagLabels = atom && atomUtils.generateShortFlagLabels(atom);
-  const fullSocketLabels = atom && atomUtils.generateFullSocketLabels(atom);
-  const shortSocketLabels = atom && atomUtils.generateShortSocketLabels(atom);
+
   const globalLastUpdateTime = useSelector(
     generalSelectors.selectLastUpdateTime
   );
@@ -37,6 +34,9 @@ export default function WonAtomContentGeneral({ atom }) {
   let sockets;
 
   if (shouldShowRdf) {
+    const fullFlagLabels = atom && atomUtils.generateFullFlagLabels(atom);
+    const fullSocketLabels = atom && atomUtils.generateFullSocketLabels(atom);
+
     if (fullFlagLabels && fullFlagLabels.length > 0) {
       const flagArray = fullFlagLabels.map((flag, index) => {
         return (
@@ -70,6 +70,9 @@ export default function WonAtomContentGeneral({ atom }) {
       );
     }
   } else {
+    const shortFlagLabels = atom && atomUtils.generateShortFlagLabels(atom);
+    const shortSocketLabels = atom && atomUtils.generateShortSocketLabels(atom);
+
     if (shortFlagLabels && shortFlagLabels.length > 0) {
       const flagArray = shortFlagLabels.map((flag, index) => {
         return (

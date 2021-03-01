@@ -61,6 +61,10 @@ const labels = deepFreeze({
     [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "Partner Activities",
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: "Memberships",
     [vocab.WXSCHEMA.WorksForSocketCompacted]: "Employers",
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "Articles",
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "Sub Organizations",
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "Parent Organization",
+    [vocab.WXSCHEMA.EventSocketCompacted]: "Events",
     [vocab.WXPERSONA.InterestOfSocketCompacted]: "Interest Of",
     [vocab.WXPERSONA.InterestSocketCompacted]: "Interests",
     [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise Of",
@@ -208,6 +212,24 @@ export function getSocketItemLabels(targetSocketType, socketTypes) {
   }
 
   return socketTypeLabels.join("/");
+}
+
+export function getAddNewSocketItemLabel(
+  isAddToOwned,
+  addToUseCase,
+  addToSocketType,
+  ucIdentifier,
+  socketType
+) {
+  if (addToUseCase === "organization" && ucIdentifier === "persona") {
+    return `Join with New Persona`;
+  }
+
+  if (isAddToOwned) {
+    return `Add New ${getSocketItemLabel(addToSocketType, socketType)}`;
+  } else {
+    return `Connect New ${getSocketItemLabel(addToSocketType, socketType)}`;
+  }
 }
 
 export function getSocketItemLabel(targetSocketType, socketType) {
