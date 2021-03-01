@@ -13,7 +13,7 @@ import * as useCaseUtils from "../usecase-utils.js";
 import * as ownerApi from "../api/owner-api.js";
 import * as stateStore from "../redux/state-store.js";
 
-import { getIn, getUri, extractAtomUriBySocketUri, delay } from "../utils.js";
+import { getIn, getUri, extractAtomUriBySocketUri } from "../utils.js";
 
 import { ensureLoggedIn } from "./account-actions";
 
@@ -338,28 +338,25 @@ export const connectAtomSockets = (
       socketUri: senderSocketUri,
       targetSocketUri: targetSocketUri,
     });
-    //TODO: DELAY WORKAROUND TO FIX CONNECT ISSUES
 
-    return (isSenderPending ? delay(2000) : Promise.resolve()).then(() =>
-      ownerApi.sendMessage(cnctMsg).then(jsonResp =>
-        won
-          .wonMessageFromJsonLd(
-            jsonResp.message,
-            vocab.WONMSG.uriPlaceholder.message
-          )
-          .then(wonMessage =>
-            dispatch({
-              type: actionTypes.atoms.connectSockets,
-              payload: {
-                messageUri: jsonResp.messageUri,
-                message: jsonResp.message,
-                optimisticEvent: wonMessage,
-                senderSocketUri: senderSocketUri,
-                targetSocketUri: targetSocketUri,
-              },
-            })
-          )
-      )
+    return ownerApi.sendMessage(cnctMsg).then(jsonResp =>
+      won
+        .wonMessageFromJsonLd(
+          jsonResp.message,
+          vocab.WONMSG.uriPlaceholder.message
+        )
+        .then(wonMessage =>
+          dispatch({
+            type: actionTypes.atoms.connectSockets,
+            payload: {
+              messageUri: jsonResp.messageUri,
+              message: jsonResp.message,
+              optimisticEvent: wonMessage,
+              senderSocketUri: senderSocketUri,
+              targetSocketUri: targetSocketUri,
+            },
+          })
+        )
     );
   }
 };

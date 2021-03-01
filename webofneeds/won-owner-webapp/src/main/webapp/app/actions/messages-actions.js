@@ -680,7 +680,7 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
         : stateStore
             .determineRequestCredentials(state, recipientAtomUri, true)
             .then(requestCredentials =>
-              won.fetchActiveConnectionAndDispatchBySocketUris(
+              stateStore.fetchActiveConnectionAndDispatchBySocketUris(
                 targetSocketUri,
                 senderSocketUri,
                 requestCredentials,
