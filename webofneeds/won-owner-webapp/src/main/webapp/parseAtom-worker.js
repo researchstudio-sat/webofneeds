@@ -3,7 +3,6 @@ import shajs from "sha.js";
 import Identicon from "identicon.js";
 
 export const parse = async (jsonldAtomAndAuth, fakeNames, vocab) => {
-  //TODO: IMPL THIS AS ServiceWorker
   const jsonldAtomAndAuthImm = Immutable.fromJS(jsonldAtomAndAuth);
   const jsonldAtomImm = get(jsonldAtomAndAuthImm, "atom");
   const jsonldAuthImm = get(jsonldAtomAndAuthImm, "auth");

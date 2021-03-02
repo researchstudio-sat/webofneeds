@@ -9,16 +9,15 @@ won-atom-content-auth {
   padding: 0.5rem;
 
   .acauth__item {
-    display: grid;
     background: var(--won-lighter-gray);
     border: $thinGrayBorder;
     padding: 0.5rem;
-    grid-template-areas:
-      "grid-item-label grid-item-label grid-item-label grid-item-label grid-item-label"
-      "grid-item-granteelabel grid-item-bearerlabel grid-item-grantlabel grid-item-requestedBylabel grid-item-provideAuthInfolabel"
-      "grid-item-grantee grid-item-bearer grid-item-grant grid-item-requestedBy grid-item-provideAuthInfo";
-    grid-template-columns: min-content min-content min-content min-content min-content;
-    grid-gap: 0.25rem;
+
+    &__label {
+      font-size: $normalFontSize;
+      border-bottom: $thinGrayBorder;
+      margin-bottom: 0.25rem;
+    }
 
     &__grantlabel,
     &__granteelabel,
@@ -27,26 +26,7 @@ won-atom-content-auth {
     &__requestedBylabel,
     &__label {
       font-weight: bold;
-    }
-    &__label {
-      grid-area: grid-item-label;
-      font-size: $normalFontSize;
-    }
-
-    &__grantlabel {
-      grid-area: grid-item-grantlabel;
-    }
-    &__granteelabel {
-      grid-area: grid-item-granteelabel;
-    }
-    &__bearerlabel {
-      grid-area: grid-item-bearerlabel;
-    }
-    &__requestedBylabel {
-      grid-area: grid-item-requestedBylabel;
-    }
-    &__provideAuthInfolabel {
-      grid-area: grid-item-provideAuthInfolabel;
+      padding-bottom: 0.25rem;
     }
 
     &__provideAuthInfo,
@@ -55,22 +35,8 @@ won-atom-content-auth {
     &__grantee,
     &__grant {
       font-family: monospace;
-    }
-
-    &__grantee {
-      grid-area: grid-item-grantee;
-    }
-    &__grant {
-      grid-area: grid-item-grant;
-    }
-    &__bearer {
-      grid-area: grid-item-bearer;
-    }
-    &__requestedBy {
-      grid-area: grid-item-requestedBy;
-    }
-    &__provideAuthInfo {
-      grid-area: grid-item-provideAuthInfo;
+      padding-bottom: 0.5rem;
+      margin: 0;
     }
   }
 }
