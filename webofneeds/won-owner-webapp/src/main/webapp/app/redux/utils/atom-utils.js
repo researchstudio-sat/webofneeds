@@ -67,15 +67,14 @@ export function getTokenAuth(atom) {
   return (
     auths &&
     auths.filter(auth => {
-      const grants = get(auth, vocab.AUTH.grantCompacted);
+      const grants = get(auth, vocab.AUTH.grant);
       return !!grants.find(grant => {
-        const operations = get(grant, vocab.AUTH.operationCompacted);
+        const operations = get(grant, vocab.AUTH.operation);
         return (
           !!operations &&
           !is("String", operations) &&
           operations.find(
-            op =>
-              !is("String", op) && !!get(op, vocab.AUTH.requestTokenCompacted)
+            op => !is("String", op) && !!get(op, vocab.AUTH.requestToken)
           )
         );
       });

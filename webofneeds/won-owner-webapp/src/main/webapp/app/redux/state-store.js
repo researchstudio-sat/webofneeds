@@ -204,20 +204,20 @@ export const determineRequestCredentials = (state, atomUri, isOwned) => {
         console.debug("tokenAuth: ", tokenAuth);
         const authTokenOperations = tokenAuth
           .get("auth:grant")
-          .flatMap(grant => get(grant, "auth:operation"))
-          .map(op => get(op, "auth:requestToken"))
+          .flatMap(grant => get(grant, vocab.AUTH.operation))
+          .map(op => get(op, vocab.AUTH.requestToken))
           .filter(op => !!op);
         console.debug("authOperations: ", authTokenOperations);
 
         for (const authTokenOperation of authTokenOperations) {
           const tokenScopeUri = getIn(authTokenOperation, [
-            "auth:tokenScope",
+            vocab.AUTH.tokenScope,
             "@id",
           ]);
           console.debug("### ", tokenScopeUri);
 
           //TODO: THIS IS NEXT PART PRETTY HARDCODED (which isnt great but works for now):
-          if (tokenScopeUri === vocab.HOLD.ScopeReadHeldAtomsCompacted) {
+          if (tokenScopeUri === vocab.HOLD.ScopeReadHeldAtoms) {
             const ownedBuddyUrisOfConsideredAtom = atomUtils
               .getConnectedConnections(
                 consideredAtom,
@@ -251,7 +251,7 @@ export const determineRequestCredentials = (state, atomUri, isOwned) => {
               return ownerApi
                 .fetchTokenForAtom(getUri(consideredAtom), {
                   requesterWebId: fetchTokenRequesterId,
-                  scopes: vocab.HOLD.ScopeReadHeldAtoms,
+                  scopes: tokenScopeUri,
                 })
                 .then(tokens => {
                   console.debug("tokens: ", tokens);

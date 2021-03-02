@@ -15,11 +15,11 @@ export default function WonAtomContentAuth({ atom }) {
 
   authImm &&
     authImm.map((auth, idx) => {
-      const grantee = get(auth, vocab.AUTH.granteeCompacted);
-      const grant = get(auth, vocab.AUTH.grantCompacted);
-      const bearer = get(auth, vocab.AUTH.bearerCompacted);
-      const provideAuthInfo = get(auth, vocab.AUTH.provideAuthInfoCompacted);
-      const requestedBy = get(auth, vocab.AUTH.requestedByCompacted);
+      const grantee = get(auth, vocab.AUTH.grantee);
+      const grant = get(auth, vocab.AUTH.grant);
+      const bearer = get(auth, vocab.AUTH.bearer);
+      const provideAuthInfo = get(auth, vocab.AUTH.provideAuthInfo);
+      const requestedBy = get(auth, vocab.AUTH.requestedBy);
 
       authElements.push(
         <div key={"key_" + idx} className="acauth__item">

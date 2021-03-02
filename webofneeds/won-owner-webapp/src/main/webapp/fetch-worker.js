@@ -603,8 +603,7 @@ export const fetchAtom = (atomUri, requestCredentials, vocab) =>
           "@embed": "@always",
         }),
         jsonld.frame(jsonLdData, {
-          "@type": vocab.AUTH.AuthorizationCompacted,
-          "@context": vocab.defaultContext,
+          "@type": vocab.AUTH.Authorization,
           "@embed": "@always",
         }),
       ])
