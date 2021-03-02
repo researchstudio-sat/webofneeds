@@ -203,7 +203,7 @@ export const determineRequestCredentials = (state, atomUri, isOwned) => {
       for (const tokenAuth of tokenAuths) {
         console.debug("tokenAuth: ", tokenAuth);
         const authTokenOperations = tokenAuth
-          .get("auth:grant")
+          .get(vocab.AUTH.grant)
           .flatMap(grant => get(grant, vocab.AUTH.operation))
           .map(op => get(op, vocab.AUTH.requestToken))
           .filter(op => !!op);
