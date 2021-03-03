@@ -5,6 +5,8 @@ import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 
 import "~/style/_signup.scss";
 import ico16_indicator_warning from "~/images/won-icons/ico16_indicator_warning.svg";
+import ico16_indicator_info from "~/images/won-icons/ico16_indicator_info.svg";
+
 import { actionCreators } from "../../actions/actions";
 import { useHistory } from "react-router-dom";
 import WonGenericPage from "~/app/pages/genericPage";
@@ -223,6 +225,17 @@ export default function PageForgotPassword() {
                 </span>
               </div>
             )}
+          <div className="signup__content__form__infomsg">
+            <svg className="signup__content__form__infomsg__icon">
+              <use
+                xlinkHref={ico16_indicator_info}
+                href={ico16_indicator_info}
+              />
+            </svg>
+            <span className="signup__content__form__infomsg__label">
+              {`We sent you the Recovery Key by email when you set your password`}
+            </span>
+          </div>
           <button
             className="won-button--filled secondary"
             disabled={!isValid()}
