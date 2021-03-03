@@ -98,19 +98,33 @@ export default function WonLoginForm({ className }) {
           onKeyUp={formKeyUp}
           onChange={event => setPassword(event.target.value)}
         />
+        {email.length > 0 &&
+          password.length > 0 && (
+            <label>
+              <input
+                id="remember-me"
+                value={rememberMe}
+                onChange={event => setRememberMe(event.target.checked)}
+                type="checkbox"
+              />
+              Remember me
+            </label>
+          )}
         <button
           className="won-button--filled secondary"
           disabled={password === "" || email === ""}
         >
           Sign In
         </button>
-        <input
-          id="remember-me"
-          value={rememberMe}
-          onChange={event => setRememberMe(event.target.checked)}
-          type="checkbox"
-        />
-        {" Remember me"}
+        <div className="wl__forgot">
+          <Link
+            className="wl__forgot__link"
+            onClick={() => dispatch(actionCreators.view__hideMainMenu())}
+            to={"/forgotPassword" + (email.length ? "?email=" + email : "")}
+          >
+            Forgot Password
+          </Link>
+        </div>
       </form>
       <WonLabelledHr label="Or" />
       <div className="wl__register">

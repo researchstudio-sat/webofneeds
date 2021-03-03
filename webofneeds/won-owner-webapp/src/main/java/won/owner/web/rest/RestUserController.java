@@ -226,13 +226,6 @@ public class RestUserController {
     public ResponseEntity resetPassword(@RequestBody ResetPasswordPojo resetPasswordPojo, Errors errors,
                     HttpServletRequest request, HttpServletResponse response) {
         logger.debug("processing request to /resetPassword");
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (username == null) {
-            return generateStatusResponse(RestStatusResponse.USER_NOT_SIGNED_IN);
-        }
-        if (!username.equals(resetPasswordPojo.getUsername())) {
-            return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
-        }
         try {
             resetPasswordValidator.validate(resetPasswordPojo, errors);
             if (errors.hasErrors()) {

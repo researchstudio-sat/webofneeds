@@ -89,6 +89,32 @@ export const changePassword = credentials => {
 };
 
 /**
+ * Reset password with email and recoveryKey
+ * @param credentials { email, newPassword, recoveryKey }
+ * @returns {*}
+ */
+export const resetPassword = credentials => {
+  const { email, recoveryKey, newPassword } = credentials;
+
+  return fetch("/owner/rest/users/resetPassword", {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      username: email,
+      recoveryKey: recoveryKey,
+      newPassword: newPassword,
+      verificationToken: "",
+    }),
+  })
+    .then(checkHttpStatus("/owner/rest/users/resetPassword"))
+    .then(() => ({ ok: true }));
+};
+
+/**
  * @param credentials either {email, password} or {privateId}
  * @returns {*}
  */
@@ -247,30 +273,6 @@ export const transferPrivateAccount = credentials => {
       privatePassword: privatePassword,
     }),
   }).then(checkHttpStatus("/owner/rest/users/transfer"));
-};
-
-/**
- * Change the password of the user currently logged in.
- * @param credentials { email, oldPassword, newPassword }
- * @returns {*}
- */
-export const resetPassword = credentials => {
-  const { email, recoveryKey, newPassword } = credentials;
-
-  return fetch("/owner/rest/users/resetPassword", {
-    method: "post",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      username: email,
-      recoveryKey: recoveryKey,
-      newPassword: newPassword,
-      verificationToken: "",
-    }),
-  }).then(checkHttpStatus("/owner/rest/users/resetPassword"));
 };
 
 export const serverSideConnect = (

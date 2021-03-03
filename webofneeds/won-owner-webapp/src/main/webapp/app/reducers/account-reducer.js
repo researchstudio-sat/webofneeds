@@ -114,6 +114,11 @@ export default function(userData = initialState, action = {}) {
         .set("registerError", action.payload.registerError)
         .set("loggedIn", false);
 
+    case actionTypes.account.resetPasswordFailed:
+      return userData.set(
+        "resetPasswordError",
+        action.payload.resetPasswordError
+      );
     case actionTypes.account.acceptDisclaimerSuccess:
       return userData.set("acceptedDisclaimer", true);
 

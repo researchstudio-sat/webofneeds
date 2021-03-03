@@ -35,6 +35,20 @@ won-login-form {
     }
   }
 
+  .wl__forgot {
+    cursor: pointer;
+    margin-top: 1rem;
+    text-align: center;
+
+    &__link {
+      color: $won-subtitle-gray;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
   .wl__register {
     padding-top: 0.5rem;
     display: block;

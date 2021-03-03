@@ -85,7 +85,7 @@ export const transferPrivateAccount = credentials =>
 
 /**
  * Change the password of the user currently logged in.
- * @param credentials { email, oldPassword, newPassword }
+ * @param credentials  {email, newPassword, recoveryKey}
  * @returns {*}
  */
 export const resetPassword = credentials =>
