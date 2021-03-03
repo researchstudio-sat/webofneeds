@@ -72,6 +72,16 @@ export function getRegisterError(accountState) {
 }
 
 /**
+ * Returns the resetPasswordError if present
+ *
+ * @param accountState
+ * @returns {*}
+ */
+export function getResetPasswordError(accountState) {
+  return get(accountState, "resetPasswordError");
+}
+
+/**
  * Returns the emailVerificationError if present
  *
  * @param accountState

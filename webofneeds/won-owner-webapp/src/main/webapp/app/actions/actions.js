@@ -41,6 +41,7 @@ import * as atomActions from "./atoms-actions.js";
 import {
   accountAcceptDisclaimer,
   accountAcceptTermsOfService,
+  accountResetPassword,
   accountChangePassword,
   accountLogin,
   accountLogout,
@@ -253,6 +254,8 @@ const actionHierarchy = {
     register: accountRegister,
     transfer: accountTransfer,
     registerFailed: INJ_DEFAULT,
+    resetPassword: accountResetPassword,
+    resetPasswordFailed: INJ_DEFAULT,
 
     acceptDisclaimer: accountAcceptDisclaimer,
     acceptDisclaimerSuccess: INJ_DEFAULT,

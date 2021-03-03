@@ -42,6 +42,7 @@ import PageActivities from "./pages/react/activities";
 import PageOverview from "./pages/react/overview";
 import PagePost from "./pages/react/post";
 import PageSettings from "./pages/react/settings";
+import PageForgotPassword from "./pages/react/forgotPassword";
 import { Provider, useSelector, useDispatch } from "react-redux";
 import reducer from "./reducers/reducers.js";
 import thunk from "redux-thunk";
@@ -145,6 +146,13 @@ function AppRoutes({ processState }) {
       </Route>
       <Route path="/signup">
         {isLoggedIn && !isAnonymous ? <Redirect to="/" /> : <PageSignUp />}
+      </Route>
+      <Route path="/forgotPassword">
+        {isLoggedIn && !isAnonymous ? (
+          <Redirect to="/" />
+        ) : (
+          <PageForgotPassword />
+        )}
       </Route>
       <Route path="/about">
         <PageAbout />

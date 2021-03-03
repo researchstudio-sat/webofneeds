@@ -210,6 +210,45 @@ export const accountTransfer = credentials => (dispatch, getState) =>
     });
 
 /**
+ * @param credentials {email, newPassword, recoveryKey}
+ */
+export const accountResetPassword = credentials => (dispatch, getState) =>
+  ownerApi
+    .resetPassword(credentials)
+    .then(() => {
+      credentials.privateId = undefined;
+      credentials.password = credentials.newPassword;
+      return accountLogin(credentials)(dispatch, getState);
+    })
+    .catch(error => {
+      let errorParsed = parseWorkerError(error);
+
+      let resetPasswordError = "Password Reset failed. Error not found";
+      switch (errorParsed.response.code) {
+        case 1400:
+        case 8400:
+          resetPasswordError = "No User found with this email";
+          break;
+        case 8401:
+          resetPasswordError = "Password not valid";
+          break;
+        case 8402:
+          resetPasswordError = "Wrong Recovery Key";
+          break;
+      }
+
+      dispatch({
+        type: actionTypes.account.resetPasswordFailed,
+        payload: {
+          resetPasswordError: Immutable.fromJS({
+            code: errorParsed.response.code,
+            msg: resetPasswordError,
+          }),
+        },
+      });
+    });
+
+/**
  * @param credentials {email, oldPassword, newPassword}
  * @returns {Function}
  */
