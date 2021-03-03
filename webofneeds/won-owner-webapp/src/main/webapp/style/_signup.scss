@@ -38,6 +38,24 @@ main.signup {
           --local-primary: #{$won-primary-color};
         }
       }
+
+      &__infomsg {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: max-content;
+        align-items: center;
+        grid-gap: 0.25rem;
+        margin-bottom: 0.5rem;
+
+        &__label {
+          font-size: $smallFontSize;
+          color: $won-subtitle-gray;
+        }
+        &__icon {
+          @include fixed-square(1em);
+          --local-primary: #{$won-subtitle-gray};
+        }
+      }
     }
   }
 }
