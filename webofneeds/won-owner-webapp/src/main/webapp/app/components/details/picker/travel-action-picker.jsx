@@ -332,7 +332,7 @@ export default class WonTravelActionPicker extends React.Component {
         >
           <TileLayer
             attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-            url="https://www.matchat.org/tile/{z}/{x}/{y}.png"
+            url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {selectedLocationMarkers}
         </Map>
