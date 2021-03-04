@@ -75,6 +75,7 @@ won-atom-messages {
     border-top: $thinGrayBorder;
     overflow: auto;
     scroll-behavior: smooth;
+    overscroll-behavior: contain;
     flex-grow: 1;
 
     &__loadbutton, /* just so the button and spinner won't make the chatmessages "jump"*/
