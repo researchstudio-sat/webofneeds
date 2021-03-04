@@ -19,7 +19,10 @@ import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -53,12 +56,12 @@ public class ServerSideActionService implements WonMessageProcessor {
         final String message = connectAction.getMessage();
         final URI toSocket = URI.create(connectAction.getToSocket());
         // count the pending sockets
-        int atoms = 0;
+        int atoms = 2;
         if (connectAction.isFromPending()) {
-            atoms++;
+            atoms--;
         }
         if (connectAction.isToPending()) {
-            atoms++;
+            atoms--;
         }
         atomCounter.set(atoms);
         final Function<Optional<WonMessage>, Collection<EventTriggeredAction<WonMessage>>> action = new Function<Optional<WonMessage>, Collection<EventTriggeredAction<WonMessage>>>() {
