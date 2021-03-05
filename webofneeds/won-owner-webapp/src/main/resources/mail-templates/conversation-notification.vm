@@ -13,7 +13,7 @@ Hi there,
 
 
 #if ($localAtomIsPersona)
-    ## do nothing
+## do nothing
 #elseif ($localAtomTitle)
 We have news regarding your post '$localAtomTitle' on $serviceName:
 
@@ -42,7 +42,7 @@ The user who posted '$targetAtomTitle' sends this message:
 To reply, open the conversation:
 $linkConnection
 #else
-The Connection: $linkConnection
+The connection: $linkConnection
 #end
 
 #if ($localAtomIsPersona)
