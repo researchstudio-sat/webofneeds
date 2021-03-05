@@ -237,7 +237,14 @@ export default function WonModalDialog() {
                 </button>
               </div>
             ) : (
-              undefined
+              <div className="md__dialog__footer md__dialog__footer--column">
+                <button
+                  className={"won-button--filled secondary"}
+                  onClick={closeDialog}
+                >
+                  <span>No, cancel</span>
+                </button>
+              </div>
             )}
           </React.Fragment>
         ) : (
