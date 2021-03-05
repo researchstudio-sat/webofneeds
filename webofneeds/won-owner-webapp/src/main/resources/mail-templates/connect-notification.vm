@@ -65,10 +65,10 @@ The connection: $linkConnection
 #if ($localAtomIsPersona)
 $localAtomTitle: $linkLocalAtom
 #else
-#if ($targetAtomTitle)
-Your post '$targetAtomTitle': $linkTargetAtom
+#if ($localAtomTitle)
+Your post '$localAtomTitle': $linkLocalAtom
 #else
-Your post: $linkTargetAtom
+Your post: '$linkLocalAtom'
 #end
 #end
 

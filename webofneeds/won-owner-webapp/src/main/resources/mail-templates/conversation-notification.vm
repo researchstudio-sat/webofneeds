@@ -48,23 +48,23 @@ The user who posted '$targetAtomTitle' sends this message:
 
 #if ($localSocketIsChatSocket)
 To reply, open the conversation:
-    $linkConnection
+$linkConnection
 #else
 The connection: $linkConnection
 #end
 
 #if ($localAtomIsPersona)
-    $localAtomTitle: $linkLocalAtom
+$localAtomTitle: $linkLocalAtom
 #else
-#if ($targetAtomTitle)
-Your post '$targetAtomTitle': $linkTargetAtom
+#if ($localAtomTitle)
+Your post '$localAtomTitle': $linkLocalAtom
 #else
-Your post: $linkTargetAtom
+Your post: '$linkLocalAtom'
 #end
 #end
 
 #if ($targetAtomIsPersona)
-    $targetAtomTitle: $linkTargetAtom
+$targetAtomTitle: $linkTargetAtom
 #elseif ($targetSocketIsGroupSocket)
 #if ($targetAtomTitle)
 The group '$targetAtomTitle': $linkTargetAtom
