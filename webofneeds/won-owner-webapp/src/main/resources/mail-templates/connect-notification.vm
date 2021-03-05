@@ -51,7 +51,7 @@ They wrote this welcome message:
 To reply, open the conversation:
 $linkConnection
 #else
-the connection: $linkConnection
+The connection: $linkConnection
 #end
 
 #if ($localAtomIsPersona)
