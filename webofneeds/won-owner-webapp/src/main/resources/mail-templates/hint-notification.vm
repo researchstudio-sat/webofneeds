@@ -1,8 +1,16 @@
 Hi there,
 
-The post '$targetAtomTitle' may be interesting for you. 
+#if ($targetAtomTitle && $localAtomTitle)
+We found the post '$targetAtomTitle' which be relevant regarding your post '$localAtomTitle'!
+#elsif ($targetAtomTitle)
+We found the post '$targetAtomTitle' which may be relevant regarding one of your posts!
+#elsif ($localAtomTitle)
+We found a post that may be relevant regarding your post '$localAtomTitle'!
+#else
+We found a post that may be relevant regarding one of your posts!
+#end
 
-Go to your 'Suggestions' tab: $linkLocalAtom
+Go to your post: $linkLocalAtom
 
 Best wishes, 
 

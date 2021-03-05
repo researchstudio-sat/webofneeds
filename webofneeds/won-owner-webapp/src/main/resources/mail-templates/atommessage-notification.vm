@@ -1,13 +1,25 @@
 Hi there,
 
+#if ($localAtomTitle)
 We have news regarding your post '$localAtomTitle' on $serviceName:
+#else
+We have news regarding one of your posts on $serviceName:
+#end
 
+#if ($localAtomTitle)
 The server hosting your post '$localAtomTitle' says:
+#else
+The server hosting your post says:
+#end
 
     $textMsg
 
-View your post: $linkLocalAtom
-
-Best wishes, 
+Best wishes,
 
 The team at $serviceName
+
+Links:
+======
+
+Open your post: $linkLocalAtom
+

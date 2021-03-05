@@ -2,17 +2,31 @@ Hi there,
 
 We have news regarding your post '$localAtomTitle' on $serviceName:
 
-The conversation between '$targetAtomTitle' and your post
-        '$localAtomTitle' was closed by your server.
+#if ($targetAtomTitle && $localAtomTitle)
+The conversation between '$targetAtomTitle' and your post '$localAtomTitle' was closed by your server.
+#elsif ($targetAtomTitle)
+The conversation between '$targetAtomTitle' and one of your posts was closed by your server.
+#elsif ($localAtomTitle)
+The conversation between your post '$localAtomTitle' and another post was closed by your server.
+#else
+The conversation between your post and another post was closed by your server.
+#end
+
 #if ($textMsg)
 Explanation:<br/>
     $textMsg
 #end
-    
-View the conversation: $linkConnection
-View your post: $linkLocalAtom  
-View their post: $linkTargetAtom
 
 Best wishes, 
 
 The team at $serviceName
+
+
+Links:
+======
+
+Go to the conversation: $linkConnection
+
+Open your post: $linkLocalAtom
+
+Open their post: $linkTargetAtom

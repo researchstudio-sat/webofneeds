@@ -117,7 +117,7 @@ public class WonOwnerMailSender {
             Dataset atomDataset = linkedDataSource.getDataForPublicResource(URI.create(targetAtom));
             DefaultAtomModelWrapper targetAtomWrapper = new DefaultAtomModelWrapper(atomDataset);
             String targetAtomTitle = targetAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
-            targetAtomTitle = useValueOrDefaultValue(targetAtomTitle, "(no title)");
+            targetAtomTitle = useValueOrDefaultValue(targetAtomTitle, null);
             velocityContext.put("targetAtomTitle", targetAtomTitle);
             String linkTargetAtom = uriService.getOwnerProtocolOwnerURI() + OWNER_TARGET_ATOM_LINK + targetAtom;
             velocityContext.put("linkTargetAtom", linkTargetAtom);
@@ -126,7 +126,7 @@ public class WonOwnerMailSender {
             Dataset localAtomDataset = linkedDataSource.getDataForPublicResource(URI.create(localAtom));
             DefaultAtomModelWrapper localAtomWrapper = new DefaultAtomModelWrapper(localAtomDataset);
             String localAtomTitle = localAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
-            localAtomTitle = useValueOrDefaultValue(localAtomTitle, "(no title)");
+            localAtomTitle = useValueOrDefaultValue(localAtomTitle, null);
             String linkLocalAtom = ownerAppLink + OWNER_LOCAL_ATOM_LINK + localAtom;
             velocityContext.put("linkLocalAtom", linkLocalAtom);
             velocityContext.put("localAtomTitle", localAtomTitle);
@@ -191,7 +191,7 @@ public class WonOwnerMailSender {
             Dataset localAtomDataset = linkedDataSource.getDataForPublicResource(URI.create(localAtom));
             DefaultAtomModelWrapper localAtomWrapper = new DefaultAtomModelWrapper(localAtomDataset);
             String localAtomTitle = localAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
-            localAtomTitle = useValueOrDefaultValue(localAtomTitle, "(no title)");
+            localAtomTitle = useValueOrDefaultValue(localAtomTitle, null);
             String linkLocalAtom = ownerAppLink + OWNER_LOCAL_ATOM_LINK + localAtom;
             atomLinks.put(localAtom, linkLocalAtom);
             atomTitles.put(localAtom, localAtomTitle);

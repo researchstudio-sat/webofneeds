@@ -1,17 +1,32 @@
 Hi there,
 
+#if ($localAtomTitle)
 We have news regarding your post '$localAtomTitle' on $serviceName:
+#else
+We have news regarding one of your posts on $serviceName:
+#end
 
-The user who posted '$targetAtomTitle' sent you a message:
+#if ($targetAtomTitle)
+The user who posted '$targetAtomTitle' sent you this message:
+#else
+Someone sent you this message:
+#end
 
 #if ($textMsg)
     $textMsg
 #end
     
-View the conversation: $linkConnection
-View your post: $linkLocalAtom  
-View their post: $linkTargetAtom
 
 Best wishes, 
 
 The team at $serviceName
+
+
+Links:
+======
+
+Go to the conversation: $linkConnection
+
+Open your post: $linkLocalAtom
+
+Open their post: $linkTargetAtom

@@ -1,14 +1,17 @@
 Hi there,
 
 We have news regarding your post '$localAtomTitle' on $serviceName:
-
+#if ($localAtomTitle)
 Your post '$localAtomTitle' was deactivated by the WoN node that hosts it.
+#else
+One of your posts was deactivated by the WoN node that hosts it.
+#end
 #if ($textMsg)
 Explanation:
     $textMsg
 #end
 
-View your post: $linkLocalAtom
+Go to your post: $linkLocalAtom
 
 Best wishes, 
 
