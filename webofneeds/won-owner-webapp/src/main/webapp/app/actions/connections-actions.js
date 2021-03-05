@@ -20,7 +20,7 @@ import {
   parseWorkerError,
 } from "../utils.js";
 
-import { ensureLoggedIn } from "./account-actions";
+import { checkLoginState } from "./account-actions";
 
 import { actionTypes, actionCreators } from "./actions.js";
 
@@ -371,40 +371,38 @@ const connectReactionAtom = (
   dispatch,
   getState
 ) => {
-  //TODO: SHOW LOGGED OUT DIALOG IF NECESSARY
-  const state = getState();
-  const nodeUri = generalSelectors.getDefaultNodeUri(state);
+  return checkLoginState(dispatch, getState, state => {
+    const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
-  const holder = generalSelectors.getAtom(personaUri)(state);
+    const holder = generalSelectors.getAtom(personaUri)(state);
 
-  if (personaUri && !holder) {
-    console.warn(
-      "Could not find holder with Uri: ",
-      personaUri,
-      ", holder not be stored in the state"
-    );
-  }
+    if (personaUri && !holder) {
+      console.warn(
+        "Could not find holder with Uri: ",
+        personaUri,
+        ", holder not be stored in the state"
+      );
+    }
 
-  const getSocketStringFromDraft = atomDraft => {
-    const draftContent = atomDraft["content"];
-    const draftSockets = draftContent["sockets"];
+    const getSocketStringFromDraft = atomDraft => {
+      const draftContent = atomDraft["content"];
+      const draftSockets = draftContent["sockets"];
 
-    if (draftSockets && atomDraftSocketType) {
-      for (let socketKey in draftSockets) {
-        if (draftSockets[socketKey] === atomDraftSocketType) {
-          return socketKey;
+      if (draftSockets && atomDraftSocketType) {
+        for (let socketKey in draftSockets) {
+          if (draftSockets[socketKey] === atomDraftSocketType) {
+            return socketKey;
+          }
         }
       }
-    }
-  };
+    };
 
-  const connectToSocketUri = atomUtils.getSocketUri(
-    generalSelectors.getAtom(connectToAtomUri)(state),
-    connectToSocketType
-  );
+    const connectToSocketUri = atomUtils.getSocketUri(
+      generalSelectors.getAtom(connectToAtomUri)(state),
+      connectToSocketType
+    );
 
-  return ensureLoggedIn(dispatch, getState).then(() =>
-    createAtomFromDraftAndDispatch(atomDraft, nodeUri, dispatch)
+    return createAtomFromDraftAndDispatch(atomDraft, nodeUri, dispatch)
       .then(atomUri => connectHolderToCreatedAtomUri(holder, atomUri))
       .then(atomUri =>
         connectAtomSockets(
@@ -415,8 +413,8 @@ const connectReactionAtom = (
           dispatch,
           true
         )
-      )
-  );
+      );
+  });
 };
 
 export const connectionsConnectAdHoc = (
@@ -475,48 +473,46 @@ const connectAdHoc = (
   dispatch,
   getState
 ) => {
-  //TODO: SHOW LOGGED OUT DIALOG IF NECESSARY
-  const state = getState();
-  const nodeUri = generalSelectors.getDefaultNodeUri(state);
+  return checkLoginState(dispatch, getState, state => {
+    const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
-  const holder = generalSelectors.getAtom(personaUriForAdHocAtom)(getState());
+    const holder = generalSelectors.getAtom(personaUriForAdHocAtom)(getState());
 
-  if (personaUriForAdHocAtom && !holder) {
-    console.warn(
-      "Could not find holder with Uri: ",
-      personaUriForAdHocAtom,
-      ", holder not be stored in the state"
-    );
-  }
+    if (personaUriForAdHocAtom && !holder) {
+      console.warn(
+        "Could not find holder with Uri: ",
+        personaUriForAdHocAtom,
+        ", holder not be stored in the state"
+      );
+    }
 
-  const atomDraft = useCaseUtils.getUseCase(adHocUseCaseIdentifier).draft;
+    const atomDraft = useCaseUtils.getUseCase(adHocUseCaseIdentifier).draft;
 
-  if (targetAtom) {
-    // For some special create cases we move some content of the fromAtom to the createAtomDraft
-    const contentTypes =
-      getIn(targetAtom, ["content", "type"]) &&
-      getIn(targetAtom, ["content", "type"])
-        .toSet()
-        .remove(vocab.WON.AtomCompacted);
+    if (targetAtom) {
+      // For some special create cases we move some content of the fromAtom to the createAtomDraft
+      const contentTypes =
+        getIn(targetAtom, ["content", "type"]) &&
+        getIn(targetAtom, ["content", "type"])
+          .toSet()
+          .remove(vocab.WON.AtomCompacted);
 
-    if (
-      contentTypes.includes("s:PlanAction") ||
-      contentTypes.includes(vocab.WXPERSONA.InterestCompacted) ||
-      contentTypes.includes(vocab.WXPERSONA.ExpertiseCompacted)
-    ) {
-      const eventObjectAboutUris = getIn(targetAtom, [
-        "content",
-        "eventObjectAboutUris",
-      ]);
-      if (eventObjectAboutUris) {
-        atomDraft.content.eventObjectAboutUris = eventObjectAboutUris.toArray();
+      if (
+        contentTypes.includes("s:PlanAction") ||
+        contentTypes.includes(vocab.WXPERSONA.InterestCompacted) ||
+        contentTypes.includes(vocab.WXPERSONA.ExpertiseCompacted)
+      ) {
+        const eventObjectAboutUris = getIn(targetAtom, [
+          "content",
+          "eventObjectAboutUris",
+        ]);
+        if (eventObjectAboutUris) {
+          atomDraft.content.eventObjectAboutUris = eventObjectAboutUris.toArray();
+        }
       }
     }
-  }
-  const connectToAtomUri = extractAtomUriBySocketUri(connectToSocketUri);
+    const connectToAtomUri = extractAtomUriBySocketUri(connectToSocketUri);
 
-  return ensureLoggedIn(dispatch, getState).then(() =>
-    createAtomFromDraftAndDispatch(atomDraft, nodeUri, dispatch)
+    return createAtomFromDraftAndDispatch(atomDraft, nodeUri, dispatch)
       .then(atomUri => connectHolderToCreatedAtomUri(holder, atomUri))
       .then(atomUri =>
         connectAtomSockets(
@@ -527,8 +523,8 @@ const connectAdHoc = (
           dispatch,
           true
         )
-      )
-  );
+      );
+  });
 };
 
 export const connectionsClose = connectionUri => (dispatch, getState) => {

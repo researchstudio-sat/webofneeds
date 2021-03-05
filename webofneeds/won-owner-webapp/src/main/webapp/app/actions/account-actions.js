@@ -16,47 +16,56 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { getPathname, getQueryParams, delay, parseWorkerError } from "../utils";
 
-/**
- * Makes sure user is either logged in
- * or creates a private-ID account as fallback.
- */
-export const ensureLoggedIn = (dispatch, getState) => {
+export const checkLoginState = (dispatch, getState, actionWhenLoggedIn) => {
+  //TODO: DISTINGUISH BETWEEN ACCEPT ANON, AND LOGIN SUCCESS
   const state = getState();
+
   if (accountUtils.isLoggedIn(generalSelectors.getAccountState(state))) {
-    //we know that the state still flags a logged-in of a user, but lets just check if thats really the case
-    return ownerApi.checkLoginStatus().catch((/*err*/) => {
-      // We can ignore the error status for now since we know we aren't logged in anymore anyway
-      // const error = parseWorkerError(err);
-      // if (error.status >= 400 && error.status < 500) {
-      //   //do nothing now
-      // }
-
-      // I know this is duplicate code now, and we do not really want to create a new private account, but for now
-      // this behaviour should at least not break the app, on a timeout like it currently does
-      const privateId = wonUtils.generatePrivateId();
-
-      return accountRegister({ privateId })(dispatch, getState)
-        .then(() => delay(2000))
-        .catch(err => {
-          console.error(
-            `Creating temporary account (${privateId}) has failed due to `,
-            err
-          );
-          dispatch(actionCreators.account__registerFailed({ privateId }));
-        });
-    });
+    return ownerApi
+      .checkLoginStatus()
+      .then(() => {
+        actionWhenLoggedIn(state);
+      })
+      .catch(() => {
+        dispatch(
+          actionCreators.view__showLoggedOutDialog(
+            Immutable.fromJS({
+              acceptCallback: () => {
+                dispatch(actionCreators.view__hideModalDialog());
+                actionWhenLoggedIn(state);
+              },
+              cancelCallback: () => {
+                dispatch(actionCreators.view__hideModalDialog());
+              },
+            })
+          )
+        );
+      });
   } else {
     const privateId = wonUtils.generatePrivateId();
 
-    return accountRegister({ privateId })(dispatch, getState)
-      .then(() => delay(2000))
-      .catch(err => {
-        console.error(
-          `Creating temporary account (${privateId}) has failed due to `,
-          err
-        );
-        dispatch(actionCreators.account__registerFailed({ privateId }));
-      });
+    dispatch(
+      actionCreators.view__showLoggedOutDialog(
+        Immutable.fromJS({
+          acceptCallback: () => {
+            dispatch(actionCreators.view__hideModalDialog());
+            accountRegister({ privateId })(dispatch, getState)
+              .then(() => delay(2000))
+              .then(() => actionWhenLoggedIn(state))
+              .catch(err => {
+                console.error(
+                  `Creating temporary account (${privateId}) has failed due to `,
+                  err
+                );
+                dispatch(actionCreators.account__registerFailed({ privateId }));
+              });
+          },
+          cancelCallback: () => {
+            dispatch(actionCreators.view__hideModalDialog());
+          },
+        })
+      )
+    );
   }
 };
 
