@@ -277,7 +277,8 @@ export const connectionsConnectReactionAtom = (
   atomDraft,
   persona,
   connectToSocketType,
-  atomDraftSocketType
+  atomDraftSocketType,
+  callback
 ) => (dispatch, getState) =>
   connectReactionAtom(
     connectToAtomUri,
@@ -286,7 +287,8 @@ export const connectionsConnectReactionAtom = (
     connectToSocketType,
     atomDraftSocketType,
     dispatch,
-    getState
+    getState,
+    callback
   ); // moved to separate function to make transpilation work properly
 
 /**
@@ -369,7 +371,8 @@ const connectReactionAtom = (
   connectToSocketType,
   atomDraftSocketType,
   dispatch,
-  getState
+  getState,
+  callback
 ) => {
   return checkLoginState(dispatch, getState, state => {
     const nodeUri = generalSelectors.getDefaultNodeUri(state);
@@ -413,7 +416,8 @@ const connectReactionAtom = (
           dispatch,
           true
         )
-      );
+      )
+      .then(() => callback());
   });
 };
 
@@ -422,7 +426,8 @@ export const connectionsConnectAdHoc = (
   connectMessage,
   adHocUseCaseIdentifier,
   targetAtom,
-  personaUriForAdHocAtom
+  personaUriForAdHocAtom,
+  callback
 ) => (dispatch, getState) =>
   connectAdHoc(
     connectToSocketUri,
@@ -431,7 +436,8 @@ export const connectionsConnectAdHoc = (
     targetAtom,
     personaUriForAdHocAtom,
     dispatch,
-    getState
+    getState,
+    callback
   ); // moved to separate function to make transpilation work properly
 
 /**
@@ -471,7 +477,8 @@ const connectAdHoc = (
   targetAtom,
   personaUriForAdHocAtom,
   dispatch,
-  getState
+  getState,
+  callback
 ) => {
   return checkLoginState(dispatch, getState, state => {
     const nodeUri = generalSelectors.getDefaultNodeUri(state);
@@ -523,7 +530,8 @@ const connectAdHoc = (
           dispatch,
           true
         )
-      );
+      )
+      .then(() => callback());
   });
 };
 

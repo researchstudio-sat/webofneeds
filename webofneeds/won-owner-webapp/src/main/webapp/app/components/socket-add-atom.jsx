@@ -353,10 +353,12 @@ export default function WonSocketAddAtom({
           message,
           adHocUseCaseIdentifier,
           addToAtom,
-          personaUri
+          personaUri,
+          () => {
+            history.push("/connections");
+          }
         )
       );
-      history.push("/connections");
     }
   }
 

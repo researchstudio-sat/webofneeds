@@ -185,44 +185,51 @@ export default function WonCreateAtom({
           tempDraftImm.toJS(),
           personaId,
           targetSocketType,
-          senderSocketType
+          senderSocketType,
+          () => {
+            //if fromAtomUri is the uri of the activePinnedAtom we simply go to the tab of the inventory instead of the fromAtomUri itself
+            if (activePinnedAtomUri === fromAtomUri) {
+              dispatch(
+                actionCreators.view__setActivePinnedAtomTab(
+                  isTagViewSocket(targetSocketType)
+                    ? "DETAIL"
+                    : targetSocketType
+                )
+              );
+              history.replace(
+                generateLink(history.location, {}, "/inventory", false)
+              );
+            } else {
+              history.replace(
+                generateLink(
+                  history.location,
+                  {
+                    postUri: fromAtomUri,
+                    connectionUri: undefined,
+                    tab: isTagViewSocket(targetSocketType)
+                      ? "DETAIL"
+                      : targetSocketType,
+                  },
+                  "/post"
+                )
+              );
+            }
+          }
         )
       );
-
-      //if fromAtomUri is the uri of the activePinnedAtom we simply go to the tab of the inventory instead of the fromAtomUri itself
-      if (activePinnedAtomUri === fromAtomUri) {
-        dispatch(
-          actionCreators.view__setActivePinnedAtomTab(
-            isTagViewSocket(targetSocketType) ? "DETAIL" : targetSocketType
-          )
-        );
-        history.replace(
-          generateLink(history.location, {}, "/inventory", false)
-        );
-      } else {
-        history.replace(
-          generateLink(
-            history.location,
-            {
-              postUri: fromAtomUri,
-              connectionUri: undefined,
-              tab: isTagViewSocket(targetSocketType)
-                ? "DETAIL"
-                : targetSocketType,
-            },
-            "/post"
-          )
-        );
-      }
     } else {
       dispatch(
         actionCreators.atoms__create(
           tempDraftImm.toJS(),
           personaId,
-          defaultNodeUri
+          defaultNodeUri,
+          () => {
+            history.replace(
+              generateLink(history.location, {}, "/inventory", false)
+            );
+          }
         )
       );
-      history.replace(generateLink(history.location, {}, "/inventory", false));
     }
   }
 

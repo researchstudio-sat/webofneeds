@@ -184,7 +184,10 @@ export const createAtomFromDraftAndDispatch = (
     .then(() => atomUri);
 };
 
-export const create = (draft, personaUri, nodeUri) => (dispatch, getState) => {
+export const create = (draft, personaUri, nodeUri, callback) => (
+  dispatch,
+  getState
+) => {
   return checkLoginState(dispatch, getState, state => {
     if (!nodeUri) {
       nodeUri = generalSelectors.getDefaultNodeUri(state);
@@ -198,8 +201,8 @@ export const create = (draft, personaUri, nodeUri) => (dispatch, getState) => {
         ", holder not be stored in the state"
       );
     }
-    return createAtomFromDraftAndDispatch(draft, nodeUri, dispatch).then(
-      atomUri => connectHolderToCreatedAtomUri(holder, atomUri)
-    );
+    return createAtomFromDraftAndDispatch(draft, nodeUri, dispatch)
+      .then(atomUri => connectHolderToCreatedAtomUri(holder, atomUri))
+      .then(() => callback());
   });
 };
