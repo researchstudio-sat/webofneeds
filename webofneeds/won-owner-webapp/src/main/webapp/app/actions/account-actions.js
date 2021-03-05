@@ -23,7 +23,28 @@ import { getPathname, getQueryParams, delay, parseWorkerError } from "../utils";
 export const ensureLoggedIn = (dispatch, getState) => {
   const state = getState();
   if (accountUtils.isLoggedIn(generalSelectors.getAccountState(state))) {
-    return Promise.resolve();
+    //we know that the state still flags a logged-in of a user, but lets just check if thats really the case
+    return ownerApi.checkLoginStatus().catch((/*err*/) => {
+      // We can ignore the error status for now since we know we aren't logged in anymore anyway
+      // const error = parseWorkerError(err);
+      // if (error.status >= 400 && error.status < 500) {
+      //   //do nothing now
+      // }
+
+      // I know this is duplicate code now, and we do not really want to create a new private account, but for now
+      // this behaviour should at least not break the app, on a timeout like it currently does
+      const privateId = wonUtils.generatePrivateId();
+
+      return accountRegister({ privateId })(dispatch, getState)
+        .then(() => delay(2000))
+        .catch(err => {
+          console.error(
+            `Creating temporary account (${privateId}) has failed due to `,
+            err
+          );
+          dispatch(actionCreators.account__registerFailed({ privateId }));
+        });
+    });
   } else {
     const privateId = wonUtils.generatePrivateId();
 
@@ -345,14 +366,15 @@ export const reconnect = () => (dispatch, getState) => {
 
       return stateStore.fetchOwnedMetaData(dispatch, getState);
     })
-    .catch(e => {
-      if (e.status >= 400 && e.status < 500) {
+    .catch(err => {
+      const error = parseWorkerError(err);
+      if (error.status >= 400 && error.status < 500) {
         //FIXME: this seems weird and unintentional to me, the actionTypes.account.reset closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
         dispatch({ type: actionTypes.account.reset });
         dispatch({ type: actionTypes.view.showMainMenu });
       } else {
         dispatch(actionCreators.lostConnection());
       }
-      console.warn(e);
+      console.warn(error);
     });
 };
