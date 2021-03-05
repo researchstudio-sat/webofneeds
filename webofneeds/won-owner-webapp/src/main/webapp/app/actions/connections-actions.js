@@ -417,7 +417,7 @@ const connectReactionAtom = (
           true
         )
       )
-      .then(() => callback());
+      .then(() => callback && callback());
   });
 };
 
@@ -531,7 +531,7 @@ const connectAdHoc = (
           true
         )
       )
-      .then(() => callback());
+      .then(() => callback && callback());
   });
 };
 

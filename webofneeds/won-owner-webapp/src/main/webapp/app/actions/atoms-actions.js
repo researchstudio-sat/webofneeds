@@ -157,7 +157,7 @@ export const edit = (draft, oldAtom, callback) => (dispatch, getState) =>
           oldAtom,
         },
       });
-      callback();
+      callback && callback();
     });
   });
 
@@ -203,6 +203,6 @@ export const create = (draft, personaUri, nodeUri, callback) => (
     }
     return createAtomFromDraftAndDispatch(draft, nodeUri, dispatch)
       .then(atomUri => connectHolderToCreatedAtomUri(holder, atomUri))
-      .then(() => callback());
+      .then(() => callback && callback());
   });
 };
