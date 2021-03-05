@@ -238,7 +238,7 @@ export default function WonCreateAtom({
       executeFunction();
     } else {
       dispatch(
-        actionCreators.view__showTermsDialog(
+        actionCreators.view__showLoggedOutDialog(
           Immutable.fromJS({
             acceptCallback: () => {
               dispatch(actionCreators.view__hideModalDialog());

@@ -371,6 +371,7 @@ const connectReactionAtom = (
   dispatch,
   getState
 ) => {
+  //TODO: SHOW LOGGED OUT DIALOG IF NECESSARY
   const state = getState();
   const nodeUri = generalSelectors.getDefaultNodeUri(state);
 
@@ -474,6 +475,7 @@ const connectAdHoc = (
   dispatch,
   getState
 ) => {
+  //TODO: SHOW LOGGED OUT DIALOG IF NECESSARY
   const state = getState();
   const nodeUri = generalSelectors.getDefaultNodeUri(state);
 

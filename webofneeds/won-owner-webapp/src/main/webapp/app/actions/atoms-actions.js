@@ -185,6 +185,8 @@ export const createAtomFromDraftAndDispatch = (
 };
 
 export const create = (draft, personaUri, nodeUri) => (dispatch, getState) => {
+  //TODO: SHOW LOGGED OUT DIALOG IF NECESSARY
+
   const state = getState();
 
   if (!nodeUri) {

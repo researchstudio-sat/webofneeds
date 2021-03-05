@@ -36,6 +36,13 @@
         overflow-y: auto;
         &__text {
         }
+
+        won-login-form button {
+          width: 100%;
+        }
+        won-labelled-hr > .wlh__label {
+          background: white;
+        }
       }
 
       &__footer {
@@ -85,6 +92,13 @@
         grid-area: modal_content;
         overflow-y: auto;
         &__text {
+        }
+
+        won-login-form button {
+          width: 100%;
+        }
+        won-labelled-hr > .wlh__label {
+          background: white;
         }
       }
 

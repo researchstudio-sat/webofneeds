@@ -364,7 +364,7 @@ export default function WonSocketAddAtom({
       }
     } else {
       dispatch(
-        actionCreators.view__showTermsDialog(
+        actionCreators.view__showLoggedOutDialog(
           Immutable.fromJS({
             acceptCallback: () => {
               dispatch(actionCreators.view__hideModalDialog());
