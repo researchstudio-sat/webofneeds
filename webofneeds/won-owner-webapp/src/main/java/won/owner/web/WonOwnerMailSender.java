@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 public class WonOwnerMailSender {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String OWNER_TARGET_ATOM_LINK = "/#!/post?postUri=";
-    private static final String OWNER_CONNECTION_LINK = "/#!/connections?postUri=%s&connectionUri=%s";
-    private static final String OWNER_LOCAL_ATOM_LINK = "/#!/post?postUri=";
+    private static final String OWNER_CONNECTION_LINK = "/#!/connections?requireLogin=true&postUri=%s&connectionUri=%s";
+    private static final String OWNER_LOCAL_ATOM_LINK = "/#!/post?requireLogin=true&postUri=";
     private static final String OWNER_VERIFICATION_LINK = "/#!/inventory?token=";
     private static final String OWNER_ANONYMOUS_LINK = "/#!/inventory?privateId=";
     private static final String EXPORT_FILE_NAME = "export.zip";

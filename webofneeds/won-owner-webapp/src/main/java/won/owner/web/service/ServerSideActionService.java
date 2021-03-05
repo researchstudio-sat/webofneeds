@@ -55,7 +55,8 @@ public class ServerSideActionService implements WonMessageProcessor {
         final URI fromSocket = URI.create(connectAction.getFromSocket());
         final String message = connectAction.getMessage();
         final URI toSocket = URI.create(connectAction.getToSocket());
-        // count the sockets that are NOT pending (= the number of atoms that have already been created)
+        // count the sockets that are NOT pending (= the number of atoms that have
+        // already been created)
         int atoms = 2;
         if (connectAction.isFromPending()) {
             atoms--;
