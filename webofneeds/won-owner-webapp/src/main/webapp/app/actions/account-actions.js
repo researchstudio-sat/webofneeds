@@ -67,19 +67,6 @@ export const accountLogin = (credentials, callback) => (dispatch, getState) => {
     return;
   }
 
-  if (isLoggedIn && !processUtils.isProcessingInitialLoad(processState)) {
-    const loggedInEmail = accountUtils.getEmail(accountState);
-
-    if (credentials.email === loggedInEmail) {
-      console.debug(
-        "Already loggedIn with (" +
-          credentials.email +
-          "). Aborting login attempt."
-      );
-      return;
-    }
-  }
-
   return Promise.resolve()
     .then(() => {
       _loginInProcessFor = email;
