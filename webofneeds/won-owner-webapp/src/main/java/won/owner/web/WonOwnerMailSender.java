@@ -14,6 +14,8 @@ import won.owner.service.impl.URIService;
 import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.vocabulary.WON;
+import won.protocol.vocabulary.WXCHAT;
+import won.protocol.vocabulary.WXGROUP;
 import won.utils.mail.WonMailSender;
 
 import java.io.File;
@@ -112,6 +114,7 @@ public class WonOwnerMailSender {
     }
 
     private VelocityContext createContext(String toEmail, String localAtom, String targetAtom, String localConnection,
+                    String localSocket, String targetSocket,
                     String textMsg) {
         String ownerAppLink = uriService.getOwnerProtocolOwnerURI().toString();
         VelocityContext velocityContext = new VelocityContext();
@@ -120,6 +123,8 @@ public class WonOwnerMailSender {
             DefaultAtomModelWrapper targetAtomWrapper = new DefaultAtomModelWrapper(atomDataset);
             velocityContext.put("targetAtomTitle", getLabelForAtomInMail(targetAtomWrapper));
             velocityContext.put("targetAtomIsPersona", isPersonaAtom(targetAtomWrapper));
+            velocityContext.put("targetSocketIsGroupSocket", isGroupChatSocket(targetAtomWrapper, targetSocket));
+            velocityContext.put("targetSocketIsChatSocket", isChatSocket(targetAtomWrapper, targetSocket));
             String linkTargetAtom = uriService.getOwnerProtocolOwnerURI() + OWNER_TARGET_ATOM_LINK + targetAtom;
             velocityContext.put("linkTargetAtom", linkTargetAtom);
         }
@@ -130,6 +135,7 @@ public class WonOwnerMailSender {
             velocityContext.put("linkLocalAtom", linkLocalAtom);
             velocityContext.put("localAtomTitle", getLabelForAtomInMail(localAtomWrapper));
             velocityContext.put("localAtomIsPersona", isPersonaAtom(localAtomWrapper));
+            velocityContext.put("localSocketIsChatSocket", isChatSocket(localAtomWrapper, localSocket));
         }
         if (localConnection != null && localAtom != null) {
             String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK, localAtom, localConnection);
@@ -142,6 +148,24 @@ public class WonOwnerMailSender {
             velocityContext.put("serviceName", this.ownerWebappUri);
         }
         return velocityContext;
+    }
+
+    private Object isGroupChatSocket(DefaultAtomModelWrapper atomWrapper, String socket) {
+        if (socket == null) {
+            return false;
+        }
+        return atomWrapper.getSocketTypeUri(socket)
+                        .map(u -> u.equals(WXGROUP.GroupSocket.asURI()))
+                        .orElse(false);
+    }
+
+    private Object isChatSocket(DefaultAtomModelWrapper atomWrapper, String socket) {
+        if (socket == null) {
+            return false;
+        }
+        return atomWrapper.getSocketTypeUri(socket)
+                        .map(su -> su.equals(WXCHAT.ChatSocket.asURI()))
+                        .orElse(false);
     }
 
     private String getLabelForAtomInMail(DefaultAtomModelWrapper localAtomWrapper) {
@@ -224,10 +248,11 @@ public class WonOwnerMailSender {
     }
 
     public void sendConversationNotificationMessage(String toEmail, String localAtom, String targetAtom,
-                    String localConnection, String textMsg) {
+                    String localConnection, String localSocket, String targetSocket, String textMsg) {
         if (textMsg != null && !textMsg.isEmpty()) {
             StringWriter writer = new StringWriter();
-            VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, textMsg);
+            VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, localSocket,
+                            targetSocket, textMsg);
             conversationNotificationTemplate.merge(context, writer);
             logger.debug("sending " + SUBJECT_CONVERSATION_MESSAGE + " to " + toEmail);
             this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CONVERSATION_MESSAGE, writer.toString());
@@ -238,18 +263,20 @@ public class WonOwnerMailSender {
     }
 
     public void sendConnectNotificationMessage(String toEmail, String localAtom, String targetAtom,
-                    String localConnection, String textMsg) {
+                    String localConnection, String localSocket, String targetSocket, String textMsg) {
         StringWriter writer = new StringWriter();
-        VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, textMsg);
+        VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, localSocket,
+                        targetSocket, textMsg);
         connectNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_CONNECT + " to " + toEmail);
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CONNECT, writer.toString());
     }
 
     public void sendCloseNotificationMessage(String toEmail, String localAtom, String targetAtom,
-                    String localConnection, String textMsg) {
+                    String localConnection, String localSocket, String targetSocket, String textMsg) {
         StringWriter writer = new StringWriter();
-        VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, textMsg);
+        VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, localSocket,
+                        targetSocket, textMsg);
         closeNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_CLOSE + " to " + toEmail);
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CLOSE, writer.toString());
@@ -258,7 +285,7 @@ public class WonOwnerMailSender {
     public void sendHintNotificationMessage(String toEmail, String localAtom, String targetAtom,
                     String localConnection) {
         StringWriter writer = new StringWriter();
-        VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, null);
+        VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, null, null, null);
         hintNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_MATCH + " to " + toEmail);
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_MATCH, writer.toString());
@@ -275,7 +302,7 @@ public class WonOwnerMailSender {
 
     public void sendAtomMessageNotificationMessage(String toEmail, String localAtom, String textMsg) {
         StringWriter writer = new StringWriter();
-        VelocityContext context = createContext(toEmail, localAtom, null, null, textMsg);
+        VelocityContext context = createContext(toEmail, localAtom, null, null, null, null, textMsg);
         atomMessageNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_ATOM_MESSAGE + " to " + toEmail);
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_ATOM_MESSAGE, writer.toString());
@@ -283,7 +310,7 @@ public class WonOwnerMailSender {
 
     public void sendSystemDeactivateNotificationMessage(String toEmail, String localAtom, String textMsg) {
         StringWriter writer = new StringWriter();
-        VelocityContext context = createContext(toEmail, localAtom, null, null, textMsg);
+        VelocityContext context = createContext(toEmail, localAtom, null, null, null, null, textMsg);
         systemDeactivateNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_SYSTEM_DEACTIVATE + " to " + toEmail);
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_SYSTEM_DEACTIVATE, writer.toString());
@@ -292,7 +319,7 @@ public class WonOwnerMailSender {
     public void sendSystemCloseNotificationMessage(String toEmail, String localAtom, String targetAtom,
                     String localConnection, String textMsg) {
         StringWriter writer = new StringWriter();
-        VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, textMsg);
+        VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, null, null, textMsg);
         systemCloseNotificationTemplate.merge(context, writer);
         logger.debug("sending " + SUBJECT_SYSTEM_CLOSE + " to " + toEmail);
         this.wonMailSender.sendTextMessage(toEmail, SUBJECT_SYSTEM_CLOSE, writer.toString());

@@ -486,14 +486,19 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     if (userAtom.isConversations()) {
                         emailSender.sendConversationNotificationMessage(user.getEmail(), atomUri.toString(),
                                         wonMessage.getSenderAtomURI().toString(),
-                                        connectionUri.toString(), textMsg);
+                                        connectionUri.toString(),
+                                        wonMessage.getRecipientSocketURIRequired().toString(),
+                                        wonMessage.getSenderSocketURIRequired().toString(), textMsg);
                     }
                     return;
                 case CONNECT:
                     if (userAtom.isRequests()) {
                         emailSender.sendConnectNotificationMessage(user.getEmail(), atomUri.toString(),
                                         wonMessage.getSenderAtomURI().toString(),
-                                        connectionUri.toString(), textMsg);
+                                        connectionUri.toString(),
+                                        wonMessage.getRecipientSocketURIRequired().toString(),
+                                        wonMessage.getSenderSocketURIRequired().toString(),
+                                        textMsg);
                     }
                     return;
                 case ATOM_HINT_MESSAGE:

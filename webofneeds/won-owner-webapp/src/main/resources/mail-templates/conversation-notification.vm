@@ -1,15 +1,37 @@
-Hi there,
-
-#if ($localAtomTitle)
-We have news regarding your post '$localAtomTitle' on $serviceName:
+#if ($targetAtomTitle)
+    #set($targetAtomLabel = $targetAtomTitle)
+#elseif ($targetAtomIsPersona)
+    #set($targetAtomLabel = "somebody")
 #else
-We have news regarding one of your posts on $serviceName:
+    #set($targetAtomLabel = "their post")
+#end
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
+Hi there,
 #end
 
-#if ($targetAtomTitle)
-The user who posted '$targetAtomTitle' sent you this message:
+
+#if ($localAtomIsPersona)
+    ## do nothing
+#elseif ($localAtomTitle)
+We have news regarding your post '$localAtomTitle' on $serviceName:
+
 #else
-Someone sent you this message:
+We have news regarding one of your posts on $serviceName:
+
+#end
+##
+#if ($targetAtomIsPersona)
+$targetAtomLabel sends you this message:
+#elseif (($targetSocketIsGroupSocket))
+    #if ($targetAtomTitle)
+You have received this message from Group Chat '$targetAtomTitle':
+    #else
+You have received this group chat message:
+    #end
+#else
+The user who posted '$targetAtomTitle' sends this message:
 #end
 
 #if ($textMsg)
@@ -24,7 +46,11 @@ The team at $serviceName
 
 Links:
 
+#if ($localSocketIsChatSocket)
 Conversation: $linkConnection
+#else
+Connection: $linkConnection
+#end
 
 #if ($localAtomIsPersona)
 Your persona: $linkLocalAtom

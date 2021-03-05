@@ -1,3 +1,10 @@
+#if ($targetAtomTitle)
+    #set($targetAtomLabel = $targetAtomTitle)
+#elseif ($targetAtomIsPersona)
+    #set($targetAtomLabel = "somebody")
+#else
+    #set($targetAtomLabel = "their post")
+#end
 #if ($localAtomIsPersona && $localAtomTitle)
 Hi $localAtomTitle,
 #else
@@ -14,16 +21,28 @@ We have news regarding one of your posts on $serviceName:
 
 #end
 ##
-#if ($targetAtomIsPersona && $targetAtomTitle)
-$targetAtomTitle invites you to start a conversation!
-#elseif ((!$targetAtomIsPersona) && $targetAtomTitle)
-The user who posted '$targetAtomTitle' invites you to start a conversation!
+#if ($targetAtomIsPersona)
+    #if ($localSocketIsChatSocket)
+$targetAtomLabel invites you to start a conversation!
+    #else
+$targetAtomLabel wants to connect!
+    #end
+#elseif (($targetSocketIsGroupSocket))
+    #if ($targetAtomTitle)
+You have been invited to join the Group Chat '$targetAtomTitle'!
+    #else
+You have been invited to join a Group Chat!
+    #end
 #else
-Someone invites you to start a conversation!
+    #if ($localSocketIsChatSocket)
+The user who posted '$targetAtomTitle' invites you to start a conversation!
+    #else
+The user who posted '$targetAtomTitle' wants to connect!
+    #end
 #end
+#if ($localSocketIsChatSocket && $textMsg)
 
-#if ($textMsg)
-    They wrote this welcome message:
+They wrote this welcome message:
 
     $textMsg
 #end
@@ -35,7 +54,11 @@ The team at $serviceName
 
 Links:
 
+#if ($localSocketIsChatSocket)
 Conversation: $linkConnection
+#else
+Connection: $linkConnection
+#end
 
 #if ($localAtomIsPersona)
 Your persona: $linkLocalAtom
