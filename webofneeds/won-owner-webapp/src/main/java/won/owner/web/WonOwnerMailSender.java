@@ -40,11 +40,13 @@ public class WonOwnerMailSender {
     private static final String OWNER_ANONYMOUS_LINK = "/#!/inventory?privateId=";
     private static final String EXPORT_FILE_NAME = "export.zip";
     private static final String SUBJECT_CONVERSATION_MESSAGE = "New message";
-    private static final String SUBJECT_CONNECT = "New conversation request";
+    private static final String SUBJECT_CONNECT_CHAT = "New conversation request";
+    private static final String SUBJECT_CONNECT = "New connect request";
     private static final String SUBJECT_MATCH = "New match";
-    private static final String SUBJECT_MULTI_MATCH = " new matches";
-    private static final String SUBJECT_CLOSE = "Conversation closed";
-    private static final String SUBJECT_SYSTEM_CLOSE = "Conversation closed by system";
+    private static final String SUBJECT_MULTI_MATCH = " New matches";
+    private static final String SUBJECT_CLOSE_CHAT = "Conversation closed";
+    private static final String SUBJECT_CLOSE = "Connection closed";
+    private static final String SUBJECT_SYSTEM_CLOSE = "Connection closed by system";
     private static final String SUBJECT_ATOM_MESSAGE = "Notification from WoN node";
     private static final String SUBJECT_SYSTEM_DEACTIVATE = "Posting deactivated by system";
     private static final String SUBJECT_VERIFICATION = "Please verify your email address";
@@ -135,6 +137,7 @@ public class WonOwnerMailSender {
             velocityContext.put("linkLocalAtom", linkLocalAtom);
             velocityContext.put("localAtomTitle", getLabelForAtomInMail(localAtomWrapper));
             velocityContext.put("localAtomIsPersona", isPersonaAtom(localAtomWrapper));
+            velocityContext.put("localSocketIsGroupSocket", isGroupChatSocket(localAtomWrapper, localSocket));
             velocityContext.put("localSocketIsChatSocket", isChatSocket(localAtomWrapper, localSocket));
         }
         if (localConnection != null && localAtom != null) {
@@ -150,7 +153,7 @@ public class WonOwnerMailSender {
         return velocityContext;
     }
 
-    private Object isGroupChatSocket(DefaultAtomModelWrapper atomWrapper, String socket) {
+    private boolean isGroupChatSocket(DefaultAtomModelWrapper atomWrapper, String socket) {
         if (socket == null) {
             return false;
         }
@@ -159,7 +162,7 @@ public class WonOwnerMailSender {
                         .orElse(false);
     }
 
-    private Object isChatSocket(DefaultAtomModelWrapper atomWrapper, String socket) {
+    private boolean isChatSocket(DefaultAtomModelWrapper atomWrapper, String socket) {
         if (socket == null) {
             return false;
         }
@@ -268,8 +271,14 @@ public class WonOwnerMailSender {
         VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, localSocket,
                         targetSocket, textMsg);
         connectNotificationTemplate.merge(context, writer);
-        logger.debug("sending " + SUBJECT_CONNECT + " to " + toEmail);
-        this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CONNECT, writer.toString());
+        Dataset atomDataset = linkedDataSource.getDataForPublicResource(URI.create(localAtom));
+        DefaultAtomModelWrapper wrapper = new DefaultAtomModelWrapper(atomDataset);
+        String subject = SUBJECT_CONNECT;
+        if (isChatSocket(wrapper, localSocket)) {
+            subject = SUBJECT_CONNECT_CHAT;
+        }
+        logger.debug("sending {} to {}", subject, toEmail);
+        this.wonMailSender.sendTextMessage(toEmail, subject, writer.toString());
     }
 
     public void sendCloseNotificationMessage(String toEmail, String localAtom, String targetAtom,
@@ -278,8 +287,14 @@ public class WonOwnerMailSender {
         VelocityContext context = createContext(toEmail, localAtom, targetAtom, localConnection, localSocket,
                         targetSocket, textMsg);
         closeNotificationTemplate.merge(context, writer);
-        logger.debug("sending " + SUBJECT_CLOSE + " to " + toEmail);
-        this.wonMailSender.sendTextMessage(toEmail, SUBJECT_CLOSE, writer.toString());
+        Dataset atomDataset = linkedDataSource.getDataForPublicResource(URI.create(localAtom));
+        DefaultAtomModelWrapper wrapper = new DefaultAtomModelWrapper(atomDataset);
+        String subject = SUBJECT_CLOSE;
+        if (isChatSocket(wrapper, localSocket)) {
+            subject = SUBJECT_CLOSE_CHAT;
+        }
+        logger.debug("sending {} to {}", subject, toEmail);
+        this.wonMailSender.sendTextMessage(toEmail, subject, writer.toString());
     }
 
     public void sendHintNotificationMessage(String toEmail, String localAtom, String targetAtom,

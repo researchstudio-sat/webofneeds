@@ -14,10 +14,18 @@ Hi there,
 #if ($localAtomIsPersona)
 ## do nothing
 #elseif ($localAtomTitle)
+#if ($localSocketIsGroupSocket)
+We have news regarding your group chat '$localAtomTitle' on $serviceName:
+#else
 We have news regarding your post '$localAtomTitle' on $serviceName:
+#end
 
 #else
+#if ($localSocketIsGroupSocket)
+We have news regarding one of your group chats on $serviceName:
+#else
 We have news regarding one of your posts on $serviceName:
+#end
 
 #end
 ##
@@ -55,17 +63,29 @@ The connection: $linkConnection
 #end
 
 #if ($localAtomIsPersona)
-Your persona: $linkLocalAtom
+$localAtomTitle: $linkLocalAtom
 #else
-Your post: $linkLocalAtom
+#if ($targetAtomTitle)
+Your post '$targetAtomTitle': $linkTargetAtom
+#else
+Your post: $linkTargetAtom
+#end
 #end
 
 #if ($targetAtomIsPersona)
-Their persona: $linkTargetAtom
+$targetAtomTitle: $linkTargetAtom
 #elseif ($targetSocketIsGroupSocket)
+#if ($targetAtomTitle)
+The group '$targetAtomTitle': $linkTargetAtom
+#else
 The group: $linkTargetAtom
+#end
+#else
+#if ($targetAtomTitle)
+Their post '$targetAtomTitle': $linkTargetAtom
 #else
 Their post: $linkTargetAtom
+#end
 #end
 
 
