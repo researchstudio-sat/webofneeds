@@ -68,6 +68,8 @@ Your post: $linkLocalAtom
 
 #if ($targetAtomIsPersona)
 Their persona: $linkTargetAtom
+#elseif ($targetSocketIsGroupSocket)
+The group: $linkTargetAtom
 #else
 Their post: $linkTargetAtom
 #end

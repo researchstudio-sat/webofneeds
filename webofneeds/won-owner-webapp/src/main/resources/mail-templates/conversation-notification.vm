@@ -26,7 +26,7 @@ We have news regarding one of your posts on $serviceName:
 $targetAtomLabel sends you this message:
 #elseif (($targetSocketIsGroupSocket))
     #if ($targetAtomTitle)
-You have received this message from Group Chat '$targetAtomTitle':
+You have received this message from group chat '$targetAtomTitle':
     #else
 You have received this group chat message:
     #end
@@ -60,6 +60,8 @@ Your post: $linkLocalAtom
 
 #if ($targetAtomIsPersona)
 Their persona: $linkTargetAtom
+#elseif ($targetSocketIsGroupSocket)
+The group: $linkTargetAtom
 #else
 Their post: $linkTargetAtom
 #end
