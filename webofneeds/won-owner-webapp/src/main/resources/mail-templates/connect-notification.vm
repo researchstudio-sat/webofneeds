@@ -47,15 +47,9 @@ They wrote this welcome message:
     $textMsg
 #end
 
-Best wishes, 
-
-The team at $serviceName
-
-
-Links:
-
 #if ($localSocketIsChatSocket)
-Conversation: $linkConnection
+To reply, open the conversation:
+$linkConnection
 #else
 Connection: $linkConnection
 #end
@@ -73,3 +67,9 @@ The group: $linkTargetAtom
 #else
 Their post: $linkTargetAtom
 #end
+
+
+Best wishes,
+
+The team at $serviceName
+

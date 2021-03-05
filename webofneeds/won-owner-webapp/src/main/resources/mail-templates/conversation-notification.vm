@@ -24,7 +24,7 @@ We have news regarding one of your posts on $serviceName:
 ##
 #if ($targetAtomIsPersona)
 $targetAtomLabel sends you this message:
-#elseif (($targetSocketIsGroupSocket))
+#elseif ($targetSocketIsGroupSocket)
 #if ($targetAtomTitle)
 You have received this message from group chat '$targetAtomTitle':
 #else
@@ -37,19 +37,12 @@ The user who posted '$targetAtomTitle' sends this message:
 #if ($textMsg)
     $textMsg
 #end
-    
-
-Best wishes, 
-
-The team at $serviceName
-
-
-Links:
 
 #if ($localSocketIsChatSocket)
-Conversation: $linkConnection
+To reply, open the conversation:
+$linkConnection
 #else
-Connection: $linkConnection
+The Connection: $linkConnection
 #end
 
 #if ($localAtomIsPersona)
@@ -65,3 +58,9 @@ The group: $linkTargetAtom
 #else
 Their post: $linkTargetAtom
 #end
+
+
+Best wishes,
+
+The team at $serviceName
+
