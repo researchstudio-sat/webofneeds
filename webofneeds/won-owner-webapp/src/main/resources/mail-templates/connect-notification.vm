@@ -22,23 +22,23 @@ We have news regarding one of your posts on $serviceName:
 #end
 ##
 #if ($targetAtomIsPersona)
-    #if ($localSocketIsChatSocket)
+#if ($localSocketIsChatSocket)
 $targetAtomLabel invites you to start a conversation!
-    #else
-$targetAtomLabel wants to connect!
-    #end
-#elseif (($targetSocketIsGroupSocket))
-    #if ($targetAtomTitle)
-You have been invited to join the Group Chat '$targetAtomTitle'!
-    #else
-You have been invited to join a Group Chat!
-    #end
 #else
-    #if ($localSocketIsChatSocket)
+$targetAtomLabel wants to connect!
+#end
+#elseif (($targetSocketIsGroupSocket))
+#if ($targetAtomTitle)
+You have been invited to join the Group Chat '$targetAtomTitle'!
+#else
+You have been invited to join a Group Chat!
+#end
+#else
+#if ($localSocketIsChatSocket)
 The user who posted '$targetAtomTitle' invites you to start a conversation!
-    #else
+#else
 The user who posted '$targetAtomTitle' wants to connect!
-    #end
+#end
 #end
 #if ($localSocketIsChatSocket && $textMsg)
 

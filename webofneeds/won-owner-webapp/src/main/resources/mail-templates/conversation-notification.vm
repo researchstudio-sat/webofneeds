@@ -25,11 +25,11 @@ We have news regarding one of your posts on $serviceName:
 #if ($targetAtomIsPersona)
 $targetAtomLabel sends you this message:
 #elseif (($targetSocketIsGroupSocket))
-    #if ($targetAtomTitle)
+#if ($targetAtomTitle)
 You have received this message from group chat '$targetAtomTitle':
-    #else
+#else
 You have received this group chat message:
-    #end
+#end
 #else
 The user who posted '$targetAtomTitle' sends this message:
 #end
