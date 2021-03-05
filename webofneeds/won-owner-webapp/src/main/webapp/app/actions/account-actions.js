@@ -14,69 +14,40 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import { getPathname, getQueryParams, delay, parseWorkerError } from "../utils";
+import { getPathname, getQueryParams, parseWorkerError } from "../utils";
 
 export const checkLoginState = (dispatch, getState, actionWhenLoggedIn) => {
   //TODO: DISTINGUISH BETWEEN ACCEPT ANON, AND LOGIN SUCCESS
   const state = getState();
 
-  if (accountUtils.isLoggedIn(generalSelectors.getAccountState(state))) {
-    return ownerApi
-      .checkLoginStatus()
-      .then(() => {
-        actionWhenLoggedIn(state);
-      })
-      .catch(() => {
-        dispatch(
-          actionCreators.view__showLoggedOutDialog(
-            Immutable.fromJS({
-              acceptCallback: () => {
-                dispatch(actionCreators.view__hideModalDialog());
-                actionWhenLoggedIn(state);
-              },
-              cancelCallback: () => {
-                dispatch(actionCreators.view__hideModalDialog());
-              },
-            })
-          )
-        );
-      });
-  } else {
-    const privateId = wonUtils.generatePrivateId();
-
-    dispatch(
-      actionCreators.view__showLoggedOutDialog(
-        Immutable.fromJS({
-          acceptCallback: () => {
-            dispatch(actionCreators.view__hideModalDialog());
-            accountRegister({ privateId })(dispatch, getState)
-              .then(() => delay(2000))
-              .then(() => actionWhenLoggedIn(state))
-              .catch(err => {
-                console.error(
-                  `Creating temporary account (${privateId}) has failed due to `,
-                  err
-                );
-                dispatch(actionCreators.account__registerFailed({ privateId }));
-              });
-          },
-          cancelCallback: () => {
-            dispatch(actionCreators.view__hideModalDialog());
-          },
-        })
-      )
-    );
-  }
+  return ownerApi
+    .checkLoginStatus()
+    .then(() => {
+      return actionWhenLoggedIn(state);
+    })
+    .catch(() => {
+      dispatch(
+        actionCreators.view__showLoggedOutDialog(
+          Immutable.fromJS({
+            afterLoginCallback: () => {
+              dispatch(actionCreators.view__hideModalDialog());
+              //FIXME: we used to have a delay in between (anon)login and atomCreation/actionWhenLoggedIn, i am not sure if we still need it but if so, we should add it here
+              return actionWhenLoggedIn(state);
+            },
+          })
+        )
+      );
+    });
 };
 
 let _loginInProcessFor;
 /**
  *
  * @param credentials either {email, password} or {privateId}
- * @param redirectToFeed def. false, whether or not to redirect to the feed after signing in (needs `redirects` to be true)
+ * @param callback function that gets executed after successful registration/login
  * @returns {Function}
  */
-export const accountLogin = credentials => (dispatch, getState) => {
+export const accountLogin = (credentials, callback) => (dispatch, getState) => {
   const state = getState();
 
   const { email } = wonUtils.parseCredentials(credentials);
@@ -132,6 +103,7 @@ export const accountLogin = credentials => (dispatch, getState) => {
     .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
     .then(() => stateStore.fetchOwnedMetaData(dispatch, getState))
     .then(() => dispatch({ type: actionTypes.account.loginFinished }))
+    .then(() => callback && callback())
     .catch(error => {
       let errorParsed = parseWorkerError(error);
 
@@ -202,12 +174,17 @@ export const accountLogout = history => (dispatch, getState) => {
 
 /**
  * @param credentials either {email, password} or {privateId}
+ * @param callback function that gets executed after successful registration/login
  * @returns {Function}
  */
-export const accountRegister = credentials => (dispatch, getState) =>
+export const accountRegister = (credentials, callback) => (
+  dispatch,
+  getState
+) =>
   ownerApi
     .registerAccount(credentials)
     .then(() => accountLogin(credentials)(dispatch, getState))
+    .then(() => callback && callback())
     .catch(error => {
       //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
       const registerError =

@@ -118,13 +118,11 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.view.showLoggedOutDialog: {
       const payload = Immutable.fromJS(action.payload);
 
-      const acceptCallback = get(payload, "acceptCallback");
-      const cancelCallback = get(payload, "cancelCallback");
+      const afterLoginCallback = get(payload, "afterLoginCallback");
 
       const termsDialog = Immutable.fromJS({
         showLoggedOutDialog: true,
-        acceptCallback: acceptCallback,
-        cancelCallback: cancelCallback,
+        afterLoginCallback: afterLoginCallback,
       });
       return viewState
         .set("showModalDialog", true)
