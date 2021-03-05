@@ -23,10 +23,17 @@ The team at $serviceName
 
 
 Links:
-======
 
-Go to the conversation: $linkConnection
+Conversation: $linkConnection
 
-Open your post: $linkLocalAtom
+#if ($localAtomIsPersona)
+Your persona: $linkLocalAtom
+#else
+Your post: $linkLocalAtom
+#end
 
-Open their post: $linkTargetAtom
+#if ($targetAtomIsPersona)
+Their persona: $linkTargetAtom
+#else
+Their post: $linkTargetAtom
+#end

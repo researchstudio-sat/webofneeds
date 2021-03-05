@@ -1,10 +1,14 @@
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
 Hi there,
+#end
 
 #if ($targetAtomTitle && $localAtomTitle)
 We found the post '$targetAtomTitle' which be relevant regarding your post '$localAtomTitle'!
-#elsif ($targetAtomTitle)
+#elseif ($targetAtomTitle)
 We found the post '$targetAtomTitle' which may be relevant regarding one of your posts!
-#elsif ($localAtomTitle)
+#elseif ($localAtomTitle)
 We found a post that may be relevant regarding your post '$localAtomTitle'!
 #else
 We found a post that may be relevant regarding one of your posts!

@@ -1,4 +1,8 @@
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
 Hi there,
+#end
 
 #if ($localAtomTitle)
 We have news regarding your post '$localAtomTitle' on $serviceName:

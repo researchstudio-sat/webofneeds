@@ -13,12 +13,14 @@ import won.owner.model.User;
 import won.owner.service.impl.URIService;
 import won.protocol.util.DefaultAtomModelWrapper;
 import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.vocabulary.WON;
 import won.utils.mail.WonMailSender;
 
 import java.io.File;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -116,20 +118,18 @@ public class WonOwnerMailSender {
         if (targetAtom != null) {
             Dataset atomDataset = linkedDataSource.getDataForPublicResource(URI.create(targetAtom));
             DefaultAtomModelWrapper targetAtomWrapper = new DefaultAtomModelWrapper(atomDataset);
-            String targetAtomTitle = targetAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
-            targetAtomTitle = useValueOrDefaultValue(targetAtomTitle, null);
-            velocityContext.put("targetAtomTitle", targetAtomTitle);
+            velocityContext.put("targetAtomTitle", getLabelForAtomInMail(targetAtomWrapper));
+            velocityContext.put("targetAtomIsPersona", isPersonaAtom(targetAtomWrapper));
             String linkTargetAtom = uriService.getOwnerProtocolOwnerURI() + OWNER_TARGET_ATOM_LINK + targetAtom;
             velocityContext.put("linkTargetAtom", linkTargetAtom);
         }
         if (localAtom != null) {
             Dataset localAtomDataset = linkedDataSource.getDataForPublicResource(URI.create(localAtom));
             DefaultAtomModelWrapper localAtomWrapper = new DefaultAtomModelWrapper(localAtomDataset);
-            String localAtomTitle = localAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
-            localAtomTitle = useValueOrDefaultValue(localAtomTitle, null);
             String linkLocalAtom = ownerAppLink + OWNER_LOCAL_ATOM_LINK + localAtom;
             velocityContext.put("linkLocalAtom", linkLocalAtom);
-            velocityContext.put("localAtomTitle", localAtomTitle);
+            velocityContext.put("localAtomTitle", getLabelForAtomInMail(localAtomWrapper));
+            velocityContext.put("localAtomIsPersona", isPersonaAtom(localAtomWrapper));
         }
         if (localConnection != null && localAtom != null) {
             String linkConnection = ownerAppLink + String.format(OWNER_CONNECTION_LINK, localAtom, localConnection);
@@ -142,6 +142,27 @@ public class WonOwnerMailSender {
             velocityContext.put("serviceName", this.ownerWebappUri);
         }
         return velocityContext;
+    }
+
+    private String getLabelForAtomInMail(DefaultAtomModelWrapper localAtomWrapper) {
+        String label;
+        label = localAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
+        if (label != null) {
+            return label;
+        }
+        label = localAtomWrapper.getSomeName("en", "de");
+        if (label != null) {
+            return label;
+        }
+        return null;
+    }
+
+    private boolean isPersonaAtom(DefaultAtomModelWrapper atomModelWrapper) {
+        Collection<URI> types = atomModelWrapper.getContentTypes();
+        if (types != null) {
+            return types.contains(URI.create(WON.Persona.getURI()));
+        }
+        return false;
     }
 
     private VelocityContext createVerificationContext(EmailVerificationToken verificationToken) {
@@ -187,17 +208,18 @@ public class WonOwnerMailSender {
         velocityContext.put("atoms", hintCountPerAtom.keySet());
         Map<String, String> atomLinks = new HashMap<>();
         Map<String, String> atomTitles = new HashMap<>();
+        Map<String, Boolean> atomIsPersonas = new HashMap<>();
         hintCountPerAtom.keySet().stream().forEach(localAtom -> {
             Dataset localAtomDataset = linkedDataSource.getDataForPublicResource(URI.create(localAtom));
             DefaultAtomModelWrapper localAtomWrapper = new DefaultAtomModelWrapper(localAtomDataset);
-            String localAtomTitle = localAtomWrapper.getSomeTitleFromIsOrAll("en", "de");
-            localAtomTitle = useValueOrDefaultValue(localAtomTitle, null);
             String linkLocalAtom = ownerAppLink + OWNER_LOCAL_ATOM_LINK + localAtom;
             atomLinks.put(localAtom, linkLocalAtom);
-            atomTitles.put(localAtom, localAtomTitle);
+            atomTitles.put(localAtom, getLabelForAtomInMail(localAtomWrapper));
+            atomIsPersonas.put(localAtom, isPersonaAtom(localAtomWrapper));
         });
         velocityContext.put("atomTitle", atomTitles);
         velocityContext.put("atomLink", atomLinks);
+        velocityContext.put("atomIsPersona", atomIsPersonas);
         return velocityContext;
     }
 

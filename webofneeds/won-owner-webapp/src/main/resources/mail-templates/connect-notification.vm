@@ -1,12 +1,22 @@
-Hi there,
-
-#if ($localAtomTitle)
-We have news regarding your post '$localAtomTitle' on $serviceName:
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
 #else
-We have news regarding one of your posts on $serviceName:
+Hi there,
 #end
 
-#if ($targetAtomTitle)
+#if ($localAtomIsPersona)
+## do nothing
+#elseif ($localAtomTitle)
+We have news regarding your post '$localAtomTitle' on $serviceName:
+
+#else
+We have news regarding one of your posts on $serviceName:
+
+#end
+##
+#if ($targetAtomIsPersona && $targetAtomTitle)
+$targetAtomTitle invites you to start a conversation!
+#elseif ((!$targetAtomIsPersona) && $targetAtomTitle)
 The user who posted '$targetAtomTitle' invites you to start a conversation!
 #else
 Someone invites you to start a conversation!
@@ -24,10 +34,17 @@ The team at $serviceName
 
 
 Links:
-======
 
-Go to the conversation: $linkConnection
+Conversation: $linkConnection
 
-Open your post: $linkLocalAtom
+#if ($localAtomIsPersona)
+Your persona: $linkLocalAtom
+#else
+Your post: $linkLocalAtom
+#end
 
-Open their post: $linkTargetAtom
+#if ($targetAtomIsPersona)
+Their persona: $linkTargetAtom
+#else
+Their post: $linkTargetAtom
+#end

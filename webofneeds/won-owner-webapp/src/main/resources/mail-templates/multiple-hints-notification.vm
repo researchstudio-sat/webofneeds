@@ -1,13 +1,25 @@
-Hi,
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
+Hi there,
+#end
 
 #if ( $atoms.size() > 1 )
 Multiple matches were found for you:
 #foreach ($atom in $atoms)
 #if ($atomTitle[$atom])
 * $hintCount[$atom] for '$atomTitle[$atom]'
+#if ($atomIsPersona[$atom])
+    Go to your persona: $atomLink[$atom]
+#else
     Go to your post: $atomLink[$atom]
+#end
+#else
+#if ($atomIsPersona[$atom])
+* $hintCount[$atom] for your persona $atomLink[$atom]
 #else
 * $hintCount[$atom] for your post $atomLink[$atom]
+#end
 #end
 #end
 #else
