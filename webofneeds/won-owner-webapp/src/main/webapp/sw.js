@@ -75,10 +75,10 @@ async function openNotifiedPage(event) {
   });
   const targetUri =
     type === "HINT"
-      ? `${self.registration.scope}#!/post?postUri=${atomUri}` // when deeplink works, change this to `/connections?connectionUri=${connectionUri}` see https://github.com/researchstudio-sat/webofneeds/issues/2985
+      ? `${self.registration.scope}#!/post?postUri=${atomUri}&requireLogin=true` // when deeplink works, change this to `/connections?connectionUri=${connectionUri}` see https://github.com/researchstudio-sat/webofneeds/issues/2985
       : `${
           self.registration.scope
-        }#!/connections?postUri=${atomUri}&connectionUri=${connectionUri}`;
+        }#!/connections?postUri=${atomUri}&connectionUri=${connectionUri}&requireLogin=true`;
   console.log(targetUri);
 
   if (urlWindows.length > 0) {
