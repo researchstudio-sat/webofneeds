@@ -1,19 +1,50 @@
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
 Hi there,
+#end
 
+#if ($targetAtomIsPersona)
+## do nothing
+#elseif ($localAtomTitle)
 We have news regarding your post '$localAtomTitle' on $serviceName:
 
-The user who posted '$targetAtomTitle' closed the conversation with your post.
+#else
+We have news regarding one of your posts on $serviceName:
+
+#end
+##
+#if ($targetAtomIsPersona && $targetAtomTitle)
+$targetAtomTitle just terminated the conversation with you
+#elseif ((!$targetAtomIsPersona) && $targetAtomTitle)
+The user who posted '$targetAtomTitle' just terminated a conversation with you.
+#else
+Someone just terminated a conversation with you.
+#end
 
 #if ($textMsg)
     They wrote this message:
     
     $textMsg
 #end
-    
-View the conversation: $linkConnection
-View your post: $linkLocalAtom  
-View their post: $linkTargetAtom
 
 Best wishes, 
 
 The team at $serviceName
+
+
+Links:
+
+Conversation: $linkConnection
+
+#if ($localAtomIsPersona)
+Your persona: $linkLocalAtom
+#else
+Your post: $linkLocalAtom
+#end
+
+#if ($targetAtomIsPersona)
+Their persona: $linkTargetAtom
+#else
+Their post: $linkTargetAtom
+#end

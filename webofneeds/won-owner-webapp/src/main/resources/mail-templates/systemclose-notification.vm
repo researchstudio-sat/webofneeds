@@ -1,18 +1,56 @@
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
 Hi there,
+#end
 
+#if ($localAtomIsPersona)
+## do nothing here
+#else
 We have news regarding your post '$localAtomTitle' on $serviceName:
 
-The conversation between '$targetAtomTitle' and your post
-        '$localAtomTitle' was closed by your server.
+#end
+##
+#if ($localAtomIsPersona)
+#if ($targetAtomTitle)
+The conversation between you and '$targetAtomTitle' was closed by your server.
+#else
+The conversation between you and another post was closed by your server.
+#end
+#else
+#if ($targetAtomTitle && $localAtomTitle)
+The conversation between '$targetAtomTitle' and your post '$localAtomTitle' was closed by your server.
+#elseif ($targetAtomTitle)
+The conversation between '$targetAtomTitle' and one of your posts was closed by your server.
+#elseif ($localAtomTitle)
+The conversation between your post '$localAtomTitle' and another post was closed by your server.
+#else
+The conversation between your post and another post was closed by your server.
+#end
+#end
+
 #if ($textMsg)
 Explanation:<br/>
     $textMsg
 #end
-    
-View the conversation: $linkConnection
-View your post: $linkLocalAtom  
-View their post: $linkTargetAtom
 
 Best wishes, 
 
 The team at $serviceName
+
+
+Links:
+
+Conversation: $linkConnection
+
+#if ($localAtomIsPersona)
+Your persona: $linkLocalAtom
+#else
+Your post: $linkLocalAtom
+#end
+
+#if ($targetAtomIsPersona)
+Their persona: $linkTargetAtom
+#else
+Their post: $linkTargetAtom
+#end

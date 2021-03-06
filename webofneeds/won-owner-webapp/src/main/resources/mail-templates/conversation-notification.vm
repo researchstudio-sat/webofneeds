@@ -1,17 +1,86 @@
+#if ($targetAtomTitle)
+    #set($targetAtomLabel = $targetAtomTitle)
+#elseif ($targetAtomIsPersona)
+    #set($targetAtomLabel = "somebody")
+#else
+    #set($targetAtomLabel = "their post")
+#end
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
 Hi there,
+#end
 
+
+#if ($localAtomIsPersona)
+## do nothing
+#elseif ($localAtomTitle)
+#if ($localSocketIsGroupSocket)
+We have news regarding your group chat '$localAtomTitle' on $serviceName:
+#else
 We have news regarding your post '$localAtomTitle' on $serviceName:
+#end
 
-The user who posted '$targetAtomTitle' sent you a message:
+#else
+#if ($localSocketIsGroupSocket)
+We have news regarding one of your group chats on $serviceName:
+#else
+We have news regarding one of your posts on $serviceName:
+#end
+
+#end
+##
+#if ($targetAtomIsPersona)
+$targetAtomLabel sends you this message:
+#elseif ($targetSocketIsGroupSocket)
+#if ($targetAtomTitle)
+You have received this message from group chat '$targetAtomTitle':
+#else
+You have received this group chat message:
+#end
+#else
+The user who posted '$targetAtomTitle' sends this message:
+#end
 
 #if ($textMsg)
     $textMsg
 #end
-    
-View the conversation: $linkConnection
-View your post: $linkLocalAtom  
-View their post: $linkTargetAtom
 
-Best wishes, 
+#if ($localSocketIsChatSocket)
+To reply, open the conversation:
+$linkConnection
+#else
+The connection: $linkConnection
+#end
+
+#if ($localAtomIsPersona)
+$localAtomTitle: $linkLocalAtom
+#else
+#if ($localAtomTitle)
+Your post '$localAtomTitle': $linkLocalAtom
+#else
+Your post: '$linkLocalAtom'
+#end
+#end
+
+#if ($targetAtomIsPersona)
+$targetAtomTitle: $linkTargetAtom
+#elseif ($targetSocketIsGroupSocket)
+#if ($targetAtomTitle)
+The group '$targetAtomTitle': $linkTargetAtom
+#else
+The group: $linkTargetAtom
+#end
+#else
+#if ($targetAtomTitle)
+Their post '$targetAtomTitle': $linkTargetAtom
+#else
+Their post: $linkTargetAtom
+#end
+#end
+
+
+Best wishes,
 
 The team at $serviceName
+

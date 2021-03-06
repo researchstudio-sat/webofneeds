@@ -1,19 +1,38 @@
-Hi,
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
+Hi there,
+#end
 
 #if ( $atoms.size() > 1 )
-Multple matches were found for you:
+Multiple matches were found for you:
 #foreach ($atom in $atoms)
+#if ($atomTitle[$atom])
 * $hintCount[$atom] for '$atomTitle[$atom]'
-    Go to your 'Suggestions' tab: $atomLink[$atom]
-
+#if ($atomIsPersona[$atom])
+    Go to your persona: $atomLink[$atom]
+#else
+    Go to your post: $atomLink[$atom]
+#end
+#else
+#if ($atomIsPersona[$atom])
+* $hintCount[$atom] for your persona $atomLink[$atom]
+#else
+* $hintCount[$atom] for your post $atomLink[$atom]
+#end
+#end
 #end
 #else
 #foreach ($atom in $atoms)
+#if ($atomTitle[$atom])
 $hintCount[$atom] matches were found for your post '$atomTitle[$atom]'
+    Go to your post: $atomLink[$atom]
+#else
+$hintCount[$atom] matches were found for your post $atomLink[$atom]
+#end
+#end
+#end
 
-Go to your 'Suggestions' tab: $atomLink[$atom]
-#end
-#end
-Best wishes, 
+Best wishes,
 
 The team at $serviceName

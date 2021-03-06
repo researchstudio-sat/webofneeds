@@ -1,19 +1,95 @@
+#if ($targetAtomTitle)
+    #set($targetAtomLabel = $targetAtomTitle)
+#elseif ($targetAtomIsPersona)
+    #set($targetAtomLabel = "somebody")
+#else
+    #set($targetAtomLabel = "their post")
+#end
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
 Hi there,
+#end
 
+#if ($localAtomIsPersona)
+## do nothing
+#elseif ($localAtomTitle)
+#if ($localSocketIsGroupSocket)
+We have news regarding your group chat '$localAtomTitle' on $serviceName:
+#else
 We have news regarding your post '$localAtomTitle' on $serviceName:
+#end
 
-The user who posted '$targetAtomTitle' wants to start a conversation with your post.
+#else
+#if ($localSocketIsGroupSocket)
+We have news regarding one of your group chats on $serviceName:
+#else
+We have news regarding one of your posts on $serviceName:
+#end
 
-#if ($textMsg)
-    They wrote this message:
-    
+#end
+##
+#if ($targetAtomIsPersona)
+#if ($localSocketIsChatSocket)
+$targetAtomLabel invites you to start a conversation!
+#else
+$targetAtomLabel wants to connect!
+#end
+#elseif (($targetSocketIsGroupSocket))
+#if ($targetAtomTitle)
+You have been invited to join the Group Chat '$targetAtomTitle'!
+#else
+You have been invited to join a Group Chat!
+#end
+#else
+#if ($localSocketIsChatSocket)
+The user who posted '$targetAtomTitle' invites you to start a conversation!
+#else
+The user who posted '$targetAtomTitle' wants to connect!
+#end
+#end
+#if ($localSocketIsChatSocket && $textMsg)
+
+They wrote this welcome message:
+
     $textMsg
 #end
-    
-View the conversation: $linkConnection
-View your post: $linkLocalAtom  
-View their post: $linkTargetAtom
 
-Best wishes, 
+#if ($localSocketIsChatSocket)
+To reply, open the conversation:
+$linkConnection
+#else
+The connection: $linkConnection
+#end
+
+#if ($localAtomIsPersona)
+$localAtomTitle: $linkLocalAtom
+#else
+#if ($localAtomTitle)
+Your post '$localAtomTitle': $linkLocalAtom
+#else
+Your post: '$linkLocalAtom'
+#end
+#end
+
+#if ($targetAtomIsPersona)
+$targetAtomTitle: $linkTargetAtom
+#elseif ($targetSocketIsGroupSocket)
+#if ($targetAtomTitle)
+The group '$targetAtomTitle': $linkTargetAtom
+#else
+The group: $linkTargetAtom
+#end
+#else
+#if ($targetAtomTitle)
+Their post '$targetAtomTitle': $linkTargetAtom
+#else
+Their post: $linkTargetAtom
+#end
+#end
+
+
+Best wishes,
 
 The team at $serviceName
+

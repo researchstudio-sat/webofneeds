@@ -1,14 +1,29 @@
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
 Hi there,
+#end
 
+#if ($localAtomIsPersona && $localAtomTitle)
+Your persona '$localAtomTitle' was deactivated by the WoN node that hosts it.
+#else
 We have news regarding your post '$localAtomTitle' on $serviceName:
-
+#if ($localAtomTitle)
 Your post '$localAtomTitle' was deactivated by the WoN node that hosts it.
+#else
+One of your posts was deactivated by the WoN node that hosts it.
+#end
+#end
 #if ($textMsg)
 Explanation:
     $textMsg
 #end
 
-View your post: $linkLocalAtom
+#if ($localAtomIsPersona)
+Go to your persona: $linkLocalAtom
+#else
+Go to your post: $linkLocalAtom
+#end
 
 Best wishes, 
 

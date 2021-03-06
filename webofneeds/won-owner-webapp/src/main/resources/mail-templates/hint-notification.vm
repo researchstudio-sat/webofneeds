@@ -1,8 +1,20 @@
+#if ($localAtomIsPersona && $localAtomTitle)
+Hi $localAtomTitle,
+#else
 Hi there,
+#end
 
-The post '$targetAtomTitle' may be interesting for you. 
+#if ($targetAtomTitle && $localAtomTitle)
+We found the post '$targetAtomTitle' which be relevant regarding your post '$localAtomTitle'!
+#elseif ($targetAtomTitle)
+We found the post '$targetAtomTitle' which may be relevant regarding one of your posts!
+#elseif ($localAtomTitle)
+We found a post that may be relevant regarding your post '$localAtomTitle'!
+#else
+We found a post that may be relevant regarding one of your posts!
+#end
 
-Go to your 'Suggestions' tab: $linkLocalAtom
+Go to your post: $linkLocalAtom
 
 Best wishes, 
 
