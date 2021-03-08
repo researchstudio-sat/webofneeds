@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { get, getIn } from "../utils.js";
+import { get, getIn, getQueryParams } from "../utils.js";
 
 import "~/style/_modal-dialog.scss";
 import WonLabelledHr from "~/app/components/labelled-hr";
@@ -13,12 +13,16 @@ import { parseRestErrorMessage } from "~/app/won-utils";
 import * as accountUtils from "~/app/redux/utils/account-utils";
 import won from "~/app/won-es6";
 import * as processUtils from "~/app/redux/utils/process-utils";
+import { useLocation } from "react-router-dom";
 
 export default function WonModalDialog() {
   const dispatch = useDispatch();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+
+  const { requireLogin } = getQueryParams(location);
 
   const modalDialog = useSelector(state =>
     getIn(state, ["view", "modalDialog"])
@@ -180,6 +184,19 @@ export default function WonModalDialog() {
                 <span>No, cancel</span>
               </button>
             </div>
+          </div>
+        </won-modal-dialog>
+      );
+    } else if (requireLogin) {
+      return (
+        <won-modal-dialog>
+          <div className="md__dialog">
+            <div className="md__dialog__header">
+              <span className="md__dialog__header__caption">
+                Login required
+              </span>
+            </div>
+            <div className="md__dialog__content">{wonLoginFormElement}</div>
           </div>
         </won-modal-dialog>
       );

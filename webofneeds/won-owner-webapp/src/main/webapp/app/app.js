@@ -21,6 +21,7 @@ import {
   Switch,
   Route,
   useLocation,
+  useHistory,
   Redirect,
 } from "react-router-dom";
 import "whatwg-fetch"; //polyfill for window.fetch (for backward-compatibility with older browsers)
@@ -49,11 +50,13 @@ import thunk from "redux-thunk";
 import { piwikMiddleware } from "./piwik.js";
 import { runMessagingAgent } from "./messaging-agent";
 import Immutable from "immutable";
-import { getQueryParams } from "./utils.js";
+import { getQueryParams, generateLink } from "./utils.js";
 import * as accountUtils from "./redux/utils/account-utils.js";
 import * as processUtils from "./redux/utils/process-utils.js";
 import { runPushAgent } from "./push-agent";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
+import WonModalDialog from "~/app/components/modal-dialog";
+import * as viewSelectors from "~/app/redux/selectors/view-selectors";
 
 window.won = won;
 
@@ -103,14 +106,16 @@ store.dispatch(actionCreators.tick());
 
 function AppRoutes({ processState }) {
   const dispatch = useDispatch();
+  const history = useHistory();
   const location = useLocation();
   const accountState = useSelector(generalSelectors.getAccountState);
+  const showModalDialog = useSelector(viewSelectors.showModalDialog);
 
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const hasLoginError = !!accountUtils.getLoginError(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
 
-  const { postUri, token, privateId } = getQueryParams(location);
+  const { postUri, token, privateId, requireLogin } = getQueryParams(location);
 
   //******************************** EMAIL TOKEN VERIFICATION
   const isEmailVerified = accountUtils.isEmailVerified(accountState);
@@ -134,6 +139,32 @@ function AppRoutes({ processState }) {
     console.debug("Dispatchin privateId Login");
     dispatch(actionCreators.account__login({ privateId: privateId }));
   }
+
+  if (requireLogin && !loginProcessing) {
+    dispatch(
+      actionCreators.account__requireLogin(() => {
+        dispatch(actionCreators.view__hideModalDialog());
+        history.replace(
+          generateLink(history.location, { requireLogin: undefined })
+        );
+      })
+    );
+
+    return (
+      <Switch>
+        <Route path="/">
+          <main className="ownerloading">
+            {showModalDialog && <WonModalDialog />}
+            <svg className="ownerloading__spinner hspinner">
+              <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+            </svg>
+            <span className="ownerloading__label">Login required...</span>
+          </main>
+        </Route>
+      </Switch>
+    );
+  }
+
   //********************************
 
   return (
@@ -208,16 +239,3 @@ ReactDOM.render(
   </Provider>,
   document.getElementById("root")
 );
-
-/*<Route exact path="/"><PageInventory />:token:privateId}
-
-<Route path="/create"><PageCreate />:useCase:useCaseGroup:fromAtomUri:mode:holderUri:senderSocketType:targetSocketType
-<Route path="/signup"><PageSignUp />
-<Route path="/about"><PageAbout />:aboutSection
-<Route path="/map"><PageMap />
-<Route path="/inventory"><PageInventory />:token:privateId
-<Route path="/connections"><PageConnections />:connectionUri
-<Route path="/overview"><PageOverview />
-<Route path="/post"><PagePost />:postUri
-<Route path="/settings"><PageSettings />
-*/
