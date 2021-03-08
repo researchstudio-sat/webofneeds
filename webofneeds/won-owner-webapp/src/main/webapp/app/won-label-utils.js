@@ -254,6 +254,36 @@ export function getSocketItemsLabel(socketType) {
   return labels.socketItems[socketType] || socketType;
 }
 
+/**
+ * Used within socket-add-button
+ *
+ * TODO: generate a meaningful label based on the targetAtom (the atom to connect to) reactions, targetSocketType, and reactions
+ *
+ * @param targetAtom
+ * @param isAtomOwned
+ * @param targetSocketType
+ * @param senderReactions
+ * @returns {string}
+ */
+export function generateAddButtonLabel(
+  targetAtom,
+  isAtomOwned,
+  targetSocketType,
+  senderReactions
+) {
+  return isAtomOwned
+    ? `Add ${
+        senderReactions
+          ? getSocketItemLabels(targetSocketType, senderReactions.keys())
+          : "Atom"
+      }`
+    : `Connect ${
+        senderReactions
+          ? getSocketItemLabels(targetSocketType, senderReactions.keys())
+          : "Atom"
+      }`;
+}
+
 export function getSocketActionInfoLabel(
   socketType,
   connectionState,
