@@ -1,5 +1,6 @@
 import { deepFreeze, isValidNumber } from "./utils.js";
 import vocab from "./service/vocab.js";
+import * as atomUtils from "./redux/utils/atom-utils.js";
 
 export const rdfTextfieldHelpText =
   "Expects valid turtle. " +
@@ -258,7 +259,7 @@ export function getSocketItemsLabel(socketType) {
  * Used within socket-add-button
  *
  * TODO: generate a meaningful label based on the targetAtom (the atom to connect to) reactions, targetSocketType, and reactions
- *
+ * TODO: generate dynamic labels & enum for labels
  * @param targetAtom
  * @param isAtomOwned
  * @param targetSocketType
@@ -271,6 +272,22 @@ export function generateAddButtonLabel(
   targetSocketType,
   senderReactions
 ) {
+  if (atomUtils.isOrganization(targetAtom)) {
+    switch (targetSocketType) {
+      case vocab.WXSCHEMA.ReviewSocketCompacted:
+        return "Review Organization";
+      case vocab.WXSCHEMA.AssociatedArticleSocketCompacted:
+        return "New Article";
+      case vocab.WXSCHEMA.EventSocketCompacted:
+        return "Event";
+      case vocab.WXSCHEMA.MemberSocketCompacted:
+        return isAtomOwned ? "Manage Members" : "Join Organization";
+      case vocab.WXSCHEMA.SubOrganizationSocketCompacted:
+        return "Sub Organization";
+      default:
+        break;
+    }
+  }
   return isAtomOwned
     ? `Add ${
         senderReactions

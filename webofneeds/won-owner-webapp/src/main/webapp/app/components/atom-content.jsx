@@ -215,6 +215,7 @@ export default function WonAtomContent({
                   isOwned={isOwned}
                   setVisibleTab={setVisibleTab}
                   toggleAddPicker={toggleAddPicker}
+                  targetAtom={atom}
                 />
               )}
           </React.Fragment>
@@ -421,6 +422,7 @@ function WonAtomContentReactions({
   isOwned,
   setVisibleTab,
   toggleAddPicker,
+  targetAtom,
 }) {
   const reactionElements = [];
   reactions.map((senderSocketReactions, targetSocketType) => {
@@ -432,6 +434,7 @@ function WonAtomContentReactions({
           isAtomOwned={isOwned}
           key={targetSocketType}
           className="won-socket-add-button--tag"
+          targetAtom={targetAtom}
           onClick={() => {
             setVisibleTab(targetSocketType);
             toggleAddPicker(true);
@@ -451,6 +454,7 @@ WonAtomContentReactions.propTypes = {
   isOwned: PropTypes.bool,
   setVisibleTab: PropTypes.func.isRequired,
   toggleAddPicker: PropTypes.func.isRequired,
+  targetAtom: PropTypes.object.isRequired,
 };
 
 function WonAtomContentSingleConnectSockets({
@@ -537,6 +541,7 @@ function WonAtomContentSingleConnectSockets({
                 targetSocketType={targetSocketType}
                 isAtomOwned={isOwned}
                 key={targetSocketType}
+                targetAtom={atom}
                 onClick={() => {
                   setVisibleTab(targetSocketType);
                   toggleAddPicker(true);

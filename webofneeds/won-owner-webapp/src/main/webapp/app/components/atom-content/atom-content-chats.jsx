@@ -149,6 +149,7 @@ export default function AtomContentChats({
                 <WonSocketAddButton
                   senderReactions={reactions}
                   isAtomOwned={isAtomOwned}
+                  targetAtom={atom}
                   onClick={() => toggleAddPicker(!showAddPicker)}
                   targetSocketType={vocab.CHAT.ChatSocketCompacted}
                 />

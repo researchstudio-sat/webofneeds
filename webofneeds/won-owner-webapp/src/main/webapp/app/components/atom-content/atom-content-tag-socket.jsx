@@ -91,6 +91,7 @@ export default function WonAtomContentTagSocket({
               <WonSocketAddButton
                 senderReactions={reactions}
                 isAtomOwned={isOwned}
+                targetAtom={atom}
                 onClick={() => toggleAddPicker(!showAddPicker)}
                 targetSocketType={socketType}
                 className="won-socket-add-button--tag"

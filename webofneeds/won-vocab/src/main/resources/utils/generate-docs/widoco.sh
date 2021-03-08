@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 usage(){
 cat << EOF
 usage: 
