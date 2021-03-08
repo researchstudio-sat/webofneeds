@@ -36,7 +36,7 @@ export const emptyAtomProcess = Immutable.fromJS({
   loaded: false,
   failedToLoad: false,
   processUpdate: false,
-  status: undefined,
+  status: Immutable.List(),
 });
 
 export const emptyConnectionContainerProcess = Immutable.fromJS({
@@ -44,7 +44,7 @@ export const emptyConnectionContainerProcess = Immutable.fromJS({
   toLoad: false,
   loaded: false,
   failedToLoad: false,
-  status: undefined,
+  status: Immutable.List(),
 });
 
 export const emptyConnectionProcess = Immutable.fromJS({
@@ -53,7 +53,7 @@ export const emptyConnectionProcess = Immutable.fromJS({
   loadingMessages: false,
   nextPage: undefined,
   failedToLoad: false,
-  status: undefined,
+  status: Immutable.List(),
   petriNetData: {
     loading: false,
     dirty: false,
@@ -337,39 +337,49 @@ export default function(processState = initialState, action = {}) {
       return processState.set("processingSendAnonymousLinkEmail", false);
 
     case actionTypes.atoms.storeUriFailed: {
-      return updateAtomProcess(processState, getUri(action.payload), {
+      const atomUri = getUri(action.payload);
+      const atomStatus = processUtils.getAtomProcessStatus(
+        processState,
+        atomUri
+      );
+
+      return updateAtomProcess(processState, atomUri, {
         toLoad: false,
         loaded: false,
         failedToLoad: true,
         loading: false,
-        status: get(action.payload, "status"),
+        status: atomStatus.push(get(action.payload, "status")),
       });
     }
 
     case actionTypes.atoms.storeConnectionContainerFailed: {
-      return updateConnectionContainerProcess(
+      const atomUri = getUri(action.payload);
+      const connectionContainerStatus = processUtils.getConnectionContainerProcessStatus(
         processState,
-        getUri(action.payload),
-        {
-          toLoad: false,
-          loaded: false,
-          failedToLoad: true,
-          loading: false,
-          status: get(action.payload, "status"),
-        }
+        atomUri
       );
+
+      return updateConnectionContainerProcess(processState, atomUri, {
+        toLoad: false,
+        loaded: false,
+        failedToLoad: true,
+        loading: false,
+        status: connectionContainerStatus.push(get(action.payload, "status")),
+      });
     }
 
     case actionTypes.connections.storeUriFailed: {
-      return updateConnectionProcess(
+      const connUri = get(action.payload, "connUri");
+      const connectionStatus = processUtils.getConnectionProcessStatus(
         processState,
-        get(action.payload, "connUri"),
-        {
-          failedToLoad: true,
-          loading: false,
-          status: get(action.payload, "status"),
-        }
+        connUri
       );
+
+      return updateConnectionProcess(processState, connUri, {
+        failedToLoad: true,
+        loading: false,
+        status: connectionStatus.push(get(action.payload, "status")),
+      });
     }
 
     case actionTypes.connections.fetchMessagesStart: {

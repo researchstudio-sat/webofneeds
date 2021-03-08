@@ -7,6 +7,7 @@
 
 //import won from "./won-es6.js";
 import { get, getIn } from "../../utils.js";
+import Immutable from "immutable";
 
 /**
  * Return true if processingInitialLoad is currently active
@@ -169,6 +170,7 @@ export function hasConnectionContainerFailedToLoad(process, atomUri) {
   );
 }
 
+//TODO REFACTOR NAME!
 export function getConnectionContainerStatus(process, atomUri) {
   return atomUri && getIn(process, ["connectionContainers", atomUri]);
 }
@@ -438,4 +440,19 @@ export function isAtomFetchNecessary(process, atomUri, atom) {
     }
   }
   return false;
+}
+
+export function getAtomProcessStatus(process, atomUri) {
+  return getIn(process, ["atoms", atomUri, "status"]) || Immutable.List();
+}
+
+export function getConnectionContainerProcessStatus(process, atomUri) {
+  return (
+    getIn(process, ["connectionContainers", atomUri, "status"]) ||
+    Immutable.List()
+  );
+}
+
+export function getConnectionProcessStatus(process, connUri) {
+  return getIn(process, ["connections", connUri, "status"]) || Immutable.List();
 }
