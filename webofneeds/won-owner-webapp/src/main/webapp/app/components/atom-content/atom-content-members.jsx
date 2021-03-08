@@ -253,6 +253,7 @@ export default function WonAtomContentMembers({
                   <WonSocketAddButton
                     senderReactions={reactions}
                     isAtomOwned={isAtomOwned}
+                    targetAtom={atom}
                     onClick={() => toggleAddPicker(!showAddPicker)}
                     targetSocketType={socketType}
                     className={addButtonClassName}

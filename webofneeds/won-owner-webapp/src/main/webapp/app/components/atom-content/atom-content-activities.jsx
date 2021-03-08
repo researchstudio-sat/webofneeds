@@ -150,6 +150,7 @@ export default function AtomContentActivities({
                 <WonSocketAddButton
                   senderReactions={reactions}
                   isAtomOwned={isAtomOwned}
+                  targetAtom={atom}
                   onClick={() => toggleAddPicker(!showAddPicker)}
                   targetSocketType={
                     vocab.WXVALUEFLOWS.PartnerActivitySocketCompactedd
