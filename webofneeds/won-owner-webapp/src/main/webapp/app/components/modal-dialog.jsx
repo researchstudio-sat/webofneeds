@@ -23,9 +23,6 @@ export default function WonModalDialog() {
   const modalDialog = useSelector(state =>
     getIn(state, ["view", "modalDialog"])
   );
-  const modalDialogCaption = get(modalDialog, "caption");
-  const modalDialogText = get(modalDialog, "text");
-  const modalDialogButtons = get(modalDialog, "buttons") || [];
   const showLoggedOutDialog = get(modalDialog, "showLoggedOutDialog");
 
   const accountState = useSelector(generalSelectors.getAccountState);
@@ -37,18 +34,7 @@ export default function WonModalDialog() {
     processState
   );
   const isLoggedIn = accontUtils.isLoggedIn(accountState);
-  const isAnonymous = accontUtils.isAnonymous(accountState);
   const loggedInEmail = accontUtils.getEmail(accountState);
-
-  function formKeyUp(event) {
-    if (loginError) {
-      dispatch(actionCreators.view__clearLoginError());
-    }
-
-    if (event.keyCode === 13) {
-      login(event);
-    }
-  }
 
   useEffect(
     () => {
@@ -59,56 +45,56 @@ export default function WonModalDialog() {
     [isLoggedIn, loggedInEmail]
   );
 
-  function login(event) {
-    event.preventDefault();
-    console.debug("Login submit");
-
-    dispatch(
-      actionCreators.account__login(
-        {
-          email: email,
-          password: password,
-          rememberMe: rememberMe,
-        },
-        get(modalDialog, "afterLoginCallback")
-      )
-    );
-  }
-
-  function loginAnon() {
-    dispatch(
-      actionCreators.account__login({
-        privateId: accontUtils.getPrivateId(accountState),
-      })
-    );
-  }
-
-  function registerAnonAccount() {
-    const privateId = wonUtils.generatePrivateId();
-    dispatch(
-      actionCreators.account__register(
-        { privateId },
-        get(modalDialog, "afterLoginCallback")
-      )
-    );
-  }
-
   const closeDialog = () => dispatch(actionCreators.view__hideModalDialog());
 
-  return (
-    <won-modal-dialog>
-      <div className="md__dialog">
-        {showLoggedOutDialog ? (
-          <React.Fragment>
+  if (showLoggedOutDialog) {
+    const formKeyUp = event => {
+      if (loginError) {
+        dispatch(actionCreators.view__clearLoginError());
+      }
+
+      if (event.keyCode === 13) {
+        login(event);
+      }
+    };
+
+    const login = event => {
+      event.preventDefault();
+      console.debug("Login submit");
+
+      dispatch(
+        actionCreators.account__login(
+          {
+            email: email,
+            password: password,
+            rememberMe: rememberMe,
+          },
+          get(modalDialog, "afterLoginCallback")
+        )
+      );
+    };
+
+    if (isLoggedIn) {
+      const isAnonymous = accontUtils.isAnonymous(accountState);
+
+      const loginAnon = () => {
+        dispatch(
+          actionCreators.account__login({
+            privateId: accontUtils.getPrivateId(accountState),
+          })
+        );
+      };
+
+      return (
+        <won-modal-dialog>
+          <div className="md__dialog">
             <div className="md__dialog__header">
               <span className="md__dialog__header__caption">
-                {isLoggedIn
-                  ? "Session Expired, Login to continue"
-                  : "You are currently not logged in"}
+                Session Expired, Login to continue
               </span>
             </div>
             <div className="md__dialog__content">
-              {isLoggedIn && isAnonymous ? (
+              {isAnonymous ? (
                 <span className="md__dialog__content__text">
                   Your state shows that you used to be logged in with an
                   Anonymous Account, but lost your session. Click the button
@@ -185,30 +171,7 @@ export default function WonModalDialog() {
                   </form>
                 </won-login-form>
               )}
-
-              {!isLoggedIn ? (
-                <React.Fragment>
-                  <WonLabelledHr label="or" />
-                  <span className="md__dialog__content__text">
-                    {
-                      "If you don't have an Account yet, you do not have to register right away."
-                    }
-                    <br />
-                    <br />
-                    {"Simple click 'Yes', to accept the "}
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="#!/about?aboutSection=aboutTermsOfService"
-                    >
-                      Terms Of Service(ToS)
-                    </a>
-                    {
-                      " and anonymous account will be created for you. Clicking 'No' will just cancel the action. You can link this Account to an E-Mail address later."
-                    }
-                  </span>
-                </React.Fragment>
-              ) : isAnonymous ? (
+              {isAnonymous ? (
                 <div className="md__dialog__footer md__dialog__footer--column">
                   <button
                     className={"won-button--filled secondary"}
@@ -221,65 +184,181 @@ export default function WonModalDialog() {
                 undefined
               )}
             </div>
-            {!isLoggedIn ? (
-              <div className="md__dialog__footer md__dialog__footer--column">
-                <button
-                  className={"won-button--filled secondary"}
-                  onClick={registerAnonAccount}
-                >
-                  <span>Yes, I accept ToS</span>
-                </button>
-                <button
-                  className={"won-button--filled secondary"}
-                  onClick={closeDialog}
-                >
-                  <span>No, cancel</span>
-                </button>
-              </div>
-            ) : (
-              <div className="md__dialog__footer md__dialog__footer--column">
-                <button
-                  className={"won-button--filled secondary"}
-                  onClick={closeDialog}
-                >
-                  <span>No, cancel</span>
-                </button>
-              </div>
-            )}
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
+            <div className="md__dialog__footer md__dialog__footer--column">
+              <button
+                className={"won-button--filled secondary"}
+                onClick={closeDialog}
+              >
+                <span>No, cancel</span>
+              </button>
+            </div>
+          </div>
+        </won-modal-dialog>
+      );
+    } else {
+      const registerAnonAccount = () => {
+        const privateId = wonUtils.generatePrivateId();
+        dispatch(
+          actionCreators.account__register(
+            { privateId },
+            get(modalDialog, "afterLoginCallback")
+          )
+        );
+      };
+
+      return (
+        <won-modal-dialog>
+          <div className="md__dialog">
             <div className="md__dialog__header">
               <span className="md__dialog__header__caption">
-                {modalDialogCaption}
+                {isLoggedIn
+                  ? "Session Expired, Login to continue"
+                  : "You are currently not logged in"}
               </span>
             </div>
             <div className="md__dialog__content">
+              <won-login-form>
+                <form onSubmit={login} id="loginForm" className="loginForm">
+                  <input
+                    id="loginEmail"
+                    placeholder="Email address"
+                    value={email}
+                    type="email"
+                    disabled={isLoggedIn}
+                    required
+                    autoFocus
+                    onKeyUp={formKeyUp}
+                    onChange={event => setEmail(event.target.value)}
+                  />
+                  {!!loginError && (
+                    <ReactMarkdown
+                      className="wl__errormsg markdown"
+                      source={parseRestErrorMessage(loginError)}
+                    />
+                  )}
+                  {isNotVerified &&
+                    (!processingResendVerificationEmail ? (
+                      <a
+                        className="wl__errormsg__resend"
+                        onClick={() =>
+                          dispatch(
+                            actionCreators.account__resendVerificationEmail(
+                              email
+                            )
+                          )
+                        }
+                      >
+                        {"(Click to Resend Verification Email)"}
+                      </a>
+                    ) : (
+                      <a className="wl__errormsg__resend">{"(Resending...)"}</a>
+                    ))}
+                  <input
+                    id="loginPassword"
+                    placeholder="Password"
+                    value={password}
+                    type="password"
+                    required
+                    onKeyUp={formKeyUp}
+                    onChange={event => setPassword(event.target.value)}
+                  />
+                  {email.length > 0 &&
+                    password.length > 0 && (
+                      <label>
+                        <input
+                          id="remember-me"
+                          value={rememberMe}
+                          onChange={event =>
+                            setRememberMe(event.target.checked)
+                          }
+                          type="checkbox"
+                        />
+                        Remember me
+                      </label>
+                    )}
+                  <button
+                    className="won-button--filled secondary"
+                    disabled={password === "" || email === ""}
+                  >
+                    Sign In
+                  </button>
+                </form>
+              </won-login-form>
+
+              <WonLabelledHr label="or" />
               <span className="md__dialog__content__text">
-                {modalDialogText}
+                {
+                  "If you don't have an Account yet, you do not have to register right away."
+                }
+                <br />
+                <br />
+                {"Simple click 'Yes', to accept the "}
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="#!/about?aboutSection=aboutTermsOfService"
+                >
+                  Terms Of Service(ToS)
+                </a>
+                {
+                  " and anonymous account will be created for you. Clicking 'No' will just cancel the action. You can link this Account to an E-Mail address later."
+                }
               </span>
             </div>
-            <div
-              className={
-                "md__dialog__footer " +
-                (modalDialogButtons.size > 2
-                  ? " md__dialog__footer--row"
-                  : " md__dialog__footer--column")
-              }
-            >
-              {modalDialogButtons.map((button, index) => (
-                <button
-                  key={get(button, "caption") + "-" + index}
-                  className={"won-button--filled secondary"}
-                  onClick={get(button, "callback")}
-                >
-                  <span>{get(button, "caption")}</span>
-                </button>
-              ))}
+            <div className="md__dialog__footer md__dialog__footer--column">
+              <button
+                className={"won-button--filled secondary"}
+                onClick={registerAnonAccount}
+              >
+                <span>Yes, I accept ToS</span>
+              </button>
+              <button
+                className={"won-button--filled secondary"}
+                onClick={closeDialog}
+              >
+                <span>No, cancel</span>
+              </button>
             </div>
-          </React.Fragment>
-        )}
-      </div>
-    </won-modal-dialog>
-  );
+          </div>
+        </won-modal-dialog>
+      );
+    }
+  } else {
+    const modalDialogCaption = get(modalDialog, "caption");
+    const modalDialogText = get(modalDialog, "text");
+    const modalDialogButtons = get(modalDialog, "buttons") || [];
+
+    return (
+      <won-modal-dialog>
+        <div className="md__dialog">
+          <div className="md__dialog__header">
+            <span className="md__dialog__header__caption">
+              {modalDialogCaption}
+            </span>
+          </div>
+          <div className="md__dialog__content">
+            <span className="md__dialog__content__text">{modalDialogText}</span>
+          </div>
+          <div
+            className={
+              "md__dialog__footer " +
+              (modalDialogButtons.size > 2
+                ? " md__dialog__footer--row"
+                : " md__dialog__footer--column")
+            }
+          >
+            {modalDialogButtons.map((button, index) => (
+              <button
+                key={get(button, "caption") + "-" + index}
+                className={"won-button--filled secondary"}
+                onClick={get(button, "callback")}
+              >
+                <span>{get(button, "caption")}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </won-modal-dialog>
+    );
+  }
 }
