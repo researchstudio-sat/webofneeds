@@ -11,12 +11,12 @@ import {
   connectToSocketsAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
-import ico36_uc_wtf from "../../images/won-icons/ico36_uc_wtf.svg";
+import ico16_uc_organization from "../../images/won-icons/ico16_uc_organization.svg";
 
 export const organization = {
   identifier: "organization",
   label: "Organization",
-  icon: ico36_uc_wtf, //TODO: Find better Icon
+  icon: ico16_uc_organization,
   draft: {
     ...mergeInEmptyDraft({
       content: {

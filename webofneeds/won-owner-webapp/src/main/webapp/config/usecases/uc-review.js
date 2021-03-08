@@ -4,11 +4,12 @@ import {
   defaultReactions,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
+import ico16_uc_review from "../../images/won-icons/ico16_uc_review.svg";
 
 export const review = {
   identifier: "review",
   label: "Review",
-  icon: undefined, //No Icon For Persona UseCase (uses identicon)
+  icon: ico16_uc_review,
   draft: {
     ...mergeInEmptyDraft({
       content: {
