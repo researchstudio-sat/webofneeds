@@ -74,9 +74,73 @@ export default function WonModalDialog() {
       );
     };
 
-    if (isLoggedIn) {
-      const isAnonymous = accontUtils.isAnonymous(accountState);
+    const wonLoginFormElement = (
+      <won-login-form>
+        <form onSubmit={login} id="loginForm" className="loginForm">
+          <input
+            id="loginEmail"
+            placeholder="Email address"
+            value={email}
+            type="email"
+            disabled={isLoggedIn}
+            required
+            autoFocus
+            onKeyUp={formKeyUp}
+            onChange={event => setEmail(event.target.value)}
+          />
+          {!!loginError && (
+            <ReactMarkdown
+              className="wl__errormsg markdown"
+              source={parseRestErrorMessage(loginError)}
+            />
+          )}
+          {isNotVerified &&
+            (!processingResendVerificationEmail ? (
+              <a
+                className="wl__errormsg__resend"
+                onClick={() =>
+                  dispatch(
+                    actionCreators.account__resendVerificationEmail(email)
+                  )
+                }
+              >
+                {"(Click to Resend Verification Email)"}
+              </a>
+            ) : (
+              <a className="wl__errormsg__resend">{"(Resending...)"}</a>
+            ))}
+          <input
+            id="loginPassword"
+            placeholder="Password"
+            value={password}
+            type="password"
+            required
+            onKeyUp={formKeyUp}
+            onChange={event => setPassword(event.target.value)}
+          />
+          {email.length > 0 &&
+            password.length > 0 && (
+              <label>
+                <input
+                  id="remember-me"
+                  value={rememberMe}
+                  onChange={event => setRememberMe(event.target.checked)}
+                  type="checkbox"
+                />
+                Remember me
+              </label>
+            )}
+          <button
+            className="won-button--filled secondary"
+            disabled={password === "" || email === ""}
+          >
+            Sign In
+          </button>
+        </form>
+      </won-login-form>
+    );
 
+    if (isLoggedIn && accontUtils.isAnonymous(accountState)) {
       const loginAnon = () => {
         dispatch(
           actionCreators.account__login({
@@ -94,96 +158,41 @@ export default function WonModalDialog() {
               </span>
             </div>
             <div className="md__dialog__content">
-              {isAnonymous ? (
-                <span className="md__dialog__content__text">
-                  Your state shows that you used to be logged in with an
-                  Anonymous Account, but lost your session. Click the button
-                  below to sign in again.
-                </span>
-              ) : (
-                <won-login-form>
-                  <form onSubmit={login} id="loginForm" className="loginForm">
-                    <input
-                      id="loginEmail"
-                      placeholder="Email address"
-                      value={email}
-                      type="email"
-                      disabled={isLoggedIn}
-                      required
-                      autoFocus
-                      onKeyUp={formKeyUp}
-                      onChange={event => setEmail(event.target.value)}
-                    />
-                    {!!loginError && (
-                      <ReactMarkdown
-                        className="wl__errormsg markdown"
-                        source={parseRestErrorMessage(loginError)}
-                      />
-                    )}
-                    {isNotVerified &&
-                      (!processingResendVerificationEmail ? (
-                        <a
-                          className="wl__errormsg__resend"
-                          onClick={() =>
-                            dispatch(
-                              actionCreators.account__resendVerificationEmail(
-                                email
-                              )
-                            )
-                          }
-                        >
-                          {"(Click to Resend Verification Email)"}
-                        </a>
-                      ) : (
-                        <a className="wl__errormsg__resend">
-                          {"(Resending...)"}
-                        </a>
-                      ))}
-                    <input
-                      id="loginPassword"
-                      placeholder="Password"
-                      value={password}
-                      type="password"
-                      required
-                      onKeyUp={formKeyUp}
-                      onChange={event => setPassword(event.target.value)}
-                    />
-                    {email.length > 0 &&
-                      password.length > 0 && (
-                        <label>
-                          <input
-                            id="remember-me"
-                            value={rememberMe}
-                            onChange={event =>
-                              setRememberMe(event.target.checked)
-                            }
-                            type="checkbox"
-                          />
-                          Remember me
-                        </label>
-                      )}
-                    <button
-                      className="won-button--filled secondary"
-                      disabled={password === "" || email === ""}
-                    >
-                      Sign In
-                    </button>
-                  </form>
-                </won-login-form>
-              )}
-              {isAnonymous ? (
-                <div className="md__dialog__footer md__dialog__footer--column">
-                  <button
-                    className={"won-button--filled secondary"}
-                    onClick={loginAnon}
-                  >
-                    <span>Re-Login Anonymous Account</span>
-                  </button>
-                </div>
-              ) : (
-                undefined
-              )}
+              <span className="md__dialog__content__text">
+                Your state shows that you used to be logged in with an Anonymous
+                Account, but lost your session. Click the button below to sign
+                in again.
+              </span>
+              <div className="md__dialog__footer md__dialog__footer--column">
+                <button
+                  className={"won-button--filled secondary"}
+                  onClick={loginAnon}
+                >
+                  <span>Re-Login Anonymous Account</span>
+                </button>
+              </div>
             </div>
+            <div className="md__dialog__footer md__dialog__footer--column">
+              <button
+                className={"won-button--filled secondary"}
+                onClick={closeDialog}
+              >
+                <span>No, cancel</span>
+              </button>
+            </div>
+          </div>
+        </won-modal-dialog>
+      );
+    } else if (isLoggedIn) {
+      return (
+        <won-modal-dialog>
+          <div className="md__dialog">
+            <div className="md__dialog__header">
+              <span className="md__dialog__header__caption">
+                Session Expired, Login to continue
+              </span>
+            </div>
+            <div className="md__dialog__content">{wonLoginFormElement}</div>
             <div className="md__dialog__footer md__dialog__footer--column">
               <button
                 className={"won-button--filled secondary"}
@@ -217,74 +226,7 @@ export default function WonModalDialog() {
               </span>
             </div>
             <div className="md__dialog__content">
-              <won-login-form>
-                <form onSubmit={login} id="loginForm" className="loginForm">
-                  <input
-                    id="loginEmail"
-                    placeholder="Email address"
-                    value={email}
-                    type="email"
-                    disabled={isLoggedIn}
-                    required
-                    autoFocus
-                    onKeyUp={formKeyUp}
-                    onChange={event => setEmail(event.target.value)}
-                  />
-                  {!!loginError && (
-                    <ReactMarkdown
-                      className="wl__errormsg markdown"
-                      source={parseRestErrorMessage(loginError)}
-                    />
-                  )}
-                  {isNotVerified &&
-                    (!processingResendVerificationEmail ? (
-                      <a
-                        className="wl__errormsg__resend"
-                        onClick={() =>
-                          dispatch(
-                            actionCreators.account__resendVerificationEmail(
-                              email
-                            )
-                          )
-                        }
-                      >
-                        {"(Click to Resend Verification Email)"}
-                      </a>
-                    ) : (
-                      <a className="wl__errormsg__resend">{"(Resending...)"}</a>
-                    ))}
-                  <input
-                    id="loginPassword"
-                    placeholder="Password"
-                    value={password}
-                    type="password"
-                    required
-                    onKeyUp={formKeyUp}
-                    onChange={event => setPassword(event.target.value)}
-                  />
-                  {email.length > 0 &&
-                    password.length > 0 && (
-                      <label>
-                        <input
-                          id="remember-me"
-                          value={rememberMe}
-                          onChange={event =>
-                            setRememberMe(event.target.checked)
-                          }
-                          type="checkbox"
-                        />
-                        Remember me
-                      </label>
-                    )}
-                  <button
-                    className="won-button--filled secondary"
-                    disabled={password === "" || email === ""}
-                  >
-                    Sign In
-                  </button>
-                </form>
-              </won-login-form>
-
+              {wonLoginFormElement}
               <WonLabelledHr label="or" />
               <span className="md__dialog__content__text">
                 {
