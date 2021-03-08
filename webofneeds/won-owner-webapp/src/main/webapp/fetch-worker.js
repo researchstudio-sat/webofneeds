@@ -1093,6 +1093,7 @@ const checkHttpStatus = (uri, params = {}) => response => {
     return response;
   } else {
     try {
+      //TODO: returning response.json() as promise will not fall into the catch block somehow (fix with inner catch after json()
       return response.json().then(jsonResponse => {
         const errorPayload = {
           response: jsonResponse,

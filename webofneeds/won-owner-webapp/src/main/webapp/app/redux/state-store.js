@@ -491,7 +491,11 @@ export const fetchAtomAndDispatch = (
               dispatch({
                 type: actionTypes.atoms.store,
                 payload: Immutable.fromJS({
-                  atoms: { [atomUri]: parsedAtomImm },
+                  atom: parsedAtomImm,
+                  status: {
+                    code: 200,
+                    requestCredentials: requestCredentials,
+                  },
                 }),
               });
             }

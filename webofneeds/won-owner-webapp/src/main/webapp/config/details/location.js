@@ -78,7 +78,7 @@ export const jobLocation = {
 
 export const travelAction = {
   identifier: "travelAction",
-  label: "Route (From - To)",
+  label: "Route",
   icon: ico36_detail_travelaction,
   placeholder: {
     departure: "Start location",
