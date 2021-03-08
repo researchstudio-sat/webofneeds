@@ -180,6 +180,7 @@ export default function WonAtomContentSocket({
                   senderReactions={reactions}
                   isAtomOwned={isAtomOwned}
                   onClick={() => toggleAddPicker(!showAddPicker)}
+                  targetAtom={atom}
                   targetSocketType={socketType}
                   className={addButtonClassName}
                 />
