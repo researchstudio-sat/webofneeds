@@ -16,7 +16,6 @@ import * as atomUtils from "../../redux/utils/atom-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import * as accountUtils from "../../redux/utils/account-utils.js";
 
-import Immutable from "immutable";
 import WonBranchDetailInput from "./branch-detail-input.jsx";
 import WonLabelledHr from "../labelled-hr.jsx";
 import WonPublishButton from "~/app/components/publish-button";
@@ -179,75 +178,56 @@ export default function WonCreateAtom({
       useCaseImm
     );
 
-    let executeFunction;
-
     if (connect) {
-      executeFunction = () => {
-        dispatch(
-          actionCreators.connections__connectReactionAtom(
-            fromAtomUri,
-            tempDraftImm.toJS(),
-            personaId,
-            targetSocketType,
-            senderSocketType
-          )
-        );
-
-        //if fromAtomUri is the uri of the activePinnedAtom we simply go to the tab of the inventory instead of the fromAtomUri itself
-        if (activePinnedAtomUri === fromAtomUri) {
-          dispatch(
-            actionCreators.view__setActivePinnedAtomTab(
-              isTagViewSocket(targetSocketType) ? "DETAIL" : targetSocketType
-            )
-          );
-          history.replace(
-            generateLink(history.location, {}, "/inventory", false)
-          );
-        } else {
-          history.replace(
-            generateLink(
-              history.location,
-              {
-                postUri: fromAtomUri,
-                connectionUri: undefined,
-                tab: isTagViewSocket(targetSocketType)
-                  ? "DETAIL"
-                  : targetSocketType,
-              },
-              "/post"
-            )
-          );
-        }
-      };
-    } else {
-      executeFunction = () => {
-        dispatch(
-          actionCreators.atoms__create(
-            tempDraftImm.toJS(),
-            personaId,
-            defaultNodeUri
-          )
-        );
-        history.replace(
-          generateLink(history.location, {}, "/inventory", false)
-        );
-      };
-    }
-
-    if (loggedIn) {
-      executeFunction();
+      dispatch(
+        actionCreators.connections__connectReactionAtom(
+          fromAtomUri,
+          tempDraftImm.toJS(),
+          personaId,
+          targetSocketType,
+          senderSocketType,
+          () => {
+            //if fromAtomUri is the uri of the activePinnedAtom we simply go to the tab of the inventory instead of the fromAtomUri itself
+            if (activePinnedAtomUri === fromAtomUri) {
+              dispatch(
+                actionCreators.view__setActivePinnedAtomTab(
+                  isTagViewSocket(targetSocketType)
+                    ? "DETAIL"
+                    : targetSocketType
+                )
+              );
+              history.replace(
+                generateLink(history.location, {}, "/inventory", false)
+              );
+            } else {
+              history.replace(
+                generateLink(
+                  history.location,
+                  {
+                    postUri: fromAtomUri,
+                    connectionUri: undefined,
+                    tab: isTagViewSocket(targetSocketType)
+                      ? "DETAIL"
+                      : targetSocketType,
+                  },
+                  "/post"
+                )
+              );
+            }
+          }
+        )
+      );
     } else {
       dispatch(
-        actionCreators.view__showTermsDialog(
-          Immutable.fromJS({
-            acceptCallback: () => {
-              dispatch(actionCreators.view__hideModalDialog());
-              executeFunction();
-            },
-            cancelCallback: () => {
-              dispatch(actionCreators.view__hideModalDialog());
-            },
-          })
+        actionCreators.atoms__create(
+          tempDraftImm.toJS(),
+          personaId,
+          defaultNodeUri,
+          () => {
+            history.replace(
+              generateLink(history.location, {}, "/inventory", false)
+            );
+          }
         )
       );
     }

@@ -323,7 +323,7 @@ const actionHierarchy = {
     selectAddMessageContent: INJ_DEFAULT,
     removeAddMessageContent: INJ_DEFAULT,
 
-    showTermsDialog: INJ_DEFAULT,
+    showLoggedOutDialog: INJ_DEFAULT,
     showModalDialog: INJ_DEFAULT,
     hideModalDialog: INJ_DEFAULT,
 

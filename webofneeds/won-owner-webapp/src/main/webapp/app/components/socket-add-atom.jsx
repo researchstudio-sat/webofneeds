@@ -21,8 +21,6 @@ import ico36_plus from "~/images/won-icons/ico36_plus.svg";
 
 import "~/style/_socket-add-atom.scss";
 
-import Immutable from "immutable";
-
 /**
  * Component that lets you pick certain Atoms (or create New "matching" atoms) that are connected with the `addToAtom`
  * @param addToAtom - atom to connect to
@@ -348,41 +346,17 @@ export default function WonSocketAddAtom({
     personaUri,
     adHocUseCaseIdentifier
   ) {
-    if (accountUtils.isLoggedIn(accountState)) {
-      if (addToAtomUri) {
-        history.push("/connections");
-
-        dispatch(
-          actionCreators.connections__connectAdHoc(
-            targetSocketUri,
-            message,
-            adHocUseCaseIdentifier,
-            addToAtom,
-            personaUri
-          )
-        );
-      }
-    } else {
+    if (addToAtomUri) {
       dispatch(
-        actionCreators.view__showTermsDialog(
-          Immutable.fromJS({
-            acceptCallback: () => {
-              dispatch(actionCreators.view__hideModalDialog());
-              history.push("/connections");
-
-              dispatch(
-                actionCreators.connections__connectAdHoc(
-                  targetSocketUri,
-                  message,
-                  adHocUseCaseIdentifier,
-                  addToAtom
-                )
-              );
-            },
-            cancelCallback: () => {
-              dispatch(actionCreators.view__hideModalDialog());
-            },
-          })
+        actionCreators.connections__connectAdHoc(
+          targetSocketUri,
+          message,
+          adHocUseCaseIdentifier,
+          addToAtom,
+          personaUri,
+          () => {
+            history.push("/connections");
+          }
         )
       );
     }

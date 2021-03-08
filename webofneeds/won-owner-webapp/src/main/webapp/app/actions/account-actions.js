@@ -14,39 +14,40 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 
 import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import { getPathname, getQueryParams, delay, parseWorkerError } from "../utils";
+import { getPathname, getQueryParams, parseWorkerError } from "../utils";
 
-/**
- * Makes sure user is either logged in
- * or creates a private-ID account as fallback.
- */
-export const ensureLoggedIn = (dispatch, getState) => {
+export const checkLoginState = (dispatch, getState, actionWhenLoggedIn) => {
+  //TODO: DISTINGUISH BETWEEN ACCEPT ANON, AND LOGIN SUCCESS
   const state = getState();
-  if (accountUtils.isLoggedIn(generalSelectors.getAccountState(state))) {
-    return Promise.resolve();
-  } else {
-    const privateId = wonUtils.generatePrivateId();
 
-    return accountRegister({ privateId })(dispatch, getState)
-      .then(() => delay(2000))
-      .catch(err => {
-        console.error(
-          `Creating temporary account (${privateId}) has failed due to `,
-          err
-        );
-        dispatch(actionCreators.account__registerFailed({ privateId }));
-      });
-  }
+  return ownerApi
+    .checkLoginStatus()
+    .then(() => {
+      return actionWhenLoggedIn(state);
+    })
+    .catch(() => {
+      dispatch(
+        actionCreators.view__showLoggedOutDialog(
+          Immutable.fromJS({
+            afterLoginCallback: () => {
+              dispatch(actionCreators.view__hideModalDialog());
+              //FIXME: we used to have a delay in between (anon)login and atomCreation/actionWhenLoggedIn, i am not sure if we still need it but if so, we should add it here
+              return actionWhenLoggedIn(state);
+            },
+          })
+        )
+      );
+    });
 };
 
 let _loginInProcessFor;
 /**
  *
  * @param credentials either {email, password} or {privateId}
- * @param redirectToFeed def. false, whether or not to redirect to the feed after signing in (needs `redirects` to be true)
+ * @param callback function that gets executed after successful registration/login
  * @returns {Function}
  */
-export const accountLogin = credentials => (dispatch, getState) => {
+export const accountLogin = (credentials, callback) => (dispatch, getState) => {
   const state = getState();
 
   const { email } = wonUtils.parseCredentials(credentials);
@@ -64,19 +65,6 @@ export const accountLogin = credentials => (dispatch, getState) => {
       ". Canceling redundant attempt."
     );
     return;
-  }
-
-  if (isLoggedIn && !processUtils.isProcessingInitialLoad(processState)) {
-    const loggedInEmail = accountUtils.getEmail(accountState);
-
-    if (credentials.email === loggedInEmail) {
-      console.debug(
-        "Already loggedIn with (" +
-          credentials.email +
-          "). Aborting login attempt."
-      );
-      return;
-    }
   }
 
   return Promise.resolve()
@@ -102,6 +90,7 @@ export const accountLogin = credentials => (dispatch, getState) => {
     .then(() => dispatch({ type: actionTypes.upgradeHttpSession }))
     .then(() => stateStore.fetchOwnedMetaData(dispatch, getState))
     .then(() => dispatch({ type: actionTypes.account.loginFinished }))
+    .then(() => callback && callback())
     .catch(error => {
       let errorParsed = parseWorkerError(error);
 
@@ -172,12 +161,17 @@ export const accountLogout = history => (dispatch, getState) => {
 
 /**
  * @param credentials either {email, password} or {privateId}
+ * @param callback function that gets executed after successful registration/login
  * @returns {Function}
  */
-export const accountRegister = credentials => (dispatch, getState) =>
+export const accountRegister = (credentials, callback) => (
+  dispatch,
+  getState
+) =>
   ownerApi
     .registerAccount(credentials)
     .then(() => accountLogin(credentials)(dispatch, getState))
+    .then(() => callback && callback())
     .catch(error => {
       //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
       const registerError =
@@ -345,14 +339,15 @@ export const reconnect = () => (dispatch, getState) => {
 
       return stateStore.fetchOwnedMetaData(dispatch, getState);
     })
-    .catch(e => {
-      if (e.status >= 400 && e.status < 500) {
+    .catch(err => {
+      const error = parseWorkerError(err);
+      if (error.status >= 400 && error.status < 500) {
         //FIXME: this seems weird and unintentional to me, the actionTypes.account.reset closes the main menu (see view-reducer.js) and the dispatch after opens it again, is this wanted that way?
         dispatch({ type: actionTypes.account.reset });
         dispatch({ type: actionTypes.view.showMainMenu });
       } else {
         dispatch(actionCreators.lostConnection());
       }
-      console.warn(e);
+      console.warn(error);
     });
 };

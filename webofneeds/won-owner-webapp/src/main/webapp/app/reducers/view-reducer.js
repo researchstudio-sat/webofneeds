@@ -115,24 +115,14 @@ export default function(viewState = initialState, action = {}) {
     case actionTypes.view.removeAddMessageContent:
       return viewState.set("selectedAddMessageContent", undefined);
 
-    case actionTypes.view.showTermsDialog: {
+    case actionTypes.view.showLoggedOutDialog: {
       const payload = Immutable.fromJS(action.payload);
 
-      const acceptCallback = get(payload, "acceptCallback");
-      const cancelCallback = get(payload, "cancelCallback");
+      const afterLoginCallback = get(payload, "afterLoginCallback");
 
       const termsDialog = Immutable.fromJS({
-        showTerms: true,
-        buttons: [
-          {
-            caption: "Yes, I accept ToS",
-            callback: acceptCallback,
-          },
-          {
-            caption: "No, cancel",
-            callback: cancelCallback,
-          },
-        ],
+        showLoggedOutDialog: true,
+        afterLoginCallback: afterLoginCallback,
       });
       return viewState
         .set("showModalDialog", true)

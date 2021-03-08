@@ -21,7 +21,7 @@ import * as atomUtils from "../redux/utils/atom-utils.js";
 import * as stateStore from "../redux/state-store.js";
 import * as ownerApi from "../api/owner-api.js";
 import { getUri, extractAtomUriBySocketUri } from "../utils.js";
-import { ensureLoggedIn } from "./account-actions.js";
+import { checkLoginState } from "./account-actions.js";
 
 export const fetchUnloadedAtom = atomUri => (dispatch, getState) =>
   stateStore.fetchAtomAndDispatch(atomUri, dispatch, getState);
@@ -144,7 +144,7 @@ export const deleteAtom = atomUri => dispatch => {
 };
 
 export const edit = (draft, oldAtom, callback) => (dispatch, getState) =>
-  ensureLoggedIn(dispatch, getState).then(() => {
+  checkLoginState(dispatch, getState, () => {
     const { message, atomUri } = buildEditMessage(draft, oldAtom);
     return ownerApi.sendMessage(message).then(jsonResp => {
       dispatch({
@@ -157,7 +157,7 @@ export const edit = (draft, oldAtom, callback) => (dispatch, getState) =>
           oldAtom,
         },
       });
-      callback();
+      callback && callback();
     });
   });
 
@@ -184,26 +184,25 @@ export const createAtomFromDraftAndDispatch = (
     .then(() => atomUri);
 };
 
-export const create = (draft, personaUri, nodeUri) => (dispatch, getState) => {
-  const state = getState();
+export const create = (draft, personaUri, nodeUri, callback) => (
+  dispatch,
+  getState
+) => {
+  return checkLoginState(dispatch, getState, state => {
+    if (!nodeUri) {
+      nodeUri = generalSelectors.getDefaultNodeUri(state);
+    }
+    const holder = generalSelectors.getAtom(personaUri)(state);
 
-  if (!nodeUri) {
-    nodeUri = generalSelectors.getDefaultNodeUri(state);
-  }
-
-  const holder = generalSelectors.getAtom(personaUri)(getState());
-
-  if (personaUri && !holder) {
-    console.warn(
-      "Could not find holder with Uri: ",
-      personaUri,
-      ", holder not be stored in the state"
-    );
-  }
-
-  return ensureLoggedIn(dispatch, getState).then(() => {
-    return createAtomFromDraftAndDispatch(draft, nodeUri, dispatch).then(
-      atomUri => connectHolderToCreatedAtomUri(holder, atomUri)
-    );
+    if (personaUri && !holder) {
+      console.warn(
+        "Could not find holder with Uri: ",
+        personaUri,
+        ", holder not be stored in the state"
+      );
+    }
+    return createAtomFromDraftAndDispatch(draft, nodeUri, dispatch)
+      .then(atomUri => connectHolderToCreatedAtomUri(holder, atomUri))
+      .then(() => callback && callback());
   });
 };
