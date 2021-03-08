@@ -16,6 +16,9 @@ import * as accountUtils from "../redux/utils/account-utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
 import { getPathname, getQueryParams, parseWorkerError } from "../utils";
 
+export const requireLogin = callback => (dispatch, getState) =>
+  checkLoginState(dispatch, getState, callback);
+
 export const checkLoginState = (dispatch, getState, actionWhenLoggedIn) => {
   //TODO: DISTINGUISH BETWEEN ACCEPT ANON, AND LOGIN SUCCESS
   const state = getState();
@@ -47,7 +50,7 @@ let _loginInProcessFor;
  * @param callback function that gets executed after successful registration/login
  * @returns {Function}
  */
-export const accountLogin = (credentials, callback) => (dispatch, getState) => {
+export const login = (credentials, callback) => (dispatch, getState) => {
   const state = getState();
 
   const { email } = wonUtils.parseCredentials(credentials);
@@ -125,7 +128,7 @@ let _logoutInProcess;
  * Processes logout
  * @returns {Function}
  */
-export const accountLogout = history => (dispatch, getState) => {
+export const logout = history => (dispatch, getState) => {
   const state = getState();
 
   if (
@@ -164,13 +167,10 @@ export const accountLogout = history => (dispatch, getState) => {
  * @param callback function that gets executed after successful registration/login
  * @returns {Function}
  */
-export const accountRegister = (credentials, callback) => (
-  dispatch,
-  getState
-) =>
+export const register = (credentials, callback) => (dispatch, getState) =>
   ownerApi
     .registerAccount(credentials)
-    .then(() => accountLogin(credentials)(dispatch, getState))
+    .then(() => login(credentials)(dispatch, getState))
     .then(() => callback && callback())
     .catch(error => {
       //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
@@ -186,13 +186,13 @@ export const accountRegister = (credentials, callback) => (
  * @param credentials {email, password, privateId}
  * @returns {Function}
  */
-//FIXME: accountTransfer only works if we have the full privateId which we might not have anymore after the refactoring
-export const accountTransfer = credentials => (dispatch, getState) =>
+//FIXME: transfer only works if we have the full privateId which we might not have anymore after the refactoring
+export const transfer = credentials => (dispatch, getState) =>
   ownerApi
     .transferPrivateAccount(credentials)
     .then(() => {
       credentials.privateId = undefined;
-      return accountLogin(credentials)(dispatch, getState);
+      return login(credentials)(dispatch, getState);
     })
     .catch(error => {
       //TODO: PRINT MORE SPECIFIC ERROR MESSAGE, already registered/password to short etc.
@@ -206,13 +206,13 @@ export const accountTransfer = credentials => (dispatch, getState) =>
 /**
  * @param credentials {email, newPassword, recoveryKey}
  */
-export const accountResetPassword = credentials => (dispatch, getState) =>
+export const resetPassword = credentials => (dispatch, getState) =>
   ownerApi
     .resetPassword(credentials)
     .then(() => {
       credentials.privateId = undefined;
       credentials.password = credentials.newPassword;
-      return accountLogin(credentials)(dispatch, getState);
+      return login(credentials)(dispatch, getState);
     })
     .catch(error => {
       let errorParsed = parseWorkerError(error);
@@ -246,7 +246,7 @@ export const accountResetPassword = credentials => (dispatch, getState) =>
  * @param credentials {email, oldPassword, newPassword}
  * @returns {Function}
  */
-export const accountChangePassword = credentials => dispatch =>
+export const changePassword = credentials => dispatch =>
   ownerApi
     .changePassword(credentials)
     .then(() => {
@@ -256,12 +256,12 @@ export const accountChangePassword = credentials => dispatch =>
       dispatch({ type: actionTypes.account.changePasswordFailed });
     });
 
-export const accountAcceptDisclaimer = () => dispatch => {
+export const acceptDisclaimer = () => dispatch => {
   setDisclaimerAccepted();
   dispatch({ type: actionTypes.account.acceptDisclaimerSuccess });
 };
 
-export const accountAcceptTermsOfService = () => dispatch => {
+export const acceptTermsOfService = () => dispatch => {
   dispatch({ type: actionTypes.account.acceptTermsOfServiceStarted });
   ownerApi
     .acceptTermsOfService()
@@ -273,7 +273,7 @@ export const accountAcceptTermsOfService = () => dispatch => {
     });
 };
 
-export const accountVerifyEmailAddress = verificationToken => dispatch => {
+export const verifyEmailAddress = verificationToken => dispatch => {
   dispatch({ type: actionTypes.account.verifyEmailAddressStarted });
   ownerApi
     .confirmRegistration(verificationToken)
@@ -292,7 +292,7 @@ export const accountVerifyEmailAddress = verificationToken => dispatch => {
     });
 };
 
-export const accountResendVerificationEmail = email => dispatch => {
+export const resendVerificationEmail = email => dispatch => {
   dispatch({ type: actionTypes.account.resendVerificationEmailStarted });
   ownerApi
     .resendEmailVerification(email)
@@ -311,7 +311,7 @@ export const accountResendVerificationEmail = email => dispatch => {
     });
 };
 
-export const accountSendAnonymousLinkEmail = (email, privateId) => dispatch => {
+export const sendAnonymousLinkEmail = (email, privateId) => dispatch => {
   dispatch({ type: actionTypes.account.sendAnonymousLinkEmailStarted });
   ownerApi
     .sendAnonymousLinkEmail(email, privateId)

@@ -37,32 +37,12 @@
 // <utils>
 
 import * as atomActions from "./atoms-actions.js";
-
-import {
-  accountAcceptDisclaimer,
-  accountAcceptTermsOfService,
-  accountResetPassword,
-  accountChangePassword,
-  accountLogin,
-  accountLogout,
-  accountRegister,
-  accountResendVerificationEmail,
-  accountSendAnonymousLinkEmail,
-  accountTransfer,
-  accountVerifyEmailAddress,
-  reconnect,
-} from "./account-actions.js";
-
-import * as cnct from "./connections-actions.js";
+import * as accountActions from "./account-actions.js";
+import * as connectionActions from "./connections-actions.js";
 import * as messages from "./messages-actions.js";
 import * as configActions from "./config-actions.js";
+import * as loadActions from "./load-action.js";
 
-import {
-  fetchPersonas,
-  fetchWhatsAround,
-  fetchWhatsNew,
-  pageLoadAction,
-} from "./load-action.js";
 import { deepFreeze } from "../utils.js";
 import won from "../won-es6";
 import * as stateStore from "~/app/redux/state-store";
@@ -73,19 +53,20 @@ import * as stateStore from "~/app/redux/state-store";
  */
 const INJ_DEFAULT = "INJECT_DEFAULT_ACTION_CREATOR";
 const actionHierarchy = {
-  initialPageLoad: pageLoadAction,
+  initialPageLoad: loadActions.pageLoadAction,
   initialLoadFinished: INJ_DEFAULT,
   connections: {
-    connectAdHoc: cnct.connectionsConnectAdHoc,
-    connectReactionAtom: cnct.connectionsConnectReactionAtom,
-    close: cnct.connectionsClose,
-    closeRemote: cnct.connectionsCloseRemote,
-    sendChatMessage: cnct.connectionsChatMessage,
-    sendChatMessageClaimOnSuccess: cnct.connectionsChatMessageClaimOnSuccess,
+    connectAdHoc: connectionActions.connectionsConnectAdHoc,
+    connectReactionAtom: connectionActions.connectionsConnectReactionAtom,
+    close: connectionActions.connectionsClose,
+    closeRemote: connectionActions.connectionsCloseRemote,
+    sendChatMessage: connectionActions.connectionsChatMessage,
+    sendChatMessageClaimOnSuccess:
+      connectionActions.connectionsChatMessageClaimOnSuccess,
     sendChatMessageRefreshDataOnSuccess: INJ_DEFAULT, //will be dispatched solely within sendChatMessage (only if chatMessage that is sent contains References)
     sendChatMessageFailed: INJ_DEFAULT,
-    showLatestMessages: cnct.showLatestMessages,
-    showMoreMessages: cnct.showMoreMessages,
+    showLatestMessages: connectionActions.showLatestMessages,
+    showMoreMessages: connectionActions.showMoreMessages,
     fetchMessagesStart: INJ_DEFAULT,
     fetchMessagesEnd: INJ_DEFAULT,
     fetchMessagesFailed: INJ_DEFAULT,
@@ -104,14 +85,14 @@ const actionHierarchy = {
     updateAgreementData: INJ_DEFAULT,
     updateAgreementDataset: INJ_DEFAULT,
     agreementData: {
-      markAsRetracted: cnct.markAsRetracted,
-      markAsRejected: cnct.markAsRejected,
-      markAsProposed: cnct.markAsProposed,
-      markAsClaimed: cnct.markAsClaimed,
-      markAsAccepted: cnct.markAsAccepted,
-      markAsAgreed: cnct.markAsAgreed,
-      markAsCancelled: cnct.markAsCancelled,
-      markAsCancellationPending: cnct.markAsCancellationPending,
+      markAsRetracted: connectionActions.markAsRetracted,
+      markAsRejected: connectionActions.markAsRejected,
+      markAsProposed: connectionActions.markAsProposed,
+      markAsClaimed: connectionActions.markAsClaimed,
+      markAsAccepted: connectionActions.markAsAccepted,
+      markAsAgreed: connectionActions.markAsAgreed,
+      markAsCancelled: connectionActions.markAsCancelled,
+      markAsCancellationPending: connectionActions.markAsCancellationPending,
     },
     updatePetriNetData: INJ_DEFAULT,
 
@@ -141,9 +122,9 @@ const actionHierarchy = {
       atomActions.fetchUnloadedConnectionsContainer,
 
     fetchMetaAtoms: INJ_DEFAULT,
-    fetchWhatsNew: fetchWhatsNew,
-    fetchPersonas: fetchPersonas,
-    fetchWhatsAround: fetchWhatsAround,
+    fetchWhatsNew: loadActions.fetchWhatsNew,
+    fetchPersonas: loadActions.fetchPersonas,
+    fetchWhatsAround: loadActions.fetchWhatsAround,
     storeMetaAtoms: INJ_DEFAULT,
     storeWhatsNew: INJ_DEFAULT,
     storeWhatsAround: INJ_DEFAULT,
@@ -169,7 +150,7 @@ const actionHierarchy = {
     store: INJ_DEFAULT,
   },
   personas: {
-    fetchPersonas: fetchPersonas,
+    fetchPersonas: loadActions.fetchPersonas,
   },
   /**
    * Server triggered interactions (aka received messages)
@@ -239,47 +220,49 @@ const actionHierarchy = {
     waitingForAnswer: INJ_DEFAULT,
   },
   account: {
-    login: accountLogin,
+    login: accountActions.login,
     loginStarted: INJ_DEFAULT, //will only be dispatched on login not on page reload
     loginFinished: INJ_DEFAULT, //will be dispatched when data has been loaded on login not on page reload
     loginFailed: INJ_DEFAULT,
 
+    requireLogin: accountActions.requireLogin,
+
     store: INJ_DEFAULT, //stores the retrieved account in the state
     reset: INJ_DEFAULT, //resets the retrieved account back to the initialState
 
-    logout: accountLogout,
+    logout: accountActions.logout,
     logoutStarted: INJ_DEFAULT,
     logoutFinished: INJ_DEFAULT,
 
-    register: accountRegister,
-    transfer: accountTransfer,
+    register: accountActions.register,
+    transfer: accountActions.transfer,
     registerFailed: INJ_DEFAULT,
-    resetPassword: accountResetPassword,
+    resetPassword: accountActions.resetPassword,
     resetPasswordFailed: INJ_DEFAULT,
 
-    acceptDisclaimer: accountAcceptDisclaimer,
+    acceptDisclaimer: accountActions.acceptDisclaimer,
     acceptDisclaimerSuccess: INJ_DEFAULT,
 
-    changePassword: accountChangePassword,
+    changePassword: accountActions.changePassword,
     changePasswordSuccess: INJ_DEFAULT,
     changePasswordFailed: INJ_DEFAULT,
 
-    acceptTermsOfService: accountAcceptTermsOfService,
+    acceptTermsOfService: accountActions.acceptTermsOfService,
     acceptTermsOfServiceStarted: INJ_DEFAULT,
     acceptTermsOfServiceSuccess: INJ_DEFAULT,
     acceptTermsOfServiceFailed: INJ_DEFAULT,
 
-    verifyEmailAddress: accountVerifyEmailAddress,
+    verifyEmailAddress: accountActions.verifyEmailAddress,
     verifyEmailAddressStarted: INJ_DEFAULT,
     verifyEmailAddressSuccess: INJ_DEFAULT,
     verifyEmailAddressFailed: INJ_DEFAULT,
 
-    resendVerificationEmail: accountResendVerificationEmail,
+    resendVerificationEmail: accountActions.resendVerificationEmail,
     resendVerificationEmailStarted: INJ_DEFAULT,
     resendVerificationEmailSuccess: INJ_DEFAULT,
     resendVerificationEmailFailed: INJ_DEFAULT,
 
-    sendAnonymousLinkEmail: accountSendAnonymousLinkEmail,
+    sendAnonymousLinkEmail: accountActions.sendAnonymousLinkEmail,
     sendAnonymousLinkEmailStarted: INJ_DEFAULT,
     sendAnonymousLinkEmailSuccess: INJ_DEFAULT,
     sendAnonymousLinkEmailFailed: INJ_DEFAULT,
@@ -294,7 +277,7 @@ const actionHierarchy = {
   downgradeHttpSession: INJ_DEFAULT,
 
   reconnect: {
-    start: reconnect,
+    start: accountActions.reconnect,
     success: INJ_DEFAULT,
   },
 

@@ -18,6 +18,7 @@ export function getPathname(location) {
 Currently Used/possible Parameters:
   {
     connectionUri: undefined,
+    requireLogin: undefined,
     postUri: undefined,
     useCase: undefined,
     useCaseGroup: undefined,
