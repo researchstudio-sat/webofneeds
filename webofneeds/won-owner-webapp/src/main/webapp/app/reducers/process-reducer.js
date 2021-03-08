@@ -5,6 +5,7 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { get, getIn, getUri, extractAtomUriBySocketUri } from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
+import { getAtomProcessStatus } from "../redux/utils/process-utils.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -708,29 +709,23 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.store: {
-      let atoms = get(action.payload, "atoms");
+      let atom = get(action.payload, "atom");
+      let status = get(action.payload, "status");
 
-      atoms &&
-        atoms.map(atom => {
-          const parsedAtom = atom;
-          if (parsedAtom) {
-            const atomUri = getUri(parsedAtom);
-            processState = updateAtomProcess(processState, atomUri, {
-              toLoad: false,
-              failedToLoad: false,
-              status: undefined,
-              loading: false,
-              loaded: true,
-            });
-            processState = updateConnectionContainerProcess(
-              processState,
-              atomUri,
-              {
-                toLoad: true,
-              }
-            );
-          }
+      if (atom) {
+        const atomUri = getUri(atom);
+        const atomProcessState = getAtomProcessStatus(processState, atomUri);
+        processState = updateAtomProcess(processState, atomUri, {
+          toLoad: false,
+          failedToLoad: false,
+          status: atomProcessState.push(status),
+          loading: false,
+          loaded: true,
         });
+        processState = updateConnectionContainerProcess(processState, atomUri, {
+          toLoad: true,
+        });
+      }
       return processState;
     }
 

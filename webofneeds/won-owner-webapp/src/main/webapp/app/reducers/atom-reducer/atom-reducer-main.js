@@ -83,13 +83,9 @@ export default function(allAtomsInState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.store: {
-      let atoms = get(action.payload, "atoms");
-      atoms = atoms ? atoms : Immutable.Set();
+      let atom = get(action.payload, "atom");
 
-      return atoms.reduce(
-        (updatedState, atom) => addAtom(updatedState, atom),
-        allAtomsInState
-      );
+      return addAtom(allAtomsInState, atom);
     }
 
     case actionTypes.connections.storeMetaConnections: {
