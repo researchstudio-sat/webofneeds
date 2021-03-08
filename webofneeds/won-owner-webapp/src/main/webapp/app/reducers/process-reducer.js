@@ -36,6 +36,7 @@ export const emptyAtomProcess = Immutable.fromJS({
   loaded: false,
   failedToLoad: false,
   processUpdate: false,
+  status: undefined,
 });
 
 export const emptyConnectionContainerProcess = Immutable.fromJS({
