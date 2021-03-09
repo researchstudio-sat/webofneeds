@@ -272,33 +272,43 @@ export function generateAddButtonLabel(
   targetSocketType,
   senderReactions
 ) {
-  if (atomUtils.isOrganization(targetAtom)) {
-    switch (targetSocketType) {
-      case vocab.WXSCHEMA.ReviewSocketCompacted:
-        return "Review Organization";
-      case vocab.WXSCHEMA.AssociatedArticleSocketCompacted:
-        return "New Article";
-      case vocab.WXSCHEMA.EventSocketCompacted:
-        return "Event";
-      case vocab.WXSCHEMA.MemberSocketCompacted:
-        return isAtomOwned ? "Manage Members" : "Join Organization";
-      case vocab.WXSCHEMA.SubOrganizationSocketCompacted:
-        return "Sub Organization";
-      default:
-        break;
-    }
-  }
-  return isAtomOwned
-    ? `Add ${
-        senderReactions
-          ? getSocketItemLabels(targetSocketType, senderReactions.keys())
-          : "Atom"
-      }`
-    : `Connect ${
-        senderReactions
-          ? getSocketItemLabels(targetSocketType, senderReactions.keys())
-          : "Atom"
+  switch (targetSocketType) {
+    case vocab.WXSCHEMA.ReviewSocketCompacted:
+      return `Review ${
+        atomUtils.getTitle(targetAtom) ? atomUtils.getTitle(targetAtom) : "Atom"
       }`;
+    case vocab.WXSCHEMA.MemberSocketCompacted:
+      if (atomUtils.isOrganization(targetAtom)) {
+        return isAtomOwned ? "New Member/Role" : "Join Organization";
+      }
+      break;
+    case vocab.BUDDY.BuddySocketCompacted:
+      if (atomUtils.isPersona(targetAtom)) {
+        return isAtomOwned ? "Buddy" : "Add Buddy";
+      }
+      break;
+    default:
+      break;
+  }
+  return generateDefaultButtonLabel(
+    isAtomOwned,
+    targetSocketType,
+    senderReactions
+  );
+}
+
+function generateDefaultButtonLabel(
+  isAtomOwned,
+  targetSocketType,
+  senderReactions
+) {
+  return isAtomOwned
+    ? senderReactions
+      ? getSocketItemLabels(targetSocketType, senderReactions.keys())
+      : "Atom"
+    : senderReactions
+      ? getSocketItemLabels(targetSocketType, senderReactions.keys())
+      : "Atom";
 }
 
 export function getSocketActionInfoLabel(
