@@ -99,7 +99,7 @@ export const successfulCreate = wonMessage => (dispatch, getState) => {
   //load the data into the local rdf store and publish AtomCreatedEvent when done
   const atomUri = wonMessage.getAtom();
   stateStore
-    .determineRequestCredentials(getState(), atomUri, true)
+    .determineRequestCredentials(getState(), atomUri)
     .then(requestCredentials =>
       won
         .fetchAtom(atomUri, requestCredentials)
@@ -678,7 +678,7 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
       receiverCP = receiverConnectionUri
         ? Promise.resolve(true)
         : stateStore
-            .determineRequestCredentials(state, recipientAtomUri, true)
+            .determineRequestCredentials(state, recipientAtomUri)
             .then(requestCredentials =>
               stateStore.fetchActiveConnectionAndDispatchBySocketUris(
                 targetSocketUri,
@@ -828,7 +828,7 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
     return Promise.resolve(false);
   } else {
     return stateStore
-      .determineRequestCredentials(state, targetAtomUri, true)
+      .determineRequestCredentials(state, targetAtomUri)
       .then(requestCredentials =>
         (!targetConnectionUri
           ? stateStore.fetchActiveConnectionAndDispatchBySocketUris(
@@ -880,7 +880,7 @@ export const processAtomHintMessage = wonMessage =>
           }
         })
         .then(() =>
-          stateStore.determineRequestCredentials(getState(), ownedAtomUri, true)
+          stateStore.determineRequestCredentials(getState(), ownedAtomUri)
         )
         .then(requestCredentials =>
           stateStore.fetchActiveConnectionAndDispatch(
