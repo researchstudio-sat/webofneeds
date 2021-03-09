@@ -127,7 +127,7 @@ export const successfulCreate = wonMessage => (dispatch, getState) => {
               type: actionTypes.atoms.storeUriFailed,
               payload: Immutable.fromJS({
                 uri: atomUri,
-                status: {
+                request: {
                   code: error.status,
                   message: error.message,
                   requestCredentials: requestCredentials,

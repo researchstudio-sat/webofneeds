@@ -66,7 +66,7 @@ export const fetchActiveConnectionAndDispatch = (
         type: actionTypes.connections.storeUriFailed,
         payload: Immutable.fromJS({
           uri: connUri,
-          status: {
+          request: {
             code: error.status,
             message: error.message,
             requestCredentials: requestCredentials,
@@ -387,7 +387,7 @@ export const fetchConnectionsContainerAndDispatch = (
               type: actionTypes.atoms.storeConnectionContainerFailed,
               payload: Immutable.fromJS({
                 uri: atomUri,
-                status: {
+                request: {
                   code: errorParsed.status,
                   params: errorParsed.params || {},
                   message: errorParsed.message || error.message,
@@ -492,7 +492,7 @@ export const fetchAtomAndDispatch = (
                 type: actionTypes.atoms.store,
                 payload: Immutable.fromJS({
                   atom: parsedAtomImm,
-                  status: {
+                  request: {
                     code: 200,
                     requestCredentials: requestCredentials,
                   },
@@ -517,7 +517,7 @@ export const fetchAtomAndDispatch = (
                 type: actionTypes.atoms.storeUriFailed,
                 payload: Immutable.fromJS({
                   uri: atomUri,
-                  status: {
+                  request: {
                     code: errorParsed.status,
                     params: errorParsed.params || {},
                     message: errorParsed.message,
