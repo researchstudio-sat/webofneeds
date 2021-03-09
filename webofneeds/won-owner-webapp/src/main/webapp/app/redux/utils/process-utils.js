@@ -446,6 +446,47 @@ export function getAtomProcessStatus(process, atomUri) {
   return getIn(process, ["atoms", atomUri, "status"]) || Immutable.List();
 }
 
+export function isAtomProcessAccessDeniedOnly(process, atomUri) {
+  if (hasAtomFailedToLoad(process, atomUri)) {
+    const atomProcessStatus = getAtomProcessStatus(process, atomUri);
+
+    if (atomProcessStatus.find(request => get(request, "code") === 200)) {
+      return false;
+    } else {
+      return (
+        atomProcessStatus.size ===
+        atomProcessStatus.filter(request => get(request, "code") === 403)
+      );
+    }
+  }
+  return false;
+}
+
+export function isConnectionContainerProcessAccessDeniedOnly(process, atomUri) {
+  if (hasConnectionContainerFailedToLoad(process, atomUri)) {
+    const connectionContainerProcessStatus = getConnectionContainerProcessStatus(
+      process,
+      atomUri
+    );
+
+    if (
+      connectionContainerProcessStatus.find(
+        request => get(request, "code") === 200
+      )
+    ) {
+      return false;
+    } else {
+      return (
+        connectionContainerProcessStatus.size ===
+        connectionContainerProcessStatus.filter(
+          request => get(request, "code") === 403
+        )
+      );
+    }
+  }
+  return false;
+}
+
 export function getConnectionContainerProcessStatus(process, atomUri) {
   return (
     getIn(process, ["connectionContainers", atomUri, "status"]) ||
