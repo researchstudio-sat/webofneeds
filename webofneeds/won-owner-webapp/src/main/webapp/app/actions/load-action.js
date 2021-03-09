@@ -22,7 +22,7 @@ export const pageLoadAction = () => (dispatch, getState) => {
       dispatch(actionCreators.reconnect__start());
       return stateStore.fetchOwnedMetaData(dispatch, getState);
     })
-    .catch(() => handleNotLoggedIn())
+    .catch(handleNotLoggedIn)
     .then(() => dispatch({ type: actionTypes.initialLoadFinished }));
 };
 
@@ -58,7 +58,10 @@ export const fetchWhatsAround = (createdAfterDate, location, maxDistance) => (
 /*
  Simply prints a logline and resolves the promise so we can go on in the chain
 */
-const handleNotLoggedIn = () => {
-  console.debug("No User Logged in yet, continuing with the initialLoad");
+const handleNotLoggedIn = err => {
+  console.debug(
+    "No User Logged in yet, continuing with the initialLoad: ",
+    err
+  );
   return Promise.resolve();
 };

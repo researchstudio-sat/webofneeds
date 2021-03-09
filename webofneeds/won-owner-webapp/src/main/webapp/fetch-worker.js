@@ -1092,33 +1092,35 @@ const checkHttpStatus = (uri, params = {}) => response => {
   ) {
     return response;
   } else {
-    try {
-      //TODO: returning response.json() as promise will not fall into the catch block somehow (fix with inner catch after json()
-      return response.json().then(jsonResponse => {
-        const errorPayload = {
-          response: jsonResponse,
+    return response
+      .json()
+      .then(jsonResponse => ({
+        response: jsonResponse,
+        status: response.status,
+        params: params,
+        message: `ERROR for request: ${response.status} - ${
+          response.statusText
+        } for request ${uri}`,
+      }))
+      .catch(err => {
+        console.debug(
+          "checkHttpStatus response, does not have json content",
+          response.status,
+          err
+        );
+
+        return {
+          response: {},
           status: response.status,
           params: params,
           message: `ERROR for request: ${response.status} - ${
             response.statusText
           } for request ${uri}`,
         };
-
+      })
+      .then(errorPayload => {
         throw new Error(JSON.stringify(errorPayload));
       });
-    } catch {
-      console.warn("error response did not have a json as response", response);
-      const errorPayload = {
-        response: {},
-        status: response.status,
-        params: params,
-        message: `ERROR for request: ${response.status} - ${
-          response.statusText
-        } for request ${uri}`,
-      };
-
-      throw new Error(JSON.stringify(errorPayload));
-    }
   }
 };
 
