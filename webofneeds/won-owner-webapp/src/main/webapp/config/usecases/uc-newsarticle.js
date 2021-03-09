@@ -4,12 +4,12 @@ import {
   defaultReactions,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
-import ico36_uc_wtf from "../../images/won-icons/ico36_uc_wtf.svg";
+import ico16_uc_newsarticle from "../../images/won-icons/ico16_uc_newsarticle.svg";
 
 export const newsarticle = {
   identifier: "newsarticle",
   label: "News Article",
-  icon: ico36_uc_wtf, //TODO: Find better Icon
+  icon: ico16_uc_newsarticle,
   draft: {
     ...mergeInEmptyDraft({
       content: {

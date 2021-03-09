@@ -127,7 +127,9 @@ export const getUnassignedUnpinnedAtoms = createSelector(
   ownedAtoms =>
     ownedAtoms &&
     ownedAtoms.filter(
-      atom => !atomUtils.isPinnedAtom(atom) && !atomUtils.isHeld(atom)
+      atom =>
+        !atomUtils.isPinnedAtom(atom) &&
+        !atomUtils.isPinnedAtom(get(ownedAtoms, atomUtils.getHeldByUri(atom)))
     )
 );
 
