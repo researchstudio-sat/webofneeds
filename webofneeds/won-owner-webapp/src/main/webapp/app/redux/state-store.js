@@ -316,6 +316,10 @@ export const fetchConnectionsContainerAndDispatch = (
           payload: Immutable.fromJS({
             atomUri: atomUri,
             connections: connectionsWithStateAndSocket,
+            request: {
+              code: 200,
+              requestCredentials: requestCredentials,
+            },
           }),
         });
         if (isOwned) {
