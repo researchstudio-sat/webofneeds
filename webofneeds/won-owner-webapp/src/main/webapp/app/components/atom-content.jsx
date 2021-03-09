@@ -60,7 +60,7 @@ export default function WonAtomContent({
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
-  // const atomProcessStatus = processUtils.getAtomProcessStatus(process, atomUri);
+  // const atomRequests = processUtils.getAtomRequests(process, atomUri);
   const atomProcessingUpdate =
     atom && processUtils.isAtomProcessingUpdate(process, atomUri);
 
@@ -68,7 +68,7 @@ export default function WonAtomContent({
     !atom || processUtils.isConnectionContainerLoading(process, atomUri);
   const connectionContainerFailedToLoad =
     atom && processUtils.hasConnectionContainerFailedToLoad(process, atomUri);
-  const connectionContainerProcessStatus = processUtils.getConnectionContainerProcessStatus(
+  const connectionContainerProcessStatus = processUtils.getConnectionContainerRequests(
     process,
     atomUri
   );

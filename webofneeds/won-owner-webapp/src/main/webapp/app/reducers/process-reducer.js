@@ -5,7 +5,7 @@ import { actionTypes } from "../actions/actions.js";
 import Immutable from "immutable";
 import { get, getIn, getUri, extractAtomUriBySocketUri } from "../utils.js";
 import * as processUtils from "../redux/utils/process-utils.js";
-import { getAtomProcessStatus } from "../redux/utils/process-utils.js";
+import { getAtomRequests } from "../redux/utils/process-utils.js";
 
 const initialState = Immutable.fromJS({
   processingInitialLoad: true,
@@ -37,7 +37,7 @@ export const emptyAtomProcess = Immutable.fromJS({
   loaded: false,
   failedToLoad: false,
   processUpdate: false,
-  status: Immutable.List(),
+  requests: Immutable.List(),
 });
 
 export const emptyConnectionContainerProcess = Immutable.fromJS({
@@ -45,7 +45,7 @@ export const emptyConnectionContainerProcess = Immutable.fromJS({
   toLoad: false,
   loaded: false,
   failedToLoad: false,
-  status: Immutable.List(),
+  requests: Immutable.List(),
 });
 
 export const emptyConnectionProcess = Immutable.fromJS({
@@ -54,7 +54,7 @@ export const emptyConnectionProcess = Immutable.fromJS({
   loadingMessages: false,
   nextPage: undefined,
   failedToLoad: false,
-  status: Immutable.List(),
+  requests: Immutable.List(),
   petriNetData: {
     loading: false,
     dirty: false,
@@ -339,23 +339,20 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.atoms.storeUriFailed: {
       const atomUri = getUri(action.payload);
-      const atomStatus = processUtils.getAtomProcessStatus(
-        processState,
-        atomUri
-      );
+      const atomRequests = processUtils.getAtomRequests(processState, atomUri);
 
       return updateAtomProcess(processState, atomUri, {
         toLoad: false,
         loaded: false,
         failedToLoad: true,
         loading: false,
-        status: atomStatus.push(get(action.payload, "status")),
+        requests: atomRequests.push(get(action.payload, "request")),
       });
     }
 
     case actionTypes.atoms.storeConnectionContainerFailed: {
       const atomUri = getUri(action.payload);
-      const connectionContainerStatus = processUtils.getConnectionContainerProcessStatus(
+      const connectionContainerRequests = processUtils.getConnectionContainerRequests(
         processState,
         atomUri
       );
@@ -365,13 +362,15 @@ export default function(processState = initialState, action = {}) {
         loaded: false,
         failedToLoad: true,
         loading: false,
-        status: connectionContainerStatus.push(get(action.payload, "status")),
+        requests: connectionContainerRequests.push(
+          get(action.payload, "request")
+        ),
       });
     }
 
     case actionTypes.connections.storeUriFailed: {
       const connUri = get(action.payload, "connUri");
-      const connectionStatus = processUtils.getConnectionProcessStatus(
+      const connectionRequests = processUtils.getConnectionRequests(
         processState,
         connUri
       );
@@ -379,7 +378,7 @@ export default function(processState = initialState, action = {}) {
       return updateConnectionProcess(processState, connUri, {
         failedToLoad: true,
         loading: false,
-        status: connectionStatus.push(get(action.payload, "status")),
+        requests: connectionRequests.push(get(action.payload, "request")),
       });
     }
 
@@ -389,7 +388,7 @@ export default function(processState = initialState, action = {}) {
       return updateConnectionProcess(processState, connUri, {
         loadingMessages: true,
         failedToLoad: false,
-        status: undefined,
+        requests: undefined,
       });
     }
 
@@ -400,7 +399,7 @@ export default function(processState = initialState, action = {}) {
       return updateConnectionProcess(processState, connUri, {
         loadingMessages: false,
         failedToLoad: false,
-        status: undefined,
+        requests: undefined,
         nextPage: nextPage,
       });
     }
@@ -414,7 +413,7 @@ export default function(processState = initialState, action = {}) {
         processState = updateConnectionProcess(processState, connUri, {
           loadingMessages: false,
           failedToLoad: false,
-          status: undefined,
+          requests: undefined,
           nextPage: nextPage,
         });
 
@@ -619,7 +618,7 @@ export default function(processState = initialState, action = {}) {
         {
           toLoad: false,
           failedToLoad: false,
-          status: undefined,
+          requests: undefined,
           loading: false,
           loaded: true,
         }
@@ -650,7 +649,7 @@ export default function(processState = initialState, action = {}) {
           processState = updateConnectionProcess(processState, connUri, {
             toLoad: false,
             loading: true,
-            status: undefined,
+            requests: undefined,
           });
         });
       return processState;
@@ -668,7 +667,7 @@ export default function(processState = initialState, action = {}) {
               url: get(conn, "messageContainer"),
               params: {},
             },
-            status: undefined,
+            requests: undefined,
           });
 
           const targetAtomUri = get(conn, "targetAtom");
@@ -710,15 +709,15 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.atoms.store: {
       let atom = get(action.payload, "atom");
-      let status = get(action.payload, "status");
+      let status = get(action.payload, "request");
 
       if (atom) {
         const atomUri = getUri(atom);
-        const atomProcessState = getAtomProcessStatus(processState, atomUri);
+        const atomRequests = getAtomRequests(processState, atomUri);
         processState = updateAtomProcess(processState, atomUri, {
           toLoad: false,
           failedToLoad: false,
-          status: atomProcessState.push(status),
+          requests: atomRequests.push(status),
           loading: false,
           loaded: true,
         });
@@ -735,7 +734,7 @@ export default function(processState = initialState, action = {}) {
       return updateAtomProcess(processState, atomUri, {
         toLoad: false,
         failedToLoad: false,
-        status: undefined,
+        requests: undefined,
         loading: false,
         loaded: true,
       });
@@ -747,7 +746,7 @@ export default function(processState = initialState, action = {}) {
       return updateConnectionContainerProcess(processState, atomUri, {
         toLoad: false,
         failedToLoad: false,
-        status: undefined,
+        requests: undefined,
         loading: false,
         loaded: true,
       });

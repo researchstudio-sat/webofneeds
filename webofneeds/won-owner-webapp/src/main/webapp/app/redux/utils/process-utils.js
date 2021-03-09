@@ -442,43 +442,44 @@ export function isAtomFetchNecessary(process, atomUri, atom) {
   return false;
 }
 
-export function getAtomProcessStatus(process, atomUri) {
-  return getIn(process, ["atoms", atomUri, "status"]) || Immutable.List();
+export function getAtomRequests(process, atomUri) {
+  return getIn(process, ["atoms", atomUri, "requests"]) || Immutable.List();
 }
 
-export function isAtomProcessAccessDeniedOnly(process, atomUri) {
+export function areAtomRequestsAccessDeniedOnly(process, atomUri) {
   if (hasAtomFailedToLoad(process, atomUri)) {
-    const atomProcessStatus = getAtomProcessStatus(process, atomUri);
+    const atomRequests = getAtomRequests(process, atomUri);
 
-    if (atomProcessStatus.find(request => get(request, "code") === 200)) {
+    if (atomRequests.find(request => get(request, "code") === 200)) {
       return false;
     } else {
       return (
-        atomProcessStatus.size ===
-        atomProcessStatus.filter(request => get(request, "code") === 403)
+        atomRequests.size ===
+        atomRequests.filter(request => get(request, "code") === 403)
       );
     }
   }
   return false;
 }
 
-export function isConnectionContainerProcessAccessDeniedOnly(process, atomUri) {
+export function areConnectionContainerRequestsAccessDeniedOnly(
+  process,
+  atomUri
+) {
   if (hasConnectionContainerFailedToLoad(process, atomUri)) {
-    const connectionContainerProcessStatus = getConnectionContainerProcessStatus(
+    const connectionContainerRequests = getConnectionContainerRequests(
       process,
       atomUri
     );
 
     if (
-      connectionContainerProcessStatus.find(
-        request => get(request, "code") === 200
-      )
+      connectionContainerRequests.find(request => get(request, "code") === 200)
     ) {
       return false;
     } else {
       return (
-        connectionContainerProcessStatus.size ===
-        connectionContainerProcessStatus.filter(
+        connectionContainerRequests.size ===
+        connectionContainerRequests.filter(
           request => get(request, "code") === 403
         )
       );
@@ -487,13 +488,15 @@ export function isConnectionContainerProcessAccessDeniedOnly(process, atomUri) {
   return false;
 }
 
-export function getConnectionContainerProcessStatus(process, atomUri) {
+export function getConnectionContainerRequests(process, atomUri) {
   return (
-    getIn(process, ["connectionContainers", atomUri, "status"]) ||
+    getIn(process, ["connectionContainers", atomUri, "requests"]) ||
     Immutable.List()
   );
 }
 
-export function getConnectionProcessStatus(process, connUri) {
-  return getIn(process, ["connections", connUri, "status"]) || Immutable.List();
+export function getConnectionRequests(process, connUri) {
+  return (
+    getIn(process, ["connections", connUri, "requests"]) || Immutable.List()
+  );
 }
