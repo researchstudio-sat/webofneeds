@@ -8,12 +8,12 @@ import {
   defaultReactions,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
-import ico36_plus from "../../images/won-icons/ico36_plus.svg";
+import ico16_uc_goods_offer from "../../images/won-icons/ico16_uc_goods_offer.svg";
 
 export const goodsOffer = {
   identifier: "goodsOffer",
   label: "Offer Something",
-  icon: ico36_plus,
+  icon: ico16_uc_goods_offer,
   draft: {
     ...mergeInEmptyDraft({
       content: {
