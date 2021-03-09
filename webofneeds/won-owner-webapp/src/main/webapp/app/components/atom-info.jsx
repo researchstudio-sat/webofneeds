@@ -25,7 +25,6 @@ export default function WonAtomInfo({
   const history = useHistory();
   const processState = useSelector(generalSelectors.getProcessState);
   const storedAtoms = useSelector(generalSelectors.getAtoms);
-  //TODO: IMPLEMENT VISIBILITY SENSOR TO FETCH ONLY WHEN IN VIEW
   const atomLoading =
     !atom || processUtils.isAtomLoading(processState, atomUri);
 

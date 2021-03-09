@@ -41,12 +41,18 @@ export default function WonAtomMenu({
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
+  const connectionContainerFailedToLoad =
+    atom && processUtils.hasConnectionContainerFailedToLoad(process, atomUri);
+  const connectionContainerLoading =
+    atom && processUtils.isConnectionContainerLoading(process, atomUri);
   const shouldShowRdf = viewUtils.showRdf(viewState);
 
   function generateParentCssClasses() {
     const cssClassNames = [className];
-    atomLoading && cssClassNames.push("won-is-loading");
-    atomFailedToLoad && cssClassNames.push("won-failed-to-load");
+    (atomLoading || connectionContainerLoading) &&
+      cssClassNames.push("won-is-loading");
+    (atomFailedToLoad || connectionContainerFailedToLoad) &&
+      cssClassNames.push("won-failed-to-load");
 
     return cssClassNames.join(" ");
   }
@@ -80,114 +86,117 @@ export default function WonAtomMenu({
     </div>
   );
 
-  // Add generic Tabs based on available Sockets
-  relevantConnectionsMap
-    .filter(connectionUtils.filterSingleConnectedSocketCapacityFilter)
-    .filter(connectionUtils.filterTagViewSockets)
-    .toOrderedMap()
-    .sortBy((socketTypeConnections, socketType) => {
-      switch (socketType) {
-        case vocab.HOLD.HolderSocketCompacted:
-          return "1";
-        case vocab.WXPERSONA.InterestSocketCompacted:
-          return "2";
-        case vocab.WXPERSONA.ExpertiseSocketCompacted:
-          return "3";
-        case vocab.CHAT.ChatSocketCompacted:
-          return "4";
-        case vocab.GROUP.GroupSocketCompacted:
-          return "5";
-        default:
-          return wonLabelUtils.getSocketTabLabel(socketType);
-      }
-    })
-    .map((socketTypeConnections, socketType) => {
-      let label = wonLabelUtils.getSocketTabLabel(socketType);
-      let countLabel;
+  // Add generic Tabs based on available Sockets, only when the atom or the corresponding connection Container has not failed to load
+  !(atomFailedToLoad || connectionContainerFailedToLoad) &&
+    relevantConnectionsMap
+      .filter(connectionUtils.filterSingleConnectedSocketCapacityFilter)
+      .filter(connectionUtils.filterTagViewSockets)
+      .toOrderedMap()
+      .sortBy((socketTypeConnections, socketType) => {
+        switch (socketType) {
+          case vocab.HOLD.HolderSocketCompacted:
+            return "1";
+          case vocab.WXPERSONA.InterestSocketCompacted:
+            return "2";
+          case vocab.WXPERSONA.ExpertiseSocketCompacted:
+            return "3";
+          case vocab.CHAT.ChatSocketCompacted:
+            return "4";
+          case vocab.GROUP.GroupSocketCompacted:
+            return "5";
+          default:
+            return wonLabelUtils.getSocketTabLabel(socketType);
+        }
+      })
+      .map((socketTypeConnections, socketType) => {
+        let label = wonLabelUtils.getSocketTabLabel(socketType);
+        let countLabel;
 
-      const selected = visibleTab === socketType;
-      let inactive = false; //TODO: Implement inactive based on connectionsCount and possibleReactions to socket
-      let unread = false;
+        const selected = visibleTab === socketType;
+        let inactive = false; //TODO: Implement inactive based on connectionsCount and possibleReactions to socket
+        let unread = false;
 
-      switch (socketType) {
-        case vocab.CHAT.ChatSocketCompacted: {
-          //IF AN ATOM IS PINNED WE DISPLAY THE CHILDCHATS ALSO
+        switch (socketType) {
+          case vocab.CHAT.ChatSocketCompacted: {
+            //IF AN ATOM IS PINNED WE DISPLAY THE CHILDCHATS ALSO
 
-          const socketUri = atomUtils.getSocketUri(atom, socketType);
-          const activeConnections =
-            activePinnedAtomUri === atomUri
-              ? chatConnections.filter(conn => !connectionUtils.isClosed(conn))
-              : socketTypeConnections
-                  .filter(
-                    conn =>
-                      // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
-                      isOwned ||
-                      connectionUtils.hasTargetSocketUri(conn, socketUri)
+            const socketUri = atomUtils.getSocketUri(atom, socketType);
+            const activeConnections =
+              activePinnedAtomUri === atomUri
+                ? chatConnections.filter(
+                    conn => !connectionUtils.isClosed(conn)
                   )
-                  .filter(conn => !connectionUtils.isClosed(conn));
-          countLabel =
-            activeConnections && activeConnections.size > 0
-              ? "(" + activeConnections.size + ")"
-              : undefined;
-          unread =
-            activeConnections &&
-            !!activeConnections.find(connectionUtils.isUnread);
-          break;
+                : socketTypeConnections
+                    .filter(
+                      conn =>
+                        // We filter out every chat connection that is not owned, otherwise the count would show non owned chatconnections of non owned atoms
+                        isOwned ||
+                        connectionUtils.hasTargetSocketUri(conn, socketUri)
+                    )
+                    .filter(conn => !connectionUtils.isClosed(conn));
+            countLabel =
+              activeConnections && activeConnections.size > 0
+                ? "(" + activeConnections.size + ")"
+                : undefined;
+            unread =
+              activeConnections &&
+              !!activeConnections.find(connectionUtils.isUnread);
+            break;
+          }
+
+          case vocab.HOLD.HolderSocketCompacted: {
+            //Holdertab should always just display the amount of connected items
+            const activeConnections = socketTypeConnections.filter(
+              connectionUtils.isConnected
+            );
+
+            countLabel =
+              activeConnections && activeConnections.size > 0
+                ? "(" + activeConnections.size + ")"
+                : undefined;
+            unread =
+              activeConnections &&
+              !!activeConnections.find(connectionUtils.isUnread);
+            break;
+          }
+
+          default: {
+            const activeConnections = socketTypeConnections.filter(
+              conn => !connectionUtils.isClosed(conn)
+            );
+
+            countLabel =
+              activeConnections && activeConnections.size > 0
+                ? "(" + activeConnections.size + ")"
+                : undefined;
+            unread =
+              activeConnections &&
+              !!activeConnections.find(connectionUtils.isUnread);
+            break;
+          }
         }
 
-        case vocab.HOLD.HolderSocketCompacted: {
-          //Holdertab should always just display the amount of connected items
-          const activeConnections = socketTypeConnections.filter(
-            connectionUtils.isConnected
+        if (label) {
+          buttons.push(
+            <div
+              key={socketType}
+              className={generateAtomItemCssClasses(selected, inactive, unread)}
+              onClick={() => {
+                setVisibleTab(socketType);
+                toggleAddPicker(false);
+              }}
+            >
+              <span className="atom-menu__item__unread" />
+              <span className="atom-menu__item__label">{label}</span>
+              {countLabel ? (
+                <span className="atom-menu__item__count">{countLabel}</span>
+              ) : (
+                undefined
+              )}
+            </div>
           );
-
-          countLabel =
-            activeConnections && activeConnections.size > 0
-              ? "(" + activeConnections.size + ")"
-              : undefined;
-          unread =
-            activeConnections &&
-            !!activeConnections.find(connectionUtils.isUnread);
-          break;
         }
-
-        default: {
-          const activeConnections = socketTypeConnections.filter(
-            conn => !connectionUtils.isClosed(conn)
-          );
-
-          countLabel =
-            activeConnections && activeConnections.size > 0
-              ? "(" + activeConnections.size + ")"
-              : undefined;
-          unread =
-            activeConnections &&
-            !!activeConnections.find(connectionUtils.isUnread);
-          break;
-        }
-      }
-
-      if (label) {
-        buttons.push(
-          <div
-            key={socketType}
-            className={generateAtomItemCssClasses(selected, inactive, unread)}
-            onClick={() => {
-              setVisibleTab(socketType);
-              toggleAddPicker(false);
-            }}
-          >
-            <span className="atom-menu__item__unread" />
-            <span className="atom-menu__item__label">{label}</span>
-            {countLabel ? (
-              <span className="atom-menu__item__count">{countLabel}</span>
-            ) : (
-              undefined
-            )}
-          </div>
-        );
-      }
-    });
+      });
 
   shouldShowRdf &&
     buttons.push(
