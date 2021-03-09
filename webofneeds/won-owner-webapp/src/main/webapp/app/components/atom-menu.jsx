@@ -45,7 +45,6 @@ export default function WonAtomMenu({
     atom && processUtils.hasConnectionContainerFailedToLoad(process, atomUri);
   const connectionContainerLoading =
     atom && processUtils.isConnectionContainerLoading(process, atomUri);
-  const shouldShowRdf = viewUtils.showRdf(viewState);
 
   function generateParentCssClasses() {
     const cssClassNames = [className];
@@ -198,7 +197,7 @@ export default function WonAtomMenu({
         }
       });
 
-  shouldShowRdf &&
+  viewUtils.showRdf(viewState) &&
     buttons.push(
       <div
         key="rdf"
@@ -221,6 +220,20 @@ export default function WonAtomMenu({
         }}
       >
         <span className="atom-menu__item__label">ACL</span>
+      </div>
+    );
+
+  viewUtils.isDebugModeEnabled(viewState) &&
+    buttons.push(
+      <div
+        key="rdf"
+        className={generateAtomItemCssClasses(visibleTab === "REQUESTSTATUS")}
+        onClick={() => {
+          setVisibleTab("REQUESTSTATUS");
+          toggleAddPicker(false);
+        }}
+      >
+        <span className="atom-menu__item__label">Request Status</span>
       </div>
     );
 

@@ -39,6 +39,7 @@ import ico16_indicator_error from "~/images/won-icons/ico16_indicator_error.svg"
 import rdf_logo_1 from "~/images/won-icons/rdf_logo_1.svg";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import { useHistory } from "react-router-dom";
+import WonAtomContentRequests from "~/app/components/atom-content/atom-content-requests";
 
 export default function WonAtomContent({
   atom,
@@ -398,6 +399,9 @@ export default function WonAtomContent({
         break;
       case "ACL":
         visibleTabFragment = <WonAtomContentAuth atom={atom} />;
+        break;
+      case "REQUESTSTATUS":
+        visibleTabFragment = <WonAtomContentRequests atomUri={atomUri} />;
         break;
 
       default: {
