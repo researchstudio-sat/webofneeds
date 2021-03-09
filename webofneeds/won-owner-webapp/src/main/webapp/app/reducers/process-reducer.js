@@ -339,6 +339,7 @@ export default function(processState = initialState, action = {}) {
 
     case actionTypes.atoms.storeUriFailed: {
       const atomUri = getUri(action.payload);
+      const request = get(action.payload, "request");
       const atomRequests = processUtils.getAtomRequests(processState, atomUri);
 
       return updateAtomProcess(processState, atomUri, {
@@ -346,12 +347,13 @@ export default function(processState = initialState, action = {}) {
         loaded: false,
         failedToLoad: true,
         loading: false,
-        requests: atomRequests.push(get(action.payload, "request")),
+        requests: atomRequests.push(request),
       });
     }
 
     case actionTypes.atoms.storeConnectionContainerFailed: {
       const atomUri = getUri(action.payload);
+      const request = get(action.payload, "request");
       const connectionContainerRequests = processUtils.getConnectionContainerRequests(
         processState,
         atomUri
@@ -362,14 +364,13 @@ export default function(processState = initialState, action = {}) {
         loaded: false,
         failedToLoad: true,
         loading: false,
-        requests: connectionContainerRequests.push(
-          get(action.payload, "request")
-        ),
+        requests: connectionContainerRequests.push(request),
       });
     }
 
     case actionTypes.connections.storeUriFailed: {
       const connUri = get(action.payload, "connUri");
+      const request = get(action.payload, "request");
       const connectionRequests = processUtils.getConnectionRequests(
         processState,
         connUri
@@ -378,7 +379,7 @@ export default function(processState = initialState, action = {}) {
       return updateConnectionProcess(processState, connUri, {
         failedToLoad: true,
         loading: false,
-        requests: connectionRequests.push(get(action.payload, "request")),
+        requests: connectionRequests.push(request),
       });
     }
 
@@ -708,8 +709,8 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.atoms.store: {
-      let atom = get(action.payload, "atom");
-      let status = get(action.payload, "request");
+      const atom = get(action.payload, "atom");
+      const request = get(action.payload, "request");
 
       if (atom) {
         const atomUri = getUri(atom);
@@ -717,7 +718,7 @@ export default function(processState = initialState, action = {}) {
         processState = updateAtomProcess(processState, atomUri, {
           toLoad: false,
           failedToLoad: false,
-          requests: atomRequests.push(status),
+          requests: atomRequests.push(request),
           loading: false,
           loaded: true,
         });
