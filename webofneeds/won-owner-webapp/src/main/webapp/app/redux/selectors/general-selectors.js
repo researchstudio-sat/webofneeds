@@ -89,11 +89,12 @@ export const getOwnedAtoms = createSelector(
   getOwnedAtomUris,
   getAtoms,
   (ownedAtomUris, allAtoms) =>
-    ownedAtomUris &&
     ownedAtomUris
-      .toMap()
-      .map(atomUri => get(allAtoms, atomUri))
-      .filter(atom => !!atom)
+      ? ownedAtomUris
+          .toMap()
+          .map(atomUri => get(allAtoms, atomUri))
+          .filter(atom => !!atom)
+      : Immutable.Map()
 );
 
 export const getWhatsNewUris = state => getIn(state, ["owner", "whatsNewUris"]);
@@ -125,7 +126,6 @@ export const getWhatsAroundAtoms = createSelector(
 export const getUnassignedUnpinnedAtoms = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
-    ownedAtoms &&
     ownedAtoms.filter(
       atom =>
         !atomUtils.isPinnedAtom(atom) &&
@@ -243,7 +243,6 @@ export const getAllConnectedChatAndGroupConnections = createSelector(
 export const hasUnassignedUnpinnedAtomUnreads = createSelector(
   getUnassignedUnpinnedAtoms,
   ownedAtoms =>
-    ownedAtoms &&
     !!ownedAtoms
       .filter(atomUtils.isActive)
       .find(atom => atomUtils.hasUnreadConnections(atom))
@@ -252,7 +251,6 @@ export const hasUnassignedUnpinnedAtomUnreads = createSelector(
 export const getOwnedPinnedAtomsUnreads = createSelector(
   getOwnedAtoms,
   ownedAtoms =>
-    ownedAtoms &&
     ownedAtoms.filter(atomUtils.isPinnedAtom).map(atom => {
       if (atomUtils.hasUnreadConnections(atom)) {
         return true;
@@ -333,7 +331,6 @@ export const getChatConnectionsOfActivePinnedAtom = atomUri =>
 export const hasUnassignedUnpinnedAtomChatUnreads = createSelector(
   getUnassignedUnpinnedAtoms,
   ownedAtoms =>
-    ownedAtoms &&
     !!ownedAtoms
       .filter(atomUtils.isActive)
       .find(atom =>
@@ -344,7 +341,6 @@ export const hasUnassignedUnpinnedAtomChatUnreads = createSelector(
 export const hasUnassignedUnpinnedAtomNonChatUnreads = createSelector(
   getUnassignedUnpinnedAtoms,
   ownedAtoms =>
-    ownedAtoms &&
     !!ownedAtoms
       .filter(atomUtils.isActive)
       .find(atom =>
@@ -392,19 +388,17 @@ export const getAtomByConnectionUri = connectionUri =>
         atoms.find(atom => atomUtils.getConnection(atom, connectionUri)))
   );
 
-export const getOwnedPersonas = createSelector(
-  getOwnedAtoms,
-  ownedAtoms => ownedAtoms && ownedAtoms.filter(atomUtils.isPersona)
+export const getOwnedPersonas = createSelector(getOwnedAtoms, ownedAtoms =>
+  ownedAtoms.filter(atomUtils.isPersona)
 );
 
-export const getOwnedPinnedAtoms = createSelector(
-  getOwnedAtoms,
-  ownedAtoms => ownedAtoms && ownedAtoms.filter(atomUtils.isPinnedAtom)
+export const getOwnedPinnedAtoms = createSelector(getOwnedAtoms, ownedAtoms =>
+  ownedAtoms.filter(atomUtils.isPinnedAtom)
 );
 
 export const getOwnedAtomsWithBuddySocket = createSelector(
   getOwnedAtoms,
-  ownedAtoms => ownedAtoms && ownedAtoms.filter(atomUtils.hasBuddySocket)
+  ownedAtoms => ownedAtoms.filter(atomUtils.hasBuddySocket)
 );
 
 /**
@@ -479,10 +473,8 @@ export const getTargetSocketType = (allAtoms, connection) => {
  * Get all connections stored within your own atoms as a map
  * @returns Immutable.Map with all connections
  */
-export const getOwnedConnections = createSelector(
-  getOwnedAtoms,
-  ownedAtoms =>
-    ownedAtoms && ownedAtoms.flatMap(atom => atomUtils.getConnections(atom))
+export const getOwnedConnections = createSelector(getOwnedAtoms, ownedAtoms =>
+  ownedAtoms.flatMap(atom => atomUtils.getConnections(atom))
 );
 
 export const getConnections = createSelector(
@@ -578,16 +570,14 @@ export const getConnectionContainersToCrawl = createSelector(
       return ownedPinnedAtomsConnectionContainersToCrawl;
     }
 
-    const ownedAtomsConnectionContainersToCrawl =
-      ownedAtoms &&
-      ownedAtoms
-        .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
-        .filter(atom =>
-          processUtils.isConnectionContainerToLoad(processState, getUri(atom))
-        )
-        .map(atom =>
-          processUtils.getConnectionContainerStatus(processState, getUri(atom))
-        );
+    const ownedAtomsConnectionContainersToCrawl = ownedAtoms
+      .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
+      .filter(atom =>
+        processUtils.isConnectionContainerToLoad(processState, getUri(atom))
+      )
+      .map(atom =>
+        processUtils.getConnectionContainerStatus(processState, getUri(atom))
+      );
 
     if (
       ownedAtomsConnectionContainersToCrawl &&
@@ -619,3 +609,32 @@ export const getConnectionContainersToCrawl = createSelector(
     return undefined;
   }
 );
+
+export const getAllValidRequestCredentialsForAtom = atomUri =>
+  createSelector(
+    getAtoms,
+    getOwnedAtoms,
+    getConnectionsWithTargetAtomUri(atomUri),
+    (atoms, ownedAtoms, connectionsToTargetAtom) => {
+      const validRequestCredentials = [];
+
+      if (get(ownedAtoms, atomUri)) {
+        validRequestCredentials.push({ requesterWebId: atomUri });
+      } else {
+        const ownedConnectionsToTargetAtom = connectionsToTargetAtom.filter(
+          (_, connUri) =>
+            !!get(ownedAtoms, extractAtomUriFromConnectionUri(connUri))
+        );
+
+        ownedConnectionsToTargetAtom.map((_, connUri) => {
+          validRequestCredentials.push({
+            requesterWebId: extractAtomUriFromConnectionUri(connUri),
+          });
+        });
+
+        //TODO: ADD POSSIBLE TOKEN CREDENTIALS/RETRIEVALS as seen in determineRequestCredentials function
+        //TODO: EITHER REMOVE ALREADY FETCHED AND THEREFORE DISCARDED CREDENTIALS HERE OR IMPLEMENT ANOTHER METHOD THAT INCLUDES THAT
+      }
+      return Immutable.fromJS(validRequestCredentials);
+    }
+  );
