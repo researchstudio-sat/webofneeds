@@ -60,8 +60,26 @@ export default function WonAtomContent({
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
+  // const atomProcessStatus = processUtils.getAtomProcessStatus(process, atomUri);
   const atomProcessingUpdate =
     atom && processUtils.isAtomProcessingUpdate(process, atomUri);
+
+  /*const connectionContainerLoading =
+    !atom || processUtils.isConnectionContainerLoading(process, atomUri);
+  const connectionContainerFailedToLoad =
+    atom && processUtils.hasConnectionContainerFailedToLoad(process, atomUri);
+  const connectionContainerProcessStatus = processUtils.getConnectionContainerProcessStatus(
+    process,
+    atomUri
+  );
+  console.debug(
+    "connectionContainerProcessState: ",
+    connectionContainerProcessStatus
+  );*/
+
+  //TODO: Display Access Denied if status is only 403 for atomFailedState
+  //TODO: Display Access Denied if status is only 403 for connectionContainerFailedState
+  //TODO: Do not show any of the socketAddButtons or singleConnect/Expertise stuff if connectionContainer is in Failed State
 
   function tryReload() {
     if (atomUri && atomFailedToLoad) {
