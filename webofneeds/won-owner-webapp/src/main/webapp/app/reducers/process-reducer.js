@@ -611,19 +611,21 @@ export default function(processState = initialState, action = {}) {
     }
 
     case actionTypes.connections.storeMetaConnections: {
+      const atomUri = get(action.payload, "atomUri");
       const connections = get(action.payload, "connections");
-
-      processState = updateConnectionContainerProcess(
+      const request = get(action.payload, "request");
+      const connectionContainerRequests = processUtils.getConnectionContainerRequests(
         processState,
-        get(action.payload, "atomUri"),
-        {
-          toLoad: false,
-          failedToLoad: false,
-          requests: undefined,
-          loading: false,
-          loaded: true,
-        }
+        atomUri
       );
+
+      processState = updateConnectionContainerProcess(processState, atomUri, {
+        toLoad: false,
+        failedToLoad: false,
+        requests: connectionContainerRequests.push(request),
+        loading: false,
+        loaded: true,
+      });
 
       connections &&
         connections.map(conn => {
@@ -735,7 +737,6 @@ export default function(processState = initialState, action = {}) {
       return updateAtomProcess(processState, atomUri, {
         toLoad: false,
         failedToLoad: false,
-        requests: undefined,
         loading: false,
         loaded: true,
       });
@@ -747,7 +748,6 @@ export default function(processState = initialState, action = {}) {
       return updateConnectionContainerProcess(processState, atomUri, {
         toLoad: false,
         failedToLoad: false,
-        requests: undefined,
         loading: false,
         loaded: true,
       });
