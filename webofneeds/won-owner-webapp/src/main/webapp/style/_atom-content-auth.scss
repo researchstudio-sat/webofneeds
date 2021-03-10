@@ -34,7 +34,8 @@ won-atom-content-auth {
     &__requestedBy,
     &__grantee,
     &__grant {
-      white-space: break-spaces;
+      white-space: pre-wrap;
+      overflow-x: auto;
       font-family: monospace;
       padding-bottom: 0.5rem;
       margin: 0;

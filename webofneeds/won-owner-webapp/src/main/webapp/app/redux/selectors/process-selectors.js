@@ -77,3 +77,17 @@ export const getConnectionContainerRequests = atomUri =>
   createSelector(getProcessState, processState =>
     processUtils.getConnectionContainerRequests(processState, atomUri)
   );
+
+export const getAllConnectionContainerRequests = createSelector(
+  getProcessState,
+  processState =>
+    get(processState, ["connectionContainers"]).map(atom =>
+      get(atom, "connectionContainers")
+    )
+);
+
+export const getAllAtomRequests = createSelector(
+  getProcessState,
+  processState =>
+    get(processState, ["atoms"]).map(atom => get(atom, "requests"))
+);

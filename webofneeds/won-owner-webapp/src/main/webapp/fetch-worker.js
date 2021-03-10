@@ -1169,6 +1169,7 @@ function generateLinkedDataQueryString(dataUri, queryParams) {
     ...queryParams,
     requesterWebId: undefined,
     token: undefined,
+    obtainedFrom: undefined,
   });
 
   return (

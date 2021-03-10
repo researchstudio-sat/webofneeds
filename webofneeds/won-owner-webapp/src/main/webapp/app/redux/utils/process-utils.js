@@ -500,3 +500,59 @@ export function getConnectionRequests(process, connUri) {
     getIn(process, ["connections", connUri, "requests"]) || Immutable.List()
   );
 }
+
+function getRequestForSameCredentials(priorRequests, requestCredentials) {
+  const requestTokenFromAtomUri = get(
+    requestCredentials,
+    "requestTokenFromAtomUri"
+  );
+  const scope = get(requestCredentials, "scope");
+  const requesterWebId = get(requestCredentials, "requesterWebId");
+
+  if (priorRequests && priorRequests.size > 0 && requestCredentials) {
+    return priorRequests.find(request => {
+      if (requestTokenFromAtomUri) {
+        const obtainedFrom = getIn(request, [
+          "requestCredentials",
+          "obtainedFrom",
+        ]);
+
+        return (
+          get(obtainedFrom, "scope") === scope &&
+          get(obtainedFrom, "requestTokenFromAtomUri") ===
+            requestTokenFromAtomUri
+        );
+      } else {
+        return (
+          get(request, ["requestCredentials", "requesterWebId"]) ===
+          requesterWebId
+        );
+      }
+    });
+  }
+  return undefined;
+}
+
+export function isUsedCredentialsUnsuccessfully(
+  priorRequests,
+  requestCredentials
+) {
+  const priorRequest = getRequestForSameCredentials(
+    priorRequests,
+    requestCredentials
+  );
+
+  return !!(priorRequest && get(priorRequest, "code") !== 200);
+}
+
+export function isUsedCredentialsSuccessfully(
+  priorRequests,
+  requestCredentials
+) {
+  const priorRequest = getRequestForSameCredentials(
+    priorRequests,
+    requestCredentials
+  );
+
+  return !!(priorRequest && get(priorRequest, "code") === 200);
+}

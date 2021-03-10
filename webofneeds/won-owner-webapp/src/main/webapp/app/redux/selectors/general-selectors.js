@@ -610,16 +610,16 @@ export const getConnectionContainersToCrawl = createSelector(
   }
 );
 
-export const getAllValidRequestCredentialsForAtom = atomUri =>
+export const getPossibleRequestCredentialsForAtom = atomUri =>
   createSelector(
     getAtoms,
     getOwnedAtoms,
     getConnectionsWithTargetAtomUri(atomUri),
     (atoms, ownedAtoms, connectionsToTargetAtom) => {
-      const validRequestCredentials = [];
+      const possibleRequestCredentials = [];
 
       if (get(ownedAtoms, atomUri)) {
-        validRequestCredentials.push({ requesterWebId: atomUri });
+        possibleRequestCredentials.push({ requesterWebId: atomUri });
       } else {
         const ownedConnectionsToTargetAtom = connectionsToTargetAtom.filter(
           (_, connUri) =>
@@ -627,14 +627,49 @@ export const getAllValidRequestCredentialsForAtom = atomUri =>
         );
 
         ownedConnectionsToTargetAtom.map((_, connUri) => {
-          validRequestCredentials.push({
+          possibleRequestCredentials.push({
             requesterWebId: extractAtomUriFromConnectionUri(connUri),
           });
         });
 
-        //TODO: ADD POSSIBLE TOKEN CREDENTIALS/RETRIEVALS as seen in determineRequestCredentials function
+        const nonOwnedConnectionsToTargetAtom = connectionsToTargetAtom.filter(
+          (_, connUri) =>
+            !get(ownedAtoms, extractAtomUriFromConnectionUri(connUri))
+        );
+
+        nonOwnedConnectionsToTargetAtom.map((_, connUri) => {
+          const atomUri = extractAtomUriFromConnectionUri(connUri);
+          const consideredAtom = get(atoms, atomUri);
+
+          const tokenAuths = atomUtils.getTokenAuth(consideredAtom);
+
+          for (const tokenAuth of tokenAuths) {
+            console.debug("tokenAuth: ", tokenAuth);
+            const authTokenOperations = tokenAuth
+              .get(vocab.AUTH.grant)
+              .flatMap(grant => get(grant, vocab.AUTH.operation))
+              .map(op => get(op, vocab.AUTH.requestToken))
+              .filter(op => !!op);
+            console.debug("authOperations: ", authTokenOperations);
+
+            for (const authTokenOperation of authTokenOperations) {
+              const tokenScopeUri = getIn(authTokenOperation, [
+                vocab.AUTH.tokenScope,
+                "@id",
+              ]);
+              console.debug("### ", tokenScopeUri);
+
+              //FIXME: THIS IS JUST AN ASSUMPTION THAT WE MIGHT BE ABLE TO ACCESS/REQUEST THE ATOM IN QUESTION WITH A TOKEN FROM THE GIVEN ATOM
+              possibleRequestCredentials.push({
+                requestTokenFromAtomUri: atomUri,
+                scope: tokenScopeUri,
+              });
+            }
+          }
+        });
+
         //TODO: EITHER REMOVE ALREADY FETCHED AND THEREFORE DISCARDED CREDENTIALS HERE OR IMPLEMENT ANOTHER METHOD THAT INCLUDES THAT
       }
-      return Immutable.fromJS(validRequestCredentials);
+      return Immutable.fromJS(possibleRequestCredentials);
     }
   );
