@@ -64,13 +64,13 @@ const useCaseGroups = {
   plansGroup: plansGroup,
   socialGroup: socialGroup,
   classifiedsGroup: classifiedsGroup,
+  corporateGroup: corporateGroup,
   //workGroup: workGroup, //TODO: Now fully included in corporate
   academicGroup: academicGroup,
   artistGroup: artistGroup,
   realEstateGroup: realEstateGroup,
   transportGroup: transportGroup,
   personalMobilityGroup: personalMobilityGroup,
-  corporateGroup: corporateGroup,
   otherGroup: otherGroup,
 };
 

@@ -8,6 +8,7 @@ import { newsarticle } from "./uc-newsarticle";
 import { event } from "./uc-event";
 import { jobSearch } from "./uc-job-search";
 import { jobOffer } from "./uc-job-offer";
+import { groupChat } from "./uc-group-chat.js";
 
 export const corporateGroup = {
   identifier: "corporateGroup",
@@ -19,5 +20,6 @@ export const corporateGroup = {
     event: event,
     jobSearch: jobSearch,
     jobOffer: jobOffer,
+    groupChat: groupChat,
   },
 };
