@@ -31,6 +31,8 @@ export const parse = async (jsonldAtomAndAuth, fakeNames, vocab) => {
         reactions: undefined,
       },
       auth: extractAuthList(jsonldAuthImm),
+      tokenAuth: extractTokenAuth(jsonldAuthImm, vocab),
+      tokenScopeUris: extractTokenScopeUris(jsonldAuthImm, vocab),
       background: generateBackground(atomUri),
       unread: false,
       isBeingCreated: false,
@@ -141,6 +143,50 @@ function extractLastModifiedDate(atomJsonLd) {
 function extractAuthList(authList) {
   const auths = get(authList, "@graph");
   return auths ? auths.map(auth => auth.delete("@type")) : Immutable.List();
+}
+
+function extractTokenAuth(authList, vocab) {
+  const auths = extractAuthList(authList);
+
+  return auths
+    ? auths.filter(auth => {
+        const grants = get(auth, vocab.AUTH.grant);
+        return !!grants.find(grant => {
+          const operations = get(grant, vocab.AUTH.operation);
+          return (
+            !!operations &&
+            !is("String", operations) &&
+            operations.find(
+              op => !is("String", op) && !!get(op, vocab.AUTH.requestToken)
+            )
+          );
+        });
+      })
+    : Immutable.List();
+}
+
+function extractTokenScopeUris(authList, vocab) {
+  const tokenAuths = extractTokenAuth(authList, vocab);
+
+  const tokenScopeUris = [];
+
+  for (const tokenAuth of tokenAuths) {
+    const authTokenOperations = tokenAuth
+      .get(vocab.AUTH.grant)
+      .flatMap(grant => get(grant, vocab.AUTH.operation))
+      .map(op => get(op, vocab.AUTH.requestToken))
+      .filter(op => !!op);
+
+    for (const authTokenOperation of authTokenOperations) {
+      const tokenScopeUri = getIn(authTokenOperation, [
+        vocab.AUTH.tokenScope,
+        "@id",
+      ]);
+      tokenScopeUri && tokenScopeUris.push(tokenScopeUri);
+    }
+  }
+
+  return tokenScopeUris;
 }
 
 function extractState(atomJsonLd, vocab) {
@@ -276,4 +322,9 @@ function getIn(obj, path) {
       return getIn(child, path.slice(1));
     }
   }
+}
+
+function is(type, obj) {
+  const clas = Object.prototype.toString.call(obj).slice(8, -1);
+  return obj !== undefined && obj !== null && clas === type;
 }
