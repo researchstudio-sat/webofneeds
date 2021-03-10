@@ -6,6 +6,8 @@ import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import { get } from "~/app/utils";
 import * as processSelectors from "~/app/redux/selectors/process-selectors";
+import * as generalSelectors from "~/app/redux/selectors/general-selectors";
+import * as processUtils from "~/app/redux/utils/process-utils";
 
 import "~/style/_atom-content-requests.scss";
 
@@ -15,8 +17,21 @@ export default function WonAtomContentRequests({ atomUri }) {
     processSelectors.getConnectionContainerRequests(atomUri)
   );
 
+  const possibleRequestCredentials = useSelector(
+    generalSelectors.getPossibleRequestCredentialsForAtom(atomUri)
+  );
+
+  const priorAtomRequests = useSelector(
+    processSelectors.getAtomRequests(atomUri)
+  );
+  const priorConnectionContainerRequests = useSelector(
+    processSelectors.getConnectionContainerRequests(atomUri)
+  );
+
   const atomRequestElements = [];
   const connectionContainerRequestElements = [];
+  const atomRequestCredentialsElements = [];
+  const connectionContainerRequestCredentialsElements = [];
 
   const generateResponseCodeClasses = responseCode => {
     const cssClassNames = ["acrequests__item__code"];
@@ -25,6 +40,24 @@ export default function WonAtomContentRequests({ atomUri }) {
       cssClassNames.push("acrequests__item__code--success");
     } else {
       cssClassNames.push("acrequests__item__code--failure");
+    }
+
+    return cssClassNames.join(" ");
+  };
+
+  const generateCredentialsCodeClasses = (priorRequests, responseCode) => {
+    const cssClassNames = ["acrequests__item"];
+
+    if (
+      processUtils.isUsedCredentialsSuccessfully(priorRequests, responseCode)
+    ) {
+      cssClassNames.push("acrequests__item--success");
+    } else if (
+      processUtils.isUsedCredentialsUnsuccessfully(priorRequests, responseCode)
+    ) {
+      cssClassNames.push("acrequests__item--failure");
+    } else {
+      cssClassNames.push("acrequests__item--unknown");
     }
 
     return cssClassNames.join(" ");
@@ -60,6 +93,39 @@ export default function WonAtomContentRequests({ atomUri }) {
       );
     });
 
+  possibleRequestCredentials &&
+    possibleRequestCredentials.map((credentials, idx) => {
+      atomRequestCredentialsElements.push(
+        <div
+          key={"rc_" + idx}
+          className={generateCredentialsCodeClasses(
+            priorAtomRequests,
+            credentials
+          )}
+        >
+          <div className="acrequests__item__code">🔑</div>
+          <pre className="acrequests__item__content">
+            {credentials && JSON.stringify(credentials.toJS(), undefined, 2)}
+          </pre>
+        </div>
+      );
+
+      connectionContainerRequestCredentialsElements.push(
+        <div
+          key={"rc_" + idx}
+          className={generateCredentialsCodeClasses(
+            priorConnectionContainerRequests,
+            credentials
+          )}
+        >
+          <div className="acrequests__item__code">🔑</div>
+          <pre className="acrequests__item__content">
+            {credentials && JSON.stringify(credentials.toJS(), undefined, 2)}
+          </pre>
+        </div>
+      );
+    });
+
   return (
     <won-atom-content-requests>
       <div className="acrequests__atom">
@@ -71,9 +137,19 @@ export default function WonAtomContentRequests({ atomUri }) {
             No Atom Request Data available
           </div>
         )}
+        <div className="acrequests__atom__header">
+          Possible Credentials to Use
+        </div>
+        {atomRequestCredentialsElements.length > 0 ? (
+          atomRequestCredentialsElements
+        ) : (
+          <div className="acrequests__credentials__nodata">
+            No Credentials found in state
+          </div>
+        )}
       </div>
       <div className="acrequests__cc">
-        <div className="acrequests__atom__header">
+        <div className="acrequests__cc__header">
           ConnectionContainer Request Status
         </div>
         {connectionContainerRequestElements.length > 0 ? (
@@ -81,6 +157,16 @@ export default function WonAtomContentRequests({ atomUri }) {
         ) : (
           <div className="acrequests__cc__nodata">
             No Atom Request Data available
+          </div>
+        )}
+        <div className="acrequests__cc__header">
+          Possible Credentials to Use
+        </div>
+        {connectionContainerRequestCredentialsElements.length > 0 ? (
+          connectionContainerRequestCredentialsElements
+        ) : (
+          <div className="acrequests__credentials__nodata">
+            No Credentials found in state
           </div>
         )}
       </div>

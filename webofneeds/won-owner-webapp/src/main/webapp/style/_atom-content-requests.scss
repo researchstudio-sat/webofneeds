@@ -48,6 +48,31 @@ won-atom-content-requests {
         grid-template-columns: min-content 1fr;
       }
 
+      &--success {
+        > .acrequests__item__code {
+          background: green;
+          color: white;
+        }
+      }
+
+      &--unknown {
+        > .acrequests__item__code {
+          background: $won-secondary-color-light;
+          color: white;
+        }
+      }
+
+      &--failure {
+        > .acrequests__item__code {
+          background: red;
+          color: white;
+        }
+
+        > .acrequests__item__content {
+          text-decoration: line-through;
+        }
+      }
+
       &__code {
         font-family: monospace;
         font-size: $mediumFontSize;
@@ -65,7 +90,8 @@ won-atom-content-requests {
         }
       }
       &__content {
-        white-space: break-spaces;
+        white-space: pre-wrap;
+        overflow-x: auto;
         font-family: monospace;
         font-size: $smallFontSize;
         background: $won-lighter-gray;

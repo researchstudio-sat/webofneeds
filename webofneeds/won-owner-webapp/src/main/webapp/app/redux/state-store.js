@@ -2,6 +2,7 @@ import * as ownerApi from "../api/owner-api.js";
 import Immutable from "immutable";
 import { actionTypes } from "../actions/actions.js";
 import * as generalSelectors from "./selectors/general-selectors.js";
+import * as processSelectors from "./selectors/process-selectors.js";
 import * as atomUtils from "./utils/atom-utils.js";
 import * as connectionUtils from "./utils/connection-utils.js";
 import * as accountUtils from "./utils/account-utils.js";
@@ -12,14 +13,7 @@ import {
   parseMetaAtom,
   parseAtomContent,
 } from "../reducers/atom-reducer/parse-atom.js";
-import {
-  extractAtomUriFromConnectionUri,
-  get,
-  is,
-  getUri,
-  getIn,
-  parseWorkerError,
-} from "../utils.js";
+import { get, is, parseWorkerError } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
 import { fetchWikiData } from "~/app/api/wikidata-api";
@@ -125,131 +119,120 @@ export const fetchActiveConnectionAndDispatchBySocketUris = (
       );
     });
 
-export const determineRequestCredentials = (state, atomUri) => {
+export const determineRequestCredentials = (state, atomUri, priorRequests) => {
   console.debug("## Determine requesterWebId for", atomUri);
 
-  const validRequestCredentials = generalSelectors.getAllValidRequestCredentialsForAtom(
-    atomUri
-  )(state);
+  if (priorRequests) {
+    console.debug("## We have prior requests...", priorRequests);
+  }
+  const possibleRequestCredentials = generalSelectors
+    .getPossibleRequestCredentialsForAtom(atomUri)(state)
+    .filter(
+      requestCredentials =>
+        !processUtils.isUsedCredentialsUnsuccessfully(
+          priorRequests,
+          requestCredentials
+        )
+    );
+  //WARNING: if a request was successful we can't use the already successful credentials since we do not know if additional content would appear with other credentials
+  //WARNING: it might happen that a previously unsuccessful call would be successful (e.g. if a connection state changes) so it might be necessary to retry a failed call on some occasions
 
-  if (validRequestCredentials.size > 0) {
-    if (validRequestCredentials.size > 1) {
+  const possibleTokenCredentials = possibleRequestCredentials.filter(
+    credentials => !!get(credentials, "requestTokenFromAtomUri")
+  );
+
+  const possibleRequesterWebIdCredentials = possibleRequestCredentials.filter(
+    credentials => !!get(credentials, "requesterWebId")
+  );
+
+  if (possibleRequesterWebIdCredentials.size > 0) {
+    if (possibleRequesterWebIdCredentials.size > 1) {
       console.debug(
         "## more than one (seemingly) valid requestCredentials entry found to fetch (",
         atomUri,
         "), using the first one for now, here is the rest as Immutable: ",
-        validRequestCredentials
+        possibleRequestCredentials
       );
     }
 
-    return Promise.resolve(validRequestCredentials.first().toJS());
-  } else {
-    //TODO: Figure out a way to handle this within the selecter we use above
+    return Promise.resolve(possibleRequesterWebIdCredentials.first().toJS());
+  } else if (possibleTokenCredentials.size > 0) {
+    if (possibleTokenCredentials.size > 1) {
+      console.debug(
+        "## more than one (seemingly) valid token entry found to fetch (",
+        atomUri,
+        "), here are all values as Immutable: ",
+        possibleTokenCredentials
+      );
+    }
+
     const accountState = generalSelectors.getAccountState(state);
-    const nonOwnedConnectionsToTargetAtom = generalSelectors
-      .getConnectionsWithTargetAtomUri(atomUri)(state)
-      .filterNot((_, connUri) =>
-        accountUtils.isAtomOwned(
-          accountState,
-          extractAtomUriFromConnectionUri(connUri)
-        )
+
+    for (const tokenCredential of possibleTokenCredentials) {
+      const tokenScope = get(tokenCredential, "scope");
+      const requestTokenFromAtomUri = get(
+        tokenCredential,
+        "requestTokenFromAtomUri"
       );
 
-    if (nonOwnedConnectionsToTargetAtom.size > 0) {
-      const consideredAtom = generalSelectors.getAtom(
-        extractAtomUriFromConnectionUri(
-          getUri(nonOwnedConnectionsToTargetAtom.first())
-        )
-      )(state);
+      // FIXME: THIS IS NEXT PART PRETTY HARDCODED (which isnt great but works for now): the requesterWebId (or even the token, used to fetch the token from the atom should be determined by this function itself
+      if (tokenScope === vocab.HOLD.ScopeReadHeldAtoms) {
+        const requestTokenFromAtom = generalSelectors.getAtom(
+          requestTokenFromAtomUri
+        )(state);
 
-      if (nonOwnedConnectionsToTargetAtom.size > 1) {
+        const ownedBuddyUrisOfConsideredAtom = atomUtils
+          .getConnectedConnections(
+            requestTokenFromAtom,
+            vocab.BUDDY.BuddySocketCompacted
+          )
+          .filter(conn =>
+            accountUtils.isAtomOwned(
+              accountState,
+              connectionUtils.getTargetAtomUri(conn)
+            )
+          )
+          .map(connectionUtils.getTargetAtomUri)
+          .valueSeq()
+          .toSet();
         console.debug(
-          "## more than one connection found for this non owned Atom, using first one for token-access consideration: ",
-          consideredAtom,
-          nonOwnedConnectionsToTargetAtom
+          "ownedBuddyUrisOfConsideredAtom: ",
+          ownedBuddyUrisOfConsideredAtom
         );
-      } else {
-        console.debug(
-          "## one connection found for this non owned Atom, using first one as token-access consideration: ",
-          consideredAtom
-        );
-      }
 
-      const tokenAuths = atomUtils.getTokenAuth(consideredAtom);
+        if (ownedBuddyUrisOfConsideredAtom.size > 0) {
+          const fetchTokenRequesterId = ownedBuddyUrisOfConsideredAtom.first();
 
-      for (const tokenAuth of tokenAuths) {
-        console.debug("tokenAuth: ", tokenAuth);
-        const authTokenOperations = tokenAuth
-          .get(vocab.AUTH.grant)
-          .flatMap(grant => get(grant, vocab.AUTH.operation))
-          .map(op => get(op, vocab.AUTH.requestToken))
-          .filter(op => !!op);
-        console.debug("authOperations: ", authTokenOperations);
-
-        for (const authTokenOperation of authTokenOperations) {
-          const tokenScopeUri = getIn(authTokenOperation, [
-            vocab.AUTH.tokenScope,
-            "@id",
-          ]);
-          console.debug("### ", tokenScopeUri);
-
-          //TODO: THIS IS NEXT PART PRETTY HARDCODED (which isnt great but works for now):
-          if (tokenScopeUri === vocab.HOLD.ScopeReadHeldAtoms) {
-            const ownedBuddyUrisOfConsideredAtom = atomUtils
-              .getConnectedConnections(
-                consideredAtom,
-                vocab.BUDDY.BuddySocketCompacted
-              )
-              .filter(conn =>
-                accountUtils.isAtomOwned(
-                  accountState,
-                  connectionUtils.getTargetAtomUri(conn)
-                )
-              )
-              .map(connectionUtils.getTargetAtomUri)
-              .valueSeq()
-              .toSet();
+          if (ownedBuddyUrisOfConsideredAtom.size > 1) {
             console.debug(
-              "ownedBuddyUrisOfConsideredAtom: ",
+              "## more than one connection found for this non owned Atom, using first one as the tokenRequester: ",
+              fetchTokenRequesterId,
               ownedBuddyUrisOfConsideredAtom
             );
-
-            if (ownedBuddyUrisOfConsideredAtom.size > 0) {
-              const fetchTokenRequesterId = ownedBuddyUrisOfConsideredAtom.first();
-
-              if (ownedBuddyUrisOfConsideredAtom.size > 1) {
-                console.debug(
-                  "## more than one connection found for this non owned Atom, using first one as the tokenRequester: ",
-                  fetchTokenRequesterId,
-                  ownedBuddyUrisOfConsideredAtom
-                );
-              }
-
-              return ownerApi
-                .fetchTokenForAtom(getUri(consideredAtom), {
-                  requesterWebId: fetchTokenRequesterId,
-                  scopes: tokenScopeUri,
-                })
-                .then(tokens => {
-                  console.debug("tokens: ", tokens);
-                  return { token: tokens[0] };
-                })
-                .catch(error => console.debug("error: ", error)); //TODO: FIX ERROR
-            }
           }
 
-          //******************************************************************************
+          return ownerApi
+            .fetchTokenForAtom(requestTokenFromAtomUri, {
+              requesterWebId: fetchTokenRequesterId,
+              scopes: tokenScope,
+            })
+            .then(tokens => {
+              console.debug("tokens: ", tokens);
+              return {
+                token: tokens[0],
+                obtainedFrom: tokenCredential.toJS(),
+              };
+            })
+            .catch(error => console.debug("error: ", error)); //TODO: FIX ERROR
         }
       }
-
-      return Promise.resolve({ requesterWebId: undefined, token: undefined });
-    } else {
-      console.debug(
-        "## no connections found for this non owned atom, using nothing as requesterWebId/token maybe we are lucky..."
-      );
-      return Promise.resolve({ requesterWebId: undefined, token: undefined });
     }
+  } else {
+    console.debug(
+      "## no connections found for this non owned atom, using nothing as requesterWebId/token maybe we are lucky..."
+    );
   }
+  return Promise.resolve({ requesterWebId: undefined, token: undefined });
 };
 export const fetchConnectionsContainerAndDispatch = (
   atomUri,
@@ -302,7 +285,11 @@ export const fetchConnectionsContainerAndDispatch = (
     payload: Immutable.fromJS({ uri: atomUri }),
   });
 
-  return determineRequestCredentials(state, atomUri).then(requestCredentials =>
+  return determineRequestCredentials(
+    state,
+    atomUri,
+    processSelectors.getConnectionContainerRequests(atomUri)(state)
+  ).then(requestCredentials =>
     won
       .fetchConnectionUrisWithStateByAtomUri(
         atomUtils.getConnectionContainerUri(
@@ -449,7 +436,11 @@ export const fetchAtomAndDispatch = (
   return (
     (overrideCredentials
       ? Promise.resolve(overrideCredentials)
-      : determineRequestCredentials(state, atomUri)
+      : determineRequestCredentials(
+          state,
+          atomUri,
+          processSelectors.getAtomRequests(atomUri)(state)
+        )
     )
       // TODO: INCLUDE GRANTS FETCH SOMEHOW
       // .then(requestCredentials => {

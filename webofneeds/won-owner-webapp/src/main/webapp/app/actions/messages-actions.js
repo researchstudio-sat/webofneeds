@@ -8,6 +8,7 @@ import { getIn, getUri, get, extractAtomUriBySocketUri } from "../utils.js";
 
 import Immutable from "immutable";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
+import * as processSelectors from "../redux/selectors/process-selectors.js";
 import { parseAtomContent } from "../reducers/atom-reducer/parse-atom.js";
 
 import { isFetchMessageEffectsNeeded } from "../won-message-utils.js";
@@ -99,7 +100,11 @@ export const successfulCreate = wonMessage => (dispatch, getState) => {
   //load the data into the local rdf store and publish AtomCreatedEvent when done
   const atomUri = wonMessage.getAtom();
   stateStore
-    .determineRequestCredentials(getState(), atomUri)
+    .determineRequestCredentials(
+      getState(),
+      atomUri,
+      processSelectors.getAtomRequests(atomUri)(getState())
+    )
     .then(requestCredentials =>
       won
         .fetchAtom(atomUri, requestCredentials)
