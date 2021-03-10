@@ -442,6 +442,13 @@ export function isAtomFetchNecessary(process, atomUri, atom) {
   return false;
 }
 
+export function getFetchTokenRequests(process, atomUri, tokenScopeUri) {
+  return (
+    getIn(process, ["fetchTokens", atomUri, tokenScopeUri, "requests"]) ||
+    Immutable.List()
+  );
+}
+
 export function getAtomRequests(process, atomUri) {
   return getIn(process, ["atoms", atomUri, "requests"]) || Immutable.List();
 }

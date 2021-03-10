@@ -119,7 +119,12 @@ export const fetchActiveConnectionAndDispatchBySocketUris = (
       );
     });
 
-export const determineRequestCredentials = (state, atomUri, priorRequests) => {
+export const determineRequestCredentials = (
+  dispatch,
+  state,
+  atomUri,
+  priorRequests
+) => {
   console.debug("## Determine requesterWebId for", atomUri);
 
   if (priorRequests) {
@@ -211,19 +216,48 @@ export const determineRequestCredentials = (state, atomUri, priorRequests) => {
             );
           }
 
+          const requestCredentials = { requesterWebId: fetchTokenRequesterId }; //TODO: USE determineRequestCredentials for this call
+          requestCredentials.scopes = tokenScope;
+
           return ownerApi
-            .fetchTokenForAtom(requestTokenFromAtomUri, {
-              requesterWebId: fetchTokenRequesterId,
-              scopes: tokenScope,
-            })
+            .fetchTokenForAtom(requestTokenFromAtomUri, requestCredentials)
             .then(tokens => {
-              console.debug("tokens: ", tokens);
+              dispatch({
+                type: actionTypes.atoms.fetchToken.success,
+                payload: Immutable.fromJS({
+                  uri: requestTokenFromAtomUri,
+                  tokenScopeUri: tokenScope,
+                  token: tokens[0],
+                  request: {
+                    code: 200,
+                    requestCredentials: requestCredentials,
+                  },
+                }),
+              });
+
               return {
                 token: tokens[0],
                 obtainedFrom: tokenCredential.toJS(),
               };
             })
-            .catch(error => console.debug("error: ", error)); //TODO: FIX ERROR
+            .catch(error => {
+              let errorParsed = parseWorkerError(error);
+
+              dispatch({
+                type: actionTypes.atoms.fetchToken.failure,
+                payload: Immutable.fromJS({
+                  uri: requestTokenFromAtomUri,
+                  tokenScopeUri: tokenScope,
+                  request: {
+                    code: errorParsed.status,
+                    params: errorParsed.params || {},
+                    message: errorParsed.message || error.message,
+                    response: errorParsed.response,
+                    requestCredentials: requestCredentials,
+                  },
+                }),
+              });
+            });
         }
       }
     }
@@ -286,6 +320,7 @@ export const fetchConnectionsContainerAndDispatch = (
   });
 
   return determineRequestCredentials(
+    dispatch,
     state,
     atomUri,
     processSelectors.getConnectionContainerRequests(atomUri)(state)
@@ -437,6 +472,7 @@ export const fetchAtomAndDispatch = (
     (overrideCredentials
       ? Promise.resolve(overrideCredentials)
       : determineRequestCredentials(
+          dispatch,
           state,
           atomUri,
           processSelectors.getAtomRequests(atomUri)(state)

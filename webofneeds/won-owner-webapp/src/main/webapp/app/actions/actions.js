@@ -142,6 +142,10 @@ const actionHierarchy = {
     removeDeleted: INJ_DEFAULT,
     markAsLoaded: INJ_DEFAULT,
     markConnectionContainerAsLoaded: INJ_DEFAULT,
+    fetchToken: {
+      success: INJ_DEFAULT,
+      failure: INJ_DEFAULT,
+    },
   },
   externalData: {
     fetchWikiData: uri => (dispatch, getState) =>
