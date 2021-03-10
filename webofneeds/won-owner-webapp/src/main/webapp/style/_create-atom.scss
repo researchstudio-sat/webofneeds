@@ -20,8 +20,8 @@ won-create-atom {
 
     grid-area: header;
     display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas: "header_icon header_title";
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "header_icon header_title header_back";
     grid-gap: 0.5rem;
     font-size: $normalFontSize;
     text-align: left;
@@ -40,6 +40,18 @@ won-create-atom {
       --local-primary: #{$won-subtitle-gray};
       grid-area: header_icon;
       @include fixed-square($postIconSize);
+    }
+
+    &__back {
+      grid-area: header_back;
+      --local-primary: #{$won-subtitle-gray};
+      @include fixed-square($postIconSize);
+      cursor: pointer;
+      text-align: right;
+
+      &:hover {
+        --local-primary: #{$won-primary-color};
+      }
     }
   }
 

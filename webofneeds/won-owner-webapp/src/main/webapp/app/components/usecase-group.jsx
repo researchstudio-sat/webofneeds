@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import * as useCaseUtils from "../usecase-utils.js";
 
 import "~/style/_usecase-group.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 import { getQueryParams, generateLink, get } from "../utils";
 import { Link, useHistory } from "react-router-dom";
 
@@ -85,6 +86,9 @@ export default function WonUseCaseGroup({
               </svg>
             )}
             {ucgLabel && <div className="ucg__header__title">{ucgLabel}</div>}
+            <svg className="ucg__header__back" onClick={() => history.goBack()}>
+              <use xlinkHref={ico36_close} href={ico36_close} />
+            </svg>
           </div>
           <div className="ucg__main">{generateSubItems()}</div>
         </React.Fragment>

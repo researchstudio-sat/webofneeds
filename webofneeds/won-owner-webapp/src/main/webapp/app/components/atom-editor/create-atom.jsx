@@ -23,6 +23,7 @@ import { actionCreators } from "../../actions/actions";
 
 import "~/style/_create-atom.scss";
 import "~/style/_responsiveness-utils.scss";
+import ico36_close from "~/images/won-icons/ico36_close.svg";
 import WonAtomHeaderBig from "~/app/components/atom-header-big";
 import * as wonLabelUtils from "~/app/won-label-utils";
 
@@ -307,6 +308,9 @@ export default function WonCreateAtom({
         <div className="cp__header">
           {headerIconElement}
           {headerTitleElement}
+          <svg className="cp__header__back" onClick={() => history.goBack()}>
+            <use xlinkHref={ico36_close} href={ico36_close} />
+          </svg>
         </div>
         <div className="cp__content">
           {/*ADD TITLE AND DETAILS*/}
