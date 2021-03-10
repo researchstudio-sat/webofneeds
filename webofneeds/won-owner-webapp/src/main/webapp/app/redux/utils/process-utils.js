@@ -510,25 +510,19 @@ function getRequestForSameCredentials(priorRequests, requestCredentials) {
   const requesterWebId = get(requestCredentials, "requesterWebId");
 
   if (priorRequests && priorRequests.size > 0 && requestCredentials) {
-    return priorRequests.find(request => {
-      if (requestTokenFromAtomUri) {
-        const obtainedFrom = getIn(request, [
-          "requestCredentials",
-          "obtainedFrom",
-        ]);
-
-        return (
-          get(obtainedFrom, "scope") === scope &&
-          get(obtainedFrom, "requestTokenFromAtomUri") ===
-            requestTokenFromAtomUri
-        );
-      } else {
-        return (
-          get(request, ["requestCredentials", "requesterWebId"]) ===
-          requesterWebId
-        );
-      }
-    });
+    return priorRequests.find(
+      request =>
+        requestTokenFromAtomUri
+          ? getIn(request, ["requestCredentials", "obtainedFrom", "scope"]) ===
+              scope &&
+            getIn(request, [
+              "requestCredentials",
+              "obtainedFrom",
+              "requestTokenFromAtomUri",
+            ]) === requestTokenFromAtomUri
+          : getIn(request, ["requestCredentials", "requesterWebId"]) ===
+            requesterWebId
+    );
   }
   return undefined;
 }
