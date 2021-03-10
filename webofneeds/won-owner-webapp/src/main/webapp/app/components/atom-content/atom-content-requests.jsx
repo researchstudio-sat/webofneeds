@@ -4,18 +4,23 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import PropTypes from "prop-types";
-import { get } from "~/app/utils";
+import { get, getUri } from "~/app/utils";
 import * as processSelectors from "~/app/redux/selectors/process-selectors";
 import * as generalSelectors from "~/app/redux/selectors/general-selectors";
 import * as processUtils from "~/app/redux/utils/process-utils";
+import * as atomUtils from "~/app/redux/utils/atom-utils";
 
 import "~/style/_atom-content-requests.scss";
 
-export default function WonAtomContentRequests({ atomUri }) {
+export default function WonAtomContentRequests({ atom }) {
+  const atomUri = getUri(atom);
   const atomRequests = useSelector(processSelectors.getAtomRequests(atomUri));
   const connectionContainerRequests = useSelector(
     processSelectors.getConnectionContainerRequests(atomUri)
   );
+
+  const tokenScopeUriElements = [];
+  const tokenScopeUris = atomUtils.getTokenScopeUris(atom);
 
   const possibleRequestCredentials = useSelector(
     generalSelectors.getPossibleRequestCredentialsForAtom(atomUri)
@@ -62,6 +67,15 @@ export default function WonAtomContentRequests({ atomUri }) {
 
     return cssClassNames.join(" ");
   };
+
+  tokenScopeUris &&
+    tokenScopeUris.map((tokenScopeUri, idx) => {
+      tokenScopeUriElements.push(
+        <div key={"tr_" + idx} className="acrequests__tokens__item">
+          <div className="acrequests__tokens__item__uri">{tokenScopeUri}</div>
+        </div>
+      );
+    });
 
   atomRequests &&
     atomRequests.map((request, idx) => {
@@ -128,51 +142,61 @@ export default function WonAtomContentRequests({ atomUri }) {
 
   return (
     <won-atom-content-requests>
-      <div className="acrequests__atom">
-        <div className="acrequests__atom__header">Atom Request Status</div>
-        {atomRequestElements.length > 0 ? (
-          atomRequestElements
-        ) : (
-          <div className="acrequests__atom__nodata">
-            No Atom Request Data available
+      <div className="acrequests__req">
+        <div className="acrequests__atom">
+          <div className="acrequests__atom__header">Atom Request Status</div>
+          {atomRequestElements.length > 0 ? (
+            atomRequestElements
+          ) : (
+            <div className="acrequests__atom__nodata">
+              No Atom Request Data available
+            </div>
+          )}
+          <div className="acrequests__atom__header">
+            Possible Credentials to Use
           </div>
-        )}
-        <div className="acrequests__atom__header">
-          Possible Credentials to Use
+          {atomRequestCredentialsElements.length > 0 ? (
+            atomRequestCredentialsElements
+          ) : (
+            <div className="acrequests__credentials__nodata">
+              No Credentials found in state
+            </div>
+          )}
         </div>
-        {atomRequestCredentialsElements.length > 0 ? (
-          atomRequestCredentialsElements
-        ) : (
-          <div className="acrequests__credentials__nodata">
-            No Credentials found in state
+        <div className="acrequests__cc">
+          <div className="acrequests__cc__header">
+            ConnectionContainer Request Status
           </div>
-        )}
+          {connectionContainerRequestElements.length > 0 ? (
+            connectionContainerRequestElements
+          ) : (
+            <div className="acrequests__cc__nodata">
+              No Atom Request Data available
+            </div>
+          )}
+          <div className="acrequests__cc__header">
+            Possible Credentials to Use
+          </div>
+          {connectionContainerRequestCredentialsElements.length > 0 ? (
+            connectionContainerRequestCredentialsElements
+          ) : (
+            <div className="acrequests__credentials__nodata">
+              No Credentials found in state
+            </div>
+          )}
+        </div>
       </div>
-      <div className="acrequests__cc">
-        <div className="acrequests__cc__header">
-          ConnectionContainer Request Status
-        </div>
-        {connectionContainerRequestElements.length > 0 ? (
-          connectionContainerRequestElements
+      <div className="acrequests__tokens">
+        <div className="acrequests__tokens__header">Fetchable Tokens</div>
+        {tokenScopeUriElements.length > 0 ? (
+          tokenScopeUriElements
         ) : (
-          <div className="acrequests__cc__nodata">
-            No Atom Request Data available
-          </div>
-        )}
-        <div className="acrequests__cc__header">
-          Possible Credentials to Use
-        </div>
-        {connectionContainerRequestCredentialsElements.length > 0 ? (
-          connectionContainerRequestCredentialsElements
-        ) : (
-          <div className="acrequests__credentials__nodata">
-            No Credentials found in state
-          </div>
+          <div className="acrequests__tokens__nodata">No Fetchable Tokens</div>
         )}
       </div>
     </won-atom-content-requests>
   );
 }
 WonAtomContentRequests.propTypes = {
-  atomUri: PropTypes.object.isRequired,
+  atom: PropTypes.object.isRequired,
 };

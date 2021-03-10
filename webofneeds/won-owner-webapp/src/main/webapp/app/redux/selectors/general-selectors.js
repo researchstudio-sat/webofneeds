@@ -640,32 +640,15 @@ export const getPossibleRequestCredentialsForAtom = atomUri =>
         nonOwnedConnectionsToTargetAtom.map((_, connUri) => {
           const atomUri = extractAtomUriFromConnectionUri(connUri);
           const consideredAtom = get(atoms, atomUri);
+          const tokenScopeUris = atomUtils.getTokenScopeUris(consideredAtom);
 
-          const tokenAuths = atomUtils.getTokenAuth(consideredAtom);
-
-          for (const tokenAuth of tokenAuths) {
-            console.debug("tokenAuth: ", tokenAuth);
-            const authTokenOperations = tokenAuth
-              .get(vocab.AUTH.grant)
-              .flatMap(grant => get(grant, vocab.AUTH.operation))
-              .map(op => get(op, vocab.AUTH.requestToken))
-              .filter(op => !!op);
-            console.debug("authOperations: ", authTokenOperations);
-
-            for (const authTokenOperation of authTokenOperations) {
-              const tokenScopeUri = getIn(authTokenOperation, [
-                vocab.AUTH.tokenScope,
-                "@id",
-              ]);
-              console.debug("### ", tokenScopeUri);
-
-              //FIXME: THIS IS JUST AN ASSUMPTION THAT WE MIGHT BE ABLE TO ACCESS/REQUEST THE ATOM IN QUESTION WITH A TOKEN FROM THE GIVEN ATOM
-              possibleRequestCredentials.push({
-                requestTokenFromAtomUri: atomUri,
-                scope: tokenScopeUri,
-              });
-            }
-          }
+          tokenScopeUris.forEach(tokenScopeUri => {
+            //FIXME: THIS IS JUST AN ASSUMPTION THAT WE MIGHT BE ABLE TO ACCESS/REQUEST THE ATOM IN QUESTION WITH A TOKEN FROM THE GIVEN ATOM
+            possibleRequestCredentials.push({
+              requestTokenFromAtomUri: atomUri,
+              scope: tokenScopeUri,
+            });
+          });
         });
 
         //TODO: EITHER REMOVE ALREADY FETCHED AND THEREFORE DISCARDED CREDENTIALS HERE OR IMPLEMENT ANOTHER METHOD THAT INCLUDES THAT

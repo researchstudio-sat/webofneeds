@@ -401,7 +401,7 @@ export default function WonAtomContent({
         visibleTabFragment = <WonAtomContentAuth atom={atom} />;
         break;
       case "REQUESTSTATUS":
-        visibleTabFragment = <WonAtomContentRequests atomUri={atomUri} />;
+        visibleTabFragment = <WonAtomContentRequests atom={atom} />;
         break;
 
       default: {
