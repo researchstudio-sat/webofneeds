@@ -101,6 +101,7 @@ export const successfulCreate = wonMessage => (dispatch, getState) => {
   const atomUri = wonMessage.getAtom();
   stateStore
     .determineRequestCredentials(
+      dispatch,
       getState(),
       atomUri,
       processSelectors.getAtomRequests(atomUri)(getState())
@@ -683,7 +684,7 @@ export const processConnectMessage = wonMessage => (dispatch, getState) => {
       receiverCP = receiverConnectionUri
         ? Promise.resolve(true)
         : stateStore
-            .determineRequestCredentials(state, recipientAtomUri)
+            .determineRequestCredentials(dispatch, state, recipientAtomUri)
             .then(requestCredentials =>
               stateStore.fetchActiveConnectionAndDispatchBySocketUris(
                 targetSocketUri,
@@ -833,7 +834,7 @@ export const processSocketHintMessage = wonMessage => (dispatch, getState) => {
     return Promise.resolve(false);
   } else {
     return stateStore
-      .determineRequestCredentials(state, targetAtomUri)
+      .determineRequestCredentials(dispatch, state, targetAtomUri)
       .then(requestCredentials =>
         (!targetConnectionUri
           ? stateStore.fetchActiveConnectionAndDispatchBySocketUris(
@@ -885,7 +886,11 @@ export const processAtomHintMessage = wonMessage =>
           }
         })
         .then(() =>
-          stateStore.determineRequestCredentials(getState(), ownedAtomUri)
+          stateStore.determineRequestCredentials(
+            dispatch,
+            getState(),
+            ownedAtomUri
+          )
         )
         .then(requestCredentials =>
           stateStore.fetchActiveConnectionAndDispatch(

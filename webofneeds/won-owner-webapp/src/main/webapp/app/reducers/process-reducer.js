@@ -24,11 +24,17 @@ const initialState = Immutable.fromJS({
   atoms: Immutable.Map(),
   connections: Immutable.Map(),
   connectionContainers: Immutable.Map(),
+  fetchTokens: Immutable.Map(),
 });
 
 export const emptyExternalDataProcess = Immutable.fromJS({
   loading: false,
   failedToLoad: false,
+});
+
+export const emptyFetchTokenProcess = Immutable.fromJS({
+  token: undefined,
+  requests: Immutable.List(),
 });
 
 export const emptyAtomProcess = Immutable.fromJS({
@@ -94,6 +100,31 @@ function updateExternalDataProcess(processState, externalDataUri, payload) {
     oldExternalDataProcess
       ? oldExternalDataProcess.mergeDeep(payloadImm)
       : emptyExternalDataProcess.mergeDeep(payloadImm)
+  );
+}
+
+function updateFetchTokenProcess(
+  processState,
+  atomUri,
+  tokenScopeUri,
+  payload
+) {
+  if (!atomUri || !tokenScopeUri) {
+    return processState;
+  }
+
+  const oldFetchTokenProcess = getIn(processState, [
+    "fetchTokens",
+    atomUri,
+    tokenScopeUri,
+  ]);
+  const payloadImm = Immutable.fromJS(payload);
+
+  return processState.setIn(
+    ["fetchTokens", atomUri, tokenScopeUri],
+    oldFetchTokenProcess
+      ? oldFetchTokenProcess.mergeDeep(payloadImm)
+      : emptyFetchTokenProcess.mergeDeep(payloadImm)
   );
 }
 
@@ -336,6 +367,38 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.sendAnonymousLinkEmailFailed:
     case actionTypes.account.sendAnonymousLinkEmailSuccess:
       return processState.set("processingSendAnonymousLinkEmail", false);
+
+    case actionTypes.atoms.fetchToken.failure: {
+      const atomUri = getUri(action.payload);
+      const tokenScopeUri = get(action.payload, "tokenScopeUri");
+      const request = get(action.payload, "request");
+      const fetchTokenRequests = processUtils.getFetchTokenRequests(
+        processState,
+        atomUri,
+        tokenScopeUri
+      );
+
+      return updateFetchTokenProcess(processState, atomUri, tokenScopeUri, {
+        requests: fetchTokenRequests.push(request),
+      });
+    }
+
+    case actionTypes.atoms.fetchToken.success: {
+      const atomUri = getUri(action.payload);
+      const tokenScopeUri = get(action.payload, "tokenScopeUri");
+      const token = get(action.payload, "token");
+      const request = get(action.payload, "request");
+      const fetchTokenRequests = processUtils.getFetchTokenRequests(
+        processState,
+        atomUri,
+        tokenScopeUri
+      );
+
+      return updateFetchTokenProcess(processState, atomUri, tokenScopeUri, {
+        token: token,
+        requests: fetchTokenRequests.push(request),
+      });
+    }
 
     case actionTypes.atoms.storeUriFailed: {
       const atomUri = getUri(action.payload);

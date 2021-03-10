@@ -608,7 +608,7 @@ export const showLatestMessages = (connectionUri, numberOfEvents) => (
   }
 
   return stateStore
-    .determineRequestCredentials(state, atomUri)
+    .determineRequestCredentials(dispatch, state, atomUri)
     .then(requestCredentials =>
       stateStore.fetchMessages(
         dispatch,
@@ -654,7 +654,7 @@ export const showMoreMessages = (connectionUri, numberOfEvents) => (
     connectionUri
   );
   return stateStore
-    .determineRequestCredentials(getState(), atomUri)
+    .determineRequestCredentials(dispatch, getState(), atomUri)
     .then(requestCredentials =>
       stateStore.fetchMessages(
         dispatch,
