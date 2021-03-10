@@ -86,7 +86,14 @@ export default function WonUseCaseGroup({
               </svg>
             )}
             {ucgLabel && <div className="ucg__header__title">{ucgLabel}</div>}
-            <svg className="ucg__header__back" onClick={() => history.goBack()}>
+            <svg
+              className="ucg__header__back"
+              onClick={() =>
+                history.replace(
+                  generateLink(history.location, {}, "/create", false)
+                )
+              }
+            >
               <use xlinkHref={ico36_close} href={ico36_close} />
             </svg>
           </div>
