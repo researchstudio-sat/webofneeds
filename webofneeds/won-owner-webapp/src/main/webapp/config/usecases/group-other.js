@@ -1,8 +1,6 @@
 import vocab from "../../app/service/vocab.js";
 
 import { complain } from "./uc-complain.js";
-import { organization } from "./uc-organization.js";
-import { newsarticle } from "./uc-newsarticle.js";
 import { handleComplaint } from "./uc-handle-complaint.js";
 import { customUseCase } from "./uc-custom.js";
 // import { resource } from "./uc-resource.js"; //TODO: ValueFlows useCase, currently excluded
@@ -26,8 +24,6 @@ export const otherGroup = {
     complain: complain,
     handleComplaint: handleComplaint,
     customUseCase: customUseCase,
-    organization: organization,
-    newsarticle: newsarticle,
     groupChat: {
       identifier: "groupChat",
       label: "Custom GroupChat",

@@ -341,6 +341,10 @@ export default function WonMenu({ className }) {
                 )
               ) {
                 history.push(generateLink(history.location, {}, "/inventory"));
+              } else {
+                history.replace(
+                  generateLink(history.location, {}, "/inventory", false)
+                );
               }
             }}
             relevantConnectionsMap={relevantActivePinnedAtomConnectionsMap}

@@ -1,6 +1,5 @@
 import { classifiedsGroup } from "./usecases/group-classifieds";
 import { socialGroup } from "./usecases/group-social";
-import { workGroup } from "./usecases/group-work";
 import { academicGroup } from "./usecases/group-academic";
 import { artistGroup } from "./usecases/group-artists";
 import { realEstateGroup } from "./usecases/group-real-estate";
@@ -8,6 +7,8 @@ import { transportGroup } from "./usecases/group-transport";
 import { otherGroup } from "./usecases/group-other";
 import { personalMobilityGroup } from "./usecases/group-personal-mobility";
 import { interestsGroup, plansGroup } from "./usecases/group-interests";
+import { corporateGroup } from "./usecases/group-corporate";
+//import { workGroup } from "./usecases/group-work";
 // import { customUseCase } from "./usecases/uc-custom.js";
 
 import { persona } from "./usecases/uc-persona.js";
@@ -63,12 +64,13 @@ const useCaseGroups = {
   plansGroup: plansGroup,
   socialGroup: socialGroup,
   classifiedsGroup: classifiedsGroup,
-  workGroup: workGroup,
+  //workGroup: workGroup, //TODO: Now fully included in corporate
   academicGroup: academicGroup,
   artistGroup: artistGroup,
   realEstateGroup: realEstateGroup,
   transportGroup: transportGroup,
   personalMobilityGroup: personalMobilityGroup,
+  corporateGroup: corporateGroup,
   otherGroup: otherGroup,
 };
 

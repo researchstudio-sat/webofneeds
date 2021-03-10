@@ -90,7 +90,10 @@ export default function WonUseCaseGroup({
               className="ucg__header__back"
               onClick={() =>
                 history.replace(
-                  generateLink(history.location, {}, "/create", false)
+                  generateLink(history.location, {
+                    useCaseGroup: undefined,
+                    useCase: undefined,
+                  })
                 )
               }
             >
