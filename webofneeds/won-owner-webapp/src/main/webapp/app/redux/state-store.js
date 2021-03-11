@@ -4,8 +4,6 @@ import { actionTypes } from "../actions/actions.js";
 import * as generalSelectors from "./selectors/general-selectors.js";
 import * as processSelectors from "./selectors/process-selectors.js";
 import * as atomUtils from "./utils/atom-utils.js";
-import * as connectionUtils from "./utils/connection-utils.js";
-import * as accountUtils from "./utils/account-utils.js";
 import * as processUtils from "./utils/process-utils.js";
 import * as useCaseUtils from "~/app/usecase-utils";
 import { isUriDeleted } from "~/app/won-localstorage";
@@ -168,8 +166,6 @@ export const determineRequestCredentials = (
       );
     }
 
-    const accountState = generalSelectors.getAccountState(state);
-
     for (const tokenCredential of possibleTokenCredentials) {
       const tokenScope = get(tokenCredential, "scope");
       const requestTokenFromAtomUri = get(
@@ -206,69 +202,50 @@ export const determineRequestCredentials = (
         }
       }
 
-      // FIXME: THIS IS NEXT PART PRETTY HARDCODED (which isnt great but works for now): the requesterWebId (or even the token, used to fetch the token from the atom should be determined by this function itself
-      let consideredRequesterWebIds;
-      const requestTokenFromAtom = generalSelectors.getAtom(
-        requestTokenFromAtomUri
-      )(state);
-
-      if (tokenScope === vocab.HOLD.ScopeReadHeldAtoms) {
-        consideredRequesterWebIds = atomUtils
-          .getConnectedConnections(
-            requestTokenFromAtom,
-            vocab.BUDDY.BuddySocketCompacted
-          )
-          .filter(conn =>
-            accountUtils.isAtomOwned(
-              accountState,
-              connectionUtils.getTargetAtomUri(conn)
+      const possibleCredentialsForToken = generalSelectors
+        .getPossibleRequestCredentialsForAtom(requestTokenFromAtomUri)(state)
+        .filter(credentials => !!get(credentials, "requesterWebId")) //FIXME: ONLY USE requesterWebId credentials for tokenFetch now, change in the future
+        .filter(
+          requestCredentials =>
+            !processUtils.isUsedCredentialsUnsuccessfully(
+              priorTokenRequests,
+              requestCredentials
             )
-          )
-          .map(connectionUtils.getTargetAtomUri)
-          .valueSeq()
-          .toSet();
-      } else {
-        consideredRequesterWebIds = atomUtils
-          .getConnectedConnections(requestTokenFromAtom)
-          .filter(conn =>
-            accountUtils.isAtomOwned(
-              accountState,
-              connectionUtils.getTargetAtomUri(conn)
-            )
-          )
-          .map(connectionUtils.getTargetAtomUri)
-          .valueSeq()
-          .toSet();
-      }
+        );
 
-      if (consideredRequesterWebIds.size > 0) {
-        const fetchTokenRequesterId = consideredRequesterWebIds.first();
+      if (possibleCredentialsForToken.size > 0) {
+        const fetchTokenRequestCredentials = possibleCredentialsForToken
+          .first()
+          .toJS();
+        fetchTokenRequestCredentials.scopes = tokenScope;
 
-        if (consideredRequesterWebIds.size > 1) {
+        if (possibleCredentialsForToken.size > 1) {
           console.debug(
-            "## more than one connection found for this non owned Atom, using first one as the tokenRequester: ",
-            fetchTokenRequesterId,
-            consideredRequesterWebIds
+            "## more than one possible requestCredential found for this non owned Atom, using first one as the tokenRequester: ",
+            fetchTokenRequestCredentials,
+            possibleCredentialsForToken
           );
         } else {
           console.debug(
-            "## one connection found for this non owned Atom, using it as the tokenRequester: ",
-            fetchTokenRequesterId
+            "## one possible requestCredential found for this non owned Atom, using it as the tokenRequester: ",
+            fetchTokenRequestCredentials
           );
         }
-
-        //TODO: DO NOT DETERMINE THE CREDENTIALS LIKE THAT, use determineRequestCredentials method itself
-        const requestCredentials = { requesterWebId: fetchTokenRequesterId };
-        requestCredentials.scopes = tokenScope;
 
         return fetchTokenFromAtomAndDispatch(
           dispatch,
           state,
           requestTokenFromAtomUri,
-          requestCredentials,
+          fetchTokenRequestCredentials,
           tokenCredential
         );
-      }
+      } /*else {
+        //TODO: WHAT DO WE DO IF THERE ARE NO MORE POSSIBILITIES LEFT?
+        // return Promise.reject({
+        //   token: "BLARGH", //TODO: FIX THIS TO WORK WITHOUT MAKING A REQUEST WITH A FAKE-TOKEN
+        //   obtainedFrom: tokenCredential.toJS(),
+        // });
+      }*/
     }
   } else {
     console.debug(
@@ -327,11 +304,11 @@ const fetchTokenFromAtomAndDispatch = (
         }),
       });
 
-      // FIXME: THIS IS JUST SO WE THOUGHT WE COULD GET A TOKEN BUT DIDNT GET IT FROM THAT ATOM
-      return {
-        token: "BLARGH!",
-        obtainedFrom: tokenCredential.toJS(),
-      };
+      return Promise.reject({
+        uri: atomUri,
+        tokenScopeUri: requestCredentials.scopes,
+        requestCredentials: requestCredentials,
+      });
     });
 
 export const fetchConnectionsContainerAndDispatch = (
@@ -390,89 +367,98 @@ export const fetchConnectionsContainerAndDispatch = (
     state,
     atomUri,
     processSelectors.getConnectionContainerRequests(atomUri)(state)
-  ).then(requestCredentials =>
-    won
-      .fetchConnectionUrisWithStateByAtomUri(
-        atomUtils.getConnectionContainerUri(
-          generalSelectors.getAtom(atomUri)(state)
-        ),
-        requestCredentials
-      )
-      .then(connectionsWithStateAndSocket => {
-        dispatch({
-          type: actionTypes.connections.storeMetaConnections,
-          payload: Immutable.fromJS({
-            atomUri: atomUri,
-            connections: connectionsWithStateAndSocket,
-            allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
-              atomUri
-            )(state),
-            request: {
-              code: 200,
-              requestCredentials: requestCredentials,
-            },
-          }),
-        });
-        if (isOwned) {
-          const activeConnectionUris = connectionsWithStateAndSocket
-            .filter(
-              conn =>
-                !isUriDeleted(conn.uri) &&
-                conn.connectionState !== vocab.WON.Closed &&
-                conn.connectionState !== vocab.WON.Suggested
-            )
-            .map(conn => conn.uri);
-
+  )
+    .then(requestCredentials =>
+      won
+        .fetchConnectionUrisWithStateByAtomUri(
+          atomUtils.getConnectionContainerUri(
+            generalSelectors.getAtom(atomUri)(state)
+          ),
+          requestCredentials
+        )
+        .then(connectionsWithStateAndSocket => {
           dispatch({
-            type: actionTypes.connections.storeActiveUrisInLoading,
+            type: actionTypes.connections.storeMetaConnections,
             payload: Immutable.fromJS({
               atomUri: atomUri,
-              connUris: activeConnectionUris,
-            }),
-          });
-          return activeConnectionUris;
-        }
-        return undefined;
-      })
-      .then(
-        activeConnectionUris =>
-          activeConnectionUris &&
-          urisToLookupMap(activeConnectionUris, connUri =>
-            fetchActiveConnectionAndDispatch(
-              connUri,
-              requestCredentials,
-              dispatch
-            )
-          )
-      )
-      .catch(error => {
-        let errorParsed = parseWorkerError(error);
-
-        if (errorParsed.status && errorParsed.status === 410) {
-          dispatch({
-            type: actionTypes.atoms.delete,
-            payload: Immutable.fromJS({ uri: atomUri }),
-          });
-        } else {
-          dispatch({
-            type: actionTypes.atoms.storeConnectionContainerFailed,
-            payload: Immutable.fromJS({
-              uri: atomUri,
+              connections: connectionsWithStateAndSocket,
               allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
                 atomUri
               )(state),
               request: {
-                code: errorParsed.status,
-                params: errorParsed.params || {},
-                message: errorParsed.message || error.message,
-                response: errorParsed.response,
+                code: 200,
                 requestCredentials: requestCredentials,
               },
             }),
           });
-        }
-      })
-  );
+          if (isOwned) {
+            const activeConnectionUris = connectionsWithStateAndSocket
+              .filter(
+                conn =>
+                  !isUriDeleted(conn.uri) &&
+                  conn.connectionState !== vocab.WON.Closed &&
+                  conn.connectionState !== vocab.WON.Suggested
+              )
+              .map(conn => conn.uri);
+
+            dispatch({
+              type: actionTypes.connections.storeActiveUrisInLoading,
+              payload: Immutable.fromJS({
+                atomUri: atomUri,
+                connUris: activeConnectionUris,
+              }),
+            });
+            return activeConnectionUris;
+          }
+          return undefined;
+        })
+        .then(
+          activeConnectionUris =>
+            activeConnectionUris &&
+            urisToLookupMap(activeConnectionUris, connUri =>
+              fetchActiveConnectionAndDispatch(
+                connUri,
+                requestCredentials,
+                dispatch
+              )
+            )
+        )
+        .catch(error => {
+          let errorParsed = parseWorkerError(error);
+
+          if (errorParsed.status && errorParsed.status === 410) {
+            dispatch({
+              type: actionTypes.atoms.delete,
+              payload: Immutable.fromJS({ uri: atomUri }),
+            });
+          } else {
+            dispatch({
+              type: actionTypes.atoms.storeConnectionContainerFailed,
+              payload: Immutable.fromJS({
+                uri: atomUri,
+                allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+                  atomUri
+                )(state),
+                request: {
+                  code: errorParsed.status,
+                  params: errorParsed.params || {},
+                  message: errorParsed.message || error.message,
+                  response: errorParsed.response,
+                  requestCredentials: requestCredentials,
+                },
+              }),
+            });
+          }
+        })
+    )
+    .catch(error => {
+      // errorParsed 666 marks that we could simply not retrieve the token (yet) there might be a possibility that we can retrieve it another way
+      // let us not rule out this request yet
+      console.error(
+        "could not retrieve token from atom, try again with a different atom....",
+        error
+      );
+    });
 };
 
 /**
@@ -583,10 +569,7 @@ export const fetchAtomAndDispatch = (
           .catch(error => {
             let errorParsed = parseWorkerError(error);
 
-            if (
-              (errorParsed.status && errorParsed.status === 410) ||
-              (errorParsed.message && errorParsed.message.startsWith("410"))
-            ) {
+            if (errorParsed.status && errorParsed.status === 410) {
               dispatch({
                 type: actionTypes.atoms.delete,
                 payload: Immutable.fromJS({ uri: atomUri }),
@@ -610,6 +593,14 @@ export const fetchAtomAndDispatch = (
             }
           })
       )
+      .catch(error => {
+        // errorParsed 666 marks that we could simply not retrieve the token (yet) there might be a possibility that we can retrieve it another way
+        // let us not rule out this request yet
+        console.error(
+          "could not retrieve token from atom, try again with a different atom....",
+          error
+        );
+      })
   );
 };
 
