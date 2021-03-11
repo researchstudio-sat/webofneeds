@@ -35,7 +35,7 @@ won-atom-content-auth {
     &__bearer,
     &__requestedBy,
     pre.acauth__item__grantee,
-    &__grant {
+    pre.acauth__item__grant {
       white-space: pre-wrap;
       overflow-x: auto;
       font-family: monospace;
@@ -43,6 +43,7 @@ won-atom-content-auth {
       margin: 0;
     }
 
+    span.acauth__item__grant,
     span.acauth__item__grantee {
       @include defaultItemActionElevation();
       display: inline-block;
@@ -51,6 +52,11 @@ won-atom-content-auth {
       border-radius: 0.19rem;
       margin-bottom: 0.5rem;
       padding: 0.25rem 0.5rem;
+
+      &.acauth__item__grant--op {
+        background: $won-secondary-color-light;
+        margin-right: 0.5rem;
+      }
     }
   }
 }
