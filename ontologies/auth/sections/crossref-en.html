@@ -259,6 +259,7 @@ This section provides details for each class and property defined by Web of Need
          <dt>is in range of</dt>
          <dd>
             <a href="#grant" title="https://w3id.org/won/auth#grant">grant</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#provideAuthInfo" title="https://w3id.org/won/auth#provideAuthInfo">provideAuthInfo</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
       </dl>
@@ -396,6 +397,7 @@ This section provides details for each class and property defined by Web of Need
                title="https://w3id.org/won/auth#AseLeafDatatypeProperty">AseLeafDatatypeProperty</a>
             <sup class="type-dp" title="data property">dp</sup>, <a href="#AseLeafObjectProperty" title="https://w3id.org/won/auth#AseLeafObjectProperty">AseLeafProperty</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">targetAtom</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#targetWonNode" title="https://w3id.org/won/auth#targetWonNode">targetWonNode</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
          <dt>is in range of</dt>
@@ -427,6 +429,7 @@ This section provides details for each class and property defined by Web of Need
             <a href="#bearer" title="https://w3id.org/won/auth#bearer">bearer</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#grant" title="https://w3id.org/won/auth#grant">grant</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#grantee" title="https://w3id.org/won/auth#grantee">grantee</a>
+            <sup class="type-op" title="object property">op</sup>, <a href="#provideAuthInfo" title="https://w3id.org/won/auth#provideAuthInfo">provideAuthInfo</a>
             <sup class="type-op" title="object property">op</sup>, <a href="#requestedBy" title="https://w3id.org/won/auth#requestedBy">requestedBy</a>
             <sup class="type-op" title="object property">op</sup>
          </dd>
@@ -440,6 +443,8 @@ This section provides details for each class and property defined by Web of Need
          <dd>
             <a href="#grantOwnerTokenToOwner"
                title="https://w3id.org/won/auth#grantOwnerTokenToOwner">grantOwnerTokenToOwner</a>
+            <sup class="type-ni" title="named individual">ni</sup>, <a href="#grantReadKeyToConnectionTargetNodes"
+               title="https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes">grantReadKeyToConnectionTargetNodes</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#grantsForConnStateClosed"
                title="https://w3id.org/won/auth#grantsForConnStateClosed">grantsForConnStateClosed</a>
             <sup class="type-ni" title="named individual">ni</sup>, <a href="#grantsForConnStateConnected"
@@ -1296,6 +1301,9 @@ This section provides details for each class and property defined by Web of Need
          <a href="#operation" title="https://w3id.org/won/auth#operation">operation</a>
       </li>
       <li>
+         <a href="#provideAuthInfo" title="https://w3id.org/won/auth#provideAuthInfo">provideAuthInfo</a>
+      </li>
+      <li>
          <a href="#requestedBy" title="https://w3id.org/won/auth#requestedBy">requestedBy</a>
       </li>
       <li>
@@ -1315,6 +1323,9 @@ This section provides details for each class and property defined by Web of Need
       </li>
       <li>
          <a href="#targetAuth" title="https://w3id.org/won/auth#targetAuth">targetAuth</a>
+      </li>
+      <li>
+         <a href="#targetWonNode" title="https://w3id.org/won/auth#targetWonNode">targetWonNode</a>
       </li>
       <li>
          <a href="#tokenExp" title="https://w3id.org/won/auth#tokenExp">
@@ -1429,6 +1440,7 @@ This section provides details for each class and property defined by Web of Need
                <a href="#inherit" title="https://w3id.org/won/auth#inherit">inherit</a>
                <sup class="type-op" title="object property">op</sup>, <a href="#operation" title="https://w3id.org/won/auth#operation">operation</a>
                <sup class="type-op" title="object property">op</sup>, <a href="#targetAtom" title="https://w3id.org/won/auth#targetAtom">targetAtom</a>
+               <sup class="type-op" title="object property">op</sup>, <a href="#targetWonNode" title="https://w3id.org/won/auth#targetWonNode">targetWonNode</a>
                <sup class="type-op" title="object property">op</sup>
             </dd>
             <dt>has domain</dt>
@@ -1600,7 +1612,7 @@ This section provides details for each class and property defined by Web of Need
       <p>
          <strong>IRI:</strong> https://w3id.org/won/auth#bearer</p>
       <div class="comment">
-         <span class="markdown">Used in an Authorization to define constraints for tokens that if fulfilled, make their bearer a grantee.</span>
+         <span class="markdown">Used in a [auth:Authorization] to define constraints for [auth:AuthToken]s that if fulfilled, make their bearer a grantee.</span>
       </div>
       <dl class="definedBy">
          <dt>Is defined by</dt>
@@ -2242,10 +2254,10 @@ This section provides details for each class and property defined by Web of Need
       <p>
          <strong>IRI:</strong> https://w3id.org/won/auth#messageOnBehalf</p>
       <div class="comment">
-         <span class="markdown">Allows an auth:MessageOperationExpression to specify msg:MessageTypes that the grantee of the operation may
+         <span class="markdown">Allows an [auth:MessageOperationExpression] to specify [msg:MessageTypes] that the grantee of the operation may
      send __on behalf__ of the actual atom owner, at the operation's position in the atom's tree structure. The message
      types are either listed as objects of auth:messageOnBealf or defined
-     transitively. In the latter case, the object of auth:messageOnBehalf is an auth:MessageTypeSet, which in turn lists
+     transitively. In the latter case, the object of [auth:messageOnBehalf] is an [auth:MessageTypeSet], which in turn lists
      message types.
         </span>
       </div>
@@ -2341,6 +2353,37 @@ This section provides details for each class and property defined by Web of Need
             <dt>has range</dt>
             <dd>
                <a href="#OperationExpression" title="https://w3id.org/won/auth#OperationExpression">OperationExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="provideAuthInfo">
+      <h3>provideAuthInfo<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#provideAuthInfo</p>
+      <div class="comment">
+         <span class="markdown">Used in an Authorization to define a set of [auth:Operation]s for which the [won:Node] provides authorization information in case of a negative authorization decision.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#Authorization" title="https://w3id.org/won/auth#Authorization">Authorization</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <a href="#AseRoot" title="https://w3id.org/won/auth#AseRoot">AseRoot</a>
                <sup class="type-c" title="class">c</sup>
             </dd>
          </dl>
@@ -2584,6 +2627,38 @@ This section provides details for each class and property defined by Web of Need
          </dl>
       </div>
    </div>
+   <div class="entity" id="targetWonNode">
+      <h3>targetWonNode<sup class="type-op" title="object property">op</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#targetWonNode</p>
+      <div class="comment">
+         <span class="markdown">Identifies target WoN nodes of connections that are direct or transitive targetNodes of the expression's focus nodes.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
+      <div class="description">
+         <dl>
+            <dt>has super-properties</dt>
+            <dd>
+               <a href="#AseLeafObjectProperty" title="https://w3id.org/won/auth#AseLeafObjectProperty">AseLeafProperty</a>
+               <sup class="type-op" title="object property">op</sup>
+            </dd>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#AtomStructureExpression"
+                  title="https://w3id.org/won/auth#AtomStructureExpression">AtomStructureExpression</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+         </dl>
+      </div>
+   </div>
    <div class="entity" id="tokenExp">
       <h3>tokenExp<sup class="type-op" title="object property">op</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#objectproperties">Object Property ToC</a>
@@ -2742,6 +2817,9 @@ This section provides details for each class and property defined by Web of Need
          </a>
       </li>
       <li>
+         <a href="#nodeSigned" title="https://w3id.org/won/auth#nodeSigned">nodeSigned</a>
+      </li>
+      <li>
          <a href="#tokenExp" title="https://w3id.org/won/auth#tokenExp">
             <span>tokenExp</span>
          </a>
@@ -2788,6 +2866,39 @@ This section provides details for each class and property defined by Web of Need
             <dt>is also defined as</dt>
             <dd>
                <a href="#inherit">object property</a>
+            </dd>
+         </dl>
+      </div>
+   </div>
+   <div class="entity" id="nodeSigned">
+      <h3>nodeSigned<sup class="type-dp" title="data property">dp</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#dataproperties">Data Property ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#nodeSigned</p>
+      <div class="comment">
+         <span class="markdown">If `true` or missing in an [auth:TokenSpecification], tokens are issued on behalf of [won:Atom]s by the [won:Node], and signed with the node's key. If `false`, tokens issued by an atom have to be signed using the atom's key. The latter is a much more complex process as the atom's key is only known to the owner applications controlling that atom; such tokens cannot be produced by the WoN node alone. If used in an [auth:TokenShape]the property instructs the token verification algorithm on which key to verify the signature against. By default, i.e., if this property is not used, tokens are assumed to be signed by the WoN node.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
+      <div class="description">
+         <dl>
+            <dt>has domain</dt>
+            <dd>
+               <a href="#TokenShape" title="https://w3id.org/won/auth#TokenShape">TokenShape</a>
+               <sup class="type-c" title="class">c</sup> 
+               <span class="logic">or</span> 
+               <a href="#TokenSpecification" title="https://w3id.org/won/auth#TokenSpecification">TokenSpecification</a>
+               <sup class="type-c" title="class">c</sup>
+            </dd>
+            <dt>has range</dt>
+            <dd>
+               <span class="dotted" title="http://www.w3.org/2001/XMLSchema#boolean">boolean</span>
             </dd>
          </dl>
       </div>
@@ -3025,6 +3136,10 @@ This section provides details for each class and property defined by Web of Need
             title="https://w3id.org/won/auth#grantOwnerTokenToOwner">grantOwnerTokenToOwner</a>
       </li>
       <li>
+         <a href="#grantReadKeyToConnectionTargetNodes"
+            title="https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes">grantReadKeyToConnectionTargetNodes</a>
+      </li>
+      <li>
          <a href="#grantsForConnStateClosed"
             title="https://w3id.org/won/auth#grantsForConnStateClosed">grantsForConnStateClosed</a>
       </li>
@@ -3243,6 +3358,18 @@ This section provides details for each class and property defined by Web of Need
          <a href="#targetAuthPropertyShape"
             title="https://w3id.org/won/auth#targetAuthPropertyShape">
             <span>target auth property shape</span>
+         </a>
+      </li>
+      <li>
+         <a href="#targetWonNodeExpressionShape"
+            title="https://w3id.org/won/auth#targetWonNodeExpressionShape">
+            <span>target won node expression shape</span>
+         </a>
+      </li>
+      <li>
+         <a href="#targetWonNodePropertyShape"
+            title="https://w3id.org/won/auth#targetWonNodePropertyShape">
+            <span>target won node property shape</span>
          </a>
       </li>
       <li>
@@ -4239,6 +4366,42 @@ This section provides details for each class and property defined by Web of Need
          </dd>
       </dl>
    </div>
+   <div class="entity" id="grantReadKeyToConnectionTargetNodes">
+      <h3>grantReadKeyToConnectionTargetNodes<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes</p>
+      <div class="comment">
+         <span class="markdown">Implicit authorization granting the WoN node hosting an atom that we we have a connection
+    with access to our key graph so the node can verify messages we send.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#Authorization" title="https://w3id.org/won/auth#Authorization">Authorization</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+         <dt>has facts</dt>
+         <dd>
+            <a href="#grant" title="https://w3id.org/won/auth#grant">grant</a>
+            <sup class="type-op" title="object property">op</sup> 
+            <span class="literal">""</span>
+         </dd>
+         <dd>
+            <a href="#grantee" title="https://w3id.org/won/auth#grantee">grantee</a>
+            <sup class="type-op" title="object property">op</sup> 
+            <span class="literal">""</span>
+         </dd>
+      </dl>
+   </div>
    <div class="entity" id="grantsForConnStateClosed">
       <h3>grantsForConnStateClosed<sup class="type-ni" title="named individual">ni</sup>
          <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
@@ -5014,7 +5177,7 @@ This section provides details for each class and property defined by Web of Need
       <p>
          <strong>IRI:</strong> https://w3id.org/won/auth#operationRequestor</p>
       <div class="comment">
-         <span class="markdown">Placeholder for the uri of the atom that requests an operation. In the case of bearer
+         <span class="markdown">Placeholder for the uri of the atom or node that requests an operation. In the case of bearer
     authentication, there is no operationRequestor; arguably, one could use the token's subject claim, but that
     would extend additional trust to the issuer of the token.</span>
       </div>
@@ -5638,6 +5801,48 @@ This section provides details for each class and property defined by Web of Need
       </h3>
       <p>
          <strong>IRI:</strong> https://w3id.org/won/auth#targetAuthPropertyShape</p>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="http://www.w3.org/ns/shacl#PropertyShape">property shape</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="targetWonNodeExpressionShape">
+      <h3>target won node expression shape<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#targetWonNodeExpressionShape</p>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <span class="dotted" title="http://www.w3.org/ns/shacl#NodeShape">node shape</span>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="targetWonNodePropertyShape">
+      <h3>target won node property shape<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#targetWonNodePropertyShape</p>
       <dl class="definedBy">
          <dt>Is defined by</dt>
          <dd>

@@ -17,9 +17,6 @@
 # #################################################################
 # 
 # 
-# http://purl.org/dc/terms/abstract
-<http://purl.org/dc/terms/abstract> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
-# 
 # http://www.w3.org/ns/shacl#class
 <http://www.w3.org/ns/shacl#class> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
@@ -77,9 +74,6 @@
 # 
 # https://w3id.org/won/auth#asePosition
 <https://w3id.org/won/auth#asePosition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
-# 
-# https://w3id.org/won/auth#nodeSigned
-<https://w3id.org/won/auth#nodeSigned> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
 # 
 # https://w3id.org/won/auth#parentPosition
 <https://w3id.org/won/auth#parentPosition> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AnnotationProperty> .
@@ -168,7 +162,7 @@ _:genid5 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/19
 <https://w3id.org/won/auth#bearer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
 <https://w3id.org/won/auth#bearer> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/auth#Authorization> .
 <https://w3id.org/won/auth#bearer> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/auth#TokenShape> .
-<https://w3id.org/won/auth#bearer> <http://www.w3.org/2000/01/rdf-schema#comment> "Used in an Authorization to define constraints for tokens that if fulfilled, make their bearer a grantee."@en .
+<https://w3id.org/won/auth#bearer> <http://www.w3.org/2000/01/rdf-schema#comment> "Used in a [auth:Authorization] to define constraints for [auth:AuthToken]s that if fulfilled, make their bearer a grantee."@en .
 <https://w3id.org/won/auth#bearer> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#bearer> <http://www.w3.org/2000/01/rdf-schema#label> "bearer" .
 # 
@@ -429,7 +423,7 @@ _:genid43 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1
 _:genid43 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/message#MessageType> .
 <https://w3id.org/won/message#MessageType> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
 _:genid43 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
-<https://w3id.org/won/auth#messageOnBehalf> <http://www.w3.org/2000/01/rdf-schema#comment> "Allows an auth:MessageOperationExpression to specify msg:MessageTypes that the grantee of the operation may\n     send __on behalf__ of the actual atom owner, at the operation's position in the atom's tree structure. The message\n     types are either listed as objects of auth:messageOnBealf or defined\n     transitively. In the latter case, the object of auth:messageOnBehalf is an auth:MessageTypeSet, which in turn lists\n     message types.\n        "@en .
+<https://w3id.org/won/auth#messageOnBehalf> <http://www.w3.org/2000/01/rdf-schema#comment> "Allows an [auth:MessageOperationExpression] to specify [msg:MessageTypes] that the grantee of the operation may\n     send __on behalf__ of the actual atom owner, at the operation's position in the atom's tree structure. The message\n     types are either listed as objects of auth:messageOnBealf or defined\n     transitively. In the latter case, the object of [auth:messageOnBehalf] is an [auth:MessageTypeSet], which in turn lists\n     message types.\n        "@en .
 <https://w3id.org/won/auth#messageOnBehalf> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#messageOnBehalf> <http://www.w3.org/2000/01/rdf-schema#label> "messageOnBehalf" .
 # 
@@ -456,6 +450,14 @@ _:genid46 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1
 <https://w3id.org/won/auth#operation> <http://www.w3.org/2000/01/rdf-schema#comment> "Used in ASEs to enumerate operations granted for the ASE's position in the atom's tree structure.\n        When checking for granted operations, operations are inherited by nested ASEs. An ASE can reject inheriting\n        the granted operations using `auth:inherit false`."@en .
 <https://w3id.org/won/auth#operation> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#operation> <http://www.w3.org/2000/01/rdf-schema#label> "operation" .
+# 
+# https://w3id.org/won/auth#provideAuthInfo
+<https://w3id.org/won/auth#provideAuthInfo> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/auth#provideAuthInfo> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/auth#Authorization> .
+<https://w3id.org/won/auth#provideAuthInfo> <http://www.w3.org/2000/01/rdf-schema#range> <https://w3id.org/won/auth#AseRoot> .
+<https://w3id.org/won/auth#provideAuthInfo> <http://www.w3.org/2000/01/rdf-schema#comment> "Used in an Authorization to define a set of [auth:Operation]s for which the [won:Node] provides authorization information in case of a negative authorization decision."@en .
+<https://w3id.org/won/auth#provideAuthInfo> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
+<https://w3id.org/won/auth#provideAuthInfo> <http://www.w3.org/2000/01/rdf-schema#label> "provideAuthInfo" .
 # 
 # https://w3id.org/won/auth#requestToken
 <https://w3id.org/won/auth#requestToken> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
@@ -517,6 +519,14 @@ _:genid46 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1
 <https://w3id.org/won/auth#targetAuth> <http://www.w3.org/2000/01/rdf-schema#comment> "Authorization that a socket requests the target atoms of its connections to add to their `#socket-acl` graphs upon establishing a connection."@en .
 <https://w3id.org/won/auth#targetAuth> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#targetAuth> <http://www.w3.org/2000/01/rdf-schema#label> "targetAuth" .
+# 
+# https://w3id.org/won/auth#targetWonNode
+<https://w3id.org/won/auth#targetWonNode> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
+<https://w3id.org/won/auth#targetWonNode> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <https://w3id.org/won/auth#AseLeafObjectProperty> .
+<https://w3id.org/won/auth#targetWonNode> <http://www.w3.org/2000/01/rdf-schema#domain> <https://w3id.org/won/auth#AtomStructureExpression> .
+<https://w3id.org/won/auth#targetWonNode> <http://www.w3.org/2000/01/rdf-schema#comment> "Identifies target WoN nodes of connections that are direct or transitive targetNodes of the expression's focus nodes."@en .
+<https://w3id.org/won/auth#targetWonNode> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
+<https://w3id.org/won/auth#targetWonNode> <http://www.w3.org/2000/01/rdf-schema#label> "targetWonNode" .
 # 
 # https://w3id.org/won/auth#tokenExp
 <https://w3id.org/won/auth#tokenExp> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
@@ -609,6 +619,22 @@ _:genid62 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1
 # https://w3id.org/won/auth#inherit
 <https://w3id.org/won/auth#inherit> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
 <https://w3id.org/won/auth#inherit> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#boolean> .
+# 
+# https://w3id.org/won/auth#nodeSigned
+<https://w3id.org/won/auth#nodeSigned> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<https://w3id.org/won/auth#nodeSigned> <http://www.w3.org/2000/01/rdf-schema#domain> _:genid63 .
+_:genid63 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+_:genid63 <http://www.w3.org/2002/07/owl#unionOf> _:genid65 .
+_:genid65 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid65 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/auth#TokenShape> .
+_:genid65 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> _:genid64 .
+_:genid64 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#List> .
+_:genid64 <http://www.w3.org/1999/02/22-rdf-syntax-ns#first> <https://w3id.org/won/auth#TokenSpecification> .
+_:genid64 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1999/02/22-rdf-syntax-ns#nil> .
+<https://w3id.org/won/auth#nodeSigned> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/auth#nodeSigned> <http://www.w3.org/2000/01/rdf-schema#comment> "If `true` or missing in an [auth:TokenSpecification], tokens are issued on behalf of [won:Atom]s by the [won:Node], and signed with the node's key. If `false`, tokens issued by an atom have to be signed using the atom's key. The latter is a much more complex process as the atom's key is only known to the owner applications controlling that atom; such tokens cannot be produced by the WoN node alone. If used in an [auth:TokenShape]the property instructs the token verification algorithm on which key to verify the signature against. By default, i.e., if this property is not used, tokens are assumed to be signed by the WoN node."@en .
+<https://w3id.org/won/auth#nodeSigned> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
+<https://w3id.org/won/auth#nodeSigned> <http://www.w3.org/2000/01/rdf-schema#label> "nodeSigned" .
 # 
 # https://w3id.org/won/auth#tokenExp
 <https://w3id.org/won/auth#tokenExp> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
@@ -910,35 +936,35 @@ _:genid62 <http://www.w3.org/1999/02/22-rdf-syntax-ns#rest> <http://www.w3.org/1
 <https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#class> <https://w3id.org/won/auth#OperationResult> .
-<https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid63 .
-_:genid63 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean> .
-_:genid63 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid63 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
-_:genid63 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#insufficientScope> .
-<https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid64 .
-_:genid64 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid64 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authInfoShape> .
-_:genid64 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#provideAuthInfo> .
-<https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid65 .
-_:genid65 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid65 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid65 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#decisionValueShape> .
-_:genid65 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid65 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#decision> .
 <https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid66 .
-_:genid66 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean> .
 _:genid66 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid66 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
-_:genid66 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#invalidToken> .
+_:genid66 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid66 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#decisionValueShape> .
+_:genid66 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid66 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#decision> .
 <https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid67 .
-_:genid67 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authTokenShape> .
-_:genid67 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#issueToken> .
+_:genid67 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid67 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authInfoShape> .
+_:genid67 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#provideAuthInfo> .
 <https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid68 .
 _:genid68 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:genid68 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:genid68 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#operationRequestShape> .
 _:genid68 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
 _:genid68 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestedOperation> .
+<https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid69 .
+_:genid69 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean> .
+_:genid69 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid69 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:genid69 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#insufficientScope> .
+<https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid70 .
+_:genid70 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authTokenShape> .
+_:genid70 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#issueToken> .
+<https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid71 .
+_:genid71 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#boolean> .
+_:genid71 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid71 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:genid71 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#invalidToken> .
 <https://w3id.org/won/auth#aclEvalResultShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#OperationResult> .
 # 
 # https://w3id.org/won/auth#aclGraph
@@ -980,12 +1006,12 @@ _:genid68 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requested
 <https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
-<https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid69 .
-<https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/ns/shacl#in> _:genid70 .
-<https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/ns/shacl#property> _:genid71 .
-_:genid71 <http://www.w3.org/ns/shacl#class> <https://w3id.org/won/auth#AsePosition> .
-_:genid71 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid71 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#parentPosition> .
+<https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid72 .
+<https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/ns/shacl#in> _:genid73 .
+<https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/ns/shacl#property> _:genid74 .
+_:genid74 <http://www.w3.org/ns/shacl#class> <https://w3id.org/won/auth#AsePosition> .
+_:genid74 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid74 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#parentPosition> .
 <https://w3id.org/won/auth#asePositionShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#AsePosition> .
 # 
 # https://w3id.org/won/auth#aseRootShape
@@ -996,9 +1022,9 @@ _:genid71 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#parentPos
 <https://w3id.org/won/auth#aseRootShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#aseRootShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#aseRootShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#aseRootShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid72 .
+<https://w3id.org/won/auth#aseRootShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid75 .
 <https://w3id.org/won/auth#aseRootShape> <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#BlankNodeOrIRI> .
-<https://w3id.org/won/auth#aseRootShape> <http://www.w3.org/ns/shacl#or> _:genid73 .
+<https://w3id.org/won/auth#aseRootShape> <http://www.w3.org/ns/shacl#or> _:genid76 .
 <https://w3id.org/won/auth#aseRootShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionRoot> .
 # 
 # https://w3id.org/won/auth#atomExpressionShape
@@ -1006,11 +1032,11 @@ _:genid71 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#parentPos
 <https://w3id.org/won/auth#atomExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#atomExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#atomExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#atomExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid74 .
-<https://w3id.org/won/auth#atomExpressionShape> <http://www.w3.org/ns/shacl#property> _:genid75 .
-_:genid75 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid75 <http://www.w3.org/ns/shacl#or> _:genid76 .
-_:genid75 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#atom> .
+<https://w3id.org/won/auth#atomExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid77 .
+<https://w3id.org/won/auth#atomExpressionShape> <http://www.w3.org/ns/shacl#property> _:genid78 .
+_:genid78 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid78 <http://www.w3.org/ns/shacl#or> _:genid79 .
+_:genid78 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#atom> .
 <https://w3id.org/won/auth#atomExpressionShape> <http://www.w3.org/ns/shacl#targetSubjectsOf> <https://w3id.org/won/auth#atom> .
 # 
 # https://w3id.org/won/auth#atomMessageExpressionShape
@@ -1021,8 +1047,8 @@ _:genid75 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#atom> .
 <https://w3id.org/won/auth#atomMessageExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#atomMessageExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#atomMessageExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#atomMessageExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid77 .
-<https://w3id.org/won/auth#atomMessageExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid78 .
+<https://w3id.org/won/auth#atomMessageExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid80 .
+<https://w3id.org/won/auth#atomMessageExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid81 .
 <https://w3id.org/won/auth#atomMessageExpressionShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionAtomMessage> .
 # 
 # https://w3id.org/won/auth#atomMessagePropertyShape
@@ -1041,8 +1067,8 @@ _:genid75 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#atom> .
 <https://w3id.org/won/auth#atomMessagesExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#atomMessagesExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#atomMessagesExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#atomMessagesExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid79 .
-<https://w3id.org/won/auth#atomMessagesExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid80 .
+<https://w3id.org/won/auth#atomMessagesExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid82 .
+<https://w3id.org/won/auth#atomMessagesExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid83 .
 <https://w3id.org/won/auth#atomMessagesExpressionShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionAtomMessages> .
 # 
 # https://w3id.org/won/auth#atomMessagesPropertyShape
@@ -1066,7 +1092,7 @@ _:genid75 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#atom> .
 <https://w3id.org/won/auth#atomStateShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#atomStateShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#atomStateShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#atomStateShape> <http://www.w3.org/ns/shacl#in> _:genid81 .
+<https://w3id.org/won/auth#atomStateShape> <http://www.w3.org/ns/shacl#in> _:genid84 .
 <https://w3id.org/won/auth#atomStateShape> <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
 # 
 # https://w3id.org/won/auth#authInfoShape
@@ -1074,8 +1100,8 @@ _:genid75 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#atom> .
 <https://w3id.org/won/auth#authInfoShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#authInfoShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#authInfoShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#authInfoShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid82 .
-<https://w3id.org/won/auth#authInfoShape> <http://www.w3.org/ns/shacl#or> _:genid83 .
+<https://w3id.org/won/auth#authInfoShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid85 .
+<https://w3id.org/won/auth#authInfoShape> <http://www.w3.org/ns/shacl#or> _:genid86 .
 <https://w3id.org/won/auth#authInfoShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#AuthInfo> .
 # 
 # https://w3id.org/won/auth#authTokenShape
@@ -1113,12 +1139,12 @@ _:genid75 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#atom> .
 <https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#class> <https://w3id.org/won/auth#Authorization> .
 <https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid84 .
-<https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#or> _:genid85 .
-<https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#or> _:genid86 .
-<https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#property> _:genid87 .
-_:genid87 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid87 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestedBy> .
+<https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid87 .
+<https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#or> _:genid88 .
+<https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#or> _:genid89 .
+<https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#property> _:genid90 .
+_:genid90 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid90 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestedBy> .
 <https://w3id.org/won/auth#authorizationShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#Authorization> .
 # 
 # https://w3id.org/won/auth#connectionExpressionShape
@@ -1130,8 +1156,8 @@ _:genid87 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requested
 <https://w3id.org/won/auth#connectionExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#connectionExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#connectionExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#connectionExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid88 .
-<https://w3id.org/won/auth#connectionExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid89 .
+<https://w3id.org/won/auth#connectionExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid91 .
+<https://w3id.org/won/auth#connectionExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid92 .
 <https://w3id.org/won/auth#connectionExpressionShape> <http://www.w3.org/ns/shacl#targetObjectsOf> <https://w3id.org/won/auth#connection> .
 <https://w3id.org/won/auth#connectionExpressionShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionConnection> .
 # 
@@ -1143,8 +1169,8 @@ _:genid87 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requested
 <https://w3id.org/won/auth#connectionMessageExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#connectionMessageExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#connectionMessageExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#connectionMessageExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid90 .
-<https://w3id.org/won/auth#connectionMessageExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid91 .
+<https://w3id.org/won/auth#connectionMessageExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid93 .
+<https://w3id.org/won/auth#connectionMessageExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid94 .
 <https://w3id.org/won/auth#connectionMessageExpressionShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionConnectionMessage> .
 # 
 # https://w3id.org/won/auth#connectionMessagePropertyShape
@@ -1163,8 +1189,8 @@ _:genid87 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requested
 <https://w3id.org/won/auth#connectionMessagesExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#connectionMessagesExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#connectionMessagesExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#connectionMessagesExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid92 .
-<https://w3id.org/won/auth#connectionMessagesExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid93 .
+<https://w3id.org/won/auth#connectionMessagesExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid95 .
+<https://w3id.org/won/auth#connectionMessagesExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid96 .
 <https://w3id.org/won/auth#connectionMessagesExpressionShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionConnectionMessages> .
 # 
 # https://w3id.org/won/auth#connectionMessagesPropertyShape
@@ -1188,7 +1214,7 @@ _:genid87 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requested
 <https://w3id.org/won/auth#connectionStateShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#connectionStateShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#connectionStateShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#connectionStateShape> <http://www.w3.org/ns/shacl#in> _:genid94 .
+<https://w3id.org/won/auth#connectionStateShape> <http://www.w3.org/ns/shacl#in> _:genid97 .
 # 
 # https://w3id.org/won/auth#connectionsExpressionShape
 <https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -1199,8 +1225,8 @@ _:genid87 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requested
 <https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid95 .
-<https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid96 .
+<https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid98 .
+<https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid99 .
 <https://w3id.org/won/auth#connectionsExpressionShape> <http://www.w3.org/ns/shacl#targetObjectsOf> <https://w3id.org/won/auth#connections> .
 <https://w3id.org/won/auth#connectionsExpressionShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionConnections> .
 # 
@@ -1224,8 +1250,8 @@ _:genid87 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requested
 <https://w3id.org/won/auth#decisionValueShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#decisionValueShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#decisionValueShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#decisionValueShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid97 .
-<https://w3id.org/won/auth#decisionValueShape> <http://www.w3.org/ns/shacl#in> _:genid98 .
+<https://w3id.org/won/auth#decisionValueShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid100 .
+<https://w3id.org/won/auth#decisionValueShape> <http://www.w3.org/ns/shacl#in> _:genid101 .
 # 
 # https://w3id.org/won/auth#ensureShapesGraphIsAddedToDataGraph1
 <https://w3id.org/won/auth#ensureShapesGraphIsAddedToDataGraph1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -1240,25 +1266,25 @@ _:genid87 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requested
 <https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#class> <https://w3id.org/won/auth#ExpectedAclEvalResult> .
-<https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid99 .
-_:genid99 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid99 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid99 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#decisionValueShape> .
-_:genid99 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid99 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#decision> .
-<https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid100 .
-_:genid100 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid100 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid100 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#operationRequestShape> .
-_:genid100 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid100 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestedOperation> .
-<https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid101 .
-_:genid101 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid101 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authInfoShape> .
-_:genid101 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#provideAuthInfo> .
 <https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid102 .
-_:genid102 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authTokenTestSpecShape> .
-_:genid102 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#issueToken> .
+_:genid102 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid102 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid102 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#operationRequestShape> .
+_:genid102 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid102 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestedOperation> .
+<https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid103 .
+_:genid103 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid103 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid103 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#decisionValueShape> .
+_:genid103 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid103 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#decision> .
+<https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid104 .
+_:genid104 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authTokenTestSpecShape> .
+_:genid104 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#issueToken> .
+<https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#property> _:genid105 .
+_:genid105 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid105 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authInfoShape> .
+_:genid105 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#provideAuthInfo> .
 <https://w3id.org/won/auth#expectedAclEvalResultShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#ExpectedAclEvalResult> .
 # 
 # https://w3id.org/won/auth#expiresAfterPropertyShape
@@ -1267,46 +1293,59 @@ _:genid102 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#issueTok
 <https://w3id.org/won/auth#expiresAfterPropertyShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#expiresAfterPropertyShape> <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/auth#expiresAfterPropertyShape> <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
-<https://w3id.org/won/auth#expiresAfterPropertyShape> <http://www.w3.org/ns/shacl#or> _:genid103 .
+<https://w3id.org/won/auth#expiresAfterPropertyShape> <http://www.w3.org/ns/shacl#or> _:genid106 .
 <https://w3id.org/won/auth#expiresAfterPropertyShape> <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#expiresAfter> .
 # 
 # https://w3id.org/won/auth#grantOwnerTokenToOwner
 <https://w3id.org/won/auth#grantOwnerTokenToOwner> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#grantOwnerTokenToOwner> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/auth#grantOwnerTokenToOwner> <https://w3id.org/won/auth#grant> _:genid104 .
-_:genid104 <https://w3id.org/won/auth#operation> _:genid105 .
-_:genid105 <https://w3id.org/won/auth#requestToken> _:genid106 .
-_:genid106 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/auth#OwnerToken> .
-_:genid106 <https://w3id.org/won/auth#expiresAfter> "3600"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid106 <https://w3id.org/won/auth#nodeSigned> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#grantOwnerTokenToOwner> <https://w3id.org/won/auth#grantee> _:genid107 .
-_:genid107 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#self> .
+<https://w3id.org/won/auth#grantOwnerTokenToOwner> <https://w3id.org/won/auth#grant> _:genid107 .
+_:genid107 <https://w3id.org/won/auth#operation> _:genid108 .
+_:genid108 <https://w3id.org/won/auth#requestToken> _:genid109 .
+_:genid109 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/auth#OwnerToken> .
+_:genid109 <https://w3id.org/won/auth#expiresAfter> "3600"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid109 <https://w3id.org/won/auth#nodeSigned> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/auth#grantOwnerTokenToOwner> <https://w3id.org/won/auth#grantee> _:genid110 .
+_:genid110 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#self> .
 <https://w3id.org/won/auth#grantOwnerTokenToOwner> <http://www.w3.org/2000/01/rdf-schema#comment> "Implicit authorization granting an token with scope auth:OwnerToken to the atom's owner"@en .
 <https://w3id.org/won/auth#grantOwnerTokenToOwner> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#grantOwnerTokenToOwner> <http://www.w3.org/2000/01/rdf-schema#label> "grantOwnerTokenToOwner" .
+# 
+# https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes
+<https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
+<https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes> <https://w3id.org/won/auth#grant> _:genid111 .
+_:genid111 <https://w3id.org/won/auth#graph> _:genid112 .
+_:genid112 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#keyGraph> .
+<https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes> <https://w3id.org/won/auth#grantee> _:genid113 .
+_:genid113 <https://w3id.org/won/auth#connection> _:genid114 .
+_:genid114 <https://w3id.org/won/auth#targetWonNode> _:genid115 .
+<https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes> <http://www.w3.org/2000/01/rdf-schema#comment> "Implicit authorization granting the WoN node hosting an atom that we we have a connection\n    with access to our key graph so the node can verify messages we send."@en .
+<https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
+<https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes> <http://www.w3.org/2000/01/rdf-schema#label> "grantReadKeyToConnectionTargetNodes" .
 # 
 # https://w3id.org/won/auth#granteeWildcardShape
 <https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid108 .
-<https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/ns/shacl#in> _:genid109 .
+<https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid116 .
+<https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/ns/shacl#in> _:genid117 .
 <https://w3id.org/won/auth#granteeWildcardShape> <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
 # 
 # https://w3id.org/won/auth#grantsForConnStateClosed
 <https://w3id.org/won/auth#grantsForConnStateClosed> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#grantsForConnStateClosed> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/auth#grantsForConnStateClosed> <https://w3id.org/won/auth#grant> _:genid110 .
-_:genid110 <https://w3id.org/won/auth#connection> _:genid111 .
-_:genid111 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
+<https://w3id.org/won/auth#grantsForConnStateClosed> <https://w3id.org/won/auth#grant> _:genid118 .
+_:genid118 <https://w3id.org/won/auth#connection> _:genid119 .
+_:genid119 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
 <https://w3id.org/won/auth#opConnectClose> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-_:genid111 <https://w3id.org/won/auth#targetAtom> _:genid112 .
-_:genid112 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#operationRequestor> .
-<https://w3id.org/won/auth#grantsForConnStateClosed> <https://w3id.org/won/auth#grantee> _:genid113 .
-_:genid113 <https://w3id.org/won/auth#connection> _:genid114 .
-_:genid114 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Closed> .
-_:genid114 <https://w3id.org/won/auth#targetAtom> _:genid115 .
+_:genid119 <https://w3id.org/won/auth#targetAtom> _:genid120 .
+_:genid120 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#operationRequestor> .
+<https://w3id.org/won/auth#grantsForConnStateClosed> <https://w3id.org/won/auth#grantee> _:genid121 .
+_:genid121 <https://w3id.org/won/auth#connection> _:genid122 .
+_:genid122 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Closed> .
+_:genid122 <https://w3id.org/won/auth#targetAtom> _:genid123 .
 <https://w3id.org/won/auth#grantsForConnStateClosed> <http://www.w3.org/2000/01/rdf-schema#comment> "Implicit authorization for closed connections"@en .
 <https://w3id.org/won/auth#grantsForConnStateClosed> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#grantsForConnStateClosed> <http://www.w3.org/2000/01/rdf-schema#label> "grantsForConnStateClosed" .
@@ -1314,22 +1353,22 @@ _:genid114 <https://w3id.org/won/auth#targetAtom> _:genid115 .
 # https://w3id.org/won/auth#grantsForConnStateConnected
 <https://w3id.org/won/auth#grantsForConnStateConnected> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#grantsForConnStateConnected> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/auth#grantsForConnStateConnected> <https://w3id.org/won/auth#grant> _:genid116 .
-_:genid116 <https://w3id.org/won/auth#connection> _:genid117 .
-_:genid117 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opCommunicate> .
+<https://w3id.org/won/auth#grantsForConnStateConnected> <https://w3id.org/won/auth#grant> _:genid124 .
+_:genid124 <https://w3id.org/won/auth#connection> _:genid125 .
+_:genid125 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opCommunicate> .
 <https://w3id.org/won/auth#opCommunicate> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-_:genid117 <https://w3id.org/won/auth#targetAtom> _:genid118 .
-_:genid118 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#operationRequestor> .
-_:genid116 <https://w3id.org/won/auth#graph> _:genid119 .
-_:genid119 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
-_:genid119 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#keyGraph> .
-_:genid119 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#sysinfoGraph> .
-_:genid119 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+_:genid125 <https://w3id.org/won/auth#targetAtom> _:genid126 .
+_:genid126 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#operationRequestor> .
+_:genid124 <https://w3id.org/won/auth#graph> _:genid127 .
+_:genid127 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
+_:genid127 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#keyGraph> .
+_:genid127 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#sysinfoGraph> .
+_:genid127 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
 <https://w3id.org/won/auth#opRead> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
-<https://w3id.org/won/auth#grantsForConnStateConnected> <https://w3id.org/won/auth#grantee> _:genid120 .
-_:genid120 <https://w3id.org/won/auth#connection> _:genid121 .
-_:genid121 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
-_:genid121 <https://w3id.org/won/auth#targetAtom> _:genid122 .
+<https://w3id.org/won/auth#grantsForConnStateConnected> <https://w3id.org/won/auth#grantee> _:genid128 .
+_:genid128 <https://w3id.org/won/auth#connection> _:genid129 .
+_:genid129 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#Connected> .
+_:genid129 <https://w3id.org/won/auth#targetAtom> _:genid130 .
 <https://w3id.org/won/auth#grantsForConnStateConnected> <http://www.w3.org/2000/01/rdf-schema#comment> "Implicit authorization for established connections"@en .
 <https://w3id.org/won/auth#grantsForConnStateConnected> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#grantsForConnStateConnected> <http://www.w3.org/2000/01/rdf-schema#label> "grantsForConnStateConnected" .
@@ -1337,20 +1376,20 @@ _:genid121 <https://w3id.org/won/auth#targetAtom> _:genid122 .
 # https://w3id.org/won/auth#grantsForConnStateRequestReceived
 <https://w3id.org/won/auth#grantsForConnStateRequestReceived> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#grantsForConnStateRequestReceived> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/auth#grantsForConnStateRequestReceived> <https://w3id.org/won/auth#grant> _:genid123 .
-_:genid123 <https://w3id.org/won/auth#connection> _:genid124 .
-_:genid124 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
-_:genid124 <https://w3id.org/won/auth#targetAtom> _:genid125 .
-_:genid125 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#operationRequestor> .
-_:genid123 <https://w3id.org/won/auth#graph> _:genid126 .
-_:genid126 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
-_:genid126 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#keyGraph> .
-_:genid126 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#sysinfoGraph> .
-_:genid126 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
-<https://w3id.org/won/auth#grantsForConnStateRequestReceived> <https://w3id.org/won/auth#grantee> _:genid127 .
-_:genid127 <https://w3id.org/won/auth#connection> _:genid128 .
-_:genid128 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#RequestReceived> .
-_:genid128 <https://w3id.org/won/auth#targetAtom> _:genid129 .
+<https://w3id.org/won/auth#grantsForConnStateRequestReceived> <https://w3id.org/won/auth#grant> _:genid131 .
+_:genid131 <https://w3id.org/won/auth#connection> _:genid132 .
+_:genid132 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
+_:genid132 <https://w3id.org/won/auth#targetAtom> _:genid133 .
+_:genid133 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#operationRequestor> .
+_:genid131 <https://w3id.org/won/auth#graph> _:genid134 .
+_:genid134 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
+_:genid134 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#keyGraph> .
+_:genid134 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#sysinfoGraph> .
+_:genid134 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+<https://w3id.org/won/auth#grantsForConnStateRequestReceived> <https://w3id.org/won/auth#grantee> _:genid135 .
+_:genid135 <https://w3id.org/won/auth#connection> _:genid136 .
+_:genid136 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#RequestReceived> .
+_:genid136 <https://w3id.org/won/auth#targetAtom> _:genid137 .
 <https://w3id.org/won/auth#grantsForConnStateRequestReceived> <http://www.w3.org/2000/01/rdf-schema#comment> "Implicit authorization for connections that have been requested by the partner but not yet established"@en .
 <https://w3id.org/won/auth#grantsForConnStateRequestReceived> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#grantsForConnStateRequestReceived> <http://www.w3.org/2000/01/rdf-schema#label> "grantsForConnStateRequestReceived" .
@@ -1358,20 +1397,20 @@ _:genid128 <https://w3id.org/won/auth#targetAtom> _:genid129 .
 # https://w3id.org/won/auth#grantsForConnStateRequestSent
 <https://w3id.org/won/auth#grantsForConnStateRequestSent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#grantsForConnStateRequestSent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/auth#grantsForConnStateRequestSent> <https://w3id.org/won/auth#grant> _:genid130 .
-_:genid130 <https://w3id.org/won/auth#connection> _:genid131 .
-_:genid131 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
-_:genid131 <https://w3id.org/won/auth#targetAtom> _:genid132 .
-_:genid132 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#operationRequestor> .
-_:genid130 <https://w3id.org/won/auth#graph> _:genid133 .
-_:genid133 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
-_:genid133 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#keyGraph> .
-_:genid133 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#sysinfoGraph> .
-_:genid133 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
-<https://w3id.org/won/auth#grantsForConnStateRequestSent> <https://w3id.org/won/auth#grantee> _:genid134 .
-_:genid134 <https://w3id.org/won/auth#connection> _:genid135 .
-_:genid135 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#RequestSent> .
-_:genid135 <https://w3id.org/won/auth#targetAtom> _:genid136 .
+<https://w3id.org/won/auth#grantsForConnStateRequestSent> <https://w3id.org/won/auth#grant> _:genid138 .
+_:genid138 <https://w3id.org/won/auth#connection> _:genid139 .
+_:genid139 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opConnectClose> .
+_:genid139 <https://w3id.org/won/auth#targetAtom> _:genid140 .
+_:genid140 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#operationRequestor> .
+_:genid138 <https://w3id.org/won/auth#graph> _:genid141 .
+_:genid141 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#contentGraph> .
+_:genid141 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#keyGraph> .
+_:genid141 <https://w3id.org/won/auth#graphType> <https://w3id.org/won/auth#sysinfoGraph> .
+_:genid141 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#opRead> .
+<https://w3id.org/won/auth#grantsForConnStateRequestSent> <https://w3id.org/won/auth#grantee> _:genid142 .
+_:genid142 <https://w3id.org/won/auth#connection> _:genid143 .
+_:genid143 <https://w3id.org/won/auth#connectionState> <https://w3id.org/won/core#RequestSent> .
+_:genid143 <https://w3id.org/won/auth#targetAtom> _:genid144 .
 <https://w3id.org/won/auth#grantsForConnStateRequestSent> <http://www.w3.org/2000/01/rdf-schema#comment> "Implicit authorization for connections that have been requested by us but have not yet been accepted by the partner"@en .
 <https://w3id.org/won/auth#grantsForConnStateRequestSent> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#grantsForConnStateRequestSent> <http://www.w3.org/2000/01/rdf-schema#label> "grantsForConnStateRequestSent" .
@@ -1379,13 +1418,13 @@ _:genid135 <https://w3id.org/won/auth#targetAtom> _:genid136 .
 # https://w3id.org/won/auth#grantsForOwnerTokenBearer
 <https://w3id.org/won/auth#grantsForOwnerTokenBearer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#grantsForOwnerTokenBearer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#Authorization> .
-<https://w3id.org/won/auth#grantsForOwnerTokenBearer> <https://w3id.org/won/auth#bearer> _:genid137 .
-_:genid137 <https://w3id.org/won/auth#issuer> _:genid138 .
-_:genid138 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#self> .
-_:genid137 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/auth#OwnerToken> .
-_:genid137 <https://w3id.org/won/auth#nodeSigned> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#grantsForOwnerTokenBearer> <https://w3id.org/won/auth#grant> _:genid139 .
-_:genid139 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#anyOperation> .
+<https://w3id.org/won/auth#grantsForOwnerTokenBearer> <https://w3id.org/won/auth#bearer> _:genid145 .
+_:genid145 <https://w3id.org/won/auth#issuer> _:genid146 .
+_:genid146 <https://w3id.org/won/auth#atom> <https://w3id.org/won/auth#self> .
+_:genid145 <https://w3id.org/won/auth#tokenScope> <https://w3id.org/won/auth#OwnerToken> .
+_:genid145 <https://w3id.org/won/auth#nodeSigned> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/auth#grantsForOwnerTokenBearer> <https://w3id.org/won/auth#grant> _:genid147 .
+_:genid147 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#anyOperation> .
 <https://w3id.org/won/auth#grantsForOwnerTokenBearer> <http://www.w3.org/2000/01/rdf-schema#comment> "Implicit authorization granting any operation to bearers of a valid token with scope auth:OwnerToken"@en .
 <https://w3id.org/won/auth#grantsForOwnerTokenBearer> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#grantsForOwnerTokenBearer> <http://www.w3.org/2000/01/rdf-schema#label> "grantsForOwnerTokenBearer" .
@@ -1398,8 +1437,8 @@ _:genid139 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#anyO
 <https://w3id.org/won/auth#graphExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#graphExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#graphExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#graphExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid140 .
-<https://w3id.org/won/auth#graphExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid141 .
+<https://w3id.org/won/auth#graphExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid148 .
+<https://w3id.org/won/auth#graphExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid149 .
 <https://w3id.org/won/auth#graphExpressionShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionAtomGraph> .
 # 
 # https://w3id.org/won/auth#graphPropertyShape
@@ -1415,8 +1454,8 @@ _:genid139 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#anyO
 <https://w3id.org/won/auth#graphTypeShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#graphTypeShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#graphTypeShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#graphTypeShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid142 .
-<https://w3id.org/won/auth#graphTypeShape> <http://www.w3.org/ns/shacl#in> _:genid143 .
+<https://w3id.org/won/auth#graphTypeShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid150 .
+<https://w3id.org/won/auth#graphTypeShape> <http://www.w3.org/ns/shacl#in> _:genid151 .
 # 
 # https://w3id.org/won/auth#inheritPropertyShape
 <https://w3id.org/won/auth#inheritPropertyShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -1446,8 +1485,8 @@ _:genid139 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#anyO
 <https://w3id.org/won/auth#messageOperationExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#OperationExpressionShape> .
 <https://w3id.org/won/auth#messageOperationExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#messageOperationExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#messageOperationExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid144 .
-<https://w3id.org/won/auth#messageOperationExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid145 .
+<https://w3id.org/won/auth#messageOperationExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid152 .
+<https://w3id.org/won/auth#messageOperationExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid153 .
 <https://w3id.org/won/auth#messageOperationExpressionShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#MessageOperationExpression> .
 # 
 # https://w3id.org/won/auth#messageTypeShape
@@ -1456,18 +1495,18 @@ _:genid139 <https://w3id.org/won/auth#operation> <https://w3id.org/won/auth#anyO
 <https://w3id.org/won/auth#messageTypeShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#MessageTypeSpecificationShape> .
 <https://w3id.org/won/auth#messageTypeShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#messageTypeShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#messageTypeShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid146 .
-<https://w3id.org/won/auth#messageTypeShape> <http://www.w3.org/ns/shacl#in> _:genid147 .
+<https://w3id.org/won/auth#messageTypeShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid154 .
+<https://w3id.org/won/auth#messageTypeShape> <http://www.w3.org/ns/shacl#in> _:genid155 .
 # 
 # https://w3id.org/won/auth#messageTypesExpressionShape
 <https://w3id.org/won/auth#messageTypesExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#messageTypesExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#messageTypesExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#MessageTypeSpecificationShape> .
 <https://w3id.org/won/auth#messageTypesExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
-<https://w3id.org/won/auth#messageTypesExpressionShape> <http://www.w3.org/ns/shacl#property> _:genid148 .
-_:genid148 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid148 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypeShape> .
-_:genid148 <http://www.w3.org/ns/shacl#path> <http://www.w3.org/2000/01/rdf-schema#member> .
+<https://w3id.org/won/auth#messageTypesExpressionShape> <http://www.w3.org/ns/shacl#property> _:genid156 .
+_:genid156 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid156 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypeShape> .
+_:genid156 <http://www.w3.org/ns/shacl#path> <http://www.w3.org/2000/01/rdf-schema#member> .
 <https://w3id.org/won/auth#messageTypesExpressionShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#MessageTypeSet> .
 # 
 # https://w3id.org/won/auth#messageWildcardShape
@@ -1476,8 +1515,8 @@ _:genid148 <http://www.w3.org/ns/shacl#path> <http://www.w3.org/2000/01/rdf-sche
 <https://w3id.org/won/auth#messageWildcardShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#MessageTypeSpecificationShape> .
 <https://w3id.org/won/auth#messageWildcardShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#messageWildcardShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#messageWildcardShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid149 .
-<https://w3id.org/won/auth#messageWildcardShape> <http://www.w3.org/ns/shacl#in> _:genid150 .
+<https://w3id.org/won/auth#messageWildcardShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid157 .
+<https://w3id.org/won/auth#messageWildcardShape> <http://www.w3.org/ns/shacl#in> _:genid158 .
 <https://w3id.org/won/auth#messageWildcardShape> <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
 # 
 # https://w3id.org/won/auth#msgTypesCommunicate
@@ -1605,7 +1644,7 @@ _:genid148 <http://www.w3.org/ns/shacl#path> <http://www.w3.org/2000/01/rdf-sche
 <https://w3id.org/won/auth#operationPropertyShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#PropertyShape> .
 <https://w3id.org/won/auth#operationPropertyShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#operationPropertyShape> <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<https://w3id.org/won/auth#operationPropertyShape> <http://www.w3.org/ns/shacl#or> _:genid151 .
+<https://w3id.org/won/auth#operationPropertyShape> <http://www.w3.org/ns/shacl#or> _:genid159 .
 <https://w3id.org/won/auth#operationPropertyShape> <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#operation> .
 # 
 # https://w3id.org/won/auth#operationRequestShape
@@ -1613,71 +1652,71 @@ _:genid148 <http://www.w3.org/ns/shacl#path> <http://www.w3.org/2000/01/rdf-sche
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid152 .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#or> _:genid153 .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid154 .
-_:genid154 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid154 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid154 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestor> .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid155 .
-_:genid155 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid155 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#asePositionShape> .
-_:genid155 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqPosition> .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid156 .
-_:genid156 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid156 <http://www.w3.org/ns/shacl#or> _:genid157 .
-_:genid156 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#operation> .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid158 .
-_:genid158 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid158 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid158 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqAtom> .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid159 .
-_:genid159 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenSpecificationShape> .
-_:genid159 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestToken> .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid160 .
-_:genid160 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid160 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#atomStateShape> .
-_:genid160 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqAtomState> .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid161 .
-_:genid161 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid161 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqGraph> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid160 .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#or> _:genid161 .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid162 .
-_:genid162 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#graphTypeShape> .
+_:genid162 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:genid162 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid162 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqGraphType> .
+_:genid162 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestor> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid163 .
 _:genid163 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid163 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid163 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqSocketType> .
+_:genid163 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#asePositionShape> .
+_:genid163 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqPosition> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid164 .
 _:genid164 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid164 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid164 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqSocket> .
-<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid165 .
-_:genid165 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid165 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid165 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqConnection> .
+_:genid164 <http://www.w3.org/ns/shacl#or> _:genid165 .
+_:genid164 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#operation> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid166 .
 _:genid166 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid166 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#connectionStateShape> .
-_:genid166 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqConnectionState> .
+_:genid166 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid166 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqAtom> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid167 .
-_:genid167 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid167 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid167 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqConnectionTargetAtom> .
+_:genid167 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenSpecificationShape> .
+_:genid167 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestToken> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid168 .
 _:genid168 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid168 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid168 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqConnectionMessage> .
+_:genid168 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#atomStateShape> .
+_:genid168 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqAtomState> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid169 .
-_:genid169 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authTokenShape> .
-_:genid169 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsToken> .
+_:genid169 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid169 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqGraph> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid170 .
+_:genid170 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#graphTypeShape> .
+_:genid170 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid170 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqGraphType> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid171 .
+_:genid171 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid171 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid171 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqSocketType> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid172 .
+_:genid172 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid172 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid172 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqSocket> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid173 .
+_:genid173 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid173 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid173 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqConnection> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid174 .
+_:genid174 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid174 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#connectionStateShape> .
+_:genid174 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqConnectionState> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid175 .
+_:genid175 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid175 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid175 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqConnectionTargetAtom> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid176 .
+_:genid176 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid176 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid176 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#reqConnectionMessage> .
+<https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#property> _:genid177 .
+_:genid177 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authTokenShape> .
+_:genid177 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsToken> .
 <https://w3id.org/won/auth#operationRequestShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#OperationRequest> .
 # 
 # https://w3id.org/won/auth#operationRequestor
 <https://w3id.org/won/auth#operationRequestor> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
 <https://w3id.org/won/auth#operationRequestor> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#RelativeAtomExpression> .
-<https://w3id.org/won/auth#operationRequestor> <http://www.w3.org/2000/01/rdf-schema#comment> "Placeholder for the uri of the atom that requests an operation. In the case of bearer\n    authentication, there is no operationRequestor; arguably, one could use the token's subject claim, but that\n    would extend additional trust to the issuer of the token."@en .
+<https://w3id.org/won/auth#operationRequestor> <http://www.w3.org/2000/01/rdf-schema#comment> "Placeholder for the uri of the atom or node that requests an operation. In the case of bearer\n    authentication, there is no operationRequestor; arguably, one could use the token's subject claim, but that\n    would extend additional trust to the issuer of the token."@en .
 <https://w3id.org/won/auth#operationRequestor> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#operationRequestor> <http://www.w3.org/2000/01/rdf-schema#label> "operationRequestor" .
 # 
@@ -1757,8 +1796,8 @@ _:genid169 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsTok
 <https://w3id.org/won/auth#relativeAtomExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#relativeAtomExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#relativeAtomExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#relativeAtomExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid170 .
-<https://w3id.org/won/auth#relativeAtomExpressionShape> <http://www.w3.org/ns/shacl#in> _:genid171 .
+<https://w3id.org/won/auth#relativeAtomExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid178 .
+<https://w3id.org/won/auth#relativeAtomExpressionShape> <http://www.w3.org/ns/shacl#in> _:genid179 .
 <https://w3id.org/won/auth#relativeAtomExpressionShape> <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
 # 
 # https://w3id.org/won/auth#self
@@ -1775,7 +1814,7 @@ _:genid169 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsTok
 <https://w3id.org/won/auth#simpleOperationExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#simpleOperationExpressionShape> <http://www.w3.org/ns/shacl#class> <https://w3id.org/won/auth#SimpleOperationExpression> .
 <https://w3id.org/won/auth#simpleOperationExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#simpleOperationExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid172 .
+<https://w3id.org/won/auth#simpleOperationExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid180 .
 <https://w3id.org/won/auth#simpleOperationExpressionShape> <http://www.w3.org/ns/shacl#targetClass> <https://w3id.org/won/auth#SimpleOperationExpression> .
 # 
 # https://w3id.org/won/auth#socketExpressionShape
@@ -1787,8 +1826,8 @@ _:genid169 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsTok
 <https://w3id.org/won/auth#socketExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#TreeExpressionShape> .
 <https://w3id.org/won/auth#socketExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#socketExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#socketExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid173 .
-<https://w3id.org/won/auth#socketExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid174 .
+<https://w3id.org/won/auth#socketExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid181 .
+<https://w3id.org/won/auth#socketExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid182 .
 <https://w3id.org/won/auth#socketExpressionShape> <http://www.w3.org/ns/shacl#targetObjectsOf> <https://w3id.org/won/auth#socket> .
 <https://w3id.org/won/auth#socketExpressionShape> <https://w3id.org/won/auth#asePosition> <https://w3id.org/won/auth#positionSocket> .
 # 
@@ -1812,8 +1851,8 @@ _:genid169 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsTok
 <https://w3id.org/won/auth#targetAtomExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
 <https://w3id.org/won/auth#targetAtomExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#targetAtomExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#targetAtomExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid175 .
-<https://w3id.org/won/auth#targetAtomExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid176 .
+<https://w3id.org/won/auth#targetAtomExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid183 .
+<https://w3id.org/won/auth#targetAtomExpressionShape> <http://www.w3.org/ns/shacl#or> _:genid184 .
 <https://w3id.org/won/auth#targetAtomExpressionShape> <http://www.w3.org/ns/shacl#targetObjectsOf> <https://w3id.org/won/auth#targetAtom> .
 # 
 # https://w3id.org/won/auth#targetAtomPropertyShape
@@ -1831,6 +1870,23 @@ _:genid169 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsTok
 <https://w3id.org/won/auth#targetAuthPropertyShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#targetAuthPropertyShape> <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#authorizationShape> .
 <https://w3id.org/won/auth#targetAuthPropertyShape> <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#targetAuth> .
+# 
+# https://w3id.org/won/auth#targetWonNodeExpressionShape
+<https://w3id.org/won/auth#targetWonNodeExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/auth#targetWonNodeExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#NodeShape> .
+<https://w3id.org/won/auth#targetWonNodeExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
+<https://w3id.org/won/auth#targetWonNodeExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+<https://w3id.org/won/auth#targetWonNodeExpressionShape> <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#BlankNode> .
+<https://w3id.org/won/auth#targetWonNodeExpressionShape> <http://www.w3.org/ns/shacl#targetObjectsOf> <https://w3id.org/won/auth#targetWonNode> .
+# 
+# https://w3id.org/won/auth#targetWonNodePropertyShape
+<https://w3id.org/won/auth#targetWonNodePropertyShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://w3id.org/won/auth#targetWonNodePropertyShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/shacl#PropertyShape> .
+<https://w3id.org/won/auth#targetWonNodePropertyShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
+<https://w3id.org/won/auth#targetWonNodePropertyShape> <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/auth#targetWonNodePropertyShape> <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://w3id.org/won/auth#targetWonNodePropertyShape> <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#targetWonNodeExpressionShape> .
+<https://w3id.org/won/auth#targetWonNodePropertyShape> <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#targetWonNode> .
 # 
 # https://w3id.org/won/auth#tokenExpPropertyShape
 <https://w3id.org/won/auth#tokenExpPropertyShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -1867,12 +1923,12 @@ _:genid169 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsTok
 <https://w3id.org/won/auth#tokenOperationExpressionShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://w3id.org/won/auth#OperationExpressionShape> .
 <https://w3id.org/won/auth#tokenOperationExpressionShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#tokenOperationExpressionShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-<https://w3id.org/won/auth#tokenOperationExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid177 .
-<https://w3id.org/won/auth#tokenOperationExpressionShape> <http://www.w3.org/ns/shacl#property> _:genid178 .
-_:genid178 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid178 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid178 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenSpecificationShape> .
-_:genid178 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestToken> .
+<https://w3id.org/won/auth#tokenOperationExpressionShape> <http://www.w3.org/ns/shacl#ignoredProperties> _:genid185 .
+<https://w3id.org/won/auth#tokenOperationExpressionShape> <http://www.w3.org/ns/shacl#property> _:genid186 .
+_:genid186 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid186 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid186 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenSpecificationShape> .
+_:genid186 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestToken> .
 # 
 # https://w3id.org/won/auth#tokenScopePropertyShape
 <https://w3id.org/won/auth#tokenScopePropertyShape> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
@@ -1880,7 +1936,7 @@ _:genid178 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestT
 <https://w3id.org/won/auth#tokenScopePropertyShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#tokenScopePropertyShape> <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 <https://w3id.org/won/auth#tokenScopePropertyShape> <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-<https://w3id.org/won/auth#tokenScopePropertyShape> <http://www.w3.org/ns/shacl#or> _:genid179 .
+<https://w3id.org/won/auth#tokenScopePropertyShape> <http://www.w3.org/ns/shacl#or> _:genid187 .
 <https://w3id.org/won/auth#tokenScopePropertyShape> <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#tokenScope> .
 # 
 # https://w3id.org/won/auth#tokenShapeShape
@@ -1889,14 +1945,14 @@ _:genid178 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestT
 <https://w3id.org/won/auth#tokenShapeShape> <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> <https://w3id.org/won/auth#> .
 <https://w3id.org/won/auth#tokenShapeShape> <http://www.w3.org/ns/shacl#closed> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
 <https://w3id.org/won/auth#tokenShapeShape> <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#nodeSignedPropertyShape> .
-<https://w3id.org/won/auth#tokenShapeShape> <http://www.w3.org/ns/shacl#property> _:genid180 .
-_:genid180 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid180 <http://www.w3.org/ns/shacl#or> _:genid181 .
-_:genid180 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#tokenScope> .
-<https://w3id.org/won/auth#tokenShapeShape> <http://www.w3.org/ns/shacl#property> _:genid182 .
-_:genid182 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid182 <http://www.w3.org/ns/shacl#or> _:genid183 .
-_:genid182 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#issuer> .
+<https://w3id.org/won/auth#tokenShapeShape> <http://www.w3.org/ns/shacl#property> _:genid188 .
+_:genid188 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid188 <http://www.w3.org/ns/shacl#or> _:genid189 .
+_:genid188 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#tokenScope> .
+<https://w3id.org/won/auth#tokenShapeShape> <http://www.w3.org/ns/shacl#property> _:genid190 .
+_:genid190 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid190 <http://www.w3.org/ns/shacl#or> _:genid191 .
+_:genid190 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#issuer> .
 <https://w3id.org/won/auth#tokenShapeShape> <http://www.w3.org/ns/shacl#targetObjectsOf> <https://w3id.org/won/auth#bearer> .
 # 
 # https://w3id.org/won/auth#tokenSigPropertyShape
@@ -1926,152 +1982,157 @@ _:genid182 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#issuer> 
 <https://w3id.org/won/auth#tokenSubPropertyShape> <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
 <https://w3id.org/won/auth#tokenSubPropertyShape> <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#tokenSub> .
 # 
-_:genid184 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
-_:genid185 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
-_:genid185 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
-_:genid185 <http://www.w3.org/ns/shacl#pattern> "^[^\\s]+$" .
-_:genid186 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#simpleOperationExpressionShape> .
-_:genid187 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#integer> .
-_:genid188 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenOperationExpressionShape> .
-_:genid189 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageOperationExpressionShape> .
-_:genid190 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagesPropertyShape> .
-_:genid191 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagePropertyShape> .
 _:genid192 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetAtomPropertyShape> .
 _:genid193 <http://www.w3.org/ns/shacl#property> _:genid194 .
-_:genid194 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
+_:genid194 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid194 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#atomExpressionShape> .
 _:genid194 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
-_:genid195 <http://www.w3.org/ns/shacl#property> _:genid196 .
-_:genid196 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid196 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#granteeWildcardShape> .
-_:genid196 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
-_:genid197 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionsPropertyShape> .
-_:genid198 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionPropertyShape> .
-_:genid199 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid200 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#int> .
-_:genid201 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#long> .
-_:genid202 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#atomExpressionShape> .
-_:genid203 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid204 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagePropertyShape> .
-_:genid205 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
-_:genid205 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
-_:genid205 <http://www.w3.org/ns/shacl#pattern> "^[^\\s]+$" .
-_:genid206 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetAtomPropertyShape> .
-_:genid207 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#atomMessagePropertyShape> .
-_:genid208 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
-_:genid209 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagesPropertyShape> .
-_:genid210 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionPropertyShape> .
-_:genid211 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionsPropertyShape> .
-_:genid212 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#socketPropertyShape> .
-_:genid213 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionPropertyShape> .
-_:genid214 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagesPropertyShape> .
-_:genid215 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
-_:genid216 <http://www.w3.org/ns/shacl#property> _:genid217 .
-_:genid217 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#connectionStateShape> .
-_:genid217 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#connectionState> .
-_:genid218 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#atomMessagesPropertyShape> .
-_:genid219 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#graphPropertyShape> .
-_:genid220 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#atomStatePropertyShape> .
-_:genid221 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#simpleOperationExpressionShape> .
-_:genid222 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageOperationExpressionShape> .
-_:genid223 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid223 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsToken> .
-_:genid224 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
-_:genid225 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#atomMessagePropertyShape> .
-_:genid226 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
-_:genid227 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid195 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagePropertyShape> .
+_:genid196 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagesPropertyShape> .
+_:genid197 <http://www.w3.org/ns/shacl#property> _:genid198 .
+_:genid198 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#connectionStateShape> .
+_:genid198 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#connectionState> .
+_:genid199 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
+_:genid200 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid201 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid202 <http://www.w3.org/ns/shacl#property> _:genid203 .
+_:genid203 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid203 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
+_:genid203 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
+_:genid204 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetWonNodePropertyShape> .
+_:genid205 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetWonNodePropertyShape> .
+_:genid206 <http://www.w3.org/ns/shacl#property> _:genid207 .
+_:genid207 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#connectionMessageExpressionShape> .
+_:genid207 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#connectionMessage> .
+_:genid208 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid209 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#atomExpressionShape> .
+_:genid210 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#BlankNode> .
+_:genid211 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid212 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#simpleOperationExpressionShape> .
+_:genid213 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageOperationExpressionShape> .
+_:genid214 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenOperationExpressionShape> .
+_:genid215 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#integer> .
+_:genid216 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#atomMessagePropertyShape> .
+_:genid217 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid218 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid219 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetWonNodePropertyShape> .
+_:genid220 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetAtomPropertyShape> .
+_:genid221 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid222 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid223 <http://www.w3.org/ns/shacl#property> _:genid224 .
+_:genid224 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid224 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#graphIri> .
+_:genid225 <http://www.w3.org/ns/shacl#property> _:genid226 .
+_:genid226 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#graphTypeShape> .
+_:genid226 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#graphType> .
+_:genid227 <http://www.w3.org/ns/shacl#property> _:genid228 .
+_:genid228 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:genid228 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid228 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestor> .
-_:genid229 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagePropertyShape> .
-_:genid230 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetAtomPropertyShape> .
-_:genid231 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
-_:genid232 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypesExpressionShape> .
-_:genid233 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
-_:genid234 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypeShape> .
-_:genid235 <http://www.w3.org/ns/shacl#property> _:genid236 .
-_:genid236 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenShapeShape> .
-_:genid236 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearer> .
-_:genid237 <http://www.w3.org/ns/shacl#property> _:genid238 .
-_:genid238 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid238 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#socketType> .
-_:genid239 <http://www.w3.org/ns/shacl#property> _:genid240 .
-_:genid240 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid240 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid240 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageWildcardShape> .
-_:genid240 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#messageOnBehalf> .
-_:genid241 <http://www.w3.org/ns/shacl#property> _:genid242 .
-_:genid242 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid242 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#socketIri> .
-_:genid243 <http://www.w3.org/ns/shacl#property> _:genid244 .
+_:genid228 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#granteeWildcardShape> .
+_:genid228 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
+_:genid229 <http://www.w3.org/ns/shacl#property> _:genid230 .
+_:genid230 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid230 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid230 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
+_:genid230 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#provideAuthInfo> .
+_:genid231 <http://www.w3.org/ns/shacl#property> _:genid232 .
+_:genid232 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid232 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
+_:genid232 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grant> .
+_:genid233 <http://www.w3.org/ns/shacl#property> _:genid234 .
+_:genid234 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid234 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenShapeShape> .
+_:genid234 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearer> .
+_:genid235 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid236 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid237 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid238 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid239 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#relativeAtomExpressionShape> .
+_:genid240 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid241 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#int> .
+_:genid242 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#long> .
+_:genid243 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid243 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearsToken> .
 _:genid244 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid244 <http://www.w3.org/ns/shacl#or> _:genid245 .
-_:genid244 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#messageOnBehalf> .
-_:genid246 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
-_:genid247 <http://www.w3.org/ns/shacl#property> _:genid248 .
-_:genid248 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid248 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#graphIri> .
-_:genid249 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypesExpressionShape> .
-_:genid250 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypeShape> .
-_:genid251 <http://www.w3.org/ns/shacl#property> _:genid252 .
-_:genid252 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid252 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid252 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageWildcardShape> .
-_:genid252 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#messageTo> .
-_:genid253 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenOperationExpressionShape> .
+_:genid244 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#requestor> .
+_:genid245 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid246 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
+_:genid246 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:genid246 <http://www.w3.org/ns/shacl#pattern> "^[^\\s]+$" .
+_:genid247 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid248 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionPropertyShape> .
+_:genid249 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionsPropertyShape> .
+_:genid250 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#socketPropertyShape> .
+_:genid251 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenOperationExpressionShape> .
+_:genid252 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageOperationExpressionShape> .
+_:genid253 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#simpleOperationExpressionShape> .
 _:genid254 <http://www.w3.org/ns/shacl#property> _:genid255 .
-_:genid255 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid255 <http://www.w3.org/ns/shacl#or> _:genid256 .
-_:genid255 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#messageTo> .
-_:genid257 <http://www.w3.org/ns/shacl#property> _:genid258 .
-_:genid258 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#graphTypeShape> .
-_:genid258 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#graphType> .
-_:genid259 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
-_:genid260 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
-_:genid261 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#relativeAtomExpressionShape> .
-_:genid262 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
-_:genid263 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid255 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid255 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#socketType> .
+_:genid256 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid257 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypesExpressionShape> .
+_:genid258 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagePropertyShape> .
+_:genid259 <http://www.w3.org/ns/shacl#property> _:genid260 .
+_:genid260 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid260 <http://www.w3.org/ns/shacl#or> _:genid261 .
+_:genid260 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#messageTo> .
+_:genid262 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagesPropertyShape> .
+_:genid263 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#atomStatePropertyShape> .
 _:genid264 <http://www.w3.org/ns/shacl#property> _:genid265 .
 _:genid265 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid265 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
-_:genid265 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
-_:genid266 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetAtomPropertyShape> .
-_:genid267 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid265 <http://www.w3.org/ns/shacl#or> _:genid266 .
+_:genid265 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#messageOnBehalf> .
+_:genid267 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionsPropertyShape> .
 _:genid268 <http://www.w3.org/ns/shacl#property> _:genid269 .
 _:genid269 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
 _:genid269 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid269 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#granteeWildcardShape> .
-_:genid269 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
+_:genid269 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageWildcardShape> .
+_:genid269 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#messageTo> .
 _:genid270 <http://www.w3.org/ns/shacl#property> _:genid271 .
-_:genid271 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid271 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenShapeShape> .
-_:genid271 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearer> .
-_:genid272 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagePropertyShape> .
-_:genid273 <http://www.w3.org/ns/shacl#property> _:genid274 .
-_:genid274 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid274 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#atomExpressionShape> .
-_:genid274 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
-_:genid275 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagesPropertyShape> .
-_:genid276 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
-_:genid277 <http://www.w3.org/ns/shacl#property> _:genid278 .
-_:genid278 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#connectionStateShape> .
-_:genid278 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#connectionState> .
-_:genid279 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
-_:genid280 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
-_:genid281 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
-_:genid282 <http://www.w3.org/ns/shacl#property> _:genid283 .
-_:genid283 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#connectionMessageExpressionShape> .
-_:genid283 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#connectionMessage> .
-_:genid284 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#BlankNode> .
-_:genid285 <http://www.w3.org/ns/shacl#property> _:genid286 .
-_:genid286 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid286 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid286 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
-_:genid286 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#provideAuthInfo> .
-_:genid287 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#atomExpressionShape> .
-_:genid288 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
-_:genid289 <http://www.w3.org/ns/shacl#property> _:genid290 .
-_:genid290 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
-_:genid290 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
-_:genid290 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grant> .
+_:genid271 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid271 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#socketIri> .
+_:genid272 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypeShape> .
+_:genid273 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#atomMessagePropertyShape> .
+_:genid274 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypesExpressionShape> .
+_:genid275 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#atomMessagesPropertyShape> .
+_:genid276 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagesPropertyShape> .
+_:genid277 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#graphPropertyShape> .
+_:genid278 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionPropertyShape> .
+_:genid279 <http://www.w3.org/ns/shacl#property> _:genid280 .
+_:genid280 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid280 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#granteeWildcardShape> .
+_:genid280 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
+_:genid281 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetWonNodePropertyShape> .
+_:genid282 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetAtomPropertyShape> .
+_:genid283 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagePropertyShape> .
+_:genid284 <http://www.w3.org/ns/shacl#property> _:genid285 .
+_:genid285 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#aseRootShape> .
+_:genid285 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#grantee> .
+_:genid286 <http://www.w3.org/ns/shacl#property> _:genid287 .
+_:genid287 <http://www.w3.org/ns/shacl#maxCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid287 <http://www.w3.org/ns/shacl#minCount> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+_:genid287 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageWildcardShape> .
+_:genid287 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#messageOnBehalf> .
+_:genid288 <http://www.w3.org/ns/shacl#property> _:genid289 .
+_:genid289 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#tokenShapeShape> .
+_:genid289 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#bearer> .
+_:genid290 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#messageTypeShape> .
+_:genid291 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid292 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#inheritPropertyShape> .
+_:genid293 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetAtomPropertyShape> .
+_:genid294 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagePropertyShape> .
+_:genid295 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionMessagesPropertyShape> .
+_:genid296 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#connectionPropertyShape> .
+_:genid297 <http://www.w3.org/ns/shacl#property> _:genid298 .
+_:genid298 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#connectionStateShape> .
+_:genid298 <http://www.w3.org/ns/shacl#path> <https://w3id.org/won/auth#connectionState> .
+_:genid299 <http://www.w3.org/ns/shacl#node> <https://w3id.org/won/auth#atomExpressionShape> .
+_:genid300 <http://www.w3.org/ns/shacl#datatype> <http://www.w3.org/2001/XMLSchema#string> .
+_:genid300 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#Literal> .
+_:genid300 <http://www.w3.org/ns/shacl#pattern> "^[^\\s]+$" .
+_:genid301 <http://www.w3.org/ns/shacl#nodeKind> <http://www.w3.org/ns/shacl#IRI> .
+_:genid302 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#operationPropertyShape> .
+_:genid303 <http://www.w3.org/ns/shacl#property> <https://w3id.org/won/auth#targetWonNodePropertyShape> .
 # 
 # 
 # #################################################################

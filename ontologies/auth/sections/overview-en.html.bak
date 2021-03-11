@@ -216,6 +216,9 @@ This ontology has the following classes and properties.</span>
       <a href="#operation" title="https://w3id.org/won/auth#operation">operation</a>
    </li>
    <li>
+      <a href="#provideAuthInfo" title="https://w3id.org/won/auth#provideAuthInfo">provideAuthInfo</a>
+   </li>
+   <li>
       <a href="#requestedBy" title="https://w3id.org/won/auth#requestedBy">requestedBy</a>
    </li>
    <li>
@@ -235,6 +238,9 @@ This ontology has the following classes and properties.</span>
    </li>
    <li>
       <a href="#targetAuth" title="https://w3id.org/won/auth#targetAuth">targetAuth</a>
+   </li>
+   <li>
+      <a href="#targetWonNode" title="https://w3id.org/won/auth#targetWonNode">targetWonNode</a>
    </li>
    <li>
       <a href="#tokenExp" title="https://w3id.org/won/auth#tokenExp">
@@ -268,6 +274,9 @@ This ontology has the following classes and properties.</span>
       <a href="#inherit" title="https://w3id.org/won/auth#inherit">
          <span>inherit</span>
       </a>
+   </li>
+   <li>
+      <a href="#nodeSigned" title="https://w3id.org/won/auth#nodeSigned">nodeSigned</a>
    </li>
    <li>
       <a href="#tokenExp" title="https://w3id.org/won/auth#tokenExp">
@@ -468,6 +477,10 @@ This ontology has the following classes and properties.</span>
    <li>
       <a href="#grantOwnerTokenToOwner"
          title="https://w3id.org/won/auth#grantOwnerTokenToOwner">grantOwnerTokenToOwner</a>
+   </li>
+   <li>
+      <a href="#grantReadKeyToConnectionTargetNodes"
+         title="https://w3id.org/won/auth#grantReadKeyToConnectionTargetNodes">grantReadKeyToConnectionTargetNodes</a>
    </li>
    <li>
       <a href="#grantsForConnStateClosed"
@@ -688,6 +701,18 @@ This ontology has the following classes and properties.</span>
       <a href="#targetAuthPropertyShape"
          title="https://w3id.org/won/auth#targetAuthPropertyShape">
          <span>target auth property shape</span>
+      </a>
+   </li>
+   <li>
+      <a href="#targetWonNodeExpressionShape"
+         title="https://w3id.org/won/auth#targetWonNodeExpressionShape">
+         <span>target won node expression shape</span>
+      </a>
+   </li>
+   <li>
+      <a href="#targetWonNodePropertyShape"
+         title="https://w3id.org/won/auth#targetWonNodePropertyShape">
+         <span>target won node property shape</span>
       </a>
    </li>
    <li>
