@@ -156,12 +156,23 @@ export default function WonAtomHeader({
       </div>
     );
   } else if (atomFailedToLoad) {
+    const isAtomDeleted = processUtils.isAtomDeleted(processState, atomUri);
+
     //FailedToLoad View
     atomHeaderIcon = <WonAtomIcon atom={atom} />;
     atomHeaderContent = (
       <div className="ah__right">
         <div className="ah__right__topline">
-          <div className="ah__right__topline__notitle">Atom Loading failed</div>
+          <div className="ah__right__topline__notitle">
+            {isAtomDeleted
+              ? "Atom deleted"
+              : processUtils.areAtomRequestsAccessDeniedOnly(
+                  processState,
+                  atomUri
+                )
+                ? "Atom Access Denied"
+                : "Atom Loading failed"}
+          </div>
         </div>
         <div className="ah__right__subtitle">
           <span className="ah__right__subtitle__type" />

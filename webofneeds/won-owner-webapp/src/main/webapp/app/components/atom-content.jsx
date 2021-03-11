@@ -61,7 +61,6 @@ export default function WonAtomContent({
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
-  // const atomRequests = processUtils.getAtomRequests(process, atomUri);
   const atomProcessingUpdate =
     atom && processUtils.isAtomProcessingUpdate(process, atomUri);
 
@@ -108,6 +107,8 @@ export default function WonAtomContent({
       </won-atom-content>
     );
   } else if (atomFailedToLoad) {
+    const isAtomDeleted = processUtils.isAtomDeleted(process, atomUri);
+
     return (
       <won-atom-content>
         <div className="atom-failedtoload">
@@ -117,14 +118,22 @@ export default function WonAtomContent({
               href={ico16_indicator_error}
             />
           </svg>
-          <span className="atom-failedtoload__label">Failed To Load</span>
+          <span className="atom-failedtoload__label">
+            {isAtomDeleted
+              ? "Atom has been deleted"
+              : processUtils.areAtomRequestsAccessDeniedOnly(process, atomUri)
+                ? "Access Denied"
+                : "Failed To Load"}
+          </span>
           <div className="atom-failedtoload__actions">
-            <button
-              className="atom-failedtoload__actions__button secondary won-button--outlined thin"
-              onClick={() => tryReload()}
-            >
-              Try Reload
-            </button>
+            {!isAtomDeleted && (
+              <button
+                className="atom-failedtoload__actions__button secondary won-button--outlined thin"
+                onClick={() => tryReload()}
+              >
+                Try Reload
+              </button>
+            )}
           </div>
         </div>
       </won-atom-content>

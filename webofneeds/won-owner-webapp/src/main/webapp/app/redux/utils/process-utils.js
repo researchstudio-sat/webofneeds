@@ -453,6 +453,12 @@ export function getAtomRequests(process, atomUri) {
   return getIn(process, ["atoms", atomUri, "requests"]) || Immutable.List();
 }
 
+export function isAtomDeleted(process, atomUri) {
+  return !!getAtomRequests(process, atomUri).find(
+    request => get(request, "code") === 410
+  );
+}
+
 export function areAtomRequestsAccessDeniedOnly(process, atomUri) {
   if (hasAtomFailedToLoad(process, atomUri)) {
     const atomRequests = getAtomRequests(process, atomUri);
