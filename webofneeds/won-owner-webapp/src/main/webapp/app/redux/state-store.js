@@ -13,7 +13,7 @@ import {
   parseMetaAtom,
   parseAtomContent,
 } from "../reducers/atom-reducer/parse-atom.js";
-import { get, is, parseWorkerError } from "../utils.js";
+import { get, is, parseJwtToken, parseWorkerError } from "../utils.js";
 import won from "../won-es6";
 import vocab from "../service/vocab.js";
 import { fetchWikiData } from "~/app/api/wikidata-api";
@@ -127,9 +127,6 @@ export const determineRequestCredentials = (
 ) => {
   console.debug("## Determine requesterWebId for", atomUri);
 
-  if (priorRequests) {
-    console.debug("## We have prior requests...", priorRequests);
-  }
   const possibleRequestCredentials = generalSelectors
     .getPossibleRequestCredentialsForAtom(atomUri)(state)
     .filter(
@@ -180,13 +177,43 @@ export const determineRequestCredentials = (
         "requestTokenFromAtomUri"
       );
 
-      // FIXME: THIS IS NEXT PART PRETTY HARDCODED (which isnt great but works for now): the requesterWebId (or even the token, used to fetch the token from the atom should be determined by this function itself
-      if (tokenScope === vocab.HOLD.ScopeReadHeldAtoms) {
-        const requestTokenFromAtom = generalSelectors.getAtom(
-          requestTokenFromAtomUri
-        )(state);
+      const priorTokenRequests = processSelectors.getFetchTokenRequests(
+        requestTokenFromAtomUri,
+        tokenScope
+      )(state);
 
-        const ownedBuddyUrisOfConsideredAtom = atomUtils
+      for (const priorTokenRequest of priorTokenRequests) {
+        const code = get(priorTokenRequest, "code");
+        const token = get(priorTokenRequest, "token");
+        const parsedToken = parseJwtToken(token);
+
+        console.debug(
+          code,
+          "FOUND PRIOR TOKEN REQUESTS: parsedToken: ",
+          parsedToken
+        );
+
+        if (parsedToken && code === 200) {
+          if (new Date(parsedToken.exp) < new Date()) {
+            return Promise.resolve({
+              token: token,
+              obtainedFrom: tokenCredential.toJS(),
+            });
+          } else {
+            //TODO: FETCH TOKEN FROM SAME CREDENTIALS
+            console.debug("TODO: Fetch token again from same credentials");
+          }
+        }
+      }
+
+      // FIXME: THIS IS NEXT PART PRETTY HARDCODED (which isnt great but works for now): the requesterWebId (or even the token, used to fetch the token from the atom should be determined by this function itself
+      let consideredRequesterWebIds;
+      const requestTokenFromAtom = generalSelectors.getAtom(
+        requestTokenFromAtomUri
+      )(state);
+
+      if (tokenScope === vocab.HOLD.ScopeReadHeldAtoms) {
+        consideredRequesterWebIds = atomUtils
           .getConnectedConnections(
             requestTokenFromAtom,
             vocab.BUDDY.BuddySocketCompacted
@@ -200,65 +227,47 @@ export const determineRequestCredentials = (
           .map(connectionUtils.getTargetAtomUri)
           .valueSeq()
           .toSet();
-        console.debug(
-          "ownedBuddyUrisOfConsideredAtom: ",
-          ownedBuddyUrisOfConsideredAtom
-        );
+      } else {
+        consideredRequesterWebIds = atomUtils
+          .getConnectedConnections(requestTokenFromAtom)
+          .filter(conn =>
+            accountUtils.isAtomOwned(
+              accountState,
+              connectionUtils.getTargetAtomUri(conn)
+            )
+          )
+          .map(connectionUtils.getTargetAtomUri)
+          .valueSeq()
+          .toSet();
+      }
 
-        if (ownedBuddyUrisOfConsideredAtom.size > 0) {
-          const fetchTokenRequesterId = ownedBuddyUrisOfConsideredAtom.first();
+      if (consideredRequesterWebIds.size > 0) {
+        const fetchTokenRequesterId = consideredRequesterWebIds.first();
 
-          if (ownedBuddyUrisOfConsideredAtom.size > 1) {
-            console.debug(
-              "## more than one connection found for this non owned Atom, using first one as the tokenRequester: ",
-              fetchTokenRequesterId,
-              ownedBuddyUrisOfConsideredAtom
-            );
-          }
-
-          const requestCredentials = { requesterWebId: fetchTokenRequesterId }; //TODO: USE determineRequestCredentials for this call
-          requestCredentials.scopes = tokenScope;
-
-          return ownerApi
-            .fetchTokenForAtom(requestTokenFromAtomUri, requestCredentials)
-            .then(tokens => {
-              dispatch({
-                type: actionTypes.atoms.fetchToken.success,
-                payload: Immutable.fromJS({
-                  uri: requestTokenFromAtomUri,
-                  tokenScopeUri: tokenScope,
-                  token: tokens[0],
-                  request: {
-                    code: 200,
-                    requestCredentials: requestCredentials,
-                  },
-                }),
-              });
-
-              return {
-                token: tokens[0],
-                obtainedFrom: tokenCredential.toJS(),
-              };
-            })
-            .catch(error => {
-              let errorParsed = parseWorkerError(error);
-
-              dispatch({
-                type: actionTypes.atoms.fetchToken.failure,
-                payload: Immutable.fromJS({
-                  uri: requestTokenFromAtomUri,
-                  tokenScopeUri: tokenScope,
-                  request: {
-                    code: errorParsed.status,
-                    params: errorParsed.params || {},
-                    message: errorParsed.message || error.message,
-                    response: errorParsed.response,
-                    requestCredentials: requestCredentials,
-                  },
-                }),
-              });
-            });
+        if (consideredRequesterWebIds.size > 1) {
+          console.debug(
+            "## more than one connection found for this non owned Atom, using first one as the tokenRequester: ",
+            fetchTokenRequesterId,
+            consideredRequesterWebIds
+          );
+        } else {
+          console.debug(
+            "## one connection found for this non owned Atom, using it as the tokenRequester: ",
+            fetchTokenRequesterId
+          );
         }
+
+        //TODO: DO NOT DETERMINE THE CREDENTIALS LIKE THAT, use determineRequestCredentials method itself
+        const requestCredentials = { requesterWebId: fetchTokenRequesterId };
+        requestCredentials.scopes = tokenScope;
+
+        return fetchTokenFromAtomAndDispatch(
+          dispatch,
+          state,
+          requestTokenFromAtomUri,
+          requestCredentials,
+          tokenCredential
+        );
       }
     }
   } else {
@@ -268,6 +277,63 @@ export const determineRequestCredentials = (
   }
   return Promise.resolve({ requesterWebId: undefined, token: undefined });
 };
+
+const fetchTokenFromAtomAndDispatch = (
+  dispatch,
+  state,
+  atomUri,
+  requestCredentials,
+  tokenCredential
+) =>
+  ownerApi
+    .fetchTokenForAtom(atomUri, requestCredentials)
+    .then(tokens => {
+      dispatch({
+        type: actionTypes.atoms.fetchToken.success,
+        payload: Immutable.fromJS({
+          uri: atomUri,
+          tokenScopeUri: requestCredentials.scopes,
+          request: {
+            code: 200,
+            requestCredentials: requestCredentials,
+            token: tokens[0],
+          },
+        }),
+      });
+
+      return {
+        token: tokens[0],
+        obtainedFrom: tokenCredential.toJS(),
+      };
+    })
+    .catch(error => {
+      let errorParsed = parseWorkerError(error);
+
+      dispatch({
+        type: actionTypes.atoms.fetchToken.failure,
+        payload: Immutable.fromJS({
+          uri: atomUri,
+          tokenScopeUri: requestCredentials.scopes,
+          allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+            atomUri
+          )(state),
+          request: {
+            code: errorParsed.status,
+            params: errorParsed.params || {},
+            message: errorParsed.message || error.message,
+            response: errorParsed.response,
+            requestCredentials: requestCredentials,
+          },
+        }),
+      });
+
+      // FIXME: THIS IS JUST SO WE THOUGHT WE COULD GET A TOKEN BUT DIDNT GET IT FROM THAT ATOM
+      return {
+        token: "BLARGH!",
+        obtainedFrom: tokenCredential.toJS(),
+      };
+    });
+
 export const fetchConnectionsContainerAndDispatch = (
   atomUri,
   dispatch,
@@ -338,6 +404,9 @@ export const fetchConnectionsContainerAndDispatch = (
           payload: Immutable.fromJS({
             atomUri: atomUri,
             connections: connectionsWithStateAndSocket,
+            allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+              atomUri
+            )(state),
             request: {
               code: 200,
               requestCredentials: requestCredentials,
@@ -389,6 +458,9 @@ export const fetchConnectionsContainerAndDispatch = (
             type: actionTypes.atoms.storeConnectionContainerFailed,
             payload: Immutable.fromJS({
               uri: atomUri,
+              allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+                atomUri
+              )(state),
               request: {
                 code: errorParsed.status,
                 params: errorParsed.params || {},
@@ -524,6 +596,9 @@ export const fetchAtomAndDispatch = (
                 type: actionTypes.atoms.storeUriFailed,
                 payload: Immutable.fromJS({
                   uri: atomUri,
+                  allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+                    atomUri
+                  )(state),
                   request: {
                     code: errorParsed.status,
                     params: errorParsed.params || {},
