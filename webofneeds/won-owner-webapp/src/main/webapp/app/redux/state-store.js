@@ -415,24 +415,23 @@ export const fetchConnectionsContainerAndDispatch = (
             type: actionTypes.atoms.delete,
             payload: Immutable.fromJS({ uri: atomUri }),
           });
-        } else {
-          dispatch({
-            type: actionTypes.atoms.storeConnectionContainerFailed,
-            payload: Immutable.fromJS({
-              uri: atomUri,
-              allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
-                atomUri
-              )(state),
-              request: {
-                code: errorParsed.status,
-                params: errorParsed.params || {},
-                message: errorParsed.message || error.message,
-                response: errorParsed.response,
-                requestCredentials: requestCredentials,
-              },
-            }),
-          });
         }
+        dispatch({
+          type: actionTypes.atoms.storeConnectionContainerFailed,
+          payload: Immutable.fromJS({
+            uri: atomUri,
+            allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+              atomUri
+            )(state),
+            request: {
+              code: errorParsed.status,
+              params: errorParsed.params || {},
+              message: errorParsed.message || error.message,
+              response: errorParsed.response,
+              requestCredentials: requestCredentials,
+            },
+          }),
+        });
       })
   );
 };
@@ -550,23 +549,22 @@ export const fetchAtomAndDispatch = (
                 type: actionTypes.atoms.delete,
                 payload: Immutable.fromJS({ uri: atomUri }),
               });
-            } else {
-              dispatch({
-                type: actionTypes.atoms.storeUriFailed,
-                payload: Immutable.fromJS({
-                  uri: atomUri,
-                  allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
-                    atomUri
-                  )(state),
-                  request: {
-                    code: errorParsed.status,
-                    params: errorParsed.params || {},
-                    message: errorParsed.message,
-                    requestCredentials: requestCredentials,
-                  },
-                }),
-              });
             }
+            dispatch({
+              type: actionTypes.atoms.storeUriFailed,
+              payload: Immutable.fromJS({
+                uri: atomUri,
+                allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+                  atomUri
+                )(state),
+                request: {
+                  code: errorParsed.status,
+                  params: errorParsed.params || {},
+                  message: errorParsed.message,
+                  requestCredentials: requestCredentials,
+                },
+              }),
+            });
           })
       )
   );

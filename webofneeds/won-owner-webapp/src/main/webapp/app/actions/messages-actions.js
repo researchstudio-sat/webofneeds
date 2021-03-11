@@ -128,22 +128,21 @@ export const successfulCreate = wonMessage => (dispatch, getState) => {
               type: actionTypes.atoms.delete,
               payload: Immutable.fromJS({ uri: atomUri }),
             });
-          } else {
-            dispatch({
-              type: actionTypes.atoms.storeUriFailed,
-              payload: Immutable.fromJS({
-                uri: atomUri,
-                allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
-                  atomUri
-                )(getState()),
-                request: {
-                  code: error.status,
-                  message: error.message,
-                  requestCredentials: requestCredentials,
-                },
-              }),
-            });
           }
+          dispatch({
+            type: actionTypes.atoms.storeUriFailed,
+            payload: Immutable.fromJS({
+              uri: atomUri,
+              allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+                atomUri
+              )(getState()),
+              request: {
+                code: error.status,
+                message: error.message,
+                requestCredentials: requestCredentials,
+              },
+            }),
+          });
         })
     );
 };
