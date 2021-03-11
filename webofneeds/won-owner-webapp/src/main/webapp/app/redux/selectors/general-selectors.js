@@ -650,8 +650,6 @@ export const getPossibleRequestCredentialsForAtom = atomUri =>
             });
           });
         });
-
-        //TODO: EITHER REMOVE ALREADY FETCHED AND THEREFORE DISCARDED CREDENTIALS HERE OR IMPLEMENT ANOTHER METHOD THAT INCLUDES THAT
       }
       return Immutable.fromJS(possibleRequestCredentials);
     }
