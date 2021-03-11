@@ -213,39 +213,37 @@ export const determineRequestCredentials = (
             )
         );
 
-      if (possibleCredentialsForToken.size > 0) {
-        const fetchTokenRequestCredentials = possibleCredentialsForToken
-          .first()
-          .toJS();
-        fetchTokenRequestCredentials.scopes = tokenScope;
-
-        if (possibleCredentialsForToken.size > 1) {
-          console.debug(
-            "## more than one possible requestCredential found for this non owned Atom, using first one as the tokenRequester: ",
-            fetchTokenRequestCredentials,
-            possibleCredentialsForToken
-          );
-        } else {
-          console.debug(
-            "## one possible requestCredential found for this non owned Atom, using it as the tokenRequester: ",
-            fetchTokenRequestCredentials
-          );
+      const fetchThroughPossibleTokenCredentials = async possibleTokenCredentials => {
+        if (possibleTokenCredentials.size > 0) {
+          for (const possibleTokenCred of possibleTokenCredentials) {
+            const fetchTokenRequestCredentials = possibleTokenCred.toJS();
+            fetchTokenRequestCredentials.scopes = tokenScope;
+            try {
+              const response = await fetchTokenFromAtomAndDispatch(
+                dispatch,
+                state,
+                requestTokenFromAtomUri,
+                fetchTokenRequestCredentials,
+                tokenCredential
+              );
+              return response;
+            } catch (error) {
+              console.warn(
+                "Could not obtain token with the given credentials: ",
+                error
+              );
+            }
+          }
         }
 
-        return fetchTokenFromAtomAndDispatch(
-          dispatch,
-          state,
-          requestTokenFromAtomUri,
-          fetchTokenRequestCredentials,
-          tokenCredential
-        );
-      } /*else {
-        //TODO: WHAT DO WE DO IF THERE ARE NO MORE POSSIBILITIES LEFT?
-        // return Promise.reject({
-        //   token: "BLARGH", //TODO: FIX THIS TO WORK WITHOUT MAKING A REQUEST WITH A FAKE-TOKEN
-        //   obtainedFrom: tokenCredential.toJS(),
-        // });
-      }*/
+        //FIXME: THIS IS JUST A FAILSAFE TO MARK THE obtainFrom: request option as invalid (since we did not get a token for it yet)
+        return {
+          token: "BLARGH!",
+          obtainedFrom: tokenCredential.toJS(),
+        };
+      };
+
+      return fetchThroughPossibleTokenCredentials(possibleCredentialsForToken);
     }
   } else {
     console.debug(
@@ -367,98 +365,89 @@ export const fetchConnectionsContainerAndDispatch = (
     state,
     atomUri,
     processSelectors.getConnectionContainerRequests(atomUri)(state)
-  )
-    .then(requestCredentials =>
-      won
-        .fetchConnectionUrisWithStateByAtomUri(
-          atomUtils.getConnectionContainerUri(
-            generalSelectors.getAtom(atomUri)(state)
-          ),
-          requestCredentials
-        )
-        .then(connectionsWithStateAndSocket => {
+  ).then(requestCredentials =>
+    won
+      .fetchConnectionUrisWithStateByAtomUri(
+        atomUtils.getConnectionContainerUri(
+          generalSelectors.getAtom(atomUri)(state)
+        ),
+        requestCredentials
+      )
+      .then(connectionsWithStateAndSocket => {
+        dispatch({
+          type: actionTypes.connections.storeMetaConnections,
+          payload: Immutable.fromJS({
+            atomUri: atomUri,
+            connections: connectionsWithStateAndSocket,
+            allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
+              atomUri
+            )(state),
+            request: {
+              code: 200,
+              requestCredentials: requestCredentials,
+            },
+          }),
+        });
+        if (isOwned) {
+          const activeConnectionUris = connectionsWithStateAndSocket
+            .filter(
+              conn =>
+                !isUriDeleted(conn.uri) &&
+                conn.connectionState !== vocab.WON.Closed &&
+                conn.connectionState !== vocab.WON.Suggested
+            )
+            .map(conn => conn.uri);
+
           dispatch({
-            type: actionTypes.connections.storeMetaConnections,
+            type: actionTypes.connections.storeActiveUrisInLoading,
             payload: Immutable.fromJS({
               atomUri: atomUri,
-              connections: connectionsWithStateAndSocket,
+              connUris: activeConnectionUris,
+            }),
+          });
+          return activeConnectionUris;
+        }
+        return undefined;
+      })
+      .then(
+        activeConnectionUris =>
+          activeConnectionUris &&
+          urisToLookupMap(activeConnectionUris, connUri =>
+            fetchActiveConnectionAndDispatch(
+              connUri,
+              requestCredentials,
+              dispatch
+            )
+          )
+      )
+      .catch(error => {
+        let errorParsed = parseWorkerError(error);
+
+        if (errorParsed.status && errorParsed.status === 410) {
+          dispatch({
+            type: actionTypes.atoms.delete,
+            payload: Immutable.fromJS({ uri: atomUri }),
+          });
+        } else {
+          dispatch({
+            type: actionTypes.atoms.storeConnectionContainerFailed,
+            payload: Immutable.fromJS({
+              uri: atomUri,
               allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
                 atomUri
               )(state),
               request: {
-                code: 200,
+                code: errorParsed.status,
+                params: errorParsed.params || {},
+                message: errorParsed.message || error.message,
+                response: errorParsed.response,
                 requestCredentials: requestCredentials,
               },
             }),
           });
-          if (isOwned) {
-            const activeConnectionUris = connectionsWithStateAndSocket
-              .filter(
-                conn =>
-                  !isUriDeleted(conn.uri) &&
-                  conn.connectionState !== vocab.WON.Closed &&
-                  conn.connectionState !== vocab.WON.Suggested
-              )
-              .map(conn => conn.uri);
-
-            dispatch({
-              type: actionTypes.connections.storeActiveUrisInLoading,
-              payload: Immutable.fromJS({
-                atomUri: atomUri,
-                connUris: activeConnectionUris,
-              }),
-            });
-            return activeConnectionUris;
-          }
-          return undefined;
-        })
-        .then(
-          activeConnectionUris =>
-            activeConnectionUris &&
-            urisToLookupMap(activeConnectionUris, connUri =>
-              fetchActiveConnectionAndDispatch(
-                connUri,
-                requestCredentials,
-                dispatch
-              )
-            )
-        )
-        .catch(error => {
-          let errorParsed = parseWorkerError(error);
-
-          if (errorParsed.status && errorParsed.status === 410) {
-            dispatch({
-              type: actionTypes.atoms.delete,
-              payload: Immutable.fromJS({ uri: atomUri }),
-            });
-          } else {
-            dispatch({
-              type: actionTypes.atoms.storeConnectionContainerFailed,
-              payload: Immutable.fromJS({
-                uri: atomUri,
-                allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
-                  atomUri
-                )(state),
-                request: {
-                  code: errorParsed.status,
-                  params: errorParsed.params || {},
-                  message: errorParsed.message || error.message,
-                  response: errorParsed.response,
-                  requestCredentials: requestCredentials,
-                },
-              }),
-            });
-          }
-        })
-    )
-    .catch(error => {
-      // errorParsed 666 marks that we could simply not retrieve the token (yet) there might be a possibility that we can retrieve it another way
-      // let us not rule out this request yet
-      console.error(
-        "could not retrieve token from atom, try again with a different atom....",
-        error
-      );
-    });
+        }
+      })
+  );
 };
 
 /**
@@ -593,14 +582,6 @@ export const fetchAtomAndDispatch = (
             }
           })
       )
-      .catch(error => {
-        // errorParsed 666 marks that we could simply not retrieve the token (yet) there might be a possibility that we can retrieve it another way
-        // let us not rule out this request yet
-        console.error(
-          "could not retrieve token from atom, try again with a different atom....",
-          error
-        );
-      })
   );
 };
 
