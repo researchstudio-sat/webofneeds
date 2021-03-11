@@ -85,8 +85,8 @@ export default function WonAtomMenu({
     </div>
   );
 
-  // Add generic Tabs based on available Sockets, only when the atom or the corresponding connection Container has not failed to load
-  !(atomFailedToLoad || connectionContainerFailedToLoad) &&
+  // Add generic Tabs based on available Sockets, only when the atom has not failed to load
+  !atomFailedToLoad &&
     relevantConnectionsMap
       .filter(connectionUtils.filterSingleConnectedSocketCapacityFilter)
       .filter(connectionUtils.filterTagViewSockets)
