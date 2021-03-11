@@ -22,6 +22,8 @@ export default function WonAtomContentRequests({ atom }) {
   const tokenScopeUriElements = [];
   const tokenScopeUris = atomUtils.getTokenScopeUris(atom);
 
+  const processState = useSelector(generalSelectors.getProcessState);
+
   const possibleRequestCredentials = useSelector(
     generalSelectors.getPossibleRequestCredentialsForAtom(atomUri)
   );
@@ -70,9 +72,77 @@ export default function WonAtomContentRequests({ atom }) {
 
   tokenScopeUris &&
     tokenScopeUris.map((tokenScopeUri, idx) => {
+      const fetchTokenRequests = processUtils.getFetchTokenRequests(
+        processState,
+        atomUri,
+        tokenScopeUri
+      );
+      const fetchTokenRequestElements = [];
+      const fetchTokenRequestCredentialsElements = [];
+
+      possibleRequestCredentials &&
+        possibleRequestCredentials.map((credentials, idx) => {
+          fetchTokenRequestCredentialsElements.push(
+            <div
+              key={"rc_" + idx}
+              className={generateCredentialsCodeClasses(
+                fetchTokenRequests,
+                credentials
+              )}
+            >
+              <div className="acrequests__item__code">🔑</div>
+              <pre className="acrequests__item__content">
+                {credentials &&
+                  JSON.stringify(credentials.toJS(), undefined, 2)}
+              </pre>
+            </div>
+          );
+        });
+
+      fetchTokenRequests &&
+        fetchTokenRequests.map((request, idx) => {
+          const responseCode = get(request, "code");
+          fetchTokenRequestElements.push(
+            <div key={"ftr_" + idx} className="acrequests__item">
+              <div className={generateResponseCodeClasses(responseCode)}>
+                {responseCode}
+              </div>
+              <pre className="acrequests__item__content">
+                {request && JSON.stringify(request.toJS(), undefined, 2)}
+              </pre>
+            </div>
+          );
+        });
+
       tokenScopeUriElements.push(
         <div key={"tr_" + idx} className="acrequests__tokens__item">
-          <div className="acrequests__tokens__item__uri">{tokenScopeUri}</div>
+          <div className="acrequests__tokens__item__uri">
+            {"Scope: " + tokenScopeUri}
+          </div>
+          <div className="acrequests__tokens__item__requests">
+            <div className="acrequests__tokens__item__requests__header">
+              Prior Requests
+            </div>
+            {fetchTokenRequestElements.length > 0 ? (
+              fetchTokenRequestElements
+            ) : (
+              <div className="acrequests__tokens__nodata">
+                No Fetch Token Request Data available
+              </div>
+            )}
+          </div>
+          <div className="acrequests__tokens__item__credentials">
+            <div className="acrequests__tokens__item__credentials__header">
+              Possible Credentials to Use
+            </div>
+            {fetchTokenRequestCredentialsElements.length > 0 ? (
+              fetchTokenRequestCredentialsElements
+            ) : (
+              <div className="acrequests__tokens__nodata">
+                No Credentials found in state
+              </div>
+            )}
+          </div>
         </div>
       );
     });
