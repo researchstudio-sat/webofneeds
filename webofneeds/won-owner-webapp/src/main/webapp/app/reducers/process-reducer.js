@@ -433,17 +433,8 @@ export default function(processState = initialState, action = {}) {
           )
       );
 
-      console.debug(
-        "remainingRequestCredentials for ",
-        atomUri,
-        " -> ",
-        remainingRequestCredentials.size
-      );
-
-      //TODO: DETERMINE toLoad based on status and remaining Credentials
-
       return updateAtomProcess(processState, atomUri, {
-        toLoad: false,
+        toLoad: remainingRequestCredentials.size > 0,
         loaded: false,
         failedToLoad: true,
         loading: false,
@@ -468,15 +459,6 @@ export default function(processState = initialState, action = {}) {
             requestCredentials
           )
       );
-
-      console.debug(
-        "remainingRequestCredentials for connectionContainer of ",
-        atomUri,
-        " -> ",
-        remainingRequestCredentials.size
-      );
-
-      //TODO: DETERMINE toLoad based on status and remaining Credentials
 
       return updateConnectionContainerProcess(processState, atomUri, {
         toLoad: remainingRequestCredentials.size > 0,
