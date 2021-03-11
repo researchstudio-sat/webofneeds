@@ -1,6 +1,7 @@
 @import "won-config";
 @import "sizing-utils";
 @import "animate";
+@import "elevation";
 
 won-atom-content-auth {
   display: grid;
@@ -9,6 +10,7 @@ won-atom-content-auth {
   padding: 0.5rem;
 
   .acauth__item {
+    @include defaultCardElevation();
     background: var(--won-lighter-gray);
     border: $thinGrayBorder;
     padding: 0.5rem;
@@ -32,13 +34,23 @@ won-atom-content-auth {
     &__provideAuthInfo,
     &__bearer,
     &__requestedBy,
-    &__grantee,
+    pre.acauth__item__grantee,
     &__grant {
       white-space: pre-wrap;
       overflow-x: auto;
       font-family: monospace;
       padding-bottom: 0.5rem;
       margin: 0;
+    }
+
+    span.acauth__item__grantee {
+      @include defaultItemActionElevation();
+      display: inline-block;
+      background: $won-secondary-color;
+      color: $won-secondary-text-color;
+      border-radius: 0.19rem;
+      margin-bottom: 0.5rem;
+      padding: 0.25rem 0.5rem;
     }
   }
 }
