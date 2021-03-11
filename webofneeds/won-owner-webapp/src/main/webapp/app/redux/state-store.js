@@ -317,20 +317,7 @@ export const fetchConnectionsContainerAndDispatch = (
   const state = getState();
   const processState = generalSelectors.getProcessState(state);
 
-  if (processUtils.isConnectionContainerLoaded(processState, atomUri)) {
-    console.debug(
-      "Omit Fetch of ConnectionContainer<",
-      atomUri,
-      ">, it is already loaded..."
-    );
-    if (processUtils.isConnectionContainerToLoad(processState, atomUri)) {
-      dispatch({
-        type: actionTypes.atoms.markConnectionContainerAsLoaded,
-        payload: Immutable.fromJS({ uri: atomUri }),
-      });
-    }
-    return Promise.resolve();
-  } else if (processUtils.isConnectionContainerLoading(processState, atomUri)) {
+  if (processUtils.isConnectionContainerLoading(processState, atomUri)) {
     console.debug(
       "Omit Fetch of ConnectionContainer<",
       atomUri,
