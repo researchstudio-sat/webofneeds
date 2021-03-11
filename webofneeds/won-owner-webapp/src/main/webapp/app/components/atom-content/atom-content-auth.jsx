@@ -2,6 +2,7 @@
  * Created by ms on 15.02.2021
  */
 import React from "react";
+import Immutable from "immutable";
 import PropTypes from "prop-types";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
 import { get, getIn } from "~/app/utils";
@@ -12,6 +13,80 @@ import "~/style/_atom-content-auth.scss";
 export default function WonAtomContentAuth({ atom }) {
   const authImm = atomUtils.getAuth(atom);
   const authElements = [];
+
+  const generateGrantElement = grant => {
+    const grantElements = [];
+
+    const generateInnerGrantElements = g => {
+      const operations = get(g, vocab.AUTH.operation);
+
+      if (operations) {
+        const opElements = [];
+        const remainingOperations = operations.filter(operation => {
+          if (get(operation, vocab.AUTH.requestToken)) {
+            const expirationTime = getIn(operation, [
+              vocab.AUTH.requestToken,
+              vocab.AUTH.expiresAfter,
+            ]);
+            const tokenScopeUri = getIn(operation, [
+              vocab.AUTH.requestToken,
+              vocab.AUTH.tokenScope,
+              "@id",
+            ]);
+
+            if (tokenScopeUri) {
+              opElements.push(
+                <span
+                  className="acauth__item__grant acauth__item__grant--op"
+                  key={tokenScopeUri}
+                  title={
+                    "Expires After: " +
+                    expirationTime +
+                    "\n\n" +
+                    JSON.stringify(operation.toJS(), undefined, 2)
+                  }
+                >
+                  {"🔑 " + tokenScopeUri}
+                </span>
+              );
+              return false;
+            }
+            return true;
+          }
+          return true;
+        });
+        grantElements.push(
+          <React.Fragment key="multigrants">
+            {opElements}
+            {remainingOperations.size > 0 && (
+              <pre className="acauth__item__grant">
+                {g &&
+                  JSON.stringify(
+                    g.set(vocab.AUTH.operation, remainingOperations).toJS(),
+                    undefined,
+                    2
+                  )}
+              </pre>
+            )}
+          </React.Fragment>
+        );
+      } else {
+        grantElements.push(
+          <pre className="acauth__item__grant" key="singlegrants">
+            {g && JSON.stringify(g.toJS(), undefined, 2)}
+          </pre>
+        );
+      }
+    };
+
+    if (Immutable.List.isList(grant)) {
+      grant.map(g => generateInnerGrantElements(g));
+    } else {
+      generateInnerGrantElements(grant);
+    }
+
+    return grantElements;
+  };
 
   const generateGranteeElement = grantee => {
     if (get(grantee, "@id") === vocab.AUTH.anyone) {
@@ -102,9 +177,7 @@ export default function WonAtomContentAuth({ atom }) {
           {grant && (
             <React.Fragment>
               <div className="acauth__item__grantlabel">Grant</div>
-              <pre className="acauth__item__grant">
-                {grant && JSON.stringify(grant.toJS(), undefined, 2)}
-              </pre>
+              {generateGrantElement(grant)}
             </React.Fragment>
           )}
           {provideAuthInfo && (
