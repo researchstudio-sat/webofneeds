@@ -4,7 +4,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
-import { get } from "~/app/utils";
+import { get, getIn } from "~/app/utils";
 import vocab from "~/app/service/vocab.js";
 
 import "~/style/_atom-content-auth.scss";
@@ -12,6 +12,67 @@ import "~/style/_atom-content-auth.scss";
 export default function WonAtomContentAuth({ atom }) {
   const authImm = atomUtils.getAuth(atom);
   const authElements = [];
+
+  const generateGranteeElement = grantee => {
+    if (get(grantee, "@id") === vocab.AUTH.anyone) {
+      return (
+        <span
+          className="acauth__item__grantee"
+          title={grantee && JSON.stringify(grantee.toJS(), undefined, 2)}
+        >
+          Anyone
+        </span>
+      );
+    } else if (
+      getIn(grantee, [
+        vocab.AUTH.socket,
+        vocab.AUTH.connection,
+        vocab.AUTH.connectionState,
+        "@id",
+      ]) === vocab.WON.Connected
+    ) {
+      if (
+        getIn(grantee, [vocab.AUTH.socket, vocab.AUTH.socketType, "@id"]) ===
+        vocab.BUDDY.BuddySocket
+      ) {
+        return (
+          <span
+            className="acauth__item__grantee"
+            title={grantee && JSON.stringify(grantee.toJS(), undefined, 2)}
+          >
+            Any Buddy
+          </span>
+        );
+      } else if (
+        getIn(grantee, [vocab.AUTH.socket, vocab.AUTH.socketType, "@id"]) ===
+        vocab.WXSCHEMA.MemberSocket
+      ) {
+        return (
+          <span
+            className="acauth__item__grantee"
+            title={grantee && JSON.stringify(grantee.toJS(), undefined, 2)}
+          >
+            Any Member
+          </span>
+        );
+      } else if (getIn(grantee, [vocab.AUTH.socket, vocab.AUTH.socketType])) {
+        return (
+          <span
+            className="acauth__item__grantee"
+            title={grantee && JSON.stringify(grantee.toJS(), undefined, 2)}
+          >
+            Anyone who is Connected
+          </span>
+        );
+      }
+    }
+
+    return (
+      <pre className="acauth__item__grantee">
+        {grantee && JSON.stringify(grantee.toJS(), undefined, 2)}
+      </pre>
+    );
+  };
 
   authImm &&
     authImm.map((auth, idx) => {
@@ -27,9 +88,7 @@ export default function WonAtomContentAuth({ atom }) {
           {grantee && (
             <React.Fragment>
               <div className="acauth__item__granteelabel">Grantee</div>
-              <pre className="acauth__item__grantee">
-                {grantee && JSON.stringify(grantee.toJS(), undefined, 2)}
-              </pre>
+              {generateGranteeElement(grantee)}
             </React.Fragment>
           )}
           {bearer && (
