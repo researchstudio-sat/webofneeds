@@ -4,13 +4,13 @@ import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.auth.check.AtomNodeChecker;
-import won.auth.check.TargetAtomCheck;
+import won.auth.check.ConnectionTargetCheck;
 import won.auth.check.TargetAtomCheckEvaluator;
 import won.auth.check.WonAclEvaluationException;
 import won.auth.model.*;
 import won.auth.support.AseMerger;
+import won.auth.support.ConnectionTargetCheckGenerator;
 import won.auth.support.OperationRequestChecker;
-import won.auth.support.TargetAtomCheckGenerator;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 
 import java.lang.invoke.MethodHandles;
@@ -415,17 +415,17 @@ public class WonAclEvaluator {
         debug("looking for grantee in atom structure expressions", authorization, request);
         for (AseRoot root : authorization.getGranteesAseRoot()) {
             URI baseAtom = request.getReqAtom();
-            if (isTargetAtom(requestor, baseAtom, root)) {
+            if (isTargetAtomOrTargetWonNode(requestor, baseAtom, root)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean isTargetAtom(URI candidate, URI baseAtom, AseRoot aseRoot) {
-        TargetAtomCheckGenerator v = new TargetAtomCheckGenerator(baseAtom, candidate);
+    private boolean isTargetAtomOrTargetWonNode(URI candidate, URI baseAtom, AseRoot aseRoot) {
+        ConnectionTargetCheckGenerator v = new ConnectionTargetCheckGenerator(baseAtom, candidate);
         aseRoot.accept(v);
-        if (v.getTargetAtomChecks().isEmpty()) {
+        if (v.getConnectionTargetChecks().isEmpty()) {
             logger.warn("Expected a targetAtomExpression in  ASE {} of {} for candidate {}, but none was found",
                             aseRoot.getNode(), baseAtom, candidate);
             if (logger.isDebugEnabled()) {
@@ -434,11 +434,11 @@ public class WonAclEvaluator {
                 logger.warn("ASE is logged on level DEBUG");
             }
             throw new WonAclEvaluationException(
-                            String.format("Expected a targetAtomExpression in this expression of atom %s but none was found:\n%s\n",
+                            String.format("Expected a targetAtomExpression or a targetWonNodeExpression in this expression of atom %s but none was found:\n%s\n",
                                             baseAtom,
                                             AuthUtils.toRdfString(aseRoot)));
         }
-        for (TargetAtomCheck check : v.getTargetAtomChecks()) {
+        for (ConnectionTargetCheck check : v.getConnectionTargetChecks()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Evaluating targetAtomCheck: {}", check);
             }
@@ -526,7 +526,7 @@ public class WonAclEvaluator {
     }
 
     private boolean isIssuerATargetAtom(URI baseAtom, Set<AseRoot> aseRoots, URI issuer) {
-        return aseRoots.stream().anyMatch(root -> isTargetAtom(issuer, baseAtom, root));
+        return aseRoots.stream().anyMatch(root -> isTargetAtomOrTargetWonNode(issuer, baseAtom, root));
     }
 
     private boolean isIssuerInAtomExpressions(URI baseAtom, Set<AtomExpression> atomExpressions, URI issuer) {

@@ -1,26 +1,31 @@
 package won.auth.check;
 
-import won.auth.model.*;
+import won.auth.model.ConnectionState;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TargetAtomCheck {
+public class ConnectionTargetCheck {
     private URI atom;
     private URI requestedTarget;
     private Set<URI> allowedSockets;
     private Set<URI> allowedSocketTypes;
     private Set<URI> allowedConnectionStates;
+    private boolean isWonNodeCheck = false;
 
-    public TargetAtomCheck(URI atom, URI requestedTarget) {
+    public ConnectionTargetCheck(URI atom, URI requestedTarget) {
         this.atom = atom;
         this.requestedTarget = requestedTarget;
     }
 
-    public TargetAtomCheck clone() {
-        TargetAtomCheck clone = new TargetAtomCheck(atom, requestedTarget);
+    public ConnectionTargetCheck clone() {
+        ConnectionTargetCheck clone = new ConnectionTargetCheck(atom, requestedTarget);
         clone.atom = atom;
+        clone.isWonNodeCheck = isWonNodeCheck;
         clone.requestedTarget = requestedTarget;
         clone.allowedSockets = new HashSet<>(getAllowedSockets());
         clone.allowedSocketTypes = new HashSet<>(getAllowedSocketTypes());
@@ -34,6 +39,14 @@ public class TargetAtomCheck {
 
     public URI getRequestedTarget() {
         return requestedTarget;
+    }
+
+    public boolean isWonNodeCheck() {
+        return isWonNodeCheck;
+    }
+
+    public void setWonNodeCheck(boolean wonNodeCheck) {
+        isWonNodeCheck = wonNodeCheck;
     }
 
     public Set<URI> getAllowedSockets() {
@@ -117,25 +130,6 @@ public class TargetAtomCheck {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        TargetAtomCheck that = (TargetAtomCheck) o;
-        return Objects.equals(atom, that.atom) &&
-                        Objects.equals(requestedTarget, that.requestedTarget) &&
-                        Objects.equals(allowedSockets, that.allowedSockets) &&
-                        Objects.equals(allowedSocketTypes, that.allowedSocketTypes) &&
-                        Objects.equals(allowedConnectionStates, that.allowedConnectionStates);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(atom, requestedTarget, allowedSockets, allowedSocketTypes, allowedConnectionStates);
-    }
-
     public void intersectAllowedConnectionStates(Set<URI> allowedConnectionStates) {
         if (allowedConnectionStates != null) {
             this.allowedConnectionStates.retainAll(allowedConnectionStates);
@@ -150,10 +144,34 @@ public class TargetAtomCheck {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ConnectionTargetCheck that = (ConnectionTargetCheck) o;
+        return isWonNodeCheck == that.isWonNodeCheck &&
+                        Objects.equals(atom, that.atom) &&
+                        Objects.equals(requestedTarget, that.requestedTarget) &&
+                        Objects.equals(allowedSockets, that.allowedSockets) &&
+                        Objects.equals(allowedSocketTypes, that.allowedSocketTypes) &&
+                        Objects.equals(allowedConnectionStates, that.allowedConnectionStates);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(atom, requestedTarget, allowedSockets, allowedSocketTypes, allowedConnectionStates,
+                        isWonNodeCheck);
+    }
+
+    @Override
     public String toString() {
         return "TargetAtomCheck{" +
                         "atom=" + atom +
                         ", requestorAtom=" + requestedTarget +
+                        ", isWonNodeAllowed=" + isWonNodeCheck +
                         ", allowedSockets=" + allowedSockets +
                         ", allowedSocketTypes=" + allowedSocketTypes +
                         ", allowedConnectionStates=" + allowedConnectionStates +

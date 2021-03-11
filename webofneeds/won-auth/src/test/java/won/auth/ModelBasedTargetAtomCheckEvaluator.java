@@ -4,7 +4,7 @@ import org.apache.jena.graph.Graph;
 import org.apache.jena.shacl.Shapes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import won.auth.check.TargetAtomCheck;
+import won.auth.check.ConnectionTargetCheck;
 import won.auth.check.TargetAtomCheckEvaluator;
 import won.auth.test.model.Atom;
 import won.auth.test.model.Connection;
@@ -36,7 +36,7 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
     }
 
     @Override
-    public boolean isRequestorAllowedTarget(TargetAtomCheck check) {
+    public boolean isRequestorAllowedTarget(ConnectionTargetCheck check) {
         Optional<Atom> atomOpt = accessor.getInstanceOfType(check.getAtom().toString(), Atom.class);
         if (!atomOpt.isPresent()) {
             logger.debug("No data found for atom {} ", check.getAtom());
@@ -75,7 +75,10 @@ public class ModelBasedTargetAtomCheckEvaluator implements TargetAtomCheckEvalua
                         .anyMatch(c -> c
                                         .getTargetAtom()
                                         .getNode().toString()
-                                        .equals(check.getRequestedTarget().toString()));
+                                        .equals(check.getRequestedTarget().toString())
+                                        || (check.isWonNodeCheck()
+                                                        && check.getRequestedTarget()
+                                                                        .equals(c.getTargetAtom().getWonNode())));
         if (logger.isDebugEnabled()) {
             logger.debug("{} target atom {} in connections' targetAtoms", foundIt ? "found" : "did not find",
                             check.getRequestedTarget());
