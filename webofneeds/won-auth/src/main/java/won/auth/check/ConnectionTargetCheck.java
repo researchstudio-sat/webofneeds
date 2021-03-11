@@ -171,7 +171,7 @@ public class ConnectionTargetCheck {
         return "TargetAtomCheck{" +
                         "atom=" + atom +
                         ", requestorAtom=" + requestedTarget +
-                        ", isWonNodeAllowed=" + isWonNodeCheck +
+                        ", isWonNodeCheck=" + isWonNodeCheck +
                         ", allowedSockets=" + allowedSockets +
                         ", allowedSocketTypes=" + allowedSocketTypes +
                         ", allowedConnectionStates=" + allowedConnectionStates +
