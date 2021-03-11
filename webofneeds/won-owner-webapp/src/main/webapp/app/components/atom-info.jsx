@@ -99,6 +99,7 @@ export default function WonAtomInfo({
         relevantConnectionsMap={relevantConnectionsMap}
       />
       <WonAtomContent
+        atomUri={atomUri}
         atom={atom}
         visibleTab={visibleTab}
         relevantConnectionsMap={relevantConnectionsMap}

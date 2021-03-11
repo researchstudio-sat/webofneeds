@@ -928,13 +928,13 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.messages.processConnectionMessage:
       return addMessageAtomsToLoad(processState, action.payload);
 
-    case actionTypes.atoms.delete:
+    /*case actionTypes.atoms.delete:
     case actionTypes.atoms.removeDeleted: {
       const atomUri = getUri(action.payload);
       return processState
         .deleteIn(["atoms", atomUri])
         .deleteIn(["connectionContainers", atomUri]);
-    }
+    }*/
 
     default:
       return processState;

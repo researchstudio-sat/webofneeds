@@ -42,6 +42,7 @@ import { useHistory } from "react-router-dom";
 import WonAtomContentRequests from "~/app/components/atom-content/atom-content-requests";
 
 export default function WonAtomContent({
+  atomUri,
   atom,
   visibleTab,
   setVisibleTab,
@@ -52,17 +53,16 @@ export default function WonAtomContent({
 }) {
   const history = useHistory();
   const dispatch = useDispatch();
-  const atomUri = getUri(atom);
   const { connectionUri } = getQueryParams(history.location);
   const isOwned = useSelector(generalSelectors.isAtomOwned(atomUri));
 
   const process = useSelector(generalSelectors.getProcessState);
 
-  const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
+  const atomLoading = !atomUri || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
-    atom && processUtils.hasAtomFailedToLoad(process, atomUri);
+    atomUri && processUtils.hasAtomFailedToLoad(process, atomUri);
   const atomProcessingUpdate =
-    atom && processUtils.isAtomProcessingUpdate(process, atomUri);
+    atomUri && processUtils.isAtomProcessingUpdate(process, atomUri);
 
   /*const connectionContainerLoading =
     !atom || processUtils.isConnectionContainerLoading(process, atomUri);
@@ -601,6 +601,7 @@ function WonAtomContentSingleConnectSockets({
   );
 }
 WonAtomContentSingleConnectSockets.propTypes = {
+  atomUri: PropTypes.string.isRequired,
   atom: PropTypes.object.isRequired,
   reactions: PropTypes.object.isRequired,
   relevantSingleConnectConnectionsMap: PropTypes.object.isRequired,
