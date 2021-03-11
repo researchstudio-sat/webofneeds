@@ -66,6 +66,12 @@ export function parseAtomContent(partiallyParsedAtom) {
         if (contentIdentifier === "description") {
           return "2";
         }
+        if (contentIdentifier === "fromDatetime") {
+          return "zy";
+        }
+        if (contentIdentifier === "throughDatetime") {
+          return "zz";
+        }
 
         return get(detailsToParse[contentIdentifier], "label");
       };
