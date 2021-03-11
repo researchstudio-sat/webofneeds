@@ -33,7 +33,6 @@ export const emptyExternalDataProcess = Immutable.fromJS({
 });
 
 export const emptyFetchTokenProcess = Immutable.fromJS({
-  token: undefined,
   requests: Immutable.List(),
 });
 
@@ -372,21 +371,38 @@ export default function(processState = initialState, action = {}) {
       const atomUri = getUri(action.payload);
       const tokenScopeUri = get(action.payload, "tokenScopeUri");
       const request = get(action.payload, "request");
-      const fetchTokenRequests = processUtils.getFetchTokenRequests(
-        processState,
+      const updatedFetchTokenRequests = processUtils
+        .getFetchTokenRequests(processState, atomUri, tokenScopeUri)
+        .push(request);
+
+      const remainingRequestCredentials = get(
+        action.payload,
+        "allRequestCredentials"
+      ).filter(
+        requestCredentials =>
+          !processUtils.isUsedCredentialsUnsuccessfully(
+            updatedFetchTokenRequests,
+            requestCredentials
+          )
+      );
+
+      console.debug(
+        "remainingRequestCredentials to fetch TokenScopeUri",
+        tokenScopeUri,
+        " from ",
         atomUri,
-        tokenScopeUri
+        " -> ",
+        remainingRequestCredentials.size
       );
 
       return updateFetchTokenProcess(processState, atomUri, tokenScopeUri, {
-        requests: fetchTokenRequests.push(request),
+        requests: updatedFetchTokenRequests,
       });
     }
 
     case actionTypes.atoms.fetchToken.success: {
       const atomUri = getUri(action.payload);
       const tokenScopeUri = get(action.payload, "tokenScopeUri");
-      const token = get(action.payload, "token");
       const request = get(action.payload, "request");
       const fetchTokenRequests = processUtils.getFetchTokenRequests(
         processState,
@@ -395,7 +411,6 @@ export default function(processState = initialState, action = {}) {
       );
 
       return updateFetchTokenProcess(processState, atomUri, tokenScopeUri, {
-        token: token,
         requests: fetchTokenRequests.push(request),
       });
     }
@@ -403,31 +418,72 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.atoms.storeUriFailed: {
       const atomUri = getUri(action.payload);
       const request = get(action.payload, "request");
-      const atomRequests = processUtils.getAtomRequests(processState, atomUri);
+      const updatedAtomRequests = processUtils
+        .getAtomRequests(processState, atomUri)
+        .push(request);
+
+      const remainingRequestCredentials = get(
+        action.payload,
+        "allRequestCredentials"
+      ).filter(
+        requestCredentials =>
+          !processUtils.isUsedCredentialsUnsuccessfully(
+            updatedAtomRequests,
+            requestCredentials
+          )
+      );
+
+      console.debug(
+        "remainingRequestCredentials for ",
+        atomUri,
+        " -> ",
+        remainingRequestCredentials.size
+      );
+
+      //TODO: DETERMINE toLoad based on status and remaining Credentials
 
       return updateAtomProcess(processState, atomUri, {
         toLoad: false,
         loaded: false,
         failedToLoad: true,
         loading: false,
-        requests: atomRequests.push(request),
+        requests: updatedAtomRequests,
       });
     }
 
     case actionTypes.atoms.storeConnectionContainerFailed: {
       const atomUri = getUri(action.payload);
       const request = get(action.payload, "request");
-      const connectionContainerRequests = processUtils.getConnectionContainerRequests(
-        processState,
-        atomUri
+      const updatedConnectionContainerRequests = processUtils
+        .getConnectionContainerRequests(processState, atomUri)
+        .push(request);
+
+      const remainingRequestCredentials = get(
+        action.payload,
+        "allRequestCredentials"
+      ).filter(
+        requestCredentials =>
+          !processUtils.isUsedCredentials(
+            updatedConnectionContainerRequests,
+            requestCredentials
+          )
       );
 
+      console.debug(
+        "remainingRequestCredentials for connectionContainer of ",
+        atomUri,
+        " -> ",
+        remainingRequestCredentials.size
+      );
+
+      //TODO: DETERMINE toLoad based on status and remaining Credentials
+
       return updateConnectionContainerProcess(processState, atomUri, {
-        toLoad: false,
-        loaded: false,
+        toLoad: remainingRequestCredentials.size > 0,
+        // loaded: false, //do not set loaded to false, since we will check multiple times
         failedToLoad: true,
         loading: false,
-        requests: connectionContainerRequests.push(request),
+        requests: updatedConnectionContainerRequests,
       });
     }
 
@@ -677,15 +733,32 @@ export default function(processState = initialState, action = {}) {
       const atomUri = get(action.payload, "atomUri");
       const connections = get(action.payload, "connections");
       const request = get(action.payload, "request");
-      const connectionContainerRequests = processUtils.getConnectionContainerRequests(
-        processState,
-        atomUri
+      const updatedConnectionContainerRequests = processUtils
+        .getConnectionContainerRequests(processState, atomUri)
+        .push(request);
+
+      const remainingRequestCredentials = get(
+        action.payload,
+        "allRequestCredentials"
+      ).filter(
+        requestCredentials =>
+          !processUtils.isUsedCredentials(
+            updatedConnectionContainerRequests,
+            requestCredentials
+          )
+      );
+
+      console.debug(
+        "remainingRequestCredentials for connectionContainer of ",
+        atomUri,
+        " -> ",
+        remainingRequestCredentials.size
       );
 
       processState = updateConnectionContainerProcess(processState, atomUri, {
-        toLoad: false,
+        toLoad: remainingRequestCredentials.size > 0,
         failedToLoad: false,
-        requests: connectionContainerRequests.push(request),
+        requests: updatedConnectionContainerRequests,
         loading: false,
         loaded: true,
       });

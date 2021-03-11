@@ -534,6 +534,10 @@ function getRequestForSameCredentials(priorRequests, requestCredentials) {
   return undefined;
 }
 
+export function isUsedCredentials(priorRequests, requestCredentials) {
+  return !!getRequestForSameCredentials(priorRequests, requestCredentials);
+}
+
 export function isUsedCredentialsUnsuccessfully(
   priorRequests,
   requestCredentials
