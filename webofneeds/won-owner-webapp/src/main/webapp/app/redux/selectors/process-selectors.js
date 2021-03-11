@@ -78,6 +78,11 @@ export const getConnectionContainerRequests = atomUri =>
     processUtils.getConnectionContainerRequests(processState, atomUri)
   );
 
+export const getFetchTokenRequests = (atomUri, tokenScopeUri) =>
+  createSelector(getProcessState, processState =>
+    processUtils.getFetchTokenRequests(processState, atomUri, tokenScopeUri)
+  );
+
 export const getAllConnectionContainerRequests = createSelector(
   getProcessState,
   processState =>
