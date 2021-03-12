@@ -1,6 +1,7 @@
 @import "sizing-utils";
 @import "won-config";
 @import "animate";
+@import "elevation";
 
 won-atom-context-dropdown,
 won-connection-context-dropdown {
@@ -38,6 +39,7 @@ won-connection-context-dropdown {
     right: $thinBorderWidth;
 
     .cdd__contextmenu__content {
+      @include defaultContextDropdownElevation();
       background: white;
       border: $thinGrayBorder;
       padding: 0.5rem;
