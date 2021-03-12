@@ -6,7 +6,7 @@ import WonLoginForm from "./login-form.jsx";
 
 import "~/style/_login.scss";
 import "~/style/_login-menu.scss";
-import ico36_person from "~/images/won-icons/ico36_person.svg";
+import ico36_key from "~/images/won-icons/ico36_key.svg";
 
 export default function WonLoginMenu() {
   const dispatch = useDispatch();
@@ -45,7 +45,7 @@ export default function WonLoginMenu() {
       >
         <span className="wlm__header__caption hide-in-responsive">Sign In</span>
         <svg className="wlm__header__icon">
-          <use xlinkHref={ico36_person} href={ico36_person} />
+          <use xlinkHref={ico36_key} href={ico36_key} />
         </svg>
       </div>
       {mainMenuVisible && (
