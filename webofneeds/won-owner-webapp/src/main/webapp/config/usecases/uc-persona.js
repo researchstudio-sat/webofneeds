@@ -76,6 +76,10 @@ export const persona = {
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
+        labels: {
+          owned: "Organization",
+          nonOwned: "Organization",
+        },
       },
     },
     [vocab.HOLD.HolderSocketCompacted]: {

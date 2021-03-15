@@ -53,6 +53,10 @@ export const organization = {
     [vocab.WXSCHEMA.MemberSocketCompacted]: {
       [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
+        labels: {
+          owned: "Member",
+          nonOwned: "Member",
+        },
       },
       [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: {
         useCaseIdentifiers: ["role"],

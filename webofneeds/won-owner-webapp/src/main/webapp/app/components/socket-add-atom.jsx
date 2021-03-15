@@ -86,6 +86,7 @@ export default function WonSocketAddAtom({
 
           const refuseOwned = get(reaction, "refuseOwned");
           const refuseNonOwned = get(reaction, "refuseNonOwned");
+          //const labels = get(reaction, "labels");
 
           return (
             allowedUseCaseList &&

@@ -272,29 +272,36 @@ export function generateAddButtonLabel(
   targetSocketType,
   senderReactions
 ) {
-  switch (targetSocketType) {
-    case vocab.WXSCHEMA.ReviewSocketCompacted:
-      return `Review ${
-        atomUtils.getTitle(targetAtom) ? atomUtils.getTitle(targetAtom) : "Atom"
-      }`;
-    case vocab.WXSCHEMA.MemberSocketCompacted:
-      if (atomUtils.isOrganization(targetAtom)) {
-        return isAtomOwned ? "New Member/Role" : "Join Organization";
-      }
-      break;
-    case vocab.BUDDY.BuddySocketCompacted:
-      if (atomUtils.isPersona(targetAtom)) {
-        return isAtomOwned ? "Buddy" : "Add Buddy";
-      }
-      break;
-    default:
-      break;
+  const labels = atomUtils.getReactionLabels(targetAtom, targetSocketType);
+  if (labels) {
+    return isAtomOwned ? labels.owned : labels.nonOwned;
+  } else {
+    switch (targetSocketType) {
+      case vocab.WXSCHEMA.ReviewSocketCompacted:
+        return `Review ${
+          atomUtils.getTitle(targetAtom)
+            ? atomUtils.getTitle(targetAtom)
+            : "Atom"
+        }`;
+      case vocab.WXSCHEMA.MemberSocketCompacted:
+        if (atomUtils.isOrganization(targetAtom)) {
+          return isAtomOwned ? "New Member/Role" : "Join Organization";
+        }
+        break;
+      case vocab.BUDDY.BuddySocketCompacted:
+        if (atomUtils.isPersona(targetAtom)) {
+          return isAtomOwned ? "Buddy" : "Add Buddy";
+        }
+        break;
+      default:
+        break;
+    }
+    return generateDefaultButtonLabel(
+      isAtomOwned,
+      targetSocketType,
+      senderReactions
+    );
   }
-  return generateDefaultButtonLabel(
-    isAtomOwned,
-    targetSocketType,
-    senderReactions
-  );
 }
 
 function generateDefaultButtonLabel(

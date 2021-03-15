@@ -237,6 +237,28 @@ export function getReactions(atom, socketType) {
   return socketType ? get(possibleReactions, socketType) : possibleReactions;
 }
 
+export function getReactionLabels(atom, socketType) {
+  let labels = undefined;
+  const reactions = getReactions(atom, socketType);
+  reactions.forEach(reaction => {
+    const reactionLabels = get(reaction, "labels");
+    if (reactionLabels) {
+      labels = labels
+        ? {
+            owned: [labels.owned, get(reactionLabels, "owned")].join("/"),
+            nonOwned: [labels.nonOwned, get(reactionLabels, "nonOwned")].join(
+              "/"
+            ),
+          }
+        : {
+            owned: get(reactionLabels, "owned"),
+            nonOwned: get(reactionLabels, "nonOwned"),
+          };
+    }
+  });
+  return labels;
+}
+
 export function hasMatchedUseCase(atom) {
   return !!getMatchedUseCaseIdentifier(atom);
 }
