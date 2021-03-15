@@ -170,11 +170,6 @@ export function hasConnectionContainerFailedToLoad(process, atomUri) {
   );
 }
 
-//TODO REFACTOR NAME!
-export function getConnectionContainerStatus(process, atomUri) {
-  return atomUri && getIn(process, ["connectionContainers", atomUri]);
-}
-
 export function isConnectionContainerLoading(process, atomUri) {
   return (
     atomUri && getIn(process, ["connectionContainers", atomUri, "loading"])

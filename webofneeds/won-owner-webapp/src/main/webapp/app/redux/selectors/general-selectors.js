@@ -542,12 +542,6 @@ export const getConnectionContainersToCrawl = createSelector(
           .filter(
             atom => !processUtils.isAtomToLoad(processState, getUri(atom))
           )
-          .map(atom =>
-            processUtils.getConnectionContainerStatus(
-              processState,
-              getUri(atom)
-            )
-          )
       );
     }
 
@@ -557,9 +551,6 @@ export const getConnectionContainersToCrawl = createSelector(
         .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
         .filter(atom =>
           processUtils.isConnectionContainerToLoad(processState, getUri(atom))
-        )
-        .map(atom =>
-          processUtils.getConnectionContainerStatus(processState, getUri(atom))
         );
 
     if (
@@ -574,9 +565,6 @@ export const getConnectionContainersToCrawl = createSelector(
       .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
       .filter(atom =>
         processUtils.isConnectionContainerToLoad(processState, getUri(atom))
-      )
-      .map(atom =>
-        processUtils.getConnectionContainerStatus(processState, getUri(atom))
       );
 
     if (
@@ -593,9 +581,6 @@ export const getConnectionContainersToCrawl = createSelector(
         .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
         .filter(atom =>
           processUtils.isConnectionContainerToLoad(processState, getUri(atom))
-        )
-        .map(atom =>
-          processUtils.getConnectionContainerStatus(processState, getUri(atom))
         );
 
     if (
