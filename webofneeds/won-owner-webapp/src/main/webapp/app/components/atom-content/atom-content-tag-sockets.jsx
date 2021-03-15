@@ -16,9 +16,7 @@ export default function WonAtomContentTagSockets({
   const tagViewSocketElements = [];
 
   relevantConnectionsMap.map((connections, socketType) => {
-    const activeConnections = connections.filter(
-      conn => !connectionUtils.isClosed(conn)
-    );
+    const activeConnections = connections.filterNot(connectionUtils.isClosed);
 
     const countLabel =
       activeConnections && activeConnections.size > 0

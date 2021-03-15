@@ -58,6 +58,7 @@ export default function PageMap() {
   );
 
   const debugModeEnabled = useSelector(viewSelectors.isDebugModeEnabled);
+  const accountState = useSelector(generalSelectors.getAccountState);
 
   const whatsAroundMetaAtoms = useSelector(state =>
     generalSelectors
@@ -66,7 +67,9 @@ export default function PageMap() {
       .filter(
         metaAtom => debugModeEnabled || !atomUtils.isInvisibleAtom(metaAtom)
       )
-      .filter(metaAtom => !accountUtils.isAtomOwned(metaAtom))
+      .filter(
+        (_, metaAtomUri) => !accountUtils.isAtomOwned(accountState, metaAtomUri)
+      )
       .filter(atomUtils.hasLocation)
       .filter(metaAtom => {
         const distanceFrom = atomUtils.getDistanceFrom(
