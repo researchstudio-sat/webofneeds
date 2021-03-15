@@ -18,6 +18,7 @@ import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import { Link, useHistory } from "react-router-dom";
 import WonAtomIcon from "~/app/components/atom-icon";
+import Immutable from "immutable";
 
 export default function WonTopnav({ pageTitle }) {
   const history = useHistory();
@@ -42,6 +43,10 @@ export default function WonTopnav({ pageTitle }) {
 
   const connectionContainersToCrawl = useSelector(
     generalSelectors.getConnectionContainersToCrawl
+  );
+
+  const connectionContainersWithUnusedCredentials = useSelector(
+    processSelectors.getUnusedRequestCredentialsForConnectionContainer
   );
 
   const hasUnreads = useSelector(
@@ -85,11 +90,6 @@ export default function WonTopnav({ pageTitle }) {
 
   useEffect(
     () => {
-      console.debug(
-        "connectionContainersToCrawl: ",
-        connectionContainersToCrawl ? connectionContainersToCrawl.toJS() : {}
-      );
-
       if (connectionContainersToCrawl && connectionContainersToCrawl.size > 0) {
         connectionContainersToCrawl.map((connectionContainerState, atomUri) => {
           console.debug("connectionContainerState: ", connectionContainerState);
@@ -100,6 +100,28 @@ export default function WonTopnav({ pageTitle }) {
       }
     },
     [connectionContainersToCrawl]
+  );
+
+  useEffect(
+    () => {
+      if (
+        connectionContainersWithUnusedCredentials &&
+        connectionContainersWithUnusedCredentials.size > 0
+      ) {
+        connectionContainersWithUnusedCredentials.map(
+          (connectionContainerState, atomUri) => {
+            //TODO: FIXME THIS MIGHT BE THE WRONG POSITION
+            dispatch({
+              type: actionCreators.atoms.markConnectionContainerToLoad,
+              payload: Immutable.fromJS({
+                uri: atomUri,
+              }),
+            });
+          }
+        );
+      }
+    },
+    [connectionContainersWithUnusedCredentials]
   );
 
   function toggleSlideIns() {
