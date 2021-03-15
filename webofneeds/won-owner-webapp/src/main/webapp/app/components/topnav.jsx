@@ -18,7 +18,6 @@ import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 import { Link, useHistory } from "react-router-dom";
 import WonAtomIcon from "~/app/components/atom-icon";
-import Immutable from "immutable";
 
 export default function WonTopnav({ pageTitle }) {
   const history = useHistory();
@@ -45,9 +44,9 @@ export default function WonTopnav({ pageTitle }) {
     generalSelectors.getConnectionContainersToCrawl
   );
 
-  const connectionContainersWithUnusedCredentials = useSelector(
-    processSelectors.getUnusedRequestCredentialsForConnectionContainer
-  );
+  // const connectionContainersWithUnusedCredentials = useSelector(
+  //   processSelectors.getUnusedRequestCredentialsForConnectionContainer
+  // );
 
   const hasUnreads = useSelector(
     state =>
@@ -102,27 +101,32 @@ export default function WonTopnav({ pageTitle }) {
     [connectionContainersToCrawl]
   );
 
-  useEffect(
-    () => {
-      if (
-        connectionContainersWithUnusedCredentials &&
-        connectionContainersWithUnusedCredentials.size > 0
-      ) {
-        connectionContainersWithUnusedCredentials.map(
-          (connectionContainerState, atomUri) => {
-            //TODO: FIXME THIS MIGHT BE THE WRONG POSITION
-            dispatch({
-              type: actionCreators.atoms.markConnectionContainerToLoad,
-              payload: Immutable.fromJS({
-                uri: atomUri,
-              }),
-            });
-          }
-        );
-      }
-    },
-    [connectionContainersWithUnusedCredentials]
-  );
+  // FIXME: This effect causes the App to break (loops seemingly endlessly)
+  // useEffect(
+  //   () => {
+  //     if (
+  //       connectionContainersWithUnusedCredentials &&
+  //       connectionContainersWithUnusedCredentials.size > 0
+  //     ) {
+  //       connectionContainersWithUnusedCredentials.map(
+  //         (connectionContainerState, atomUri) => {
+  //           console.debug(
+  //             "there are Unused credentials for connContainer of: ",
+  //             atomUri,
+  //             " credentials: ",
+  //             connectionContainerState
+  //           );
+  //           dispatch(
+  //             actionCreators.atoms__markConnectionContainerToLoad({
+  //               uri: atomUri,
+  //             })
+  //           );
+  //         }
+  //       );
+  //     }
+  //   },
+  //   [connectionContainersWithUnusedCredentials]
+  // );
 
   function toggleSlideIns() {
     hideMenu();
