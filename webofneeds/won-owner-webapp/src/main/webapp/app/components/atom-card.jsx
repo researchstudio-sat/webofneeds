@@ -27,6 +27,7 @@ export default function WonAtomCard({
   const isSkeleton =
     atomUtils.isBeingCreated(atom) ||
     processUtils.hasAtomFailedToLoad(processState, atomUri) ||
+    processUtils.isAtomLoading(processState, atomUri) ||
     processUtils.isAtomFetchNecessary(processState, atomUri, atom);
 
   const matchedUseCase = atomUtils.getMatchedUseCaseIdentifier(atom);
