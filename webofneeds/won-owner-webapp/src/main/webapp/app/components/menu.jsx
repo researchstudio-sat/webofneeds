@@ -9,7 +9,7 @@ import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as accountUtils from "../redux/utils/account-utils.js";
 import Immutable from "immutable";
 import { Link, NavLink, useHistory } from "react-router-dom";
-import ico36_person_anon from "~/images/won-icons/ico36_person_anon.svg";
+import ico36_unassigned from "~/images/won-icons/ico36_unassigned.svg";
 import { get, generateLink } from "~/app/utils";
 import ico32_buddy_add from "~/images/won-icons/ico32_buddy_add.svg";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
@@ -272,8 +272,8 @@ export default function WonMenu({ className }) {
           ) : (
             undefined
           )}
-          <svg className="pinnedatoms__pinnedatom__anonicon">
-            <use xlinkHref={ico36_person_anon} href={ico36_person_anon} />
+          <svg className="pinnedatoms__pinnedatom__unassignedicon">
+            <use xlinkHref={ico36_unassigned} href={ico36_unassigned} />
           </svg>
         </div>
         <Link
