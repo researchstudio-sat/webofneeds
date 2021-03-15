@@ -299,6 +299,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
         copyHeader(HttpHeaders.USER_AGENT, request, headers);
         copyHeader(HttpHeaders.CACHE_CONTROL, request, headers);
         copyHeader(HttpHeaders.IF_NONE_MATCH, request, headers);
+        copyHeader(HttpHeaders.AUTHORIZATION, request, headers);
         return headers;
     }
 
