@@ -95,6 +95,7 @@ export default function PageInventory() {
           {activePinnedAtom ? (
             <div className="ownerinventory__activepersona">
               <WonAtomContent
+                atomUri={activePinnedAtomUri}
                 atom={activePinnedAtom}
                 visibleTab={activePinnedAtomTab}
                 relevantConnectionsMap={relevantActivePinnedAtomConnectionsMap}
