@@ -4,6 +4,7 @@
 import { get } from "../../utils.js";
 import * as processUtils from "../utils/process-utils.js";
 import { createSelector } from "reselect";
+import { getPossibleRequestCredentialsForAtom } from "~/app/redux/selectors/general-selectors";
 
 const getProcessState = createSelector(
   state => get(state, "process"),
@@ -95,4 +96,21 @@ export const getAllAtomRequests = createSelector(
   getProcessState,
   processState =>
     get(processState, ["atoms"]).map(atom => get(atom, "requests"))
+);
+
+export const getUnusedRequestCredentialsForConnectionContainer = createSelector(
+  state => state,
+  state => get(state, "atoms"),
+  (state, atoms) =>
+    atoms
+      .map((_, atomUri) => {
+        const priorRequests = getConnectionContainerRequests(atomUri);
+        return getPossibleRequestCredentialsForAtom(atomUri)(state).filterNot(
+          requestCredentials =>
+            processUtils.isUsedCredentials(priorRequests, requestCredentials)
+        );
+      })
+      .filter(
+        requestCredentials => requestCredentials && requestCredentials.size > 0
+      )
 );

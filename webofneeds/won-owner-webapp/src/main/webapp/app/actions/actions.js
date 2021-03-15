@@ -141,7 +141,8 @@ const actionHierarchy = {
     storeUriFailed: INJ_DEFAULT,
     removeDeleted: INJ_DEFAULT,
     markAsLoaded: INJ_DEFAULT,
-    markConnectionContainerAsLoaded: INJ_DEFAULT,
+    markConnectionContainerToLoad: INJ_DEFAULT,
+
     fetchToken: {
       success: INJ_DEFAULT,
       failure: INJ_DEFAULT,

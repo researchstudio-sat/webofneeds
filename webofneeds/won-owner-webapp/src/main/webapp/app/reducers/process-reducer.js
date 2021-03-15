@@ -469,6 +469,15 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
+    case actionTypes.atoms.markConnectionContainerToLoad: {
+      const atomUri = getUri(action.payload);
+      console.debug("markConnectionContainerToLoad: ", atomUri);
+
+      return updateConnectionContainerProcess(processState, atomUri, {
+        toLoad: true,
+      });
+    }
+
     case actionTypes.connections.storeUriFailed: {
       const connUri = get(action.payload, "connUri");
       const request = get(action.payload, "request");
@@ -853,17 +862,6 @@ export default function(processState = initialState, action = {}) {
       let atomUri = getUri(action.payload);
 
       return updateAtomProcess(processState, atomUri, {
-        toLoad: false,
-        failedToLoad: false,
-        loading: false,
-        loaded: true,
-      });
-    }
-
-    case actionTypes.atoms.markConnectionContainerAsLoaded: {
-      let atomUri = getUri(action.payload);
-
-      return updateConnectionContainerProcess(processState, atomUri, {
         toLoad: false,
         failedToLoad: false,
         loading: false,
