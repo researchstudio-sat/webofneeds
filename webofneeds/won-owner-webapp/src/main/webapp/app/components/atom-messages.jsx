@@ -72,9 +72,9 @@ export default function WonAtomMessages({
   const chatMessages =
     messages &&
     messages
-      .filter(msg => !messageUtils.getForwardMessage(msg))
-      .filter(msg => !messageUtils.isAtomHintMessage(msg))
-      .filter(msg => !messageUtils.isSocketHintMessage(msg));
+      .filterNot(messageUtils.getForwardMessage)
+      .filterNot(messageUtils.isAtomHintMessage)
+      .filterNot(messageUtils.isSocketHintMessage);
 
   const processState = useSelector(generalSelectors.getProcessState);
   const hasConnectionMessagesToLoad = processUtils.hasMessagesToLoad(

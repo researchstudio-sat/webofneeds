@@ -60,9 +60,9 @@ export default function WonGroupAtomMessages({
   const chatMessages =
     allChatMessages &&
     allChatMessages
-      .filter(msg => !messageUtils.hasForwardsReferences(msg)) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
-      .filter(msg => !messageUtils.isAtomHintMessage(msg)) //FILTER OUT ALL HINT MESSAGES
-      .filter(msg => !messageUtils.isSocketHintMessage(msg));
+      .filterNot(messageUtils.hasForwardsReferences) //FILTER OUT ALL FORWARD MESSAGE ENVELOPES JUST IN CASE
+      .filterNot(messageUtils.isAtomHintMessage) //FILTER OUT ALL HINT MESSAGES
+      .filterNot(messageUtils.isSocketHintMessage);
 
   const allUnreadForwardMessages =
     allChatMessages &&

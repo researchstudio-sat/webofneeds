@@ -73,8 +73,8 @@ export default function WonActivityMessages({
     messages &&
     messages
       .filter(msg => !get(msg, "forwardMessage"))
-      .filter(msg => !messageUtils.isAtomHintMessage(msg))
-      .filter(msg => !messageUtils.isSocketHintMessage(msg));
+      .filterNot(messageUtils.isAtomHintMessage)
+      .filterNot(messageUtils.isSocketHintMessage);
 
   const processState = useSelector(generalSelectors.getProcessState);
   const hasConnectionMessagesToLoad = processUtils.hasMessagesToLoad(

@@ -122,9 +122,7 @@ export default function WonAtomMenu({
             const socketUri = atomUtils.getSocketUri(atom, socketType);
             const activeConnections =
               activePinnedAtomUri === atomUri
-                ? chatConnections.filter(
-                    conn => !connectionUtils.isClosed(conn)
-                  )
+                ? chatConnections.filterNot(connectionUtils.isClosed)
                 : socketTypeConnections
                     .filter(
                       conn =>
@@ -132,7 +130,7 @@ export default function WonAtomMenu({
                         isOwned ||
                         connectionUtils.hasTargetSocketUri(conn, socketUri)
                     )
-                    .filter(conn => !connectionUtils.isClosed(conn));
+                    .filterNot(connectionUtils.isClosed);
             countLabel =
               activeConnections && activeConnections.size > 0
                 ? "(" + activeConnections.size + ")"
@@ -160,8 +158,8 @@ export default function WonAtomMenu({
           }
 
           default: {
-            const activeConnections = socketTypeConnections.filter(
-              conn => !connectionUtils.isClosed(conn)
+            const activeConnections = socketTypeConnections.filterNot(
+              connectionUtils.isClosed
             );
 
             countLabel =
