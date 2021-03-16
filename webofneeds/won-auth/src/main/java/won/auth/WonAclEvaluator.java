@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import won.auth.check.AtomNodeChecker;
 import won.auth.check.ConnectionTargetCheck;
-import won.auth.check.TargetAtomCheckEvaluator;
+import won.auth.check.ConnectionTargetCheckEvaluator;
 import won.auth.check.WonAclEvaluationException;
 import won.auth.model.*;
 import won.auth.support.AseMerger;
@@ -30,12 +30,12 @@ public class WonAclEvaluator {
     public static final long DEFAULT_TOKEN_EXPIRES_AFTER_SECONDS = 3600;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final Set<Authorization> authorizations;
-    private final TargetAtomCheckEvaluator targetAtomCheckEvaluator;
+    private final ConnectionTargetCheckEvaluator targetAtomCheckEvaluator;
     private final AtomNodeChecker atomNodeChecker;
     private final WebIdKeyLoader webIdKeyLoader;
 
     public WonAclEvaluator(Set<Authorization> authorizations,
-                    TargetAtomCheckEvaluator targetAtomCheckEvaluator,
+                    ConnectionTargetCheckEvaluator targetAtomCheckEvaluator,
                     AtomNodeChecker atomNodeChecker,
                     WebIdKeyLoader webIdKeyLoader) {
         this.authorizations = authorizations;
@@ -205,7 +205,7 @@ public class WonAclEvaluator {
                                 return aer;
                             } catch (Exception e) {
                                 throw new WonAclEvaluationException(
-                                                String.format("Evaluating the following authorzation (node %s) causes exception\n%s",
+                                                String.format("Evaluating the following authorization (node %s) causes exception\n%s",
                                                                 auth.getNode(), AuthUtils.toRdfString(auth)),
                                                 e);
                             }

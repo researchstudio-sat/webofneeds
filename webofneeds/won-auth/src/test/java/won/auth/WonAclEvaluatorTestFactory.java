@@ -2,7 +2,7 @@ package won.auth;
 
 import org.apache.jena.graph.Graph;
 import won.auth.check.AtomNodeChecker;
-import won.auth.check.TargetAtomCheckEvaluator;
+import won.auth.check.ConnectionTargetCheckEvaluator;
 import won.auth.model.Authorization;
 import won.auth.model.OperationRequest;
 import won.cryptography.rdfsign.WebIdKeyLoader;
@@ -14,7 +14,7 @@ public class WonAclEvaluatorTestFactory extends WonAclEvaluatorFactory {
     private Shacl2JavaInstanceFactory.Accessor accessor = null;
 
     public WonAclEvaluatorTestFactory(
-                    TargetAtomCheckEvaluator targetAtomCheckEvaluator,
+                    ConnectionTargetCheckEvaluator targetAtomCheckEvaluator,
                     AtomNodeChecker atomNodeChecker, WebIdKeyLoader webIdKeyLoader) {
         super(targetAtomCheckEvaluator, atomNodeChecker, webIdKeyLoader);
     }

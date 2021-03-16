@@ -15,7 +15,7 @@ import won.auth.AuthUtils;
 import won.auth.WonAclEvaluator;
 import won.auth.WonAclEvaluatorFactory;
 import won.auth.check.AtomNodeChecker;
-import won.auth.check.TargetAtomCheckEvaluator;
+import won.auth.check.ConnectionTargetCheckEvaluator;
 import won.auth.model.*;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.cryptography.service.CryptographyService;
@@ -47,7 +47,7 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
     private static final String anonymousUserPrincipal = "anonymousUser";
     // the aclEvaluator is not thread-safe, each thread needs its own.
     @Autowired
-    private TargetAtomCheckEvaluator targetAtomCheckEvaluator;
+    private ConnectionTargetCheckEvaluator targetAtomCheckEvaluator;
     @Autowired
     private AtomNodeChecker atomNodeChecker;
     @Autowired

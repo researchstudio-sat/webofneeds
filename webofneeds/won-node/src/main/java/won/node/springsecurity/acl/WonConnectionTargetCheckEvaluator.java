@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.auth.check.ConnectionTargetCheck;
-import won.auth.check.TargetAtomCheckEvaluator;
+import won.auth.check.ConnectionTargetCheckEvaluator;
 import won.protocol.model.ConnectionState;
 import won.protocol.repository.ConnectionRepository;
 
@@ -13,7 +13,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 
-public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
+public class WonConnectionTargetCheckEvaluator implements ConnectionTargetCheckEvaluator {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final int RESTRICTS_SOCKETS = 1;
     private static final int RESTRICTS_SOCKET_TYPES = 2;
@@ -21,9 +21,9 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
     private static final int WON_NODE_CHECK = 8;
     @Autowired
     private ConnectionRepository connectionRepository;
-    private TargetAtomCheckEvaluator[] evaluators = new TargetAtomCheckEvaluator[16];
+    private ConnectionTargetCheckEvaluator[] evaluators = new ConnectionTargetCheckEvaluator[16];
 
-    public WonTargetAtomCheckEvaluator() {
+    public WonConnectionTargetCheckEvaluator() {
         evaluators[WON_NODE_CHECK
                         | RESTRICTS_CONNECTION_STATES
                         | RESTRICTS_SOCKET_TYPES
@@ -81,6 +81,10 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
                                                         check.getAtom(),
                                                         check.getRequestedTarget().toString(),
                                                         check.getAllowedSockets());
+        evaluators[WON_NODE_CHECK] = check -> connectionRepository
+                        .existsWithAtomAndTargetAtomPrefix(
+                                        check.getAtom(),
+                                        check.getRequestedTarget().toString());
         evaluators[RESTRICTS_CONNECTION_STATES
                         | RESTRICTS_SOCKET_TYPES
                         | RESTRICTS_SOCKETS] = check -> connectionRepository
@@ -139,10 +143,10 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
         int rs = restrictsSockets ? RESTRICTS_SOCKETS : 0;
         int wnc = check.isWonNodeCheck() ? WON_NODE_CHECK : 0;
         int evaluatorIndex = wnc | rcs | rst | rs;
-        TargetAtomCheckEvaluator evaluator = evaluators[evaluatorIndex];
+        ConnectionTargetCheckEvaluator evaluator = evaluators[evaluatorIndex];
         if (logger.isDebugEnabled()) {
-            logger.debug("Using evaluator with index {} (rcs:{}, rst:{}, rs:{}) ",
-                            new Object[] { evaluatorIndex, restrictsConnectionStates, restrictsSocketTypes,
+            logger.debug("Using evaluator with index {} (wnc:{}, rcs:{}, rst:{}, rs:{}) ",
+                            new Object[] { evaluatorIndex, wnc, restrictsConnectionStates, restrictsSocketTypes,
                                             restrictsSockets });
         }
         return evaluator.isRequestorAllowedTarget(check);

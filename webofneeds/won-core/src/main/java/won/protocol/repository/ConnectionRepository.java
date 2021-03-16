@@ -269,9 +269,10 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     boolean existsWithAtomAndTargetAtom(@Param("fromAtom") URI fromAtom, @Param("toAtom") URI toAtom);
 
     @Query("select case when (count(con) > 0) then true else false end "
-                    + "from Connection con where con.atomURI = :fromAtom and con.targetAtomURI like concat(:targetAtomPrefix,'%')")
+                    + "from Connection con where con.atomURI = :fromAtom "
+                    + "and LOCATE (:targetAtomPrefix, con.targetAtomURI) = 1 ")
     boolean existsWithAtomAndTargetAtomPrefix(@Param("fromAtom") URI fromAtom,
-                    @Param("targetAtomPrefix") URI targetAtomPrefix);
+                    @Param("targetAtomPrefix") String targetAtomPrefix);
 
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
