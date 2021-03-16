@@ -1,6 +1,23 @@
 package won.cryptography.rdfsign;
 
-import static won.cryptography.rdfsign.WonSigner.*;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
+import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
+import io.ipfs.multibase.Base58;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.protocol.message.WonMessage;
+import won.protocol.message.WonSignatureData;
+import won.protocol.util.Prefixer;
+import won.protocol.util.RdfUtils;
+import won.protocol.util.WonMessageUriHelper;
+import won.protocol.util.WonRdfUtils;
+import won.protocol.vocabulary.WONMSG;
 
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
@@ -12,25 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.GraphCollection;
-import de.uni_koblenz.aggrimm.icp.crypto.sign.graph.SignatureData;
-import io.ipfs.multibase.Base58;
-import won.protocol.message.WonMessage;
-import won.protocol.message.WonSignatureData;
-import won.protocol.util.Prefixer;
-import won.protocol.util.RdfUtils;
-import won.protocol.util.WonMessageUriHelper;
-import won.protocol.util.WonRdfUtils;
-import won.protocol.vocabulary.WONMSG;
+import static won.cryptography.rdfsign.WonSigner.SIGNING_ALGORITHM_PROVIDER;
 
 /**
  * User: ypanchenko Date: 15.07.2014
@@ -129,7 +128,7 @@ public class WonVerifier {
             PublicKey publicKey = publicKeys.get(wonSignatureData.getVerificationCertificateUri());
             if (publicKey == null) {
                 verificationState.setVerificationFailed(wonSignatureData.getSignatureUri(),
-                                "No public key found for " + wonSignatureData.getSignatureUri());
+                                "No public key found for " + wonSignatureData.getVerificationCertificateUri());
                 if (logger.isDebugEnabled()) {
                     logger.debug("offending message:\n" + RdfUtils.toString(Prefixer.setPrefixes(dataset)));
                 }
