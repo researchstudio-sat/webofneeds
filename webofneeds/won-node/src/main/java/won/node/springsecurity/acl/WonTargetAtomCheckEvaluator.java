@@ -30,7 +30,7 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
                         | RESTRICTS_SOCKETS] = check -> connectionRepository
                                         .existsWithAtomAndTargetAtomPrefixAndStatesAndSocketTypesAndSockets(
                                                         check.getAtom(),
-                                                        check.getRequestedTarget(),
+                                                        check.getRequestedTarget().toString(),
                                                         check.getAllowedConnectionStates().stream()
                                                                         .map(ConnectionState::fromURI).collect(toSet()),
                                                         check.getAllowedSocketTypes(),
@@ -40,7 +40,7 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
                         | RESTRICTS_SOCKET_TYPES] = check -> connectionRepository
                                         .existsWithAtomAndTargetAtomPrefixAndStatesAndSocketTypes(
                                                         check.getAtom(),
-                                                        check.getRequestedTarget(),
+                                                        check.getRequestedTarget().toString(),
                                                         check.getAllowedConnectionStates().stream()
                                                                         .map(ConnectionState::fromURI).collect(toSet()),
                                                         check.getAllowedSocketTypes());
@@ -49,7 +49,7 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
                         | RESTRICTS_SOCKETS] = check -> connectionRepository
                                         .existsWithAtomAndTargetAtomPrefixAndStatesAndSockets(
                                                         check.getAtom(),
-                                                        check.getRequestedTarget(),
+                                                        check.getRequestedTarget().toString(),
                                                         check.getAllowedConnectionStates().stream()
                                                                         .map(ConnectionState::fromURI).collect(toSet()),
                                                         check.getAllowedSockets());
@@ -57,7 +57,7 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
                         | RESTRICTS_CONNECTION_STATES] = check -> connectionRepository
                                         .existsWithAtomAndTargetAtomPrefixAndStates(
                                                         check.getAtom(),
-                                                        check.getRequestedTarget(),
+                                                        check.getRequestedTarget().toString(),
                                                         check.getAllowedConnectionStates().stream()
                                                                         .map(ConnectionState::fromURI)
                                                                         .collect(toSet()));
@@ -66,20 +66,20 @@ public class WonTargetAtomCheckEvaluator implements TargetAtomCheckEvaluator {
                         | RESTRICTS_SOCKETS] = check -> connectionRepository
                                         .existsWithAtomAndTargetAtomPrefixAndSocketTypesAndSockets(
                                                         check.getAtom(),
-                                                        check.getRequestedTarget(),
+                                                        check.getRequestedTarget().toString(),
                                                         check.getAllowedSocketTypes(),
                                                         check.getAllowedSockets());
         evaluators[WON_NODE_CHECK
                         | RESTRICTS_SOCKET_TYPES] = check -> connectionRepository
                                         .existsWithAtomAndTargetAtomPrefixAndSocketTypes(
                                                         check.getAtom(),
-                                                        check.getRequestedTarget(),
+                                                        check.getRequestedTarget().toString(),
                                                         check.getAllowedSocketTypes());
         evaluators[WON_NODE_CHECK
                         | RESTRICTS_SOCKETS] = check -> connectionRepository
                                         .existsWithAtomAndTargetAtomPrefixAndSockets(
                                                         check.getAtom(),
-                                                        check.getRequestedTarget(),
+                                                        check.getRequestedTarget().toString(),
                                                         check.getAllowedSockets());
         evaluators[RESTRICTS_CONNECTION_STATES
                         | RESTRICTS_SOCKET_TYPES

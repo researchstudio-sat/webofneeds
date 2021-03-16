@@ -286,11 +286,11 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
                     + "con.atomURI = :fromAtom "
-                    + "and con.targetAtomURI like concat(:targetAtomPrefix,'%')"
+                    + "and LOCATE (:targetAtomPrefix, con.targetAtomURI) = 1 "
                     + "and con.state in :allowedStates ")
     boolean existsWithAtomAndTargetAtomPrefixAndStates(
                     @Param("fromAtom") URI fromAtom,
-                    @Param("targetAtomPrefix") URI targetAtomPrefix,
+                    @Param("targetAtomPrefix") String targetAtomPrefix,
                     @Param("allowedStates") Collection<ConnectionState> allowedStates);
 
     @Query("select case when (count(con) > 0) then true else false end "
@@ -306,11 +306,11 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
                     + "con.atomURI = :fromAtom "
-                    + "and con.targetAtomURI like concat(:targetAtomPrefix,'%')"
+                    + "and LOCATE (:targetAtomPrefix, con.targetAtomURI) = 1 "
                     + "and con.typeURI in :allowedSocketTypes ")
     boolean existsWithAtomAndTargetAtomPrefixAndSocketTypes(
                     @Param("fromAtom") URI fromAtom,
-                    @Param("targetAtomPrefix") URI targetAtomPrefix,
+                    @Param("targetAtomPrefix") String targetAtomPrefix,
                     @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes);
 
     @Query("select case when (count(con) > 0) then true else false end "
@@ -326,11 +326,11 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
                     + "con.atomURI = :fromAtom "
-                    + "and con.targetAtomURI like concat(:targetAtomPrefix,'%')"
+                    + "and LOCATE (:targetAtomPrefix, con.targetAtomURI) = 1 "
                     + "and con.socketURI in :allowedSockets ")
     boolean existsWithAtomAndTargetAtomPrefixAndSockets(
                     @Param("fromAtom") URI fromAtom,
-                    @Param("targetAtomPrefix") URI targetAtomPrefix,
+                    @Param("targetAtomPrefix") String targetAtomPrefix,
                     @Param("allowedSockets") Collection<URI> allowedSockets);
 
     @Query("select case when (count(con) > 0) then true else false end "
@@ -348,12 +348,12 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
                     + "con.atomURI = :fromAtom "
-                    + "and con.targetAtomURI like concat(:targetAtomPrefix,'%')"
+                    + "and LOCATE (:targetAtomPrefix, con.targetAtomURI) = 1 "
                     + "and con.state in :allowedStates "
                     + "and con.typeURI in :allowedSocketTypes ")
     boolean existsWithAtomAndTargetAtomPrefixAndStatesAndSocketTypes(
                     @Param("fromAtom") URI fromAtom,
-                    @Param("targetAtomPrefix") URI targetAtomPrefix,
+                    @Param("targetAtomPrefix") String targetAtomPrefix,
                     @Param("allowedStates") Collection<ConnectionState> allowedStates,
                     @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes);
 
@@ -372,12 +372,12 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
                     + "con.atomURI = :fromAtom "
-                    + "and con.targetAtomURI like concat(:targetAtomPrefix,'%')"
+                    + "and LOCATE (:targetAtomPrefix, con.targetAtomURI) = 1 "
                     + "and con.state in :allowedStates "
                     + "and con.socketURI in :allowedSockets ")
     boolean existsWithAtomAndTargetAtomPrefixAndStatesAndSockets(
                     @Param("fromAtom") URI fromAtom,
-                    @Param("targetAtomPrefix") URI targetAtomPrefix,
+                    @Param("targetAtomPrefix") String targetAtomPrefix,
                     @Param("allowedStates") Collection<ConnectionState> allowedStates,
                     @Param("allowedSockets") Collection<URI> allowedSockets);
 
@@ -396,12 +396,12 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
                     + "con.atomURI = :fromAtom "
-                    + "and con.targetAtomURI like concat(:targetAtomPrefix,'%')"
+                    + "and LOCATE (:targetAtomPrefix, con.targetAtomURI) = 1 "
                     + "and con.typeURI in :allowedSocketTypes "
                     + "and con.socketURI in :allowedSockets ")
     boolean existsWithAtomAndTargetAtomPrefixAndSocketTypesAndSockets(
                     @Param("fromAtom") URI fromAtom,
-                    @Param("targetAtomPrefix") URI targetAtomPrefix,
+                    @Param("targetAtomPrefix") String targetAtomPrefix,
                     @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes,
                     @Param("allowedSockets") Collection<URI> allowedSockets);
 
@@ -422,13 +422,13 @@ public interface ConnectionRepository extends WonRepository<Connection> {
     @Query("select case when (count(con) > 0) then true else false end "
                     + "from Connection con where "
                     + "con.atomURI = :fromAtom "
-                    + "and con.targetAtomURI like concat(:targetAtomPrefix,'%')"
+                    + "and LOCATE (:targetAtomPrefix, con.targetAtomURI) = 1 "
                     + "and con.state in :allowedStates "
                     + "and con.typeURI in :allowedSocketTypes "
                     + "and con.socketURI in :allowedSockets ")
     boolean existsWithAtomAndTargetAtomPrefixAndStatesAndSocketTypesAndSockets(
                     @Param("fromAtom") URI fromAtom,
-                    @Param("targetAtomPrefix") URI targetAtomPrefix,
+                    @Param("targetAtomPrefix") String targetAtomPrefix,
                     @Param("allowedStates") Collection<ConnectionState> allowedStates,
                     @Param("allowedSocketTypes") Collection<URI> allowedSocketTypes,
                     @Param("allowedSockets") Collection<URI> allowedSockets);
