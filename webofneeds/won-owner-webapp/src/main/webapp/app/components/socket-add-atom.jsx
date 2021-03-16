@@ -371,12 +371,12 @@ export default function WonSocketAddAtom({
           <use xlinkHref={ico36_close} href={ico36_close} />
         </svg>
         <div className="wsaa__header__label">
-          {wonLabelUtils.getAtomSocketPickLabel(
+          {wonLabelUtils.getAtomSocketPickerLabel(
             addToAtom,
             addToSocketType,
             isAddToAtomOwned
           )
-            ? wonLabelUtils.getAtomSocketPickLabel(
+            ? wonLabelUtils.getAtomSocketPickerLabel(
                 addToAtom,
                 addToSocketType,
                 isAddToAtomOwned

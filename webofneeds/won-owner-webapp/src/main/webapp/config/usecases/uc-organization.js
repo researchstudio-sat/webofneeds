@@ -53,29 +53,33 @@ export const organization = {
     [vocab.WXSCHEMA.MemberSocketCompacted]: {
       [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
-        owned: {
-          default: "Member",
-          addNew: "Add New Member",
-          pick: "Pick an Persona below to invite",
-        },
-        nonOwned: {
-          default: "Join Organization",
-          addNew: "Add New Member",
-          pick: "Pick a Persona below to add",
+        labels: {
+          owned: {
+            default: "Member",
+            addNew: "Add New Member",
+            picker: "Pick an Persona below to invite",
+          },
+          nonOwned: {
+            default: "Join Organization",
+            addNew: "Add New Member",
+            picker: "Pick a Persona below to add",
+          },
         },
       },
       [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: {
         useCaseIdentifiers: ["role"],
         refuseNonOwned: true,
-        owned: {
-          default: "Role",
-          addNew: "Add New Role",
-          pick: "Add Role to Persona",
-        },
-        nonOwned: {
-          default: "Role",
-          addNew: "Add New Role",
-          pick: "Add Role to Persona",
+        labels: {
+          owned: {
+            default: "Role",
+            addNew: "Add New Role",
+            picker: "Add Role to Persona",
+          },
+          nonOwned: {
+            default: "Role",
+            addNew: "Add New Role",
+            picker: "Add Role to Persona",
+          },
         },
       },
     },

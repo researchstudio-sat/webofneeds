@@ -79,13 +79,13 @@ export const persona = {
         labels: {
           owned: {
             default: "Organization",
-            addNew: "Add to Organization",
-            pick: "Pick an Organization below to join",
+            addNew: "Add to New Organization",
+            picker: "Pick an Organization below to join",
           },
           nonOwned: {
             default: "Organization",
-            addNew: "Add to Organization",
-            pick: "Pick an Organization below to join",
+            addNew: "Add to New Organization",
+            picker: "Pick an Organization below to join",
           },
         },
       },

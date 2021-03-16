@@ -326,10 +326,10 @@ export function getAtomSocketAddNewLabel(atom, socketType, isOwned) {
   return undefined;
 }
 
-export function getAtomSocketPickLabel(atom, socketType, isOwned) {
+export function getAtomSocketPickerLabel(atom, socketType, isOwned) {
   const labels = atomUtils.getReactionLabels(atom, socketType);
   if (labels) {
-    return isOwned ? labels.owned.pick : labels.nonOwned.pick;
+    return isOwned ? labels.owned.picker : labels.nonOwned.picker;
   }
   return undefined;
 }

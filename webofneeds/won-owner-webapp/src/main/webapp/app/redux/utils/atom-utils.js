@@ -238,57 +238,51 @@ export function getReactions(atom, socketType) {
 }
 
 export function getReactionLabels(atom, socketType) {
-  let labels = undefined;
+  let labels = {
+    owned: {
+      default: [],
+      addNew: [],
+      picker: [],
+    },
+    nonOwned: {
+      default: [],
+      addNew: [],
+      picker: [],
+    },
+  };
   const reactions = getReactions(atom, socketType);
-  reactions.forEach(reaction => {
-    const reactionLabels = get(reaction, "labels");
-    if (reactionLabels) {
-      labels = labels
-        ? {
-            owned: {
-              default: [
-                labels.owned.default,
-                getIn(reactionLabels, ["owned", "default"]),
-              ].join("/"),
-              addNew: [
-                labels.owned.default,
-                getIn(reactionLabels, ["owned", "addNew"]),
-              ].join("/"),
-              pick: [
-                labels.owned.default,
-                getIn(reactionLabels, ["owned", "pick"]),
-              ].join("/"),
-            },
-            nonOwned: {
-              default: [
-                labels.nonOwned.default,
-                getIn(reactionLabels, ["nonOwned", "default"]),
-              ].join("/"),
-              addNew: [
-                labels.nonOwned.default,
-                getIn(reactionLabels, ["nonOwned", "addNew"]),
-              ].join("/"),
-              pick: [
-                labels.nonOwned.default,
-                getIn(reactionLabels, ["nonOwned", "pick"]),
-              ].join("/"),
-            },
-          }
-        : {
-            owned: {
-              default: getIn(reactionLabels, ["owned", "default"]),
-              addNew: getIn(reactionLabels, ["owned", "addNew"]),
-              pick: getIn(reactionLabels, ["owned", "pick"]),
-            },
-            nonOwned: {
-              default: getIn(reactionLabels, ["nonOwned", "default"]),
-              addNew: getIn(reactionLabels, ["nonOwned", "addNew"]),
-              pick: getIn(reactionLabels, ["nonOwned", "pick"]),
-            },
-          };
-    }
-  });
-  return labels;
+  if (reactions && reactions.size > 0) {
+    reactions.map(reaction => {
+      const reactionLabels = get(reaction, "labels");
+      if (reactionLabels) {
+        labels.owned.default.push(getIn(reactionLabels, ["owned", "default"]));
+        labels.owned.addNew.push(getIn(reactionLabels, ["owned", "addNew"]));
+        labels.owned.picker.push(getIn(reactionLabels, ["owned", "picker"]));
+        labels.nonOwned.default.push(
+          getIn(reactionLabels, ["nonOwned", "default"])
+        );
+        labels.nonOwned.addNew.push(
+          getIn(reactionLabels, ["nonOwned", "addNew"])
+        );
+        labels.nonOwned.picker.push(
+          getIn(reactionLabels, ["nonOwned", "picker"])
+        );
+      }
+    });
+    return {
+      owned: {
+        default: labels.owned.default.join(" / "),
+        addNew: labels.owned.addNew.join(" / "),
+        picker: labels.owned.picker.join(" / "),
+      },
+      nonOwned: {
+        default: labels.nonOwned.default.join(" / "),
+        addNew: labels.nonOwned.addNew.join(" / "),
+        picker: labels.nonOwned.picker.join(" / "),
+      },
+    };
+  }
+  return undefined;
 }
 
 export function hasMatchedUseCase(atom) {
