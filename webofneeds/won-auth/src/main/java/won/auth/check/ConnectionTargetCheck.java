@@ -130,15 +130,15 @@ public class ConnectionTargetCheck {
         }
     }
 
-    public void intersectAllowedConnectionStates(Set<URI> allowedConnectionStates) {
+    public void addAllowedConnectionStates(Set<URI> allowedConnectionStates) {
         if (allowedConnectionStates != null) {
-            this.allowedConnectionStates.retainAll(allowedConnectionStates);
+            this.allowedConnectionStates.addAll(allowedConnectionStates);
         }
     }
 
-    public void intersectAllowedConnectionStatesCS(Set<ConnectionState> connectionStates) {
+    public void addAllowedConnectionStatesCS(Set<ConnectionState> connectionStates) {
         if (connectionStates != null) {
-            intersectAllowedConnectionStates(connectionStates
+            addAllowedConnectionStates(connectionStates
                             .stream().map(ConnectionState::getValue).collect(Collectors.toSet()));
         }
     }

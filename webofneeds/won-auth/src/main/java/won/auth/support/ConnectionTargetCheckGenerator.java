@@ -4,7 +4,10 @@ import won.auth.check.ConnectionTargetCheck;
 import won.auth.model.*;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ConnectionTargetCheckGenerator extends DefaultTreeExpressionVisitor {
     private Deque<ConnectionTargetCheck> checks = new ArrayDeque<>();
@@ -39,7 +42,7 @@ public class ConnectionTargetCheckGenerator extends DefaultTreeExpressionVisitor
         if (other instanceof TargetAtomContainer) {
             TargetAtomContainer tac = (TargetAtomContainer) other;
             if (tac.getTargetAtom() != null) {
-                collectTargetAtomCheck(tac);
+                collectConnectionTargetCheck(tac);
             }
         }
     }
@@ -49,16 +52,13 @@ public class ConnectionTargetCheckGenerator extends DefaultTreeExpressionVisitor
             TargetAtomContainer tac = (TargetAtomContainer) other;
             if (tac.getTargetWonNode() != null) {
                 checks.peek().setWonNodeCheck(true);
-                collectTargetAtomCheck(tac);
+                collectConnectionTargetCheck(tac);
             }
         }
     }
 
-    public void collectTargetAtomCheck(TargetAtomContainer node) {
+    public void collectConnectionTargetCheck(TargetAtomContainer node) {
         ConnectionTargetCheck collected = checks.peek().clone();
-        if (collected.getAllowedConnectionStates().isEmpty()) {
-            collected.setAllowedConnectionStatesCS(Collections.singleton(ConnectionState.CONNECTED));
-        }
         this.connectionTargetChecks.add(collected);
     }
 
@@ -92,7 +92,7 @@ public class ConnectionTargetCheckGenerator extends DefaultTreeExpressionVisitor
         if (inherited.isEmpty()) {
             check.setAllowedConnectionStatesCS(other.getConnectionStates());
         } else {
-            check.intersectAllowedConnectionStatesCS(other.getConnectionStates());
+            check.addAllowedConnectionStatesCS(other.getConnectionStates());
         }
         processPossibleTargetAtom(other);
         processPossibleTargetWonNode(other);

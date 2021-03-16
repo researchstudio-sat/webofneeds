@@ -45,11 +45,8 @@ ex:atom2
 <#authorization>
     a            auth:Authorization ;
     auth:grantee [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
-                                 auth:targetAtom  [ ] ;
-                                 auth:connections
-                                                  [ auth:connection
-                                                          [ auth:connectionState
-                                                                  won:RequestSent, won:RequestReceived ] ] ] ] ;
+                                 auth:connections [ auth:connection [ auth:targetAtom      [ ] ;
+                                                                      auth:connectionState won:Connected ] ] ] ] ;
     auth:grant   [ auth:atomState won:Active ;
                    auth:operation auth:anyOperation ] .
 
