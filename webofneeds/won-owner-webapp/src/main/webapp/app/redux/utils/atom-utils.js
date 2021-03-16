@@ -245,14 +245,46 @@ export function getReactionLabels(atom, socketType) {
     if (reactionLabels) {
       labels = labels
         ? {
-            owned: [labels.owned, get(reactionLabels, "owned")].join("/"),
-            nonOwned: [labels.nonOwned, get(reactionLabels, "nonOwned")].join(
-              "/"
-            ),
+            owned: {
+              default: [
+                labels.owned.default,
+                getIn(reactionLabels, ["owned", "default"]),
+              ].join("/"),
+              addNew: [
+                labels.owned.default,
+                getIn(reactionLabels, ["owned", "addNew"]),
+              ].join("/"),
+              pick: [
+                labels.owned.default,
+                getIn(reactionLabels, ["owned", "pick"]),
+              ].join("/"),
+            },
+            nonOwned: {
+              default: [
+                labels.nonOwned.default,
+                getIn(reactionLabels, ["nonOwned", "default"]),
+              ].join("/"),
+              addNew: [
+                labels.nonOwned.default,
+                getIn(reactionLabels, ["nonOwned", "addNew"]),
+              ].join("/"),
+              pick: [
+                labels.nonOwned.default,
+                getIn(reactionLabels, ["nonOwned", "pick"]),
+              ].join("/"),
+            },
           }
         : {
-            owned: get(reactionLabels, "owned"),
-            nonOwned: get(reactionLabels, "nonOwned"),
+            owned: {
+              default: getIn(reactionLabels, ["owned", "default"]),
+              addNew: getIn(reactionLabels, ["owned", "addNew"]),
+              pick: getIn(reactionLabels, ["owned", "pick"]),
+            },
+            nonOwned: {
+              default: getIn(reactionLabels, ["nonOwned", "default"]),
+              addNew: getIn(reactionLabels, ["nonOwned", "addNew"]),
+              pick: getIn(reactionLabels, ["nonOwned", "pick"]),
+            },
           };
     }
   });

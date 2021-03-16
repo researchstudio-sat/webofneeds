@@ -77,8 +77,16 @@ export const persona = {
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
         labels: {
-          owned: "Organization",
-          nonOwned: "Organization",
+          owned: {
+            default: "Organization",
+            addNew: "Add to Organization",
+            pick: "Pick an Organization below to join",
+          },
+          nonOwned: {
+            default: "Organization",
+            addNew: "Add to Organization",
+            pick: "Pick an Organization below to join",
+          },
         },
       },
     },
@@ -120,6 +128,10 @@ export const persona = {
     [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
       [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
         useCaseIdentifiers: ["event"],
+        labels: {
+          owned: "Event",
+          nonOwned: "Event",
+        },
       },
     },
   },

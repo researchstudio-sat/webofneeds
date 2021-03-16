@@ -220,16 +220,23 @@ export function getAddNewSocketItemLabel(
   addToUseCase,
   addToSocketType,
   ucIdentifier,
-  socketType
+  socketType,
+  atom
 ) {
-  if (addToUseCase === "organization" && ucIdentifier === "persona") {
+  if (
+    atom &&
+    addToSocketType &&
+    getAtomSocketAddNewLabel(atom, addToSocketType, isAddToOwned)
+  ) {
+    return getAtomSocketAddNewLabel(atom, addToSocketType, isAddToOwned);
+  } else if (addToUseCase === "organization" && ucIdentifier === "persona") {
     return `Join with New Persona`;
-  }
-
-  if (isAddToOwned) {
-    return `Add New ${getSocketItemLabel(addToSocketType, socketType)}`;
   } else {
-    return `Connect New ${getSocketItemLabel(addToSocketType, socketType)}`;
+    if (isAddToOwned) {
+      return `New ${getSocketItemLabel(addToSocketType, socketType)}`;
+    } else {
+      return `New ${getSocketItemLabel(addToSocketType, socketType)}`;
+    }
   }
 }
 
@@ -272,9 +279,8 @@ export function generateAddButtonLabel(
   targetSocketType,
   senderReactions
 ) {
-  const labels = atomUtils.getReactionLabels(targetAtom, targetSocketType);
-  if (labels) {
-    return isAtomOwned ? labels.owned : labels.nonOwned;
+  if (getAtomSocketDefaultLabel(targetAtom, targetSocketType, isAtomOwned)) {
+    return getAtomSocketDefaultLabel(targetAtom, targetSocketType, isAtomOwned);
   } else {
     switch (targetSocketType) {
       case vocab.WXSCHEMA.ReviewSocketCompacted:
@@ -302,6 +308,30 @@ export function generateAddButtonLabel(
       senderReactions
     );
   }
+}
+
+export function getAtomSocketDefaultLabel(atom, socketType, isOwned) {
+  const labels = atomUtils.getReactionLabels(atom, socketType);
+  if (labels) {
+    return isOwned ? labels.owned.default : labels.nonOwned.default;
+  }
+  return undefined;
+}
+
+export function getAtomSocketAddNewLabel(atom, socketType, isOwned) {
+  const labels = atomUtils.getReactionLabels(atom, socketType);
+  if (labels) {
+    return isOwned ? labels.owned.addNew : labels.nonOwned.addNew;
+  }
+  return undefined;
+}
+
+export function getAtomSocketPickLabel(atom, socketType, isOwned) {
+  const labels = atomUtils.getReactionLabels(atom, socketType);
+  if (labels) {
+    return isOwned ? labels.owned.pick : labels.nonOwned.pick;
+  }
+  return undefined;
 }
 
 function generateDefaultButtonLabel(

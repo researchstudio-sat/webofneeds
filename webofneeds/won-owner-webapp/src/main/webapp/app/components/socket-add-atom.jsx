@@ -173,7 +173,8 @@ export default function WonSocketAddAtom({
                       addToUseCase,
                       addToSocketType,
                       ucIdentifier,
-                      socketType
+                      socketType,
+                      addToAtom
                     )}
                   </div>
                 </div>
@@ -370,9 +371,19 @@ export default function WonSocketAddAtom({
           <use xlinkHref={ico36_close} href={ico36_close} />
         </svg>
         <div className="wsaa__header__label">
-          {`Pick an Atom below to ${
-            isAddToAtomOwned ? "add" : "connect"
-          } to the ${wonLabelUtils.getSocketTabLabel(addToSocketType)}`}
+          {wonLabelUtils.getAtomSocketPickLabel(
+            addToAtom,
+            addToSocketType,
+            isAddToAtomOwned
+          )
+            ? wonLabelUtils.getAtomSocketPickLabel(
+                addToAtom,
+                addToSocketType,
+                isAddToAtomOwned
+              )
+            : `Pick an Atom below to ${
+                isAddToAtomOwned ? "add" : "connect"
+              } to the ${wonLabelUtils.getSocketTabLabel(addToSocketType)}`}
         </div>
       </div>
       <div className="wsaa__content">

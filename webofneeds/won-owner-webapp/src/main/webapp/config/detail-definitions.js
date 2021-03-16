@@ -177,6 +177,10 @@ export const defaultReactions = {
     [vocab.BUDDY.BuddySocketCompacted]: {
       useCaseIdentifiers: ["persona"],
       refuseOwned: true,
+      labels: {
+        owned: "Buddy",
+        nonOwned: "Buddy",
+      },
     },
   },
   [vocab.CHAT.ChatSocketCompacted]: {
