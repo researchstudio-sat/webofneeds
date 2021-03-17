@@ -80,12 +80,12 @@ export const persona = {
           owned: {
             default: "Organization",
             addNew: "Add to New Organization",
-            picker: "Pick an Organization below to join",
+            picker: "Pick a Organization below to join",
           },
           nonOwned: {
             default: "Organization",
             addNew: "Add to New Organization",
-            picker: "Pick an Organization below to join",
+            picker: "Pick a Organization below to join",
           },
         },
       },
@@ -129,8 +129,16 @@ export const persona = {
       [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
         useCaseIdentifiers: ["event"],
         labels: {
-          owned: "Event",
-          nonOwned: "Event",
+          owned: {
+            default: "Join Event",
+            addNew: "Join New Event",
+            picker: "Pick an Event below to join",
+          },
+          nonOwned: {
+            default: "Join Event",
+            addNew: "Join New Event",
+            picker: "Pick an Event below to join",
+          },
         },
       },
     },

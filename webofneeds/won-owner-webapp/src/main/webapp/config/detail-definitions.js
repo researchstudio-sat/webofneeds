@@ -171,6 +171,18 @@ export const defaultReactions = {
     [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: {
       useCaseIdentifiers: ["review"],
       refuseNonOwned: true,
+      labels: {
+        owned: {
+          default: "Review",
+          addNew: "New Review",
+          picker: "Pick a Review below",
+        },
+        nonOwned: {
+          default: "Review",
+          addNew: "New Review",
+          picker: "Pick a Review below",
+        },
+      },
     },
   },
   [vocab.BUDDY.BuddySocketCompacted]: {
@@ -178,8 +190,16 @@ export const defaultReactions = {
       useCaseIdentifiers: ["persona"],
       refuseOwned: true,
       labels: {
-        owned: "Buddy",
-        nonOwned: "Buddy",
+        owned: {
+          default: "Buddy",
+          addNew: "Add New Persona as Buddy",
+          picker: "Pick a Persona below to add as Buddy",
+        },
+        nonOwned: {
+          default: "Buddy",
+          addNew: "New Persona to send Request",
+          picker: "Pick a Persona below to add as Buddy",
+        },
       },
     },
   },
@@ -211,6 +231,18 @@ export const defaultReactions = {
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: {
       useCaseIdentifiers: ["event"],
       refuseNonOwned: true,
+      labels: {
+        owned: {
+          default: "Event",
+          addNew: "Organize New Event",
+          picker: "Pick an Event below",
+        },
+        nonOwned: {
+          default: "Event",
+          addNew: "Organize New Event",
+          picker: "Pick an Event below",
+        },
+      },
     },
   },
   [vocab.WXSCHEMA.AttendeeSocketCompacted]: {

@@ -34,11 +34,18 @@ export const event = {
     [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
       [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
-      },
-    },
-    [vocab.WXSCHEMA.ReviewSocketCompacted]: {
-      [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: {
-        useCaseIdentifier: ["review"],
+        labels: {
+          owned: {
+            default: "Persona",
+            addNew: "New Persona",
+            picker: "Pick a Persona below to invite",
+          },
+          nonOwned: {
+            default: "Persona",
+            addNew: "New Persona",
+            picker: "Pick a Persona below to invite",
+          },
+        },
       },
     },
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: {
@@ -49,6 +56,18 @@ export const event = {
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
       [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
         useCaseIdentifiers: ["newsarticle"],
+        labels: {
+          owned: {
+            default: "Article",
+            addNew: "New Article",
+            picker: "Pick an Article below",
+          },
+          nonOwned: {
+            default: "Article",
+            addNew: "New Article",
+            picker: "Pick an Article below",
+          },
+        },
       },
     },
     [vocab.GROUP.GroupSocketCompacted]: {
