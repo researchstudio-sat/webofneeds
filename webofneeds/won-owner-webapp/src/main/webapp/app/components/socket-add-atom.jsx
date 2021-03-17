@@ -4,7 +4,7 @@ import { actionCreators } from "../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 
-import { get, getUri, generateLink } from "../utils.js";
+import { generateLink, get, getUri } from "../utils.js";
 import vocab from "../service/vocab.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -380,7 +380,7 @@ export default function WonSocketAddAtom({
         <div className="wsaa__header__label">
           {specificLabels
             ? `${specificLabels}`
-            : `Pick an Atom below to ${
+            : `Pick an Atom to ${
                 isAddToAtomOwned ? "add" : "connect"
               } to the ${wonLabelUtils.getSocketTabLabel(addToSocketType)}`}
         </div>
