@@ -363,7 +363,14 @@ export default function WonSocketAddAtom({
       );
     }
   }
-
+  const specificLabels =
+    addToAtom &&
+    addToSocketType &&
+    wonLabelUtils.getAtomSocketPickerLabel(
+      addToAtom,
+      addToSocketType,
+      isAddToAtomOwned
+    );
   return (
     <won-socket-add-atom>
       <div className="wsaa__header">
@@ -371,16 +378,8 @@ export default function WonSocketAddAtom({
           <use xlinkHref={ico36_close} href={ico36_close} />
         </svg>
         <div className="wsaa__header__label">
-          {wonLabelUtils.getAtomSocketPickerLabel(
-            addToAtom,
-            addToSocketType,
-            isAddToAtomOwned
-          )
-            ? wonLabelUtils.getAtomSocketPickerLabel(
-                addToAtom,
-                addToSocketType,
-                isAddToAtomOwned
-              )
+          {specificLabels
+            ? `${specificLabels}`
             : `Pick an Atom below to ${
                 isAddToAtomOwned ? "add" : "connect"
               } to the ${wonLabelUtils.getSocketTabLabel(addToSocketType)}`}

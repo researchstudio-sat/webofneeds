@@ -237,7 +237,7 @@ export function getReactions(atom, socketType) {
   return socketType ? get(possibleReactions, socketType) : possibleReactions;
 }
 
-export function getReactionLabels(atom, socketType) {
+export function getReactionLabels(atom, addToSocketType, socketType) {
   let labels = {
     owned: {
       default: [],
@@ -250,37 +250,56 @@ export function getReactionLabels(atom, socketType) {
       picker: [],
     },
   };
-  const reactions = getReactions(atom, socketType);
+  const reactions = getReactions(atom, addToSocketType);
   if (reactions && reactions.size > 0) {
-    reactions.map(reaction => {
-      const reactionLabels = get(reaction, "labels");
-      if (reactionLabels) {
-        labels.owned.default.push(getIn(reactionLabels, ["owned", "default"]));
-        labels.owned.addNew.push(getIn(reactionLabels, ["owned", "addNew"]));
-        labels.owned.picker.push(getIn(reactionLabels, ["owned", "picker"]));
-        labels.nonOwned.default.push(
-          getIn(reactionLabels, ["nonOwned", "default"])
-        );
-        labels.nonOwned.addNew.push(
-          getIn(reactionLabels, ["nonOwned", "addNew"])
-        );
-        labels.nonOwned.picker.push(
-          getIn(reactionLabels, ["nonOwned", "picker"])
-        );
-      }
-    });
-    return {
-      owned: {
-        default: labels.owned.default.join(" / "),
-        addNew: labels.owned.addNew.join(" / "),
-        picker: labels.owned.picker.join(" / "),
-      },
-      nonOwned: {
-        default: labels.nonOwned.default.join(" / "),
-        addNew: labels.nonOwned.addNew.join(" / "),
-        picker: labels.nonOwned.picker.join(" / "),
-      },
-    };
+    if (socketType) {
+      const typeReactions = get(reactions, socketType);
+      const reactionLabels = get(typeReactions, "labels");
+      return {
+        owned: {
+          default: getIn(reactionLabels, ["owned", "default"]),
+          addNew: getIn(reactionLabels, ["owned", "addNew"]),
+          picker: getIn(reactionLabels, ["owned", "picker"]),
+        },
+        nonOwned: {
+          default: getIn(reactionLabels, ["nonOwned", "default"]),
+          addNew: getIn(reactionLabels, ["nonOwned", "addNew"]),
+          picker: getIn(reactionLabels, ["nonOwned", "picker"]),
+        },
+      };
+    } else {
+      reactions.map(reaction => {
+        const reactionLabels = get(reaction, "labels");
+        if (reactionLabels) {
+          labels.owned.default.push(
+            getIn(reactionLabels, ["owned", "default"])
+          );
+          labels.owned.addNew.push(getIn(reactionLabels, ["owned", "addNew"]));
+          labels.owned.picker.push(getIn(reactionLabels, ["owned", "picker"]));
+          labels.nonOwned.default.push(
+            getIn(reactionLabels, ["nonOwned", "default"])
+          );
+          labels.nonOwned.addNew.push(
+            getIn(reactionLabels, ["nonOwned", "addNew"])
+          );
+          labels.nonOwned.picker.push(
+            getIn(reactionLabels, ["nonOwned", "picker"])
+          );
+        }
+      });
+      return {
+        owned: {
+          default: labels.owned.default.join(" / "),
+          addNew: labels.owned.addNew.join(" / "),
+          picker: labels.owned.picker.join(" / "),
+        },
+        nonOwned: {
+          default: labels.nonOwned.default.join(" / "),
+          addNew: labels.nonOwned.addNew.join(" / "),
+          picker: labels.nonOwned.picker.join(" / "),
+        },
+      };
+    }
   }
   return undefined;
 }

@@ -223,12 +223,12 @@ export function getAddNewSocketItemLabel(
   socketType,
   atom
 ) {
-  if (
+  const specificLabels =
     atom &&
     addToSocketType &&
-    getAtomSocketAddNewLabel(atom, addToSocketType, isAddToOwned)
-  ) {
-    return getAtomSocketAddNewLabel(atom, addToSocketType, isAddToOwned);
+    getAtomSocketAddNewLabel(atom, addToSocketType, socketType, isAddToOwned);
+  if (specificLabels) {
+    return specificLabels;
   } else if (addToUseCase === "organization" && ucIdentifier === "persona") {
     return `Join with New Persona`;
   } else {
@@ -279,8 +279,12 @@ export function generateAddButtonLabel(
   targetSocketType,
   senderReactions
 ) {
-  if (getAtomSocketDefaultLabel(targetAtom, targetSocketType, isAtomOwned)) {
-    return getAtomSocketDefaultLabel(targetAtom, targetSocketType, isAtomOwned);
+  const specificLabels =
+    targetAtom &&
+    targetSocketType &&
+    getAtomSocketDefaultLabel(targetAtom, targetSocketType, isAtomOwned);
+  if (specificLabels) {
+    return specificLabels;
   } else {
     switch (targetSocketType) {
       case vocab.WXSCHEMA.ReviewSocketCompacted:
@@ -318,8 +322,13 @@ export function getAtomSocketDefaultLabel(atom, socketType, isOwned) {
   return undefined;
 }
 
-export function getAtomSocketAddNewLabel(atom, socketType, isOwned) {
-  const labels = atomUtils.getReactionLabels(atom, socketType);
+export function getAtomSocketAddNewLabel(
+  atom,
+  addToSocketType,
+  socketType,
+  isOwned
+) {
+  const labels = atomUtils.getReactionLabels(atom, addToSocketType, socketType);
   if (labels) {
     return isOwned ? labels.owned.addNew : labels.nonOwned.addNew;
   }
