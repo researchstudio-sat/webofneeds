@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import won.auth.check.AtomNodeChecker;
-import won.auth.check.TargetAtomCheckEvaluator;
+import won.auth.check.ConnectionTargetCheckEvaluator;
 import won.auth.model.Authorization;
 import won.cryptography.rdfsign.WebIdKeyLoader;
 import won.shacl2java.Shacl2JavaInstanceFactory;
@@ -20,7 +20,7 @@ public class WonAclEvaluatorFactory {
     protected Shacl2JavaInstanceFactory instanceFactory = AuthUtils.instanceFactory();
     protected Shapes shapes;
     @Autowired
-    protected TargetAtomCheckEvaluator targetAtomCheckEvaluator;
+    protected ConnectionTargetCheckEvaluator targetAtomCheckEvaluator;
     @Autowired
     protected AtomNodeChecker atomNodeChecker;
     @Autowired
@@ -30,7 +30,7 @@ public class WonAclEvaluatorFactory {
     }
 
     public WonAclEvaluatorFactory(
-                    TargetAtomCheckEvaluator targetAtomCheckEvaluator,
+                    ConnectionTargetCheckEvaluator targetAtomCheckEvaluator,
                     AtomNodeChecker atomNodeChecker,
                     WebIdKeyLoader webIdKeyLoader) {
         this.targetAtomCheckEvaluator = targetAtomCheckEvaluator;

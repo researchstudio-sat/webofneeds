@@ -119,6 +119,14 @@ auth:targetAtomPropertyShape
     sh:node          auth:targetAtomExpressionShape ;
     sh:minCount      1 .
 
+auth:targetWonNodePropertyShape
+    rdfs:isDefinedBy auth: ;
+    a                sh:PropertyShape ;
+    sh:path          auth:targetWonNode ;
+    sh:maxCount      1 ;
+    sh:node          auth:targetWonNodeExpressionShape ;
+    sh:minCount      1 .
+
 auth:expiresAfterPropertyShape
     rdfs:isDefinedBy auth: ;
     a                sh:PropertyShape ;
@@ -200,7 +208,7 @@ auth:aseRootShape
     sh:ignoredProperties ( auth:atomState auth:graph auth:atomMessages auth:atomMessage auth:socket
                            auth:connections
                            auth:connection auth:connectionMessages auth:connectionMessage
-                           auth:operation auth:targetAtom rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
+                           auth:operation auth:targetAtom auth:targetWonNode rdfs:label rdfs:comment rdfs:isDefinedBy ) ;
     sh:nodeKind          sh:BlankNodeOrIRI ;
     sh:or                ( [ sh:property auth:atomStatePropertyShape ]
                            [ sh:property auth:graphPropertyShape ]
@@ -212,7 +220,8 @@ auth:aseRootShape
                            [ sh:property auth:connectionMessagesPropertyShape ]
                            [ sh:property auth:connectionMessagePropertyShape ]
                            [ sh:property auth:operationPropertyShape ]
-                           [ sh:property auth:targetAtomPropertyShape ] ) .
+                           [ sh:property auth:targetAtomPropertyShape ]
+                           [ sh:property auth:targetWonNodePropertyShape ] ) .
 
 
 auth:atomStateShape
@@ -276,7 +285,7 @@ auth:socketExpressionShape
     sh:closed            true ;
     sh:ignoredProperties ( auth:connections
                            auth:connection auth:connectionMessages auth:connectionMessage
-                           auth:operation auth:targetAtom auth:socketType auth:socketIri
+                           auth:operation auth:targetAtom auth:targetWonNode auth:socketType auth:socketIri
                            auth:inherit ) ;
     sh:targetObjectsOf   auth:socket ;
     auth:asePosition     auth:positionSocket ;
@@ -290,6 +299,7 @@ auth:socketExpressionShape
                            [ sh:property auth:connectionMessagesPropertyShape ]
                            [ sh:property auth:connectionMessagePropertyShape ]
                            [ sh:property auth:targetAtomPropertyShape ]
+                           [ sh:property auth:targetWonNodePropertyShape ]
                            [ sh:property auth:operationPropertyShape ] ) .
 
 # Definition 11 (connections expression)
@@ -300,7 +310,7 @@ auth:connectionsExpressionShape
                          auth:TargetAtomContainerShape ;
     sh:closed            true ;
     sh:ignoredProperties ( auth:connection auth:connectionMessages auth:connectionMessage
-                           auth:operation auth:targetAtom auth:socketType auth:socketIri
+                           auth:operation auth:targetAtom auth:targetWonNode auth:socketType auth:socketIri
                            auth:connectionState
                            auth:inherit ) ;
     auth:asePosition     auth:positionConnections ;
@@ -312,6 +322,7 @@ auth:connectionsExpressionShape
                            [ sh:property auth:connectionMessagesPropertyShape ]
                            [ sh:property auth:connectionMessagePropertyShape ]
                            [ sh:property auth:targetAtomPropertyShape ]
+                           [ sh:property auth:targetWonNodePropertyShape ]
                            [ sh:property auth:operationPropertyShape ] ) .
 
 # Definition 12 (connection expression)
@@ -322,7 +333,7 @@ auth:connectionExpressionShape
                          auth:TargetAtomContainerShape ;
     sh:closed            true ;
     sh:ignoredProperties ( auth:connectionMessages auth:connectionMessage
-                           auth:operation auth:targetAtom auth:connectionState auth:inherit ) ;
+                           auth:operation auth:targetAtom auth:targetWonNode auth:connectionState auth:inherit ) ;
     sh:targetObjectsOf   auth:connection ;
     auth:asePosition     auth:positionConnection ;
     sh:or                ( [ sh:property auth:inheritPropertyShape ]
@@ -331,6 +342,8 @@ auth:connectionExpressionShape
                            [ sh:property auth:connectionMessagesPropertyShape ]
                            [ sh:property auth:connectionMessagePropertyShape ]
                            [ sh:property auth:targetAtomPropertyShape ]
+                           [ sh:property auth:targetWonNodePropertyShape ]
+                           [ sh:property auth:targetWonNodePropertyShape ]
                            [ sh:property auth:operationPropertyShape ] ) .
 
 auth:connectionStateShape
@@ -353,6 +366,15 @@ auth:targetAtomExpressionShape
     sh:ignoredProperties ( auth:atom ) ;
     sh:or                ( [ sh:nodeKind sh:BlankNode ]
                            [ sh:node auth:atomExpressionShape ] ) .
+
+# TODO: describe
+
+auth:targetWonNodeExpressionShape
+    rdfs:isDefinedBy   auth: ;
+    a                  sh:NodeShape ;
+    sh:closed          true ;
+    sh:targetObjectsOf auth:targetWonNode ;
+    sh:nodeKind        sh:BlankNode .
 
 # Definition 14 (connection messages expression)
 
@@ -1004,7 +1026,7 @@ auth:operationRequestor
     rdfs:isDefinedBy auth: ;
     a                owl:NamedIndividual, auth:RelativeAtomExpression ;
     rdfs:label       "operationRequestor" ;
-    rdfs:comment     """Placeholder for the uri of the atom that requests an operation. In the case of bearer
+    rdfs:comment     """Placeholder for the uri of the atom or node that requests an operation. In the case of bearer
     authentication, there is no operationRequestor; arguably, one could use the token's subject claim, but that
     would extend additional trust to the issuer of the token."""@en .
 
@@ -1180,6 +1202,15 @@ auth:targetAtom
                        "Identifies target atoms of connections that are direct or transitive targetNodes of the expression's focus nodes."@en ;
     rdfs:label         "targetAtom" .
 
+auth:targetWonNode
+    rdfs:isDefinedBy   auth: ;
+    rdfs:subPropertyOf auth:AseLeafObjectProperty ;
+    a                  owl:ObjectProperty ;
+    rdfs:domain        auth:AtomStructureExpression ;
+    rdfs:comment
+                       "Identifies target WoN nodes of connections that are direct or transitive targetNodes of the expression's focus nodes."@en ;
+    rdfs:label         "targetWonNode" .
+
 auth:atomState
     rdfs:isDefinedBy   auth: ;
     a                  owl:ObjectProperty ;
@@ -1284,7 +1315,7 @@ auth:connectionMessage
     rdfs:subPropertyOf auth:AseBranchProperty ;
     rdfs:domain        [ a           owl:Class ;
                          owl:unionOf ( auth:AseRoot auth:SocketExpression auth:ConnectionsExpression
-                                     auth:ConnectionExpression auth:ConnectionMessagesExpression ) ] ;
+                                       auth:ConnectionExpression auth:ConnectionMessagesExpression ) ] ;
     rdfs:range         auth:ConnectionMessageExpression ;
     rdfs:label         "connectionMessage" ;
     rdfs:comment       """Used in the ASE root, socket, connections, connection, or connection messages expressions to specify
@@ -1446,10 +1477,12 @@ auth:expiresAfter
 auth:nodeSigned
     rdfs:isDefinedBy auth: ;
     a                owl:DatatypeProperty ;
-    rdfs:domain      [ a owl:Class ; owl:unionOf (auth:TokenSpecification auth:TokenShape ) ];
+    rdfs:domain      [ a           owl:Class ;
+                       owl:unionOf ( auth:TokenSpecification auth:TokenShape ) ] ;
     rdfs:range       xsd:boolean ;
     rdfs:label       "nodeSigned" ;
-    rdfs:comment     "If `true` or missing in an [auth:TokenSpecification], tokens are issued on behalf of [won:Atom]s by the [won:Node], and signed with the node's key. If `false`, tokens issued by an atom have to be signed using the atom's key. The latter is a much more complex process as the atom's key is only known to the owner applications controlling that atom; such tokens cannot be produced by the WoN node alone. If used in an [auth:TokenShape]the property instructs the token verification algorithm on which key to verify the signature against. By default, i.e., if this property is not used, tokens are assumed to be signed by the WoN node."@en .
+    rdfs:comment
+                     "If `true` or missing in an [auth:TokenSpecification], tokens are issued on behalf of [won:Atom]s by the [won:Node], and signed with the node's key. If `false`, tokens issued by an atom have to be signed using the atom's key. The latter is a much more complex process as the atom's key is only known to the owner applications controlling that atom; such tokens cannot be produced by the WoN node alone. If used in an [auth:TokenShape]the property instructs the token verification algorithm on which key to verify the signature against. By default, i.e., if this property is not used, tokens are assumed to be signed by the WoN node."@en .
 
 auth:tokenIss
     rdfs:isDefinedBy auth: ;
@@ -1562,6 +1595,15 @@ auth:grantsForConnStateConnected
                                          auth:connectionState won:Connected ] ] ;
     rdfs:label       "grantsForConnStateConnected" ;
     rdfs:comment     "Implicit authorization for established connections"@en .
+
+auth:grantReadKeyToConnectionTargetNodes
+    rdfs:isDefinedBy auth: ;
+    a                auth:Authorization, owl:NamedIndividual ;
+    auth:grant       [ auth:graph [ auth:graphType auth:keyGraph ] ] ;
+    auth:grantee     [ auth:connection [ auth:targetWonNode [ ] ] ] ;
+    rdfs:label       "grantReadKeyToConnectionTargetNodes" ;
+    rdfs:comment     """Implicit authorization granting the WoN node hosting an atom that we we have a connection
+    with access to our key graph so the node can verify messages we send."""@en .
 
 # Operations
 

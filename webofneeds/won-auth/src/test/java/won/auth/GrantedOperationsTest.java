@@ -97,7 +97,7 @@ public class GrantedOperationsTest {
     public void testSet1() throws IOException {
         Shacl2JavaInstanceFactory factory = AuthUtils.instanceFactory();
         Shapes atomDataShapes = loadShapes(atomDataShapesDef);
-        ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(
+        ModelBasedConnectionTargetCheckEvaluator targetAtomChecker = new ModelBasedConnectionTargetCheckEvaluator(
                         atomDataShapes,
                         "won.auth.test.model");
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,

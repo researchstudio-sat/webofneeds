@@ -55,6 +55,30 @@
     restricted access, we want to verify the WebID and we want no client-side caching. For public access, the WebID
     verification step is not needed, and we can be more open about caching.
      -->
+
+	<!-- specific config for WoN node descriptor: requires no authentication, webids are not checked
+	 	This is required so that other nodes can verify requests that this node sends using its own
+	 	webid. If the requestor's webid was checked before responding with the node descriptor, we
+	 	would cause a deadlock:
+	 	node1: request to node2 (using webid of node1)
+	 	node2: check webid of node1 -> request descriptor of node1 (using webid of node2)
+	 	node1: check webid of node2 -> request descriptor of node2 (using webid of node1)
+	 	node2: check webid of node1 -> request descriptor of node1 (using webid of node2)
+	 	...
+	 -->
+	<sec:http request-matcher="regex" pattern="/(resource|data|page)/?$"
+			  entry-point-ref="authorizationEntryPoint">
+		<sec:headers defaults-disabled="true">
+			<sec:cache-control/>
+			<sec:content-type-options/>
+			<sec:hsts/>
+			<sec:frame-options/>
+			<sec:xss-protection/>
+		</sec:headers>
+		<sec:intercept-url pattern="/(resource|data|page)/?$" access="permitAll"/>
+		<sec:csrf disabled="true"/>
+	</sec:http>
+
 	<!-- slightly different config for cases in which a client certificate is sufficient (but the webID will not be
     checked
      -->
@@ -75,7 +99,7 @@
 		<sec:custom-filter ref="wonAclAuthTokenFilter" after="X509_FILTER"/>
 		<!-- we allow self-signed certificates that need not be webids -->
 		<!--sec:intercept-url pattern=".*" access="hasRole('ROLE_CLIENT_CERTIFICATE_PRESENTED')"/-->
-		<sec:intercept-url pattern="/(resource|data|page)/?(\?.+)?$" access="permitAll"/>
+		<sec:intercept-url pattern="/(resource|data|page)/?(\?.+)?$" access="permitAll"/><!-- required for register -->
 		<sec:intercept-url pattern="/(resource|data|page)/(atom)/?(\?.+)?$" access="permitAll"/>
 		<sec:intercept-url pattern="/(resource|data|page)/(atom|msg)/[^\?]+(\?.+)?$"
 						   access="hasRole('ROLE_WEBID') or hasRole('ROLE_CLIENT_CERTIFICATE') or isAnonymous()"/>
@@ -116,7 +140,7 @@
 	<bean id="webIdUserDetailsService" class="won.node.springsecurity.UserDetailsService"/>
 	<bean id="wonAclAccessDecisionVoter" class="won.node.springsecurity.acl.WonAclAccessDecisionVoter"/>
 	<bean id="wonAclEvaluatorFactory" class="won.auth.WonAclEvaluatorFactory"/>
-	<bean id="targetAtomCheckEvaluator" class="won.node.springsecurity.acl.WonTargetAtomCheckEvaluator"/>
+	<bean id="targetAtomCheckEvaluator" class="won.node.springsecurity.acl.WonConnectionTargetCheckEvaluator"/>
 	<bean id="ldFetchingAtomNodeChecker" class="won.auth.check.impl.LDFetchingAtomNodeChecker"/>
 	<bean id="atomNodeChecker" class="won.node.springsecurity.acl.NodeBasedAtomNodeChecker" primary="true"/>
 

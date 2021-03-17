@@ -75,9 +75,9 @@ ex:atom4
     auth:grantee [ auth:socket [ auth:socketType  wx-buddy:BuddySocket ;
                                  auth:connections [ auth:connection [ auth:targetAtom      [ ] ;
                                                                       auth:connectionState won:Closed ] ] ] ;
-# requires state won:Connected
-                   auth:socket [ auth:socketType ex:ExSocketDef ;
-                                 auth:targetAtom [ ] ] ] ;
+                   auth:socket [ auth:socketType  ex:ExSocketDef ;
+                                 auth:connections [ auth:connectionState won:Connected ;
+                                                    auth:targetAtom      [ ] ] ] ] ;
     auth:grant   [ auth:atomState won:Active ;
                    auth:operation auth:anyOperation ] .
 

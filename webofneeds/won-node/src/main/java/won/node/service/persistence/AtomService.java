@@ -136,7 +136,7 @@ public class AtomService {
         if (atomURI != null) {
             return getAtomRequired(atomURI);
         } else {
-            throw new WonMessageProcessingException("Could not obtain atom URI from messsage " + msg.getMessageURI());
+            throw new WonMessageProcessingException("Could not obtain atom URI from message " + msg.getMessageURI());
         }
     }
 

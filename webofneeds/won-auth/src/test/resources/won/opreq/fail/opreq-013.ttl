@@ -72,8 +72,7 @@ ex:atom4
 
 <#authorization>
     a            auth:Authorization ;
-    auth:grantee [ auth:targetAtom [ ] ;
-#allows connected - but none here are
+    auth:grantee [
                    auth:socket     [ auth:socketIri   atom1:bsConn1 ;
                                      auth:connections [ auth:connection [ auth:targetAtom      [ ] ;
                                                                           auth:connectionState
@@ -81,12 +80,9 @@ ex:atom4
                    auth:socket     [ auth:socketType  wx-buddy:BuddySocket ;
                                      auth:connections [ auth:connection [ auth:targetAtom      [ ] ;
                                                                           auth:connectionState won:Connected ] ] ] ;
-# requires state won:Connected
-                   auth:socket [ auth:socketType ex:ExSocketDef ;
-                                 auth:targetAtom [ ] ;
-                                 auth:connections [auth:connectionState won:RequestSent ] ; # target atom is at socket level
-                               ]
-                 ] ;
+                   auth:socket     [ auth:socketType  ex:ExSocketDef ;
+                                     auth:connections [ auth:targetAtom      [ ] ;
+                                                        auth:connectionState won:Connected ] ] ] ;
     auth:grant   [ auth:atomState won:Active ;
                    auth:operation auth:anyOperation ] .
 

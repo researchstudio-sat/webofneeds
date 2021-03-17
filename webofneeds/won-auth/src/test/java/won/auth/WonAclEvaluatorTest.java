@@ -98,8 +98,8 @@ public class WonAclEvaluatorTest {
     public void testWonAcl_fail() throws IOException {
         Shapes shapes = loadShapes(shapesDef);
         Shapes atomDataShapes = loadShapes(atomDataShapesDef);
-        ModelBasedTargetAtomCheckEvaluator targetAtomChecker = withDurationLog("initializing TargetAtomChecker",
-                        () -> new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
+        ModelBasedConnectionTargetCheckEvaluator targetAtomChecker = withDurationLog("initializing TargetAtomChecker",
+                        () -> new ModelBasedConnectionTargetCheckEvaluator(atomDataShapes,
                                         "won.auth.test.model"));
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
                         "won.auth.test.model");
@@ -121,7 +121,8 @@ public class WonAclEvaluatorTest {
     public void testWonAcl_ok() throws IOException {
         Shapes shapes = loadShapes(shapesDef);
         Shapes atomDataShapes = loadShapes(atomDataShapesDef);
-        ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
+        ModelBasedConnectionTargetCheckEvaluator targetAtomChecker = new ModelBasedConnectionTargetCheckEvaluator(
+                        atomDataShapes,
                         "won.auth.test.model");
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
                         "won.auth.test.model");
@@ -143,7 +144,8 @@ public class WonAclEvaluatorTest {
     public void testWonAcl_spec() throws IOException {
         Shapes shapes = loadShapes(shapesDef);
         Shapes atomDataShapes = loadShapes(atomDataShapesDef);
-        ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
+        ModelBasedConnectionTargetCheckEvaluator targetAtomChecker = new ModelBasedConnectionTargetCheckEvaluator(
+                        atomDataShapes,
                         "won.auth.test.model");
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
                         "won.auth.test.model");
@@ -167,7 +169,8 @@ public class WonAclEvaluatorTest {
     public void testWonAcl_domain_spec() throws IOException {
         Shapes shapes = loadShapes(shapesDef);
         Shapes atomDataShapes = loadShapes(atomDataShapesDef);
-        ModelBasedTargetAtomCheckEvaluator targetAtomChecker = new ModelBasedTargetAtomCheckEvaluator(atomDataShapes,
+        ModelBasedConnectionTargetCheckEvaluator targetAtomChecker = new ModelBasedConnectionTargetCheckEvaluator(
+                        atomDataShapes,
                         "won.auth.test.model");
         ModelBasedAtomNodeChecker atomNodeChecker = new ModelBasedAtomNodeChecker(atomDataShapes,
                         "won.auth.test.model");
@@ -189,7 +192,7 @@ public class WonAclEvaluatorTest {
 
     private void evaluateTest(Shapes shapes, Shapes atomDataShapes,
                     WonAclEvaluatorTestFactory evaluatorFactory,
-                    ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
+                    ModelBasedConnectionTargetCheckEvaluator targetAtomChecker,
                     Resource resource,
                     DecisionValue accessDenied)
                     throws IOException {
@@ -212,7 +215,7 @@ public class WonAclEvaluatorTest {
 
     private void evaluateTestWithSpec(Shapes shapes, Shapes atomDataShapes,
                     WonAclEvaluatorTestFactory evaluatorFactory,
-                    ModelBasedTargetAtomCheckEvaluator targetAtomChecker,
+                    ModelBasedConnectionTargetCheckEvaluator targetAtomChecker,
                     ModelBasedAtomNodeChecker atomNodeChecker, Graph graph,
                     Resource resource)
                     throws IOException {

@@ -35,7 +35,7 @@ public class AclChecker extends AbstractCamelProcessor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        URI atomUri = WonCamelHelper.getRecipientAtomURIRequired(exchange);
+        URI recipientAtomUri = WonCamelHelper.getRecipientAtomURIRequired(exchange);
         WonMessage message = WonCamelHelper.getMessageRequired(exchange);
         if (message.getMessageType().isCreateAtom()) {
             // no checks required for a create message
@@ -55,7 +55,7 @@ public class AclChecker extends AbstractCamelProcessor {
                 return;
             }
         }
-        Atom atom = atomService.getAtomRequired(atomUri);
+        Atom atom = atomService.getAtomForMessageRequired(message, direction);
         Optional<Graph> aclGraph = atom.getAclGraph();
         if (aclGraph.isEmpty()) {
             // no checks if no acl present
@@ -80,7 +80,7 @@ public class AclChecker extends AbstractCamelProcessor {
             }
         }
         OperationRequest operationRequest = OperationRequest.builder()
-                        .setReqAtom(atomUri)
+                        .setReqAtom(atom.getAtomURI())
                         .setReqAtomState(AuthUtils.toAuthAtomState(atom.getState()))
                         .setRequestor(requestor)
                         .build();
