@@ -440,7 +440,7 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
 
     /**
      * Performs the actual request via the linkedDataRestClient.
-     * 
+     *
      * @param resource
      * @param requesterWebID
      * @param headers
@@ -599,8 +599,10 @@ public class CachingLinkedDataSource extends LinkedDataSourceBase implements Lin
         }
         // use space to separate the URIS
         // use space in the null placeholder to make it impossible to inject a
-        // requesterWebID URI that is equal to the null place holder (because an URI can't have spaces).
-        return resourceForCacheKey.toString() + " " + (requesterWebID == null ? " (no Web ID)" : requesterWebID.toString());
+        // requesterWebID URI that is equal to the null place holder (because an URI
+        // can't have spaces).
+        return resourceForCacheKey.toString() + " "
+                        + (requesterWebID == null ? " (no Web ID)" : requesterWebID.toString());
     }
 
     public enum CacheControlFlag {
