@@ -1,11 +1,11 @@
 import {
+  connectedConnectionsAuthorization,
+  connectToSocketsAuthorization,
+  defaultPublicAtomAuthorization,
+  defaultReactions,
   details,
   mergeInEmptyDraft,
-  defaultReactions,
-  connectedConnectionsAuthorization,
-  defaultPublicAtomAuthorization,
   seeHolderSocketConnectionsAuthorization,
-  connectToSocketsAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 
@@ -80,12 +80,12 @@ export const persona = {
           owned: {
             default: "Organization",
             addNew: "Add to New Organization",
-            picker: "Pick a Organization below to join",
+            picker: "Pick a Organization to join",
           },
           nonOwned: {
             default: "Organization",
             addNew: "Add to New Organization",
-            picker: "Pick a Organization below to join",
+            picker: "Pick a Organization to join",
           },
         },
       },
@@ -132,12 +132,12 @@ export const persona = {
           owned: {
             default: "Join Event",
             addNew: "Join New Event",
-            picker: "Pick an Event below to join",
+            picker: "Pick an Event to join",
           },
           nonOwned: {
             default: "Join Event",
             addNew: "Join New Event",
-            picker: "Pick an Event below to join",
+            picker: "Pick an Event to join",
           },
         },
       },

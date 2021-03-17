@@ -57,12 +57,12 @@ export const organization = {
           owned: {
             default: "Member",
             addNew: "Add New Member",
-            picker: "Pick a Persona below to invite",
+            picker: "Pick a Persona to invite",
           },
           nonOwned: {
             default: "Join Organization",
             addNew: "Add New Member",
-            picker: "Pick a Persona below to invite",
+            picker: "Pick a Persona to invite",
           },
         },
       },

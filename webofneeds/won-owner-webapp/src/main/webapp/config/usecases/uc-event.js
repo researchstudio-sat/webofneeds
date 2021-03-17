@@ -2,9 +2,9 @@
  * Created by fsuda on 18.09.2018.
  */
 import {
+  defaultReactions,
   details,
   mergeInEmptyDraft,
-  defaultReactions,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico36_detail_datetime from "../../images/won-icons/ico36_detail_datetime.svg";
@@ -38,12 +38,12 @@ export const event = {
           owned: {
             default: "Persona",
             addNew: "New Persona",
-            picker: "Pick a Persona below to invite",
+            picker: "Pick a Persona to invite",
           },
           nonOwned: {
             default: "Persona",
             addNew: "New Persona",
-            picker: "Pick a Persona below to invite",
+            picker: "Pick a Persona to invite",
           },
         },
       },
@@ -60,12 +60,12 @@ export const event = {
           owned: {
             default: "Article",
             addNew: "New Article",
-            picker: "Pick an Article below",
+            picker: "Pick an Article",
           },
           nonOwned: {
             default: "Article",
             addNew: "New Article",
-            picker: "Pick an Article below",
+            picker: "Pick an Article",
           },
         },
       },

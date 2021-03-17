@@ -12,8 +12,9 @@ import * as actions from "./details/action.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
 import vocab from "../app/service/vocab.js";
-export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
+
+export const abstractDetails = abstractDetails_; // reexport
 
 // Grant access to connect to all sockets 009
 export const connectToSocketsAuthorization = {
@@ -175,12 +176,12 @@ export const defaultReactions = {
         owned: {
           default: "Review",
           addNew: "New Review",
-          picker: "Pick a Review below",
+          picker: "Pick a Review",
         },
         nonOwned: {
           default: "Review",
           addNew: "New Review",
-          picker: "Pick a Review below",
+          picker: "Pick a Review",
         },
       },
     },
@@ -193,12 +194,12 @@ export const defaultReactions = {
         owned: {
           default: "Buddy",
           addNew: "Add New Persona as Buddy",
-          picker: "Pick a Persona below to add as Buddy",
+          picker: "Pick a Persona to add as Buddy",
         },
         nonOwned: {
           default: "Buddy",
           addNew: "New Persona to send Request",
-          picker: "Pick a Persona below to add as Buddy",
+          picker: "Pick a Persona to add as Buddy",
         },
       },
     },
@@ -235,12 +236,12 @@ export const defaultReactions = {
         owned: {
           default: "Event",
           addNew: "Organize New Event",
-          picker: "Pick an Event below",
+          picker: "Pick an Event",
         },
         nonOwned: {
           default: "Event",
           addNew: "Organize New Event",
-          picker: "Pick an Event below",
+          picker: "Pick an Event",
         },
       },
     },
