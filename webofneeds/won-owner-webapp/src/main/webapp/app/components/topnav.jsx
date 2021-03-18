@@ -44,9 +44,9 @@ export default function WonTopnav({ pageTitle }) {
     generalSelectors.getConnectionContainersToCrawl
   );
 
-  // const connectionContainersWithUnusedCredentials = useSelector(
-  //   processSelectors.getUnusedRequestCredentialsForConnectionContainer
-  // );
+  const connectionContainersWithUnusedCredentials = useSelector(
+    processSelectors.getUnusedRequestCredentialsForConnectionContainer
+  );
 
   const hasUnreads = useSelector(
     state =>
@@ -101,32 +101,31 @@ export default function WonTopnav({ pageTitle }) {
     [connectionContainersToCrawl]
   );
 
-  // FIXME: This effect causes the App to break (loops seemingly endlessly)
-  // useEffect(
-  //   () => {
-  //     if (
-  //       connectionContainersWithUnusedCredentials &&
-  //       connectionContainersWithUnusedCredentials.size > 0
-  //     ) {
-  //       connectionContainersWithUnusedCredentials.map(
-  //         (connectionContainerState, atomUri) => {
-  //           console.debug(
-  //             "there are Unused credentials for connContainer of: ",
-  //             atomUri,
-  //             " credentials: ",
-  //             connectionContainerState
-  //           );
-  //           dispatch(
-  //             actionCreators.atoms__markConnectionContainerToLoad({
-  //               uri: atomUri,
-  //             })
-  //           );
-  //         }
-  //       );
-  //     }
-  //   },
-  //   [connectionContainersWithUnusedCredentials]
-  // );
+  useEffect(
+    () => {
+      if (
+        connectionContainersWithUnusedCredentials &&
+        connectionContainersWithUnusedCredentials.size > 0
+      ) {
+        connectionContainersWithUnusedCredentials.map(
+          (unusedCredentials, atomUri) => {
+            console.debug(
+              "there are Unused credentials for connContainer of: ",
+              atomUri,
+              " credentials: ",
+              unusedCredentials.toJS()
+            );
+            dispatch(
+              actionCreators.atoms__markConnectionContainerToLoad({
+                uri: atomUri,
+              })
+            );
+          }
+        );
+      }
+    },
+    [connectionContainersWithUnusedCredentials]
+  );
 
   function toggleSlideIns() {
     hideMenu();

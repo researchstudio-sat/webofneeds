@@ -539,8 +539,8 @@ export const getConnectionContainersToCrawl = createSelector(
         ownedPinnedAtoms &&
         ownedPinnedAtoms
           .filter(atom => getUri(atom) === activePinnedAtomUri)
-          .filter(
-            atom => !processUtils.isAtomToLoad(processState, getUri(atom))
+          .filterNot(atom =>
+            processUtils.isAtomToLoad(processState, getUri(atom))
           )
       );
     }
@@ -548,7 +548,9 @@ export const getConnectionContainersToCrawl = createSelector(
     const ownedPinnedAtomsConnectionContainersToCrawl =
       ownedPinnedAtoms &&
       ownedPinnedAtoms
-        .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
+        .filterNot(atom =>
+          processUtils.isAtomToLoad(processState, getUri(atom))
+        )
         .filter(atom =>
           processUtils.isConnectionContainerToLoad(processState, getUri(atom))
         );
@@ -562,7 +564,7 @@ export const getConnectionContainersToCrawl = createSelector(
     }
 
     const ownedAtomsConnectionContainersToCrawl = ownedAtoms
-      .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
+      .filterNot(atom => processUtils.isAtomToLoad(processState, getUri(atom)))
       .filter(atom =>
         processUtils.isConnectionContainerToLoad(processState, getUri(atom))
       );
@@ -578,7 +580,9 @@ export const getConnectionContainersToCrawl = createSelector(
     const atomsConnectionContainersToCrawl =
       atoms &&
       atoms
-        .filter(atom => !processUtils.isAtomToLoad(processState, getUri(atom)))
+        .filterNot(atom =>
+          processUtils.isAtomToLoad(processState, getUri(atom))
+        )
         .filter(atom =>
           processUtils.isConnectionContainerToLoad(processState, getUri(atom))
         );
