@@ -37,14 +37,6 @@ export default function WonTopnav({ pageTitle }) {
   const isSignUpView = currentPath === "/signup";
   const showLoadingIndicator = useSelector(processSelectors.isLoading);
 
-  const connectionContainersToCrawl = useSelector(
-    generalSelectors.getConnectionContainersToCrawl
-  );
-
-  const atomUrisWithUnusedCredentialsForConnectionContainer = useSelector(
-    processSelectors.getAtomUrisWithUnusedRequestCredentialsForConnectionContainer
-  );
-
   const hasUnreads = useSelector(
     state =>
       generalSelectors.hasUnassignedUnpinnedAtomUnreads(state) ||
@@ -96,6 +88,9 @@ export default function WonTopnav({ pageTitle }) {
   * this is used to fetch every connection Container with the appropriate credentials in order to display all the content
   * available to the user
   */
+  const connectionContainersToCrawl = useSelector(
+    generalSelectors.getConnectionContainersToCrawl
+  );
   useEffect(
     () => {
       if (connectionContainersToCrawl && connectionContainersToCrawl.size > 0) {
@@ -109,10 +104,32 @@ export default function WonTopnav({ pageTitle }) {
     [connectionContainersToCrawl]
   );
 
+  /**
+   * Crawler for externalDataUris (e.g. wikidata uris)
+   * this is used to fetch every wikidata uri that is not yet in the state
+   */
+  // TODO: FIX ME (LOOPS)
+  // const externalDataUrisToLoad = useSelector(
+  //   generalSelectors.getExternalDataUrisToLoad
+  // );
+  // useEffect(
+  //   () => {
+  //     if (externalDataUrisToLoad && externalDataUrisToLoad.size > 0) {
+  //       externalDataUrisToLoad.map(entityUri => {
+  //         dispatch(actionCreators.externalData__fetchWikiData(entityUri));
+  //       });
+  //     }
+  //   },
+  //   [externalDataUrisToLoad]
+  // );
+
   /*
   * Crawler to see if RequestCredentials for ConnectionContainers appeared
   * This is used to mark connection containers as "toLoad" in order to refetch them
   */
+  const atomUrisWithUnusedCredentialsForConnectionContainer = useSelector(
+    processSelectors.getAtomUrisWithUnusedRequestCredentialsForConnectionContainer
+  );
   useEffect(
     () => {
       if (

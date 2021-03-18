@@ -643,3 +643,21 @@ export const getPossibleRequestCredentialsForAtom = atomUri =>
       return Immutable.fromJS(possibleRequestCredentials);
     }
   );
+
+export const getExternalDataUrisToLoad = createSelector(
+  getAtoms,
+  getProcessState,
+  getExternalDataState,
+  (allAtoms, processState, externalDataState) =>
+    allAtoms
+      .map(atom => getIn(atom, ["content", "eventObjectAboutUris"]))
+      .filter(entityUri =>
+        processUtils.isExternalDataFetchNecessary(
+          processState,
+          entityUri,
+          get(externalDataState, entityUri)
+        )
+      )
+      .flatten()
+      .toSet()
+);
