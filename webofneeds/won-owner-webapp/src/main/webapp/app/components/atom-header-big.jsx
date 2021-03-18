@@ -105,7 +105,8 @@ export default function WonAtomHeaderBig({
     isSenderAtomFetchNecessary ||
     isSenderHolderFetchNecessary ||
     isTargetAtomFetchNecessary ||
-    isTargetHolderFetchNecessary
+    isTargetHolderFetchNecessary ||
+    atomLoading
   ) {
     const onChange = isVisible => {
       if (isVisible) {

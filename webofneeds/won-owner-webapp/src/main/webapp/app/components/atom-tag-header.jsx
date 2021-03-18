@@ -64,7 +64,7 @@ export default function WonAtomTagHeader({ atom, toLink, onClick, className }) {
     holderAtom
   );
 
-  if (isAtomFetchNecessary || isHolderFetchNecessary) {
+  if (isAtomFetchNecessary || isHolderFetchNecessary || atomLoading) {
     //Loading View
 
     atomHeaderContent = (
