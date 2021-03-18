@@ -447,13 +447,22 @@ export default function(processState = initialState, action = {}) {
       });
     }
 
-    case actionTypes.atoms.markConnectionContainerToLoad: {
-      const atomUri = getUri(action.payload);
-      console.debug("markConnectionContainerToLoad: ", atomUri);
+    case actionTypes.atoms.markConnectionContainersToLoad: {
+      const atomUris = get(action.payload, "uris");
 
-      return updateConnectionContainerProcess(processState, atomUri, {
-        toLoad: true,
-      });
+      if (atomUris && atomUris.size > 0) {
+        atomUris.map(atomUri => {
+          processState = updateConnectionContainerProcess(
+            processState,
+            atomUri,
+            {
+              toLoad: true,
+            }
+          );
+        });
+      }
+
+      return processState;
     }
 
     case actionTypes.connections.storeUriFailed: {

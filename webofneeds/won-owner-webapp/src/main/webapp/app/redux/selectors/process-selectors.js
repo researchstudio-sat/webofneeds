@@ -98,7 +98,12 @@ export const getAllAtomRequests = createSelector(
     get(processState, ["atoms"]).map(atom => get(atom, "requests"))
 );
 
-export const getUnusedRequestCredentialsForConnectionContainer = createSelector(
+/**
+ * Returns a Set of AtomUris where there are unused Credentials left for connectionContainer fetches
+ * That way we can indicate or induce a refetch of the connectionContainer in order to get all the data
+ * available
+ */
+export const getAtomUrisWithUnusedRequestCredentialsForConnectionContainer = createSelector(
   state => state,
   getProcessState,
   state => get(state, "atoms"),
@@ -121,4 +126,6 @@ export const getUnusedRequestCredentialsForConnectionContainer = createSelector(
       .filter(
         requestCredentials => requestCredentials && requestCredentials.size > 0
       )
+      .keySeq()
+      .toSet()
 );
