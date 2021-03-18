@@ -440,6 +440,7 @@ export default function WonAtomContent({
   }
 }
 WonAtomContent.propTypes = {
+  atomUri: PropTypes.string.isRequired,
   atom: PropTypes.object.isRequired,
   relevantConnectionsMap: PropTypes.object.isRequired,
   visibleTab: PropTypes.string.isRequired,
@@ -601,7 +602,6 @@ function WonAtomContentSingleConnectSockets({
   );
 }
 WonAtomContentSingleConnectSockets.propTypes = {
-  atomUri: PropTypes.string.isRequired,
   atom: PropTypes.object.isRequired,
   reactions: PropTypes.object.isRequired,
   relevantSingleConnectConnectionsMap: PropTypes.object.isRequired,
