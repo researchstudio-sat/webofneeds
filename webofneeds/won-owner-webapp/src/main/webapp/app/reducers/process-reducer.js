@@ -378,12 +378,11 @@ export default function(processState = initialState, action = {}) {
       const remainingRequestCredentials = get(
         action.payload,
         "allRequestCredentials"
-      ).filter(
-        requestCredentials =>
-          !processUtils.isUsedCredentialsUnsuccessfully(
-            updatedFetchTokenRequests,
-            requestCredentials
-          )
+      ).filterNot(requestCredentials =>
+        processUtils.isUsedCredentialsUnsuccessfully(
+          updatedFetchTokenRequests,
+          requestCredentials
+        )
       );
 
       console.debug(
@@ -425,12 +424,11 @@ export default function(processState = initialState, action = {}) {
       const remainingRequestCredentials = get(
         action.payload,
         "allRequestCredentials"
-      ).filter(
-        requestCredentials =>
-          !processUtils.isUsedCredentialsUnsuccessfully(
-            updatedAtomRequests,
-            requestCredentials
-          )
+      ).filterNot(requestCredentials =>
+        processUtils.isUsedCredentialsUnsuccessfully(
+          updatedAtomRequests,
+          requestCredentials
+        )
       );
 
       return updateAtomProcess(processState, atomUri, {
@@ -452,12 +450,11 @@ export default function(processState = initialState, action = {}) {
       const remainingRequestCredentials = get(
         action.payload,
         "allRequestCredentials"
-      ).filter(
-        requestCredentials =>
-          !processUtils.isUsedCredentials(
-            updatedConnectionContainerRequests,
-            requestCredentials
-          )
+      ).filterNot(requestCredentials =>
+        processUtils.isUsedCredentials(
+          updatedConnectionContainerRequests,
+          requestCredentials
+        )
       );
 
       return updateConnectionContainerProcess(processState, atomUri, {
@@ -731,12 +728,11 @@ export default function(processState = initialState, action = {}) {
       const remainingRequestCredentials = get(
         action.payload,
         "allRequestCredentials"
-      ).filter(
-        requestCredentials =>
-          !processUtils.isUsedCredentials(
-            updatedConnectionContainerRequests,
-            requestCredentials
-          )
+      ).filterNot(requestCredentials =>
+        processUtils.isUsedCredentials(
+          updatedConnectionContainerRequests,
+          requestCredentials
+        )
       );
 
       console.debug(

@@ -517,8 +517,9 @@ function getRequestForSameCredentials(priorRequests, requestCredentials) {
   const scope = get(requestCredentials, "scope");
   const requesterWebId = get(requestCredentials, "requesterWebId");
 
+  let foundRequest = undefined;
   if (priorRequests && priorRequests.size > 0 && requestCredentials) {
-    return priorRequests.find(
+    foundRequest = priorRequests.find(
       request =>
         requestTokenFromAtomUri
           ? getIn(request, ["requestCredentials", "obtainedFrom", "scope"]) ===
@@ -532,7 +533,7 @@ function getRequestForSameCredentials(priorRequests, requestCredentials) {
             requesterWebId
     );
   }
-  return undefined;
+  return foundRequest;
 }
 
 export function isUsedCredentials(priorRequests, requestCredentials) {
