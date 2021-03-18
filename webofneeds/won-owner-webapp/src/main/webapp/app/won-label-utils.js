@@ -215,6 +215,25 @@ export function getSocketItemLabels(targetSocketType, socketTypes) {
   return socketTypeLabels.join("/");
 }
 
+export function getSocketPickerLabel(
+  addToAtom,
+  addToSocketType,
+  isAddToAtomOwned
+) {
+  const specificLabels =
+    addToAtom &&
+    addToSocketType &&
+    getAtomSocketPickerLabel(addToAtom, addToSocketType, isAddToAtomOwned);
+
+  if (specificLabels) {
+    return specificLabels;
+  } else {
+    return `Pick an Atom to ${
+      isAddToAtomOwned ? "add" : "connect"
+    } to the ${getSocketTabLabel(addToSocketType)}`;
+  }
+}
+
 export function getAddNewSocketItemLabel(
   isAddToOwned,
   addToUseCase,
@@ -314,7 +333,7 @@ export function generateAddButtonLabel(
   }
 }
 
-export function getAtomSocketDefaultLabel(atom, socketType, isOwned) {
+function getAtomSocketDefaultLabel(atom, socketType, isOwned) {
   const labels = atomUtils.getReactionLabels(atom, socketType);
   if (labels) {
     return isOwned ? labels.owned.default : labels.nonOwned.default;
@@ -322,12 +341,7 @@ export function getAtomSocketDefaultLabel(atom, socketType, isOwned) {
   return undefined;
 }
 
-export function getAtomSocketAddNewLabel(
-  atom,
-  addToSocketType,
-  socketType,
-  isOwned
-) {
+function getAtomSocketAddNewLabel(atom, addToSocketType, socketType, isOwned) {
   const labels = atomUtils.getReactionLabels(atom, addToSocketType, socketType);
   if (labels) {
     return isOwned ? labels.owned.addNew : labels.nonOwned.addNew;
@@ -335,7 +349,7 @@ export function getAtomSocketAddNewLabel(
   return undefined;
 }
 
-export function getAtomSocketPickerLabel(atom, socketType, isOwned) {
+function getAtomSocketPickerLabel(atom, socketType, isOwned) {
   const labels = atomUtils.getReactionLabels(atom, socketType);
   if (labels) {
     return isOwned ? labels.owned.picker : labels.nonOwned.picker;
