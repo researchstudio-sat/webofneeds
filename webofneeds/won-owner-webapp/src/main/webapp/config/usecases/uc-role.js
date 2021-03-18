@@ -34,6 +34,18 @@ export const role = {
     [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: {
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
+        labels: {
+          owned: {
+            default: "Organization",
+            addNew: "Add to New Organization",
+            picker: "Pick a Organization to join",
+          },
+          nonOwned: {
+            default: "Organization",
+            addNew: "Add to New Organization",
+            picker: "Pick a Organization to join",
+          },
+        },
         refuseNonOwned: true,
       },
     },
