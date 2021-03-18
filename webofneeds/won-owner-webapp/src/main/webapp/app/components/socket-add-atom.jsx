@@ -4,7 +4,7 @@ import { actionCreators } from "../actions/actions.js";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 
-import { get, getUri, generateLink } from "../utils.js";
+import { generateLink, get, getUri } from "../utils.js";
 import vocab from "../service/vocab.js";
 import * as generalSelectors from "../redux/selectors/general-selectors.js";
 import * as atomUtils from "../redux/utils/atom-utils.js";
@@ -86,6 +86,7 @@ export default function WonSocketAddAtom({
 
           const refuseOwned = get(reaction, "refuseOwned");
           const refuseNonOwned = get(reaction, "refuseNonOwned");
+          //const labels = get(reaction, "labels");
 
           return (
             allowedUseCaseList &&
@@ -172,7 +173,8 @@ export default function WonSocketAddAtom({
                       addToUseCase,
                       addToSocketType,
                       ucIdentifier,
-                      socketType
+                      socketType,
+                      addToAtom
                     )}
                   </div>
                 </div>
@@ -361,7 +363,14 @@ export default function WonSocketAddAtom({
       );
     }
   }
-
+  const specificLabels =
+    addToAtom &&
+    addToSocketType &&
+    wonLabelUtils.getAtomSocketPickerLabel(
+      addToAtom,
+      addToSocketType,
+      isAddToAtomOwned
+    );
   return (
     <won-socket-add-atom>
       <div className="wsaa__header">
@@ -369,9 +378,11 @@ export default function WonSocketAddAtom({
           <use xlinkHref={ico36_close} href={ico36_close} />
         </svg>
         <div className="wsaa__header__label">
-          {`Pick an Atom below to ${
-            isAddToAtomOwned ? "add" : "connect"
-          } to the ${wonLabelUtils.getSocketTabLabel(addToSocketType)}`}
+          {specificLabels
+            ? `${specificLabels}`
+            : `Pick an Atom to ${
+                isAddToAtomOwned ? "add" : "connect"
+              } to the ${wonLabelUtils.getSocketTabLabel(addToSocketType)}`}
         </div>
       </div>
       <div className="wsaa__content">

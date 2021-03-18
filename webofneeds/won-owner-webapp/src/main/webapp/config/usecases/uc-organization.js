@@ -2,13 +2,13 @@
  * Created by fsuda on 18.09.2018.
  */
 import {
-  details,
-  mergeInEmptyDraft,
-  defaultReactions,
-  onlyMembersSeeMembersAuthorization,
-  defaultPublicAtomAuthorization,
   connectedConnectionsAuthorization,
   connectToSocketsAuthorization,
+  defaultPublicAtomAuthorization,
+  defaultReactions,
+  details,
+  mergeInEmptyDraft,
+  onlyMembersSeeMembersAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico16_uc_organization from "../../images/won-icons/ico16_uc_organization.svg";
@@ -53,10 +53,34 @@ export const organization = {
     [vocab.WXSCHEMA.MemberSocketCompacted]: {
       [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
         useCaseIdentifiers: ["persona"],
+        labels: {
+          owned: {
+            default: "Member",
+            addNew: "Add New Member",
+            picker: "Pick a Persona to invite",
+          },
+          nonOwned: {
+            default: "Join Organization",
+            addNew: "Add New Member",
+            picker: "Pick a Persona to invite",
+          },
+        },
       },
       [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: {
         useCaseIdentifiers: ["role"],
         refuseNonOwned: true,
+        labels: {
+          owned: {
+            default: "Role",
+            addNew: "Add New Role",
+            picker: "Add Role",
+          },
+          nonOwned: {
+            default: "Role",
+            addNew: "Add New Role",
+            picker: "Add Role",
+          },
+        },
       },
     },
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {

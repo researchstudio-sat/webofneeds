@@ -12,8 +12,9 @@ import * as actions from "./details/action.js";
 
 import * as abstractDetails_ from "./details/abstract.js";
 import vocab from "../app/service/vocab.js";
-export const abstractDetails = abstractDetails_; // reexport
 import Immutable from "immutable";
+
+export const abstractDetails = abstractDetails_; // reexport
 
 // Grant access to connect to all sockets 009
 export const connectToSocketsAuthorization = {
@@ -171,12 +172,36 @@ export const defaultReactions = {
     [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: {
       useCaseIdentifiers: ["review"],
       refuseNonOwned: true,
+      labels: {
+        owned: {
+          default: "Review",
+          addNew: "New Review",
+          picker: "Pick a Review",
+        },
+        nonOwned: {
+          default: "Review",
+          addNew: "New Review",
+          picker: "Pick a Review",
+        },
+      },
     },
   },
   [vocab.BUDDY.BuddySocketCompacted]: {
     [vocab.BUDDY.BuddySocketCompacted]: {
       useCaseIdentifiers: ["persona"],
       refuseOwned: true,
+      labels: {
+        owned: {
+          default: "Buddy",
+          addNew: "Add New Persona as Buddy",
+          picker: "Pick a Persona to add as Buddy",
+        },
+        nonOwned: {
+          default: "Buddy",
+          addNew: "New Persona to send Request",
+          picker: "Pick a Persona to add as Buddy",
+        },
+      },
     },
   },
   [vocab.CHAT.ChatSocketCompacted]: {
@@ -207,6 +232,18 @@ export const defaultReactions = {
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: {
       useCaseIdentifiers: ["event"],
       refuseNonOwned: true,
+      labels: {
+        owned: {
+          default: "Event",
+          addNew: "Organize New Event",
+          picker: "Pick an Event",
+        },
+        nonOwned: {
+          default: "Event",
+          addNew: "Organize New Event",
+          picker: "Pick an Event",
+        },
+      },
     },
   },
   [vocab.WXSCHEMA.AttendeeSocketCompacted]: {

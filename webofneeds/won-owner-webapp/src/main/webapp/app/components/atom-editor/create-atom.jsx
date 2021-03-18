@@ -259,7 +259,8 @@ export default function WonCreateAtom({
             fromAtomUseCase,
             targetSocketType,
             useCaseIdentifier,
-            senderSocketType
+            senderSocketType,
+            fromAtom
           )}
         </span>
       );

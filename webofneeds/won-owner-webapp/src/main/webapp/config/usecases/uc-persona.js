@@ -1,11 +1,11 @@
 import {
+  connectedConnectionsAuthorization,
+  connectToSocketsAuthorization,
+  defaultPublicAtomAuthorization,
+  defaultReactions,
   details,
   mergeInEmptyDraft,
-  defaultReactions,
-  connectedConnectionsAuthorization,
-  defaultPublicAtomAuthorization,
   seeHolderSocketConnectionsAuthorization,
-  connectToSocketsAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 
@@ -76,6 +76,18 @@ export const persona = {
     [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
         useCaseIdentifiers: ["organization"],
+        labels: {
+          owned: {
+            default: "Organization",
+            addNew: "Add to New Organization",
+            picker: "Pick a Organization to join",
+          },
+          nonOwned: {
+            default: "Organization",
+            addNew: "Add to New Organization",
+            picker: "Pick a Organization to join",
+          },
+        },
       },
     },
     [vocab.HOLD.HolderSocketCompacted]: {
@@ -116,6 +128,18 @@ export const persona = {
     [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
       [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
         useCaseIdentifiers: ["event"],
+        labels: {
+          owned: {
+            default: "Join Event",
+            addNew: "Join New Event",
+            picker: "Pick an Event to join",
+          },
+          nonOwned: {
+            default: "Join Event",
+            addNew: "Join New Event",
+            picker: "Pick an Event to join",
+          },
+        },
       },
     },
   },
