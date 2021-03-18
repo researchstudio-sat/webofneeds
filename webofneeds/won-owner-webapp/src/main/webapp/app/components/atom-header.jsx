@@ -105,7 +105,12 @@ export default function WonAtomHeader({
     orgAtom
   );
 
-  if (isAtomFetchNecessary || isHolderFetchNecessary || isOrgFetchNecessary) {
+  if (
+    isAtomFetchNecessary ||
+    isHolderFetchNecessary ||
+    isOrgFetchNecessary ||
+    atomLoading
+  ) {
     //Loading View
 
     atomHeaderIcon = <div className="ah__icon__skeleton" />;
