@@ -372,11 +372,15 @@ export const fetchConnectionsContainerAndDispatch = (
         requestCredentials
       )
       .then(connectionsWithStateAndSocket => {
+        const connectionsWithNonDeletedAtoms = connectionsWithStateAndSocket.filter(
+          conn => !isUriDeleted(conn.uri)
+        );
+
         dispatch({
           type: actionTypes.connections.storeMetaConnections,
           payload: Immutable.fromJS({
             atomUri: atomUri,
-            connections: connectionsWithStateAndSocket,
+            connections: connectionsWithNonDeletedAtoms,
             allRequestCredentials: generalSelectors.getPossibleRequestCredentialsForAtom(
               atomUri
             )(state),
@@ -387,10 +391,9 @@ export const fetchConnectionsContainerAndDispatch = (
           }),
         });
         if (isOwned) {
-          const activeConnectionUris = connectionsWithStateAndSocket
+          const activeConnectionUris = connectionsWithNonDeletedAtoms
             .filter(
               conn =>
-                !isUriDeleted(conn.uri) &&
                 conn.connectionState !== vocab.WON.Closed &&
                 conn.connectionState !== vocab.WON.Suggested
             )
