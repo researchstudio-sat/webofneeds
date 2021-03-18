@@ -237,6 +237,15 @@ export function getReactions(atom, socketType) {
   return socketType ? get(possibleReactions, socketType) : possibleReactions;
 }
 
+/**
+ * Returns the Label defined in the UseCase/Reaction
+ * @param atom
+ * @param labelType - which label you want (e.g. default, addNew, picker...)
+ * @param isOwned - if the atom in question is Owned or not
+ * @param addToSocketType
+ * @param socketType
+ * @returns {undefined|*}
+ */
 export function getReactionLabel(
   atom,
   labelType,
