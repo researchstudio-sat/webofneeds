@@ -117,22 +117,33 @@ export const fetchActiveConnectionAndDispatchBySocketUris = (
       );
     });
 
+/**
+ * @param dispatch
+ * @param state
+ * @param atomUri
+ * @param priorRequests
+ * @param omitAlreadySuccessfulCredentials -> default is false, if set to true we also avoid already successful request Credentials (e.g. to "loop" through all possibleConnectionContainer fetches)
+ * @returns {Promise<{requesterWebId: undefined, token: undefined}>|Promise<unknown>|Promise<*|{obtainedFrom: *, token: string}>|Promise<{obtainedFrom: *, token: any}>}
+ */
 export const determineRequestCredentials = (
   dispatch,
   state,
   atomUri,
-  priorRequests
+  priorRequests,
+  omitAlreadySuccessfulCredentials = false
 ) => {
   console.debug("## Determine requesterWebId for", atomUri);
 
   const possibleRequestCredentials = generalSelectors
     .getPossibleRequestCredentialsForAtom(atomUri)(state)
-    .filter(
+    .filterNot(
       requestCredentials =>
-        !processUtils.isUsedCredentialsUnsuccessfully(
-          priorRequests,
-          requestCredentials
-        )
+        omitAlreadySuccessfulCredentials
+          ? processUtils.isUsedCredentials(priorRequests, requestCredentials)
+          : processUtils.isUsedCredentialsUnsuccessfully(
+              priorRequests,
+              requestCredentials
+            )
     );
   //WARNING: if a request was successful we can't use the already successful credentials since we do not know if additional content would appear with other credentials
   //WARNING: it might happen that a previously unsuccessful call would be successful (e.g. if a connection state changes) so it might be necessary to retry a failed call on some occasions
@@ -205,12 +216,11 @@ export const determineRequestCredentials = (
       const possibleCredentialsForToken = generalSelectors
         .getPossibleRequestCredentialsForAtom(requestTokenFromAtomUri)(state)
         .filter(credentials => !!get(credentials, "requesterWebId")) //FIXME: ONLY USE requesterWebId credentials for tokenFetch now, change in the future
-        .filter(
-          requestCredentials =>
-            !processUtils.isUsedCredentialsUnsuccessfully(
-              priorTokenRequests,
-              requestCredentials
-            )
+        .filterNot(requestCredentials =>
+          processUtils.isUsedCredentialsUnsuccessfully(
+            priorTokenRequests,
+            requestCredentials
+          )
         );
 
       const fetchThroughPossibleTokenCredentials = async possibleTokenCredentials => {
@@ -351,7 +361,8 @@ export const fetchConnectionsContainerAndDispatch = (
     dispatch,
     state,
     atomUri,
-    processSelectors.getConnectionContainerRequests(atomUri)(state)
+    processSelectors.getConnectionContainerRequests(atomUri)(state),
+    true
   ).then(requestCredentials =>
     won
       .fetchConnectionUrisWithStateByAtomUri(
