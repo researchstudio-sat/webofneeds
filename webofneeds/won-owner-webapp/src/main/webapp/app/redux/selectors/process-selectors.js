@@ -104,10 +104,12 @@ export const getUnusedRequestCredentialsForConnectionContainer = createSelector(
   state => get(state, "atoms"),
   (state, processState, atoms) =>
     atoms
-      .filterNot(
-        (_, atomUri) =>
-          processUtils.isConnectionContainerToLoad(processState, atomUri) ||
-          processUtils.isConnectionContainerLoading(processState, atomUri)
+      .filter((_, atomUri) => processUtils.isAtomLoaded(processState, atomUri))
+      .filterNot((_, atomUri) =>
+        processUtils.isConnectionContainerToLoad(processState, atomUri)
+      )
+      .filterNot((_, atomUri) =>
+        processUtils.isConnectionContainerLoading(processState, atomUri)
       )
       .map((_, atomUri) => {
         const priorRequests = getConnectionContainerRequests(atomUri)(state);
