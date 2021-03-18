@@ -27,6 +27,7 @@ export default function WonSkeletonCard({
     atomUri
   );
   const atomToLoad = processUtils.isAtomToLoad(processState, atomUri) || !atom;
+  const atomLoading = processUtils.isAtomLoading(processState, atomUri);
 
   const isAtomFetchNecessary =
     !atomInCreation &&
@@ -94,8 +95,9 @@ export default function WonSkeletonCard({
   return (
     <won-skeleton-card
       class={
-        (isAtomFetchNecessary || atomInCreation ? " won-is-loading " : "") +
-        (atomToLoad ? "won-is-toload" : "")
+        (isAtomFetchNecessary || atomLoading || atomInCreation
+          ? " won-is-loading "
+          : "") + (atomToLoad ? "won-is-toload" : "")
       }
     >
       {cardIconSkeleton}
