@@ -36,16 +36,13 @@ export default function WonTopnav({ pageTitle }) {
   const loggedIn = accountUtils.isLoggedIn(accountState);
   const isSignUpView = currentPath === "/signup";
   const showLoadingIndicator = useSelector(processSelectors.isLoading);
-  const connectionsToCrawl = useSelector(
-    generalSelectors.getConnectionsToCrawl
-  );
 
   const connectionContainersToCrawl = useSelector(
     generalSelectors.getConnectionContainersToCrawl
   );
 
-  const connectionContainersWithUnusedCredentials = useSelector(
-    processSelectors.getUnusedRequestCredentialsForConnectionContainer
+  const atomUrisWithUnusedCredentialsForConnectionContainer = useSelector(
+    processSelectors.getAtomUrisWithUnusedRequestCredentialsForConnectionContainer
   );
 
   const hasUnreads = useSelector(
@@ -61,6 +58,13 @@ export default function WonTopnav({ pageTitle }) {
     generalSelectors.getActivePinnedAtom(pinnedAtomUri)
   );
 
+  /*
+  * Crawler for Fetch Messages for connections ->
+  * this is used to fetch the latest set of messages for every connected connection in order to show unreads appropriatelly
+  */
+  const connectionsToCrawl = useSelector(
+    generalSelectors.getConnectionsToCrawl
+  );
   useEffect(
     () => {
       const MESSAGECOUNT = 3;
@@ -87,11 +91,15 @@ export default function WonTopnav({ pageTitle }) {
     [connectionsToCrawl]
   );
 
+  /*
+  * Crawler for ConnectionContainers ->
+  * this is used to fetch every connection Container with the appropriate credentials in order to display all the content
+  * available to the user
+  */
   useEffect(
     () => {
       if (connectionContainersToCrawl && connectionContainersToCrawl.size > 0) {
         connectionContainersToCrawl.map((connectionContainerState, atomUri) => {
-          console.debug("connectionContainerState: ", connectionContainerState);
           dispatch(
             actionCreators.atoms__fetchUnloadedConnectionsContainer(atomUri)
           );
@@ -101,30 +109,24 @@ export default function WonTopnav({ pageTitle }) {
     [connectionContainersToCrawl]
   );
 
+  /*
+  * Crawler to see if RequestCredentials for ConnectionContainers appeared
+  * This is used to mark connection containers as "toLoad" in order to refetch them
+  */
   useEffect(
     () => {
       if (
-        connectionContainersWithUnusedCredentials &&
-        connectionContainersWithUnusedCredentials.size > 0
+        atomUrisWithUnusedCredentialsForConnectionContainer &&
+        atomUrisWithUnusedCredentialsForConnectionContainer.size > 0
       ) {
-        connectionContainersWithUnusedCredentials.map(
-          (unusedCredentials, atomUri) => {
-            console.debug(
-              "there are Unused credentials for connContainer of: ",
-              atomUri,
-              " credentials: ",
-              unusedCredentials.toJS()
-            );
-            dispatch(
-              actionCreators.atoms__markConnectionContainerToLoad({
-                uri: atomUri,
-              })
-            );
-          }
+        dispatch(
+          actionCreators.atoms__markConnectionContainersToLoad({
+            uris: atomUrisWithUnusedCredentialsForConnectionContainer,
+          })
         );
       }
     },
-    [connectionContainersWithUnusedCredentials]
+    [atomUrisWithUnusedCredentialsForConnectionContainer]
   );
 
   function toggleSlideIns() {
