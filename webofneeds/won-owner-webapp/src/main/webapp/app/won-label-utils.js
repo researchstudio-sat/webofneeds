@@ -223,7 +223,12 @@ export function getSocketPickerLabel(
   const specificLabels =
     addToAtom &&
     addToSocketType &&
-    getAtomSocketPickerLabel(addToAtom, addToSocketType, isAddToAtomOwned);
+    atomUtils.getReactionLabel(
+      addToAtom,
+      "picker",
+      isAddToAtomOwned,
+      addToSocketType
+    );
 
   if (specificLabels) {
     return specificLabels;
@@ -245,7 +250,13 @@ export function getAddNewSocketItemLabel(
   const specificLabels =
     atom &&
     addToSocketType &&
-    getAtomSocketAddNewLabel(atom, addToSocketType, socketType, isAddToOwned);
+    atomUtils.getReactionLabel(
+      atom,
+      "addNew",
+      isAddToOwned,
+      addToSocketType,
+      socketType
+    );
   if (specificLabels) {
     return specificLabels;
   } else if (addToUseCase === "organization" && ucIdentifier === "persona") {
@@ -301,7 +312,13 @@ export function generateAddButtonLabel(
   const specificLabels =
     targetAtom &&
     targetSocketType &&
-    getAtomSocketDefaultLabel(targetAtom, targetSocketType, isAtomOwned);
+    atomUtils.getReactionLabel(
+      targetAtom,
+      "default",
+      isAtomOwned,
+      targetSocketType
+    );
+
   if (specificLabels) {
     return specificLabels;
   } else {
@@ -331,30 +348,6 @@ export function generateAddButtonLabel(
       senderReactions
     );
   }
-}
-
-function getAtomSocketDefaultLabel(atom, socketType, isOwned) {
-  const labels = atomUtils.getReactionLabels(atom, socketType);
-  if (labels) {
-    return isOwned ? labels.owned.default : labels.nonOwned.default;
-  }
-  return undefined;
-}
-
-function getAtomSocketAddNewLabel(atom, addToSocketType, socketType, isOwned) {
-  const labels = atomUtils.getReactionLabels(atom, addToSocketType, socketType);
-  if (labels) {
-    return isOwned ? labels.owned.addNew : labels.nonOwned.addNew;
-  }
-  return undefined;
-}
-
-function getAtomSocketPickerLabel(atom, socketType, isOwned) {
-  const labels = atomUtils.getReactionLabels(atom, socketType);
-  if (labels) {
-    return isOwned ? labels.owned.picker : labels.nonOwned.picker;
-  }
-  return undefined;
 }
 
 function generateDefaultButtonLabel(
