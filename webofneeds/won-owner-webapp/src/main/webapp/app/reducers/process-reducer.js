@@ -375,25 +375,6 @@ export default function(processState = initialState, action = {}) {
         .getFetchTokenRequests(processState, atomUri, tokenScopeUri)
         .push(request);
 
-      const remainingRequestCredentials = get(
-        action.payload,
-        "allRequestCredentials"
-      ).filterNot(requestCredentials =>
-        processUtils.isUsedCredentialsUnsuccessfully(
-          updatedFetchTokenRequests,
-          requestCredentials
-        )
-      );
-
-      console.debug(
-        "remainingRequestCredentials to fetch TokenScopeUri",
-        tokenScopeUri,
-        " from ",
-        atomUri,
-        " -> ",
-        remainingRequestCredentials.size
-      );
-
       return updateFetchTokenProcess(processState, atomUri, tokenScopeUri, {
         requests: updatedFetchTokenRequests,
       });
