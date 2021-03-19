@@ -706,15 +706,6 @@ export function isHeld(atomImm) {
   return !!getHeldByUri(atomImm);
 }
 
-export function getSeeksSocketsWithKeysReset(atomImm) {
-  const sockets = getIn(atomImm, ["seeks", "sockets"]);
-
-  if (sockets) {
-    return getSocketKeysReset(sockets);
-  }
-  return undefined;
-}
-
 function getSocketKeysReset(socketsImm) {
   //TODO: Needs to be generic somehow, otherwise every socket that is added would not be able to be reset correctly
   return socketsImm.mapKeys(key => key.substr(key.lastIndexOf("#")));

@@ -120,6 +120,32 @@ won-create-atom {
       }
     }
 
+    .cp__content__sockets {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      grid-row-gap: 0.5rem;
+      grid-auto-rows: 1.5rem;
+      align-items: center;
+      padding: 0 0.5rem;
+
+      &__helptext,
+      &__label {
+        padding-right: 0.5rem;
+        white-space: nowrap;
+      }
+
+      &__label {
+        font-weight: 400;
+      }
+
+      &__helptext {
+        color: $won-line-gray;
+        font-size: $smallFontSize;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
     &__responsivebuttons {
       padding: 0 0.5rem;
 

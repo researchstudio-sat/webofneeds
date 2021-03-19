@@ -66,7 +66,6 @@ export default function WonCreateAtom({
     const fromAtomContent = get(fromAtom, "content");
     const fromAtomSeeks = get(fromAtom, "seeks");
     const socketsReset = atomUtils.getSocketsWithKeysReset(fromAtom);
-    const seeksSocketsReset = atomUtils.getSeeksSocketsWithKeysReset(fromAtom);
 
     if (fromAtomContent) {
       useCaseImm = useCaseImm.setIn(["draft", "content"], fromAtomContent);
@@ -77,14 +76,7 @@ export default function WonCreateAtom({
 
     if (socketsReset) {
       useCaseImm = useCaseImm.setIn(
-        ["draft", "seeks", "content", "sockets"],
-        socketsReset
-      );
-    }
-
-    if (seeksSocketsReset) {
-      useCaseImm = useCaseImm.setIn(
-        ["draft", "seeks", "seeks", "sockets"],
+        ["draft", "content", "sockets"],
         socketsReset
       );
     }
@@ -295,6 +287,24 @@ export default function WonCreateAtom({
         </React.Fragment>
       );
 
+    const sockets = getIn(useCaseImm, ["draft", "content", "sockets"]);
+    const socketElements = [];
+
+    sockets.map(compactedSocketUri => {
+      const helpText = wonLabelUtils.getSocketHelpText(compactedSocketUri);
+
+      socketElements.push(
+        <React.Fragment key={compactedSocketUri}>
+          <div className="cp__content__sockets__label">
+            {wonLabelUtils.getSocketLabel(compactedSocketUri)}
+          </div>
+          {helpText && (
+            <div className="cp__content__sockets__helptext">{helpText}</div>
+          )}
+        </React.Fragment>
+      );
+    });
+
     return (
       <won-create-atom>
         {connect && fromAtom ? (
@@ -317,6 +327,8 @@ export default function WonCreateAtom({
           {/*ADD TITLE AND DETAILS*/}
           {createContentFragment}
           {createSeeksFragment}
+          <div className="cp__content__branchheader">Activated Sockets</div>
+          <div className="cp__content__sockets">{socketElements}</div>
         </div>
         <div className="cp__footer">
           <WonLabelledHr label="done?" className="cp__footer__labelledhr" />

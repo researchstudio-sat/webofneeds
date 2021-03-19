@@ -29,6 +29,7 @@ export const organization = {
           "#associatedArticleSocket":
             vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
           "#parentOrgSocket": vocab.WXSCHEMA.ParentOrganizationSocketCompacted,
+          "#projectSocket": vocab.PROJECT.ProjectSocketCompacted,
           "#subOrgSocket": vocab.WXSCHEMA.SubOrganizationSocketCompacted,
           "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
           "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
@@ -84,6 +85,23 @@ export const organization = {
       //   },
       // },
     },
+    [vocab.PROJECT.ProjectSocketCompacted]: {
+      [vocab.WXSCHEMA.ProjectOfSocketCompacted]: {
+        useCaseIdentifiers: ["project"],
+        labels: {
+          owned: {
+            default: "Project",
+            addNew: "Add New Project",
+            picker: "Pick a Project to add",
+          },
+          nonOwned: {
+            default: "Project",
+            addNew: "Add New Project",
+            picker: "Pick a Project to add",
+          },
+        },
+      },
+    },
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
       [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
         useCaseIdentifiers: ["newsarticle"],
@@ -101,7 +119,7 @@ export const organization = {
     },
   },
   details: {
-    title: { ...details.title },
+    title: { ...details.title, mandatory: true },
     description: { ...details.description },
     location: { ...details.location },
     tags: { ...details.tags },
