@@ -364,8 +364,8 @@ export const flags = {
   ...select,
   identifier: "flags",
   label: "Flags",
-  icon: ico36_detail_title, //TODO: CORRECT ICON
-  viewerComponent: undefined, //this is so we do not display this with a detail-viewer,
+  icon: ico36_detail_tags,
+  viewerComponent: WonTagsViewer,
   component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
   options: [

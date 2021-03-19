@@ -4,7 +4,6 @@
 
 import vocab from "../../service/vocab.js";
 import { get, getIn, getUri } from "../../utils.js";
-import * as wonLabelUtils from "../../won-label-utils.js";
 import * as connectionUtils from "./connection-utils.js";
 import * as useCaseUtils from "../../usecase-utils.js";
 import Immutable from "immutable";
@@ -558,36 +557,6 @@ export function hasUnreadBuddyRequests(atom) {
 }
 
 /**
- * Generates an array that contains all atom flags, using a human readable label if available.
- */
-export function generateFullFlagLabels(atomImm) {
-  const flags = atomImm && atomImm.getIn(["content", "flags"]);
-  return (
-    flags &&
-    flags
-      // use nicer socket labels if available
-      // TODO: remove this to match RDF state?
-      .map(wonLabelUtils.getFlagLabel)
-      .toArray()
-  );
-}
-
-/**
- * Generates an array that contains all atom sockets, using a human readable label if available.
- */
-export function generateFullSocketLabels(atomImm) {
-  const sockets = getSockets(atomImm);
-  return (
-    sockets &&
-    sockets
-      // use nicer socket labels if available
-      // TODO: remove this to match RDF state?
-      .map(wonLabelUtils.getSocketLabel)
-      .toArray()
-  );
-}
-
-/**
  * Retrieves the Label of the used useCase as an atomType, if no usecase is specified we check if atom is a searchAtom
  * @param {*} atomImm the atom as saved in the state
  */
@@ -600,44 +569,6 @@ export function generateTypeLabel(atomImm, defaultType) {
     return useCaseLabel;
   }
   return defaultType ? defaultType : "";
-}
-
-/**
- * Generates an array that contains some atom sockets, using a human readable label if possible.
- */
-export function generateShortSocketLabels(atomImm) {
-  const sockets = getSockets(atomImm);
-  return (
-    sockets &&
-    sockets
-      // rename sockets
-      // TODO: check if this can be used anywhere or whether it should be Group Chat Enabled
-      .filter(socket => socket === vocab.GROUP.GroupSocketCompacted)
-      .map(wonLabelUtils.getSocketLabel)
-      .toArray()
-  );
-}
-
-/**
- * Generates an array that contains some atom flags, using a human readable label if possible.
- */
-export function generateShortFlagLabels(atomImm) {
-  const flags = atomImm && atomImm.getIn(["content", "flags"]);
-
-  return (
-    flags &&
-    flags
-
-      // rename flags
-      // TODO: flags should have explanatory hovertext
-      .filter(
-        flag =>
-          flag === vocab.WONMATCH.NoHintForCounterpartCompacted ||
-          flag === vocab.WONMATCH.NoHintForMeCompacted
-      )
-      .map(wonLabelUtils.getFlagLabel)
-      .toArray()
-  );
 }
 
 export function getSockets(atomImm) {
