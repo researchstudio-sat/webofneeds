@@ -33,11 +33,6 @@ const labels = deepFreeze({
     [vocab.WONMSG.socketHintMessage]: "Socket Hint Message",
     [vocab.WONMSG.hintFeedbackMessage]: "Hint Feedback Message",
   },
-  flags: {
-    [vocab.WONMATCH.NoHintForCounterpartCompacted]: "Invisible",
-    [vocab.WONMATCH.NoHintForMeCompacted]: "Silent",
-    [vocab.WONMATCH.UsedForTestingCompacted]: "Used For Testing",
-  },
   sockets: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Chat",
     [vocab.CHAT.ChatSocketCompacted]: "Chat",
@@ -234,10 +229,6 @@ export function getConnectionStateLabel(connectionState) {
 
 export function getMessageTypeLabel(messageType) {
   return labels.messageType[messageType] || messageType;
-}
-
-export function getFlagLabel(flag) {
-  return labels.flags[flag] || flag;
 }
 
 export function getSocketLabel(socket) {

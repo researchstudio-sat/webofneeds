@@ -201,7 +201,6 @@ export default function WonAtomContent({
 
         visibleTabFragment = (
           <React.Fragment>
-            <WonAtomContentGeneral atom={atom} />
             {atomUtils.isActive(atom) &&
               relevantSingleConnectConnectionsMap &&
               relevantSingleConnectConnectionsMap.size > 0 && (
@@ -246,6 +245,7 @@ export default function WonAtomContent({
                   targetAtom={atom}
                 />
               )}
+            <WonAtomContentGeneral atom={atom} />
           </React.Fragment>
         );
         break;
