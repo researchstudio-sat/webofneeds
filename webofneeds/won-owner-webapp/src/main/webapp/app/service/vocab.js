@@ -316,6 +316,19 @@ vocab.GROUP.prefix = "group";
 vocab.GROUP.GroupSocket = vocab.GROUP.baseUri + "GroupSocket";
 vocab.GROUP.GroupSocketCompacted = vocab.GROUP.prefix + ":GroupSocket";
 
+vocab.PROJECT = {};
+vocab.PROJECT.baseUri = "https://w3id.org/won/ext/project#";
+vocab.PROJECT.prefix = "wx-project";
+vocab.PROJECT.ProjectSocket = vocab.PROJECT.baseUri + "ProjectSocket";
+vocab.PROJECT.ProjectSocketCompacted = vocab.PROJECT.prefix + ":ProjectSocket";
+vocab.PROJECT.ProjectOfSocket = vocab.PROJECT.baseUri + "ProjectOfSocket";
+vocab.PROJECT.ProjectOfSocketCompacted =
+  vocab.PROJECT.prefix + ":ProjectOfSocket";
+vocab.PROJECT.RelatedProjectSocket =
+  vocab.PROJECT.baseUri + "RelatedProjectSocket";
+vocab.PROJECT.RelatedProjectSocketCompacted =
+  vocab.PROJECT.prefix + ":RelatedProjectSocket";
+
 vocab.BUDDY = {};
 vocab.BUDDY.baseUri = "https://w3id.org/won/ext/buddy#";
 vocab.BUDDY.prefix = "buddy";
@@ -598,6 +611,7 @@ vocab.minimalContext = {
   [vocab.DEMO.prefix]: vocab.DEMO.baseUri,
   [vocab.WXPERSONA.prefix]: vocab.WXPERSONA.baseUri,
   [vocab.BOT.prefix]: vocab.BOT.baseUri,
+  [vocab.PROJECT.prefix]: vocab.PROJECT.baseUri,
   [vocab.WXSCHEMA.prefix]: vocab.WXSCHEMA.baseUri,
   [vocab.HOLD.prefix]: vocab.HOLD.baseUri,
   [vocab.CHAT.prefix]: vocab.CHAT.baseUri,

@@ -70,6 +70,43 @@ const labels = deepFreeze({
     [vocab.WXPERSONA.InterestSocketCompacted]: "Interests",
     [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise Of",
     [vocab.WXPERSONA.ExpertiseSocketCompacted]: "Expertises",
+    [vocab.PROJECT.ProjectSocketCompacted]: "Projects",
+    [vocab.PROJECT.ProjectOfSocketCompacted]: "Project Of",
+    [vocab.PROJECT.RelatedProjectSocketCompacted]: "Related Projects",
+  },
+  helpText: {
+    [vocab.GROUP.GroupSocketCompacted]: "TODO",
+    [vocab.CHAT.ChatSocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.MemberSocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: "TODO",
+    [vocab.HOLD.HoldableSocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: "TODO",
+    [vocab.HOLD.HolderSocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.SupporterSocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.ReviewSocketCompacted]: "TODO",
+    [vocab.BUDDY.BuddySocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.PrimaryAccountableSocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.CustodianOfSocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.CustodianSocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.ResourceSocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.ResourceActivitySocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.ActorSocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.ActorActivitySocketCompacted]: "TODO",
+    [vocab.WXVALUEFLOWS.PartnerActivitySocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.MemberOfSocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.WorksForSocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.SubOrganizationSocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.ParentOrganizationSocketCompacted]: "TODO",
+    [vocab.WXSCHEMA.EventSocketCompacted]: "TODO",
+    [vocab.WXPERSONA.InterestOfSocketCompacted]: "TODO",
+    [vocab.WXPERSONA.InterestSocketCompacted]: "TODO",
+    [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "TODO",
+    [vocab.WXPERSONA.ExpertiseSocketCompacted]: "TODO",
+    [vocab.PROJECT.ProjectSocketCompacted]: "TODO",
+    [vocab.PROJECT.ProjectOfSocketCompacted]: "TODO",
+    [vocab.PROJECT.RelatedProjectSocketCompacted]: "TODO",
   },
   socketTabs: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Chat Members",
@@ -107,6 +144,9 @@ const labels = deepFreeze({
     [vocab.WXPERSONA.InterestSocketCompacted]: "Interests",
     [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise Of",
     [vocab.WXPERSONA.ExpertiseSocketCompacted]: "Expertises",
+    [vocab.PROJECT.ProjectSocketCompacted]: "Projects",
+    [vocab.PROJECT.ProjectOfSocketCompacted]: "Project Of",
+    [vocab.PROJECT.RelatedProjectSocketCompacted]: "Related Projects",
   },
   socketItem: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Member",
@@ -144,6 +184,9 @@ const labels = deepFreeze({
     [vocab.WXPERSONA.InterestSocketCompacted]: "Interest",
     [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise",
     [vocab.WXPERSONA.ExpertiseSocketCompacted]: "Expertise",
+    [vocab.PROJECT.ProjectSocketCompacted]: "Project",
+    [vocab.PROJECT.ProjectOfSocketCompacted]: "Organization",
+    [vocab.PROJECT.RelatedProjectSocketCompacted]: "Related Project",
   },
   socketItems: {
     [vocab.GROUP.GroupSocketCompacted]: "Group Chat Members",
@@ -179,6 +222,9 @@ const labels = deepFreeze({
     [vocab.WXPERSONA.InterestSocketCompacted]: "Interests",
     [vocab.WXPERSONA.ExpertiseOfSocketCompacted]: "Expertise Of",
     [vocab.WXPERSONA.ExpertiseSocketCompacted]: "Expertises",
+    [vocab.PROJECT.ProjectSocketCompacted]: "Projects",
+    [vocab.PROJECT.ProjectOfSocketCompacted]: "Organizations",
+    [vocab.PROJECT.RelatedProjectSocketCompacted]: "Related Projects",
   },
 });
 
@@ -196,6 +242,10 @@ export function getFlagLabel(flag) {
 
 export function getSocketLabel(socket) {
   return labels.sockets[socket] || socket;
+}
+
+export function getSocketHelpText(socket) {
+  return labels.helpText[socket];
 }
 
 export function getSocketTabLabel(socketType) {
