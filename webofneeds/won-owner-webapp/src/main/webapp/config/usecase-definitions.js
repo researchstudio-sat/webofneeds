@@ -15,7 +15,8 @@ import { persona } from "./usecases/uc-persona.js";
 import { genericExpertise } from "./usecases/uc-expertise.js";
 import { serviceAtom } from "./usecases/uc-serviceatom.js";
 import { review } from "./usecases/uc-review.js";
-import { role } from "./usecases/uc-role.js";
+// TODO: INCLUDE ROLES AGAIN ONCE THE ACL'S ARE EDITABLE
+// import { role } from "./usecases/uc-role.js";
 
 /**
  * USE CASE REQUIREMENTS
@@ -80,7 +81,8 @@ export const hiddenUseCases = {
   serviceAtom: serviceAtom,
   review: review,
   genericExpertise: genericExpertise,
-  role: role,
+  // TODO: INCLUDE ROLES AGAIN ONCE THE ACL'S ARE EDITABLE
+  // role: role,
 };
 
 // generate a list of usecases from all use case groups
