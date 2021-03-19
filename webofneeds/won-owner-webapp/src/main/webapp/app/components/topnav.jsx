@@ -108,20 +108,19 @@ export default function WonTopnav({ pageTitle }) {
    * Crawler for externalDataUris (e.g. wikidata uris)
    * this is used to fetch every wikidata uri that is not yet in the state
    */
-  // TODO: FIX ME (LOOPS)
-  // const externalDataUrisToLoad = useSelector(
-  //   generalSelectors.getExternalDataUrisToLoad
-  // );
-  // useEffect(
-  //   () => {
-  //     if (externalDataUrisToLoad && externalDataUrisToLoad.size > 0) {
-  //       externalDataUrisToLoad.map(entityUri => {
-  //         dispatch(actionCreators.externalData__fetchWikiData(entityUri));
-  //       });
-  //     }
-  //   },
-  //   [externalDataUrisToLoad]
-  // );
+  const externalDataUrisToLoad = useSelector(
+    generalSelectors.getExternalDataUrisToLoad
+  );
+  useEffect(
+    () => {
+      if (externalDataUrisToLoad && externalDataUrisToLoad.size > 0) {
+        externalDataUrisToLoad.map(entityUri => {
+          dispatch(actionCreators.externalData__fetchWikiData(entityUri));
+        });
+      }
+    },
+    [externalDataUrisToLoad]
+  );
 
   /*
   * Crawler to see if RequestCredentials for ConnectionContainers appeared

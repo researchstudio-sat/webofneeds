@@ -650,14 +650,13 @@ export const getExternalDataUrisToLoad = createSelector(
   getExternalDataState,
   (allAtoms, processState, externalDataState) =>
     allAtoms
+      .filterNot(atom => processUtils.isAtomToLoad(processState, getUri(atom)))
       .map(atom => getIn(atom, ["content", "eventObjectAboutUris"]))
-      .filter(entityUri =>
-        processUtils.isExternalDataFetchNecessary(
-          processState,
-          entityUri,
-          get(externalDataState, entityUri)
-        )
-      )
       .flatten()
       .toSet()
+      .filter(entityUri => !!entityUri)
+      .filterNot(entityUri => !!get(externalDataState, entityUri))
+      .filterNot(entityUri =>
+        processUtils.isExternalDataLoading(processState, entityUri)
+      )
 );
