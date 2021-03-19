@@ -327,7 +327,7 @@ export default function WonCreateAtom({
           {/*ADD TITLE AND DETAILS*/}
           {createContentFragment}
           {createSeeksFragment}
-          <div className="cp__content__branchheader">Activated Sockets</div>
+          <div className="cp__content__branchheader">Enabled Sockets</div>
           <div className="cp__content__sockets">{socketElements}</div>
         </div>
         <div className="cp__footer">

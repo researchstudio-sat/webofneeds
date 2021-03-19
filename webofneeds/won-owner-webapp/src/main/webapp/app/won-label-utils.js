@@ -39,15 +39,15 @@ const labels = deepFreeze({
     [vocab.WONMATCH.UsedForTestingCompacted]: "Used For Testing",
   },
   sockets: {
-    [vocab.GROUP.GroupSocketCompacted]: "Group Chat enabled",
-    [vocab.CHAT.ChatSocketCompacted]: "Chat enabled",
+    [vocab.GROUP.GroupSocketCompacted]: "Group Chat",
+    [vocab.CHAT.ChatSocketCompacted]: "Chat",
     [vocab.WXSCHEMA.MemberSocketCompacted]: "Members",
     [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: "Role Of",
     [vocab.HOLD.HoldableSocketCompacted]: "Holdable",
     [vocab.WXVALUEFLOWS.SupportableSocketCompacted]: "Supportable",
     [vocab.HOLD.HolderSocketCompacted]: "Holder",
     [vocab.WXVALUEFLOWS.SupporterSocketCompacted]: "Supporter",
-    [vocab.WXSCHEMA.ReviewSocketCompacted]: "Review enabled",
+    [vocab.WXSCHEMA.ReviewSocketCompacted]: "Review",
     [vocab.BUDDY.BuddySocketCompacted]: "Buddy",
     [vocab.WXVALUEFLOWS.PrimaryAccountableOfSocketCompacted]:
       "Primary Accountable",
@@ -76,7 +76,7 @@ const labels = deepFreeze({
   },
   helpText: {
     [vocab.GROUP.GroupSocketCompacted]: "TODO",
-    [vocab.CHAT.ChatSocketCompacted]: "TODO",
+    [vocab.CHAT.ChatSocketCompacted]: "TODO ",
     [vocab.WXSCHEMA.MemberSocketCompacted]: "TODO",
     [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: "TODO",
     [vocab.HOLD.HoldableSocketCompacted]: "TODO",
