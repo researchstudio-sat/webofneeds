@@ -66,22 +66,23 @@ export const organization = {
           },
         },
       },
-      [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: {
-        useCaseIdentifiers: ["role"],
-        refuseNonOwned: true,
-        labels: {
-          owned: {
-            default: "Role",
-            addNew: "Add New Role",
-            picker: "Add Role",
-          },
-          nonOwned: {
-            default: "Role",
-            addNew: "Add New Role",
-            picker: "Add Role",
-          },
-        },
-      },
+      // TODO: INCLUDE ROLES AGAIN ONCE THE ACL'S ARE EDITABLE
+      // [vocab.WXSCHEMA.OrganizationRoleOfSocketCompacted]: {
+      //   useCaseIdentifiers: ["role"],
+      //   refuseNonOwned: true,
+      //   labels: {
+      //     owned: {
+      //       default: "Role",
+      //       addNew: "Add New Role",
+      //       picker: "Add Role",
+      //     },
+      //     nonOwned: {
+      //       default: "Role",
+      //       addNew: "Add New Role",
+      //       picker: "Add Role",
+      //     },
+      //   },
+      // },
     },
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
       [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
