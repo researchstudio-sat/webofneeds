@@ -16,7 +16,7 @@ export const pokemonGoRaid = {
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["s:PlanAction"],
+        type: ["s:Event"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q20966579",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,

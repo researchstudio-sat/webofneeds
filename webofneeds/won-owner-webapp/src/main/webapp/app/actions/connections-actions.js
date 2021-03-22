@@ -504,7 +504,7 @@ const connectAdHoc = (
           .remove(vocab.WON.AtomCompacted);
 
       if (
-        contentTypes.includes("s:PlanAction") ||
+        contentTypes.includes("s:Event") ||
         contentTypes.includes(vocab.WXPERSONA.InterestCompacted) ||
         contentTypes.includes(vocab.WXPERSONA.ExpertiseCompacted)
       ) {

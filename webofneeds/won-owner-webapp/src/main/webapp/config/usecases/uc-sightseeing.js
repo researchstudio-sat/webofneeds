@@ -13,15 +13,15 @@ import vocab from "~/app/service/vocab";
 import { sparqlQuery, vicinityScoreSubQuery } from "~/app/sparql-builder-utils";
 import { getIn } from "~/app/utils";
 
-export const sightseeingPlan = {
-  identifier: "sightseeingPlan",
+export const sightseeingEvent = {
+  identifier: "sightseeingEvent",
   label: "Go Sightseeing!",
   icon: ico36_detail_datetime,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["s:PlanAction"],
+        type: ["s:Event"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q1542314",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
@@ -39,7 +39,7 @@ export const sightseeingPlan = {
         useCaseIdentifiers: ["sightseeingInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
-        useCaseIdentifiers: ["sightseeingPlan"],
+        useCaseIdentifiers: ["sightseeingEvent"],
       },
     },
   },
@@ -121,7 +121,7 @@ export const sightseeingInterest = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.GROUP.GroupSocketCompacted]: {
-        useCaseIdentifiers: ["sightseeingPlan"],
+        useCaseIdentifiers: ["sightseeingEvent"],
       },
     },
   },
@@ -168,7 +168,7 @@ export const sightseeingInterest = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type won:Atom.`,
-        `${resultName} rdf:type s:PlanAction.`,
+        `${resultName} rdf:type s:Event.`,
         `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://www.wikidata.org/entity/Q1542314>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,

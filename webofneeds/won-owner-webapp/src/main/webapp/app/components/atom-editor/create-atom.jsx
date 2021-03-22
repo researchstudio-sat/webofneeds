@@ -101,10 +101,10 @@ export default function WonCreateAtom({
 
     if (
       useCaseContentTypesImm &&
-      (useCaseContentTypesImm.includes("s:PlanAction") ||
+      (useCaseContentTypesImm.includes("s:Event") ||
         useCaseContentTypesImm.includes(vocab.WXPERSONA.InterestCompacted) ||
         useCaseContentTypesImm.includes(vocab.WXPERSONA.ExpertiseCompacted)) &&
-      (contentTypes.includes("s:PlanAction") ||
+      (contentTypes.includes("s:Event") ||
         contentTypes.includes(vocab.WXPERSONA.InterestCompacted) ||
         contentTypes.includes(vocab.WXPERSONA.ExpertiseCompacted))
     ) {
@@ -298,8 +298,10 @@ export default function WonCreateAtom({
           <div className="cp__content__sockets__label">
             {wonLabelUtils.getSocketLabel(compactedSocketUri)}
           </div>
-          {helpText && (
+          {helpText ? (
             <div className="cp__content__sockets__helptext">{helpText}</div>
+          ) : (
+            <div className="cp__content__sockets__helptext cp__content__sockets__helptext--notext" />
           )}
         </React.Fragment>
       );

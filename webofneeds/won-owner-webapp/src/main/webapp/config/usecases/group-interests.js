@@ -1,10 +1,10 @@
-import { breakfastInterest, breakfastPlan } from "./uc-breakfast.js";
-import { afterpartyInterest, afterpartyPlan } from "./uc-afterparty.js";
-import { cyclingInterest, cyclingPlan } from "./uc-cycling.js";
-import { lunchInterest, lunchPlan } from "./uc-lunch.js";
-import { genericInterest, genericPlan } from "./uc-interest.js";
+import { breakfastInterest, breakfastEvent } from "./uc-breakfast.js";
+import { afterpartyInterest, afterpartyEvent } from "./uc-afterparty.js";
+import { cyclingInterest, cyclingEvent } from "./uc-cycling.js";
+import { lunchInterest, lunchEvent } from "./uc-lunch.js";
+import { genericInterest } from "./uc-interest.js";
 import { pokemonInterest, pokemonGoRaid } from "./uc-pokemon.js";
-import { sightseeingInterest, sightseeingPlan } from "./uc-sightseeing.js";
+import { sightseeingInterest, sightseeingEvent } from "./uc-sightseeing.js";
 import { event } from "./uc-event.js";
 
 import ico36_detail_interests from "../../images/won-icons/ico36_detail_interests.svg";
@@ -30,13 +30,12 @@ export const plansGroup = {
   label: "Plans",
   icon: ico36_detail_datetime,
   subItems: {
-    sightseeingPlan: sightseeingPlan,
-    afterpartyPlan: afterpartyPlan,
-    breakfastPlan: breakfastPlan,
-    lunchPlan: lunchPlan,
-    cyclingPlan: cyclingPlan,
+    sightseeingEvent: sightseeingEvent,
+    afterpartyEvent: afterpartyEvent,
+    breakfastEvent: breakfastEvent,
+    lunchEvent: lunchEvent,
+    cyclingEvent: cyclingEvent,
     pokemonGoRaid: pokemonGoRaid,
-    genericPlan: genericPlan,
     event: event,
   },
 };

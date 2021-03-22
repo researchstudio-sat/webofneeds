@@ -68,6 +68,9 @@ const labels = deepFreeze({
     [vocab.PROJECT.ProjectSocketCompacted]: "Projects",
     [vocab.PROJECT.ProjectOfSocketCompacted]: "Project Of",
     [vocab.PROJECT.RelatedProjectSocketCompacted]: "Related Projects",
+    [vocab.WXSCHEMA.AttendeeSocketCompacted]: "Attendees",
+    [vocab.WXSCHEMA.EventInverseSocketCompacted]: "Organizers",
+    [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: "Publishers",
   },
   helpText: {
     [vocab.GROUP.GroupSocketCompacted]: "TODO",
