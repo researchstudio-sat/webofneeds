@@ -171,7 +171,7 @@ export function findUseCaseByAtom(atomImm) {
     if (
       matchingUseCases.size > 1 &&
       contentTypes &&
-      (contentTypes.includes("s:PlanAction") ||
+      (contentTypes.includes("s:Event") ||
         contentTypes.includes(vocab.WXPERSONA.InterestCompacted) ||
         contentTypes.includes(vocab.WXPERSONA.ExpertiseCompacted))
     ) {
@@ -216,7 +216,7 @@ export function findUseCaseByAtom(atomImm) {
     if (
       matchingUseCases.size > 1 &&
       seeksTypes &&
-      seeksTypes.includes("s:PlanAction")
+      seeksTypes.includes("s:Event")
     ) {
       const eventObjectMatchingUseCases = matchingUseCases.filter(useCase => {
         const draftEventObject = getIn(useCase, [

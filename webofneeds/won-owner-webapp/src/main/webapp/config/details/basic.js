@@ -523,7 +523,7 @@ export const sockets = {
 };
 
 /*
-  Use this detail with the s:PlanAction type -> if you use this detail make sure you add the s:PlanAction type to the corresponding branch (content or seeks)
+  Use this detail with the s:Event type -> if you use this detail make sure you add the s:Event type to the corresponding branch (content or seeks)
 */
 export const eventObjectAboutUris = {
   identifier: "eventObjectAboutUris",
@@ -556,10 +556,10 @@ export const eventObjectAboutUris = {
     const types = get(jsonLDImm, "@type");
     if (
       (Immutable.List.isList(types) &&
-        (types.includes("s:PlanAction") ||
+        (types.includes("s:Event") ||
           types.includes(vocab.WXPERSONA.InterestCompacted) ||
           types.includes(vocab.WXPERSONA.ExpertiseCompacted))) ||
-      (types === "s:PlanAction" ||
+      (types === "s:Event" ||
         types === vocab.WXPERSONA.InterestCompacted ||
         types === vocab.WXPERSONA.ExpertiseCompacted)
     ) {

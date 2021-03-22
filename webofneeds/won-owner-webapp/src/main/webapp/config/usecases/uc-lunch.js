@@ -13,15 +13,15 @@ import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import ico36_detail_datetime from "../../images/won-icons/ico36_detail_datetime.svg";
 import ico36_uc_meal_half from "../../images/won-icons/ico36_uc_meal-half.svg";
 
-export const lunchPlan = {
-  identifier: "lunchPlan",
+export const lunchEvent = {
+  identifier: "lunchEvent",
   label: "Plan Lunch!",
   icon: ico36_detail_datetime,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["s:PlanAction"],
+        type: ["s:Event"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q12896105",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
@@ -38,7 +38,9 @@ export const lunchPlan = {
       [vocab.CHAT.ChatSocketCompacted]: {
         useCaseIdentifiers: ["lunchInterest", "persona"],
       },
-      [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["lunchEvent"],
+      },
     },
   },
   details: {
@@ -118,7 +120,9 @@ export const lunchInterest = {
   reactions: {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
-      [vocab.GROUP.GroupSocketCompacted]: { useCaseIdentifiers: ["lunchPlan"] },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["lunchEvent"],
+      },
     },
   },
   details: {
@@ -164,7 +168,7 @@ export const lunchInterest = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type won:Atom.`,
-        `${resultName} rdf:type s:PlanAction.`,
+        `${resultName} rdf:type s:Event.`,
         `${resultName} s:object ?planObject.`,
         `?planObject s:about <http://www.wikidata.org/entity/Q12896105>.`,
         `?thisAtom hold:heldBy/buddy:buddy/hold:holds ${resultName}.`,

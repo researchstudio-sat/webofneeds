@@ -13,15 +13,15 @@ import * as jsonLdUtils from "../../app/service/jsonld-utils.js";
 import ico36_detail_datetime from "../../images/won-icons/ico36_detail_datetime.svg";
 import ico36_uc_cycling_cropped from "../../images/won-icons/ico36_uc_cycling_cropped.svg";
 
-export const cyclingPlan = {
-  identifier: "cyclingPlan",
+export const cyclingEvent = {
+  identifier: "cyclingEvent",
   label: "Plan a Ride!",
   icon: ico36_detail_datetime,
   doNotMatchAfter: jsonLdUtils.findLatestIntervallEndInJsonLdOrNowAndAddMillis,
   draft: {
     ...mergeInEmptyDraft({
       content: {
-        type: ["s:PlanAction"],
+        type: ["s:Event"],
         eventObjectAboutUris: "http://www.wikidata.org/entity/Q53121",
         sockets: {
           "#groupSocket": vocab.GROUP.GroupSocketCompacted,
@@ -39,7 +39,7 @@ export const cyclingPlan = {
         useCaseIdentifiers: ["cyclingInterest", "persona"],
       },
       [vocab.GROUP.GroupSocketCompacted]: {
-        useCaseIdentifiers: ["cyclingPlan"],
+        useCaseIdentifiers: ["cyclingEvent"],
       },
     },
   },
@@ -121,7 +121,7 @@ export const cyclingInterest = {
     ...defaultReactions,
     [vocab.CHAT.ChatSocketCompacted]: {
       [vocab.GROUP.GroupSocketCompacted]: {
-        useCaseIdentifiers: ["cyclingPlan"],
+        useCaseIdentifiers: ["cyclingEvent"],
       },
     },
   },
@@ -169,7 +169,7 @@ export const cyclingInterest = {
       subQueries: subQueries,
       where: [
         `${resultName} rdf:type won:Atom.`,
-        `${resultName} rdf:type s:PlanAction.`,
+        `${resultName} rdf:type s:Event.`,
         `${resultName} s:object ?planObject.`,
         `${resultName} hold:heldBy ?holder.`,
         `?planObject s:about <http://www.wikidata.org/entity/Q53121>.`,
