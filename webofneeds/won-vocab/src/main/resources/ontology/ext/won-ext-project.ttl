@@ -1,0 +1,146 @@
+@prefix :           <https://w3id.org/won/ext/project#> .
+@prefix s:          <http://schema.org/> .
+@prefix dc:         <http://purl.org/dc/elements/1.1/> .
+@prefix owl:        <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix won:        <https://w3id.org/won/core#> .
+@prefix xml:        <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:       <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:       <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann:       <http://purl.org/vocab/vann/> .
+@prefix dcterms:    <http://purl.org/dc/terms/> .
+@prefix auth:       <https://w3id.org/won/auth#> .
+@prefix wx-hold:    <https://w3id.org/won/ext/hold#> .
+@base               <https://w3id.org/won/ext/project> .
+
+<https://w3id.org/won/ext/project>
+    rdf:type                      owl:Ontology ;
+    owl:versionIRI                <https://w3id.org/won/ext/project/1.0> ;
+    owl:imports                   <https://w3id.org/won/core> ;
+    dcterms:abstract
+                                  "This ontology contains the definition of the Project Related Sockets, which, when used to establish a connection, derives a *project* relationship between the Atoms."@en ;
+    dc:creator                    "Fabian Suda" ;
+    dc:title                      "Web of Needs Project Extension" ;
+    dcterms:created               "2019-04-15"^^xsd:date ;
+    dcterms:license               <https://creativecommons.org/licenses/by/4.0/> ;
+    vann:preferredNamespacePrefix "wx-project" ;
+    rdfs:comment                  "WoN Project Extension for establishing project relationships."@en .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://purl.org/dc/elements/1.1/abstract
+
+dcterms:abstract
+    rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/creator
+
+dc:creator
+    rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/date
+
+dc:date
+    rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/description
+
+dc:description
+    rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/elements/1.1/title
+
+dc:title
+    rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/created
+
+dcterms:created
+    rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/dc/terms/license
+
+dcterms:license
+    rdf:type owl:AnnotationProperty .
+
+
+###  http://purl.org/vocab/vann/preferredNamespacePrefix
+
+vann:preferredNamespacePrefix
+    rdf:type owl:AnnotationProperty .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://w3id.org/won/ext/hold#heldBy
+
+wx-hold:heldBy
+    rdf:type owl:ObjectProperty .
+
+###  https://w3id.org/won/ext/hold#holds
+
+wx-hold:holds
+    rdf:type owl:ObjectProperty .
+
+###  https://w3id.org/won/ext/project#organization
+
+:organization
+    rdf:type                 owl:ObjectProperty ;
+    rdfs:subPropertyOf       wx-hold:heldBy ;
+    rdfs:domain              won:Atom ;
+    rdfs:range               won:Atom ;
+    owl:propertyDisjointWith :project .
+
+
+###  https://w3id.org/won/ext/project#project
+
+:project
+    rdf:type                owl:ObjectProperty ;
+    rdfs:subPropertyOf      wx-hold:holds ;
+    rdfs:domain             won:Atom ;
+    rdfs:range              won:Atom ;
+    owl:propertyDisjointWith :organization .
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://w3id.org/won/ext/project#ProjectSocket
+
+:ProjectSocket
+    rdf:type                       owl:NamedIndividual, won:SocketDefinition ;
+    won:compatibleSocketDefinition :ProjectOfSocket ;
+    won:derivesAtomProperty        :project ;
+    rdfs:comment                   """Compatible with ProjectOfSockets"""@en ;
+    rdfs:label                     "ProjectSocket" .
+### TODO: Define/Add socket Auth: ?
+
+###  https://w3id.org/won/ext/project#ProjectOfSocket
+
+:ProjectOfSocket
+    rdf:type                       owl:NamedIndividual, won:SocketDefinition ;
+    won:compatibleSocketDefinition :ProjectSocket ;
+    won:derivesAtomProperty        :organization ;
+    rdfs:comment                   """Compatible with ProjectSockets"""@en ;
+    rdfs:label                     "ProjectOfSocket" .
+### TODO: Define/Add socket Auth: ?
+
+###  https://w3id.org/won/ext/project#RelatedProjectSocket
+
+:RelatedProjectSocket
+    rdf:type                       owl:NamedIndividual, won:SocketDefinition ;
+    won:compatibleSocketDefinition :RelatedProjectSocket ;
+    won:derivesAtomProperty        :project ;
+    rdfs:comment                   """Compatible with other RelatedProjectSocket"""@en ;
+    rdfs:label                     "RelatedProjectSocket" .
+### TODO: Define/Add socket Auth: ?
