@@ -50,7 +50,7 @@ export const event = {
     },
     [vocab.WXSCHEMA.EventInverseSocketCompacted]: {
       [vocab.WXSCHEMA.EventSocketCompacted]: {
-        useCaseIdentifier: ["organization", "persona", "project"],
+        useCaseIdentifiers: ["organization", "persona", "project"],
       },
     },
     [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
