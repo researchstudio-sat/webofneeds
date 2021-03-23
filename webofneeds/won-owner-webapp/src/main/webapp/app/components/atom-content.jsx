@@ -67,7 +67,7 @@ export default function WonAtomContent({
   /*const connectionContainerLoading =
     !atom || processUtils.isConnectionContainerLoading(process, atomUri);
   const connectionContainerFailedToLoad =
-    atom && processUtils.hasConnectionContainerFailedToLoad(process, atomUri);
+    atom && processUtils.areConnectionContainerRequestsFailedOnly(process, atomUri);
   const connectionContainerProcessStatus = processUtils.getConnectionContainerRequests(
     process,
     atomUri

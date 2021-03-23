@@ -41,8 +41,9 @@ export default function WonAtomMenu({
   const atomLoading = !atom || processUtils.isAtomLoading(process, atomUri);
   const atomFailedToLoad =
     atom && processUtils.hasAtomFailedToLoad(process, atomUri);
-  const connectionContainerFailedToLoad = //FIXME: Needs to be set only if not a single connectionContainerRequest has succeeded
-    atom && processUtils.hasConnectionContainerFailedToLoad(process, atomUri);
+  const connectionContainerFailedToLoad =
+    atom &&
+    processUtils.areConnectionContainerRequestsFailedOnly(process, atomUri);
   const connectionContainerLoading =
     atom && processUtils.isConnectionContainerLoading(process, atomUri);
 

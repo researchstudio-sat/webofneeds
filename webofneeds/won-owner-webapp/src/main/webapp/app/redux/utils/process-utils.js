@@ -164,12 +164,6 @@ export function isConnectionContainerToLoad(process, atomUri) {
   return atomUri && getIn(process, ["connectionContainers", atomUri, "toLoad"]);
 }
 
-export function hasConnectionContainerFailedToLoad(process, atomUri) {
-  return (
-    atomUri && getIn(process, ["connectionContainers", atomUri, "failedToLoad"])
-  );
-}
-
 export function isConnectionContainerLoading(process, atomUri) {
   return (
     atomUri && getIn(process, ["connectionContainers", atomUri, "loading"])
@@ -474,26 +468,38 @@ export function areConnectionContainerRequestsAccessDeniedOnly(
   process,
   atomUri
 ) {
-  if (hasConnectionContainerFailedToLoad(process, atomUri)) {
-    const connectionContainerRequests = getConnectionContainerRequests(
-      process,
-      atomUri
-    );
+  const connectionContainerRequests = getConnectionContainerRequests(
+    process,
+    atomUri
+  );
 
-    if (
-      connectionContainerRequests.find(request => get(request, "code") === 200)
-    ) {
-      return false;
-    } else {
-      return (
-        connectionContainerRequests.size ===
-        connectionContainerRequests.filter(
-          request => get(request, "code") === 403
-        )
-      );
-    }
+  if (
+    connectionContainerRequests.find(request => get(request, "code") === 200)
+  ) {
+    return false;
+  } else {
+    return (
+      connectionContainerRequests.size ===
+      connectionContainerRequests.filter(
+        request => get(request, "code") === 403
+      )
+    );
   }
-  return false;
+}
+
+export function areConnectionContainerRequestsFailedOnly(process, atomUri) {
+  const connectionContainerRequests = getConnectionContainerRequests(
+    process,
+    atomUri
+  );
+
+  if (
+    connectionContainerRequests.find(request => get(request, "code") === 200)
+  ) {
+    return false;
+  }
+
+  return true;
 }
 
 export function getConnectionContainerRequests(process, atomUri) {
