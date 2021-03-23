@@ -44,7 +44,7 @@
     </bean>
     <bean id="registrationClient" class="won.cryptography.service.RegistrationRestClientHttps">
         <constructor-arg ref="keyStoreService"/>
-        <constructor-arg ref="predefinedAliasStrategy"/>
+        <constructor-arg value="${matcher.uri}"/>
         <constructor-arg ref="trustStoreService"/>
         <constructor-arg>
             <bean class="won.cryptography.ssl.TOFUStrategy">

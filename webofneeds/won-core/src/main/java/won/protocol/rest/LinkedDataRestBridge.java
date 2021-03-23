@@ -10,7 +10,6 @@ import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
-import won.cryptography.ssl.PrivateKeyAliasContextStrategy;
 
 import javax.annotation.PostConstruct;
 import java.lang.invoke.MethodHandles;
@@ -56,15 +55,12 @@ public class LinkedDataRestBridge {
     }
 
     public RestTemplate getRestTemplate() {
-        PrivateKeyAliasContext.setPrivateKeyAlias(keyPairAliasDerivationStrategy.getAliasForAtomUri(null));
         return restTemplateWithDefaultWebId;
     }
 
     public RestTemplate getRestTemplate(String requesterWebID) {
         RestTemplate restTemplate;
         try {
-            PrivateKeyAliasContext
-                            .setPrivateKeyAlias(keyPairAliasDerivationStrategy.getAliasForAtomUri(requesterWebID));
             restTemplate = getRestTemplateForReadingLinkedData(requesterWebID);
         } catch (Exception e) {
             logger.error("Failed to create ssl tofu rest template", e);
@@ -75,17 +71,16 @@ public class LinkedDataRestBridge {
 
     private RestTemplate getRestTemplateForReadingLinkedData(String webID) throws Exception {
         if (webID == null) {
-            PrivateKeyAliasContext.setPrivateKeyAlias(keyPairAliasDerivationStrategy.getAliasForAtomUri(null));
             return restTemplateWithDefaultWebId;
         }
         return createRestTemplateForReadingLinkedData(webID);
     }
 
     private RestTemplate createRestTemplateForReadingLinkedData(String webID) throws Exception {
-        PrivateKeyAliasContext.setPrivateKeyAlias(keyPairAliasDerivationStrategy.getAliasForAtomUri(webID));
-        RestTemplate template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
+        String privateKeyAlias = keyPairAliasDerivationStrategy.getAliasForAtomUri(webID);
+        RestTemplate template = CryptographyUtils.createSslRestTemplate(privateKeyAlias,
+                        this.keyStoreService.getUnderlyingKeyStore(),
                         this.keyStoreService.getPassword(),
-                        new PrivateKeyAliasContextStrategy(),
                         this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout,
                         connectionTimeout, true);
         // prevent the RestTemplate from throwing an exception when the server responds

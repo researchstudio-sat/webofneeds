@@ -1,6 +1,5 @@
 package won.cryptography.service;
 
-import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ import java.util.Collections;
 public class RegistrationRestClientHttps implements RegistrationClient {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private String registrationQuery;
-    private PrivateKeyStrategy privateKeyStrategy;
+    private String keyAlias;
     private KeyStoreService keyStoreService;
     private TrustStoreService trustStoreService;
     private TrustStrategy trustStrategy;
@@ -34,8 +33,9 @@ public class RegistrationRestClientHttps implements RegistrationClient {
         // (app certificate doesn't change) in
         // case of registration (intended for app registration)
         try {
-            restTemplate = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
-                            this.keyStoreService.getPassword(), this.privateKeyStrategy,
+            restTemplate = CryptographyUtils.createSslRestTemplate(this.keyAlias,
+                            this.keyStoreService.getUnderlyingKeyStore(),
+                            this.keyStoreService.getPassword(),
                             this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, this.readTimeout,
                             this.connectionTimeout, false);
         } catch (Exception e) {
@@ -48,10 +48,10 @@ public class RegistrationRestClientHttps implements RegistrationClient {
         entity = new HttpEntity<>("parameters", headers);
     }
 
-    public RegistrationRestClientHttps(KeyStoreService keyStoreService, PrivateKeyStrategy privateKeyStrategy,
+    public RegistrationRestClientHttps(KeyStoreService keyStoreService, String keyAlias,
                     TrustStoreService trustStoreService, TrustStrategy trustStrategy, String registrationQuery) {
         this.keyStoreService = keyStoreService;
-        this.privateKeyStrategy = privateKeyStrategy;
+        this.keyAlias = keyAlias;
         this.trustStoreService = trustStoreService;
         this.trustStrategy = trustStrategy;
         this.registrationQuery = registrationQuery;
