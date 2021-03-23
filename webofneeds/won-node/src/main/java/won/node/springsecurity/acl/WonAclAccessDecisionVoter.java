@@ -111,6 +111,10 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         }
         if (webId != null && webId.equals(cryptographyService.getDefaultPrivateKeyAlias())) {
             // if the WoN node itself is the requestor, bypass all checks and allow
+            if (logger.isDebugEnabled()) {
+                logger.debug("Requestor is WonNode itself, authenticated by its WebID. Bypassing any ACL checks");
+            }
+            WonAclRequestHelper.setWonAclEvaluationContext(filterInvocation.getRequest(), WonAclEvalContext.allowAll());
             return ACCESS_GRANTED;
         }
         String resource = filterInvocation.getRequest().getRequestURL().toString();
@@ -146,11 +150,16 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
         }
         stopWatch.stop();
         if (logger.isDebugEnabled()) {
-            logger.debug("access control check took {} millis, result: {} ",
-                            stopWatch.getLastTaskTimeMillis(),
-                            (result == ACCESS_GRANTED ? "granted"
-                                            : (result == ACCESS_DENIED ? "denied"
-                                                            : (result == ACCESS_ABSTAIN ? "abstain" : result))));
+            logger.debug("access control check for {} with webid {}, token {} took {} millis, result: {} ",
+                            new Object[] {
+                                            resourceUri,
+                                            webId,
+                                            authToken == null ? "(no token)" : "present",
+                                            stopWatch.getLastTaskTimeMillis(),
+                                            (result == ACCESS_GRANTED ? "granted"
+                                                            : (result == ACCESS_DENIED ? "denied"
+                                                                            : (result == ACCESS_ABSTAIN ? "abstain"
+                                                                                            : result))) });
         }
         return result;
     }
@@ -315,6 +324,9 @@ public class WonAclAccessDecisionVoter implements AccessDecisionVoter<FilterInvo
                             uriService.getConnectionURIofConnectionMessagesURI(
                                             resourceUri));
             if (!con.isPresent()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("request to inexistent connection denied: {}", resourceUri);
+                }
                 return ACCESS_DENIED;
             }
             request.setReqSocketType(con.get().getTypeURI());

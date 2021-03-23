@@ -21,7 +21,6 @@ import won.cryptography.keymanagement.KeyPairAliasDerivationStrategy;
 import won.cryptography.service.CryptographyUtils;
 import won.cryptography.service.TrustStoreService;
 import won.cryptography.service.keystore.KeyStoreService;
-import won.cryptography.ssl.PrivateKeyAliasContextStrategy;
 
 import javax.annotation.PostConstruct;
 import java.lang.invoke.MethodHandles;
@@ -74,25 +73,24 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
             if (actualPrivateKeyAlias == null) {
                 return restTemplateWithoutWebId;
             }
-            PrivateKeyAliasContext.setPrivateKeyAlias(actualPrivateKeyAlias);
-            template = CryptographyUtils.createSslRestTemplate(this.keyStoreService.getUnderlyingKeyStore(),
+            template = CryptographyUtils.createSslRestTemplate(actualPrivateKeyAlias,
+                            this.keyStoreService.getUnderlyingKeyStore(),
                             this.keyStoreService.getPassword(),
-                            new PrivateKeyAliasContextStrategy(),
                             this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout,
                             connectionTimeout, true);
             if (logger.isDebugEnabled()) {
                 logger.debug("rest template for webID {} created", webID == null ? "[none provided]" : webID);
             }
+            // we add our DatasetConverter before any other converter because the jackson
+            // converter feels responsible for "application/*+json" (which matches
+            // "application/ld+json") and is confident it can produce a jena Dataset - but
+            // then of course fails to instantiate one. By putting our converter first, we
+            // can be sure it is used when a jena Dataset is requested.
+            template.getMessageConverters().add(0, datasetConverter);
+            return template;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create rest template for webID '" + webID + "'", e);
         }
-        // we add our DatasetConverter before any other converter because the jackson
-        // converter feels responsible for "application/*+json" (which matches
-        // "application/ld+json") and is confident it can produce a jena Dataset - but
-        // then of course fails to instantiate one. By putting our converter first, we
-        // can be sure it is used when a jena Dataset is requested.
-        template.getMessageConverters().add(0, datasetConverter);
-        return template;
     }
 
     @Override

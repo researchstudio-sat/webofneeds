@@ -7,7 +7,6 @@ import net.sf.ehcache.Element;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.PrivateKeyStrategy;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
@@ -15,12 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import won.cryptography.ssl.PredefinedAliasStrategy;
 
 import javax.crypto.Cipher;
 import javax.net.ssl.SSLContext;
 import java.lang.invoke.MethodHandles;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Supplier;
@@ -32,6 +31,7 @@ public class CryptographyUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Ehcache ehcache;
     private static final Object monitor = new Object();
+    private static final String keyStoreType = "UBER";
     static {
         CacheManager manager = CacheManager.getInstance();
         ehcache = new Cache("sslContextCache", 500, false, false, 3600, 600);
@@ -49,14 +49,14 @@ public class CryptographyUtils {
         }
     }
 
-    private static SSLContext getSSLContext(final KeyStore keyStore, final String ksPass,
-                    final PrivateKeyStrategy keyStrategy, final KeyStore trustStore, TrustStrategy trustStrategy,
+    private static SSLContext getSSLContext(final String privateKeyAlias, final KeyStore keyStore, final String ksPass,
+                    final KeyStore trustStore, TrustStrategy trustStrategy,
                     boolean allowCached) throws Exception {
         if (allowCached) {
-            return getCachedSslContextForKeystore(keyStore,
-                            makeCacheKey(keyStore), () -> {
+            return getCachedSslContextForKeystore(privateKeyAlias,
+                            () -> {
                                 try {
-                                    return createSSLContextBuilder(keyStore, ksPass, keyStrategy, trustStore,
+                                    return createSSLContextBuilder(privateKeyAlias, keyStore, ksPass, trustStore,
                                                     trustStrategy)
                                                                     .build();
                                 } catch (Exception exception) {
@@ -65,78 +65,74 @@ public class CryptographyUtils {
                                 return null;
                             });
         } else {
-            return createSSLContextBuilder(keyStore, ksPass, keyStrategy, trustStore, trustStrategy).build();
+            return createSSLContextBuilder(privateKeyAlias, keyStore, ksPass, trustStore, trustStrategy).build();
         }
     }
 
-    private static String makeCacheKey(KeyStore keyStore) {
-        return "" + keyStore.hashCode();
+    private static String makeCacheKey(String privateKeyAlias) {
+        return privateKeyAlias == null ? "no client cert" : privateKeyAlias;
     }
 
-    private static SSLContext getCachedSslContextForKeystore(final KeyStore keyStore, String cacheKey,
+    private static SSLContext getCachedSslContextForKeystore(final String privateKeyAlias,
                     Supplier<SSLContext> sslContextSupplier) throws Exception {
         Instant start = Instant.now();
+        String cacheKey = makeCacheKey(privateKeyAlias);
         logger.debug("Creating or obtaining cached SSL context for cache key {}", cacheKey);
         Element cacheElement = ehcache.get(cacheKey);
         SSLContext sslContext;
         if (cacheElement != null) {
-            // check the size of the keystore - if it has changed, reload
-            if (keyStoreHasChanged(keyStore, cacheElement)) {
-                ehcache.remove(cacheElement);
-                cacheElement = null;
+            if (logger.isDebugEnabled()) {
+                logger.debug("Using cached SSL context");
+            }
+            return (SSLContext) cacheElement.getObjectValue();
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("No cached SSL context found");
+        }
+        // we want to avoid creating the sslContext multiple times, so we snychronize on
+        // an object shared by all threads:
+        synchronized (monitor) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Inside critical section, {} millis since method start",
+                                Duration.between(start, Instant.now()).toMillis());
+            }
+            // now we have to check again (maybe we're in the thread that had to wait - in
+            // that case, the
+            // sslContext has been created already
+            cacheElement = ehcache.get(cacheKey);
+            if (cacheElement == null) {
+                sslContext = sslContextSupplier.get();
+                cacheElement = new Element(cacheKey, sslContext);
+                ehcache.put(cacheElement);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("new SSL context created, {} millis since method start",
+                                    Duration.between(start, Instant.now()).toMillis());
+                }
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Obtaining cached SSL context took {} millis",
+                    logger.debug("SSL context initialized in concurrent thread, using that one; {} millis since method start",
                                     Duration.between(start, Instant.now()).toMillis());
                 }
             }
         }
-        if (cacheElement == null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Creating new SSL context and caching it...");
-            }
-            // we want to avoid creating the sslContext multiple times, so we snychronize on
-            // an object shared by all threads:
-            synchronized (monitor) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Inside critical section, {} millis since method start",
-                                    Duration.between(start, Instant.now()).toMillis());
-                }
-                // now we have to check again (maybe we're in the thread that had to wait - in
-                // that case, the
-                // sslContext has been created already
-                cacheElement = ehcache.get(cacheKey);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("cached element found: {} ", (cacheElement != null));
-                    if (cacheElement != null) {
-                        logger.debug("current keystore size: {}, size of cached keystore:{}", keyStore.size(),
-                                        ((CacheEntry) cacheElement.getObjectValue()).keystoreSize);
-                    }
-                }
-                if (cacheElement == null || keyStoreHasChanged(keyStore, cacheElement)) {
-                    sslContext = sslContextSupplier.get();
-                    cacheElement = new Element(cacheKey, new CacheEntry(sslContext, keyStore.size()));
-                    ehcache.put(cacheElement);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("new SSL Context created, {} millis since method start",
-                                        Duration.between(start, Instant.now()).toMillis());
-                    }
-                }
-            }
-        }
-        return ((CacheEntry) cacheElement.getObjectValue()).getSslContext();
+        return (SSLContext) cacheElement.getObjectValue();
     }
 
-    private static boolean keyStoreHasChanged(KeyStore keyStore, Element cacheElement) throws KeyStoreException {
-        return ((CacheEntry) cacheElement.getObjectValue()).keystoreSize != keyStore.size();
-    }
-
-    private static SSLContextBuilder createSSLContextBuilder(final KeyStore keyStore, final String ksPass,
-                    final PrivateKeyStrategy keyStrategy, final KeyStore trustStore, TrustStrategy trustStrategy)
+    private static SSLContextBuilder createSSLContextBuilder(String privateKeyAlias, final KeyStore keyStore,
+                    final String ksPass, final KeyStore trustStore, TrustStrategy trustStrategy)
                     throws Exception {
         Instant start = Instant.now();
         SSLContextBuilder contextBuilder = SSLContexts.custom();
-        contextBuilder.loadKeyMaterial(keyStore, ksPass.toCharArray(), keyStrategy);
+        if (privateKeyAlias != null) {
+            if (!keyStore.containsAlias(privateKeyAlias)) {
+                throw new IllegalStateException(String.format(
+                                "Cannot create SSL context for alias %s: no key with that alias found in keystore",
+                                privateKeyAlias));
+            }
+            KeyStore ks = createKeystoreForSSLContext(privateKeyAlias, keyStore, ksPass);
+            contextBuilder.loadKeyMaterial(ks, ksPass.toCharArray(),
+                            new PredefinedAliasStrategy(privateKeyAlias));
+        }
         // if trustStore is null, default CAs trust store is used
         contextBuilder.loadTrustMaterial(trustStore, trustStrategy);
         if (logger.isDebugEnabled()) {
@@ -145,11 +141,48 @@ public class CryptographyUtils {
         return contextBuilder;
     }
 
-    public static RestTemplate createSslRestTemplate(final KeyStore keyStore, final String ksPass,
-                    final PrivateKeyStrategy keyStrategy, final KeyStore trustStore, TrustStrategy trustStrategy,
+    private static KeyStore createKeystoreForSSLContext(String privateKeyAlias, KeyStore keyStore, String ksPass) {
+        try {
+            KeyStore newKeyStore = null;
+            try {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Creating keystore for SSL context...");
+                }
+                newKeyStore = java.security.KeyStore.getInstance(keyStoreType, BCProvider.getInstance());
+            } catch (Exception e) {
+                // try again with standard provider resolution
+                try {
+                    newKeyStore = java.security.KeyStore.getInstance(keyStoreType);
+                } catch (Exception e2) {
+                    logger.error("Error initializing key store with provider {}: {} - fallback to default provider failed, too (see stacktrace below).",
+                                    BCProvider.getInstance().getClass(), e.getMessage());
+                    throw e2;
+                }
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Created keystore: " + newKeyStore);
+            }
+            newKeyStore.load(null, null); // initialize the keystore
+            newKeyStore.setEntry(privateKeyAlias,
+                            keyStore.getEntry(privateKeyAlias, new KeyStore.PasswordProtection(ksPass.toCharArray())),
+                            new KeyStore.PasswordProtection(ksPass.toCharArray()));
+            if (logger.isDebugEnabled()) {
+                logger.debug("Added key for specified alias {}", privateKeyAlias);
+            }
+            return newKeyStore;
+        } catch (Exception e) {
+            logger.error("Error initializing key store for SSL context with private key alias {}", privateKeyAlias);
+            throw new IllegalStateException("Error initializing keystore for SSL context", e);
+        }
+    }
+
+    public static RestTemplate createSslRestTemplate(final String privateKeyAlias, final KeyStore keyStore,
+                    final String ksPass,
+                    final KeyStore trustStore, TrustStrategy trustStrategy,
                     final Integer readTimeout, final Integer connectionTimeout, final boolean allowCached)
                     throws Exception {
-        SSLContext sslContext = getSSLContext(keyStore, ksPass, keyStrategy, trustStore, trustStrategy, allowCached);
+        SSLContext sslContext = getSSLContext(privateKeyAlias, keyStore, ksPass, trustStore, trustStrategy,
+                        allowCached);
         // here in the constructor, also hostname verifier, protocol version, cipher
         // suits, etc. can be specified
         SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
@@ -185,23 +218,5 @@ public class CryptographyUtils {
         }
         requestFactory.setHttpClient(httpClient);
         return new RestTemplate(requestFactory);
-    }
-
-    private static class CacheEntry {
-        private SSLContext sslContext;
-        private int keystoreSize;
-
-        public CacheEntry(SSLContext sslContext, int keystoreSize) {
-            this.sslContext = sslContext;
-            this.keystoreSize = keystoreSize;
-        }
-
-        public SSLContext getSslContext() {
-            return sslContext;
-        }
-
-        public int getKeystoreSize() {
-            return keystoreSize;
-        }
     }
 }

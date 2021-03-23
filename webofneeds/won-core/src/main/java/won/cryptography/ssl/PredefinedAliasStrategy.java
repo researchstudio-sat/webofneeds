@@ -16,6 +16,9 @@ public class PredefinedAliasStrategy implements PrivateKeyStrategy {
 
     @Override
     public String chooseAlias(Map<String, PrivateKeyDetails> map, Socket socket) {
+        if (!map.containsKey(alias)) {
+            throw new IllegalStateException("Trying to select private key alias " + alias + " that is not available");
+        }
         return alias;
     }
 

@@ -24,11 +24,14 @@
         </encoder>
     </appender>
 
-    <logger name="won.integrationtest" level="debug"/>
-    <logger name="won" level="warn"/>
+    <logger name="won.integrationtest" level="info"/>
+    <logger name="won.bot.framework.eventbot.bus.impl.AsyncEventBusImpl" level="info"/>
+    <logger name="won.bot.framework.manager.impl" level="info"/>
+
+    <logger name="won" level="info"/>
     <logger name="won.shacl2java" level="warn"/>
     <logger name="org.springframework" level="warn"/>
-
+    <logger name="won.cryptography.service.CryptographyUtils" level="debug" />
 
     <!-- available log-levels: DEBUG, INFO, WARN, ERROR -->
     <root level="info">
