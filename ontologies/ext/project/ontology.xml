@@ -1,0 +1,645 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="https://w3id.org/won/ext/project#"
+     xml:base="https://w3id.org/won/ext/project"
+     xmlns:dc="http://purl.org/dc/elements/1.1/"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:auth="https://w3id.org/won/auth#"
+     xmlns:core="https://w3id.org/won/core#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:vaem="http://www.linkedmodel.org/schema/vaem#"
+     xmlns:vann="http://purl.org/vocab/vann/"
+     xmlns:terms="http://purl.org/dc/terms/">
+    <owl:Ontology rdf:about="https://w3id.org/won/ext/project">
+        <owl:versionIRI rdf:resource="https://w3id.org/won/ext/project/1.0"/>
+        <owl:imports rdf:resource="https://w3id.org/won/core"/>
+        <dc:creator>Fabian Suda</dc:creator>
+        <dc:title>Web of Needs Project Extension</dc:title>
+        <terms:abstract xml:lang="en">This ontology contains the definition of the Project Related Sockets, which, when used to establish a connection, derives a *project* relationship between the Atoms.</terms:abstract>
+        <terms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2019-04-15</terms:created>
+        <terms:license rdf:resource="https://creativecommons.org/licenses/by/4.0/"/>
+        <vann:preferredNamespacePrefix>wx-project</vann:preferredNamespacePrefix>
+        <rdfs:comment xml:lang="en">WoN Project Extension for establishing project relationships.</rdfs:comment>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/creator -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/creator"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/date -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/date"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/description -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/description"/>
+    
+
+
+    <!-- http://purl.org/dc/elements/1.1/title -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/elements/1.1/title"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/abstract -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/abstract"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/created -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/created"/>
+    
+
+
+    <!-- http://purl.org/dc/terms/license -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/dc/terms/license"/>
+    
+
+
+    <!-- http://purl.org/vocab/vann/preferredNamespacePrefix -->
+
+
+    <owl:AnnotationProperty rdf:about="http://purl.org/vocab/vann/preferredNamespacePrefix"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#bearer -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#bearer"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connection -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connection"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connectionMessages -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connectionMessages"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connectionState -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connectionState"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#connections -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#connections"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#expiresAfter -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#expiresAfter"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#grant -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#grant"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#grantee -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#grantee"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#graph -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#graph"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#graphType -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#graphType"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#inherit -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#inherit"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#issuer -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#issuer"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#localAuth -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#localAuth"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#operation -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#operation"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#requestToken -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#requestToken"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#socket -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#socket"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#socketType -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#socketType"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#targetAtom -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#targetAtom"/>
+    
+
+
+    <!-- https://w3id.org/won/auth#tokenScope -->
+
+
+    <owl:AnnotationProperty rdf:about="https://w3id.org/won/auth#tokenScope"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#heldBy -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/hold#heldBy"/>
+    
+
+
+    <!-- https://w3id.org/won/ext/hold#holds -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/hold#holds"/>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#organization -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/project#organization">
+        <rdfs:subPropertyOf rdf:resource="https://w3id.org/won/ext/hold#heldBy"/>
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+        <owl:propertyDisjointWith rdf:resource="https://w3id.org/won/ext/project#project"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#project -->
+
+
+    <owl:ObjectProperty rdf:about="https://w3id.org/won/ext/project#project">
+        <rdfs:subPropertyOf rdf:resource="https://w3id.org/won/ext/hold#holds"/>
+        <rdfs:domain rdf:resource="https://w3id.org/won/core#Atom"/>
+        <rdfs:range rdf:resource="https://w3id.org/won/core#Atom"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/auth#Authorization -->
+
+
+    <owl:Class rdf:about="https://w3id.org/won/auth#Authorization"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+    
+
+
+    <!-- https://w3id.org/won/ext/project#ProjectOfSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#ProjectOfSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/project#ProjectSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/project#organization"/>
+        <rdfs:comment xml:lang="en">Compatible with ProjectSockets</rdfs:comment>
+        <rdfs:label>ProjectOfSocket</rdfs:label>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/project#grantAccessToMemberSocketWithProjectOfSocketAuth"/>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/project#grantConnectAccessToProjectOfSocketToAnyone"/>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/project#grantReadAccessToGraphAndConnectionsWithMemberSocketAuth"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#ProjectSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#ProjectSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/project#ProjectOfSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/project#project"/>
+        <rdfs:comment xml:lang="en">Compatible with ProjectOfSockets</rdfs:comment>
+        <rdfs:label>ProjectSocket</rdfs:label>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/project#grantAccessToProjectSocketForMemberAuth"/>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/project#grantConnectAccessToProjectSocketToAnyone"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#RelatedProjectSocket -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#RelatedProjectSocket">
+        <rdf:type rdf:resource="https://w3id.org/won/core#SocketDefinition"/>
+        <core:compatibleSocketDefinition rdf:resource="https://w3id.org/won/ext/project#RelatedProjectSocket"/>
+        <core:derivesAtomProperty rdf:resource="https://w3id.org/won/ext/project#project"/>
+        <rdfs:comment xml:lang="en">Compatible with other RelatedProjectSocket</rdfs:comment>
+        <rdfs:label>RelatedProjectSocket</rdfs:label>
+        <auth:localAuth rdf:resource="https://w3id.org/won/ext/project#grantAccessForRelatedProjects"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#grantAccessForRelatedProjects -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#grantAccessForRelatedProjects">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantAccessForRelatedProjects</rdfs:label>
+        <auth:grant>
+            <rdf:Description>
+                <auth:socket>
+                    <rdf:Description>
+                        <auth:connections rdf:nodeID="genid3"/>
+                    </rdf:Description>
+                </auth:socket>
+            </rdf:Description>
+        </auth:grant>
+        <auth:grantee>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid8"/>
+            </rdf:Description>
+        </auth:grantee>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid3">
+        <auth:connection>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connection>
+        <auth:connection rdf:nodeID="genid5"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid8">
+        <auth:connection rdf:nodeID="genid9"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/project#RelatedProjectSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid5">
+        <auth:connectionMessages>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connectionMessages>
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid9">
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:targetAtom>
+            <rdf:Description/>
+        </auth:targetAtom>
+    </rdf:Description>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#grantAccessToMemberSocketWithProjectOfSocketAuth -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#grantAccessToMemberSocketWithProjectOfSocketAuth">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantAccessToMemberSocketWithProjectOfSocketAuth</rdfs:label>
+        <auth:grant>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid12"/>
+            </rdf:Description>
+        </auth:grant>
+        <auth:grantee>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid16"/>
+            </rdf:Description>
+        </auth:grantee>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid12">
+        <auth:connections>
+            <rdf:Description>
+                <auth:connectionMessages>
+                    <rdf:Description>
+                        <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+                    </rdf:Description>
+                </auth:connectionMessages>
+            </rdf:Description>
+        </auth:connections>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opConnectClose"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/schema#MemberSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid16">
+        <auth:connection rdf:nodeID="genid17"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/project#ProjectOfSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid17">
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:targetAtom>
+            <rdf:Description/>
+        </auth:targetAtom>
+    </rdf:Description>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#grantAccessToProjectSocketForMemberAuth -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#grantAccessToProjectSocketForMemberAuth">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantAccessToProjectSocketForMemberAuth</rdfs:label>
+        <auth:grant rdf:nodeID="genid19"/>
+        <auth:grantee>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid26"/>
+            </rdf:Description>
+        </auth:grantee>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid19">
+        <auth:operation>
+            <rdf:Description>
+                <auth:requestToken rdf:nodeID="genid21"/>
+            </rdf:Description>
+        </auth:operation>
+        <auth:socket rdf:nodeID="genid22"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid26">
+        <auth:connection rdf:nodeID="genid27"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/schema#MemberSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid21">
+        <auth:expiresAfter rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3600</auth:expiresAfter>
+        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/schema#MemberSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid22">
+        <auth:connections rdf:nodeID="genid23"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/project#ProjectSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid27">
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:targetAtom>
+            <rdf:Description/>
+        </auth:targetAtom>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid23">
+        <auth:connectionMessages>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connectionMessages>
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#grantConnectAccessToProjectOfSocketToAnyone -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#grantConnectAccessToProjectOfSocketToAnyone">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantConnectAccessToProjectOfSocketToAnyone</rdfs:label>
+        <auth:grant>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid30"/>
+            </rdf:Description>
+        </auth:grant>
+        <auth:grantee rdf:resource="https://w3id.org/won/auth#anyone"/>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid30">
+        <auth:connections>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connections>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opConnectClose"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/project#ProjectOfSocket"/>
+    </rdf:Description>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#grantConnectAccessToProjectSocketToAnyone -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#grantConnectAccessToProjectSocketToAnyone">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantConnectAccessToProjectSocketToAnyone</rdfs:label>
+        <auth:grant>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid33"/>
+            </rdf:Description>
+        </auth:grant>
+        <auth:grantee rdf:resource="https://w3id.org/won/auth#anyone"/>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid33">
+        <auth:connections>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connections>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opConnectClose"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/project#ProjectSocket"/>
+    </rdf:Description>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#grantConnectAccessToRelatedProjectSocketToAnyone -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#grantConnectAccessToRelatedProjectSocketToAnyone">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantConnectAccessToRelatedProjectSocketToAnyone</rdfs:label>
+        <auth:grant>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid36"/>
+            </rdf:Description>
+        </auth:grant>
+        <auth:grantee rdf:resource="https://w3id.org/won/auth#anyone"/>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid36">
+        <auth:connections>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connections>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opConnectClose"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/project#RelatedProjectSocket"/>
+    </rdf:Description>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#grantReadAccessToGraphAndConnectionsWithMemberSocketAuth -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#grantReadAccessToGraphAndConnectionsWithMemberSocketAuth">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#Authorization"/>
+        <rdfs:label>GrantReadAccessToGraphAndConnectionsWithMemberSocketAuth</rdfs:label>
+        <auth:bearer rdf:nodeID="genid38"/>
+        <auth:grant rdf:nodeID="genid43"/>
+    </owl:NamedIndividual>
+    <rdf:Description rdf:nodeID="genid38">
+        <auth:issuer>
+            <rdf:Description>
+                <auth:socket rdf:nodeID="genid40"/>
+            </rdf:Description>
+        </auth:issuer>
+        <auth:tokenScope rdf:resource="https://w3id.org/won/ext/schema#MemberSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid43">
+        <auth:graph rdf:nodeID="genid44"/>
+        <auth:socket>
+            <rdf:Description>
+                <auth:connections rdf:nodeID="genid46"/>
+            </rdf:Description>
+        </auth:socket>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid40">
+        <auth:connection rdf:nodeID="genid41"/>
+        <auth:socketType rdf:resource="https://w3id.org/won/ext/project#ProjectOfSocket"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid44">
+        <auth:graphType rdf:resource="https://w3id.org/won/auth#contentGraph"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid46">
+        <auth:connectionMessages>
+            <rdf:Description>
+                <auth:inherit rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</auth:inherit>
+            </rdf:Description>
+        </auth:connectionMessages>
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:operation rdf:resource="https://w3id.org/won/auth#opRead"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid41">
+        <auth:connectionState rdf:resource="https://w3id.org/won/core#Connected"/>
+        <auth:targetAtom>
+            <rdf:Description/>
+        </auth:targetAtom>
+    </rdf:Description>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#organization -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#organization"/>
+    
+
+
+    <!-- https://w3id.org/won/ext/project#project -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/ext/project#project"/>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 5.1.14) https://github.com/owlcs/owlapi/ -->
+
+

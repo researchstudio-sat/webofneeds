@@ -1,0 +1,54 @@
+<h2 id="overv" class="list">Web of Needs Project Extension: Overview <span class="backlink"> back to <a href="#toc">ToC</a></span></h2>
+<span class="markdown">
+This ontology has the following classes and properties.</span>
+<h4>Object Properties</h4><ul class="hlist">
+   <li>
+      <a href="#organization" title="https://w3id.org/won/ext/project#organization">
+         <span>organization</span>
+      </a>
+   </li>
+   <li>
+      <a href="#project" title="https://w3id.org/won/ext/project#project">
+         <span>project</span>
+      </a>
+   </li>
+</ul><h4>Named Individuals</h4><ul class="hlist">
+   <li>
+      <a href="#grantAccessForRelatedProjects"
+         title="https://w3id.org/won/ext/project#grantAccessForRelatedProjects">GrantAccessForRelatedProjects</a>
+   </li>
+   <li>
+      <a href="#grantAccessToMemberSocketWithProjectOfSocketAuth"
+         title="https://w3id.org/won/ext/project#grantAccessToMemberSocketWithProjectOfSocketAuth">GrantAccessToMemberSocketWithProjectOfSocketAuth</a>
+   </li>
+   <li>
+      <a href="#grantAccessToProjectSocketForMemberAuth"
+         title="https://w3id.org/won/ext/project#grantAccessToProjectSocketForMemberAuth">GrantAccessToProjectSocketForMemberAuth</a>
+   </li>
+   <li>
+      <a href="#grantConnectAccessToProjectOfSocketToAnyone"
+         title="https://w3id.org/won/ext/project#grantConnectAccessToProjectOfSocketToAnyone">GrantConnectAccessToProjectOfSocketToAnyone</a>
+   </li>
+   <li>
+      <a href="#grantConnectAccessToProjectSocketToAnyone"
+         title="https://w3id.org/won/ext/project#grantConnectAccessToProjectSocketToAnyone">GrantConnectAccessToProjectSocketToAnyone</a>
+   </li>
+   <li>
+      <a href="#grantConnectAccessToRelatedProjectSocketToAnyone"
+         title="https://w3id.org/won/ext/project#grantConnectAccessToRelatedProjectSocketToAnyone">GrantConnectAccessToRelatedProjectSocketToAnyone</a>
+   </li>
+   <li>
+      <a href="#grantReadAccessToGraphAndConnectionsWithMemberSocketAuth"
+         title="https://w3id.org/won/ext/project#grantReadAccessToGraphAndConnectionsWithMemberSocketAuth">GrantReadAccessToGraphAndConnectionsWithMemberSocketAuth</a>
+   </li>
+   <li>
+      <a href="#ProjectOfSocket" title="https://w3id.org/won/ext/project#ProjectOfSocket">ProjectOfSocket</a>
+   </li>
+   <li>
+      <a href="#ProjectSocket" title="https://w3id.org/won/ext/project#ProjectSocket">ProjectSocket</a>
+   </li>
+   <li>
+      <a href="#RelatedProjectSocket"
+         title="https://w3id.org/won/ext/project#RelatedProjectSocket">RelatedProjectSocket</a>
+   </li>
+</ul>
