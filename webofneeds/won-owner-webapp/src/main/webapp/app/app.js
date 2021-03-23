@@ -114,6 +114,9 @@ function AppRoutes({ processState }) {
   const isLoggedIn = accountUtils.isLoggedIn(accountState);
   const hasLoginError = !!accountUtils.getLoginError(accountState);
   const isAnonymous = accountUtils.isAnonymous(accountState);
+  const connectionHasBeenLost = !useSelector(
+    generalSelectors.selectIsConnected
+  );
 
   const { postUri, token, privateId, requireLogin } = getQueryParams(location);
 
@@ -166,7 +169,20 @@ function AppRoutes({ processState }) {
   }
 
   //********************************
+  document.addEventListener(
+    "visibilitychange",
+    function() {
+      if (!document["hidden"]) {
+        if (connectionHasBeenLost) {
+          console.debug("Connection has been lost, start reconnect");
+          dispatch(actionCreators.reconnect__start());
+        }
+      }
+    },
+    false
+  );
 
+  //********************************
   return (
     <Switch>
       <Route exact path="/">
