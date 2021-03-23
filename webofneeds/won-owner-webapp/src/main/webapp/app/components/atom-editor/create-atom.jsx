@@ -45,6 +45,7 @@ export default function WonCreateAtom({
   const accountState = useSelector(generalSelectors.getAccountState);
 
   const activePinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
+  const debugModeEnabled = useSelector(viewSelectors.isDebugModeEnabled);
 
   const isHolderAtomValid = useSelector(
     state =>
@@ -287,25 +288,28 @@ export default function WonCreateAtom({
         </React.Fragment>
       );
 
-    const sockets = getIn(useCaseImm, ["draft", "content", "sockets"]);
     const socketElements = [];
 
-    sockets.map(compactedSocketUri => {
-      const helpText = wonLabelUtils.getSocketHelpText(compactedSocketUri);
+    // Show enabled sockets if debug mode is enabled FIXME: IMPLEMENT ABILITY TO (DE)SELECT AVAILABLE SOCKETS, REMOVE DEBUGVIEW
+    if (debugModeEnabled) {
+      const sockets = getIn(useCaseImm, ["draft", "content", "sockets"]);
+      sockets.map(compactedSocketUri => {
+        const helpText = wonLabelUtils.getSocketHelpText(compactedSocketUri);
 
-      socketElements.push(
-        <React.Fragment key={compactedSocketUri}>
-          <div className="cp__content__sockets__label">
-            {wonLabelUtils.getSocketLabel(compactedSocketUri)}
-          </div>
-          {helpText ? (
-            <div className="cp__content__sockets__helptext">{helpText}</div>
-          ) : (
-            <div className="cp__content__sockets__helptext cp__content__sockets__helptext--notext" />
-          )}
-        </React.Fragment>
-      );
-    });
+        socketElements.push(
+          <React.Fragment key={compactedSocketUri}>
+            <div className="cp__content__sockets__label">
+              {wonLabelUtils.getSocketLabel(compactedSocketUri)}
+            </div>
+            {helpText ? (
+              <div className="cp__content__sockets__helptext">{helpText}</div>
+            ) : (
+              <div className="cp__content__sockets__helptext cp__content__sockets__helptext--notext" />
+            )}
+          </React.Fragment>
+        );
+      });
+    }
 
     return (
       <won-create-atom>
@@ -329,8 +333,12 @@ export default function WonCreateAtom({
           {/*ADD TITLE AND DETAILS*/}
           {createContentFragment}
           {createSeeksFragment}
-          <div className="cp__content__branchheader">Enabled Sockets</div>
-          <div className="cp__content__sockets">{socketElements}</div>
+          {socketElements.length > 0 && (
+            <React.Fragment>
+              <div className="cp__content__branchheader">Enabled Sockets</div>
+              <div className="cp__content__sockets">{socketElements}</div>
+            </React.Fragment>
+          )}
         </div>
         <div className="cp__footer">
           <WonLabelledHr label="done?" className="cp__footer__labelledhr" />
