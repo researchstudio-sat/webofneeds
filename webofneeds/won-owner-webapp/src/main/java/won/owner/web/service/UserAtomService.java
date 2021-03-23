@@ -3,17 +3,21 @@ package won.owner.web.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
 import won.owner.repository.UserAtomRepository;
 import won.owner.repository.UserRepository;
+import won.owner.service.impl.WONUserDetailService;
 import won.protocol.message.WonMessage;
 import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.AtomState;
 
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class UserAtomService {
@@ -22,6 +26,8 @@ public class UserAtomService {
     private UserRepository userRepository;
     @Autowired
     private UserAtomRepository userAtomRepository;
+    @Autowired
+    private WONUserDetailService wonUserDetailService;
 
     public UserAtomService() {
     }
@@ -126,6 +132,32 @@ public class UserAtomService {
         UserAtom userAtom = userAtomRepository.findByAtomUri(atomURI);
         userAtom.setState(AtomState.DELETED);
         userAtomRepository.save(userAtom);
+    }
+
+    /**
+     * Check if the current user has the claimed identity represented by web-id of
+     * the atom. I.e. if the identity is that of the atom that belongs to the user -
+     * return true, otherwise - false.
+     *
+     * @param requesterWebId
+     * @return
+     */
+    public boolean currentUserHasIdentity(final String requesterWebId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = (User) wonUserDetailService.loadUserByUsername(username);
+        Set<URI> atomUris = getUserAtomUris(user);
+        if (atomUris.contains(URI.create(requesterWebId))) {
+            return true;
+        }
+        return false;
+    }
+
+    public Set<URI> getUserAtomUris(final User user) {
+        Set<URI> atomUris = new HashSet<>();
+        for (UserAtom userAtom : user.getUserAtoms()) {
+            atomUris.add(userAtom.getUri());
+        }
+        return atomUris;
     }
 
     private void deleteUserAtom(final WonMessage wonMessage, User user) {

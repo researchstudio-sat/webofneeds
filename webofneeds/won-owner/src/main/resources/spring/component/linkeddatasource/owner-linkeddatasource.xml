@@ -26,6 +26,7 @@
     </bean>
 
     <bean id="linkedDataSourceOnBehalfOfAtom" class="won.auth.linkeddata.AuthEnabledLinkedDataSource">
+        <qualifier value="onBehalfOfAtom" />
         <property name="linkedDataRestClient" ref="linkedDataRestClientOnBehalfOfAtom"/>
         <property name="sharedCache" value="false"/>
     </bean>
