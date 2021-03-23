@@ -1,15 +1,15 @@
 package won.protocol.service.impl;
 
-import java.net.URI;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import won.protocol.message.WonMessage;
 import won.protocol.service.MessageRoutingInfoService;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
+
+import java.net.URI;
+import java.util.Optional;
 
 /**
  * Determines sender|recipient atom|node for a given message by looking up
@@ -28,13 +28,13 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
         if (atomUri == null) {
             URI socketUri = msg.getSenderSocketURI();
             if (socketUri != null) {
-                atomUri = WonLinkedDataUtils.getAtomOfSocket(socketUri, linkedDataSource).orElse(null);
+                atomUri = WonRelativeUriHelper.stripFragment(socketUri);
             }
         }
         if (atomUri == null) {
             URI senderUri = msg.getConnectionURI();
             if (senderUri != null) {
-                atomUri = WonLinkedDataUtils.getAtomURIforConnectionURI(senderUri, linkedDataSource);
+                atomUri = WonRelativeUriHelper.stripConnectionSuffix(senderUri);
             }
         }
         return Optional.ofNullable(atomUri);
@@ -72,13 +72,13 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
         if (atomUri == null) {
             URI socketUri = msg.getRecipientSocketURI();
             if (socketUri != null) {
-                atomUri = WonLinkedDataUtils.getAtomOfSocket(socketUri, linkedDataSource).orElse(null);
+                atomUri = WonRelativeUriHelper.stripFragment(socketUri);
             }
         }
         if (atomUri == null) {
             URI senderUri = msg.getConnectionURI();
             if (senderUri != null) {
-                atomUri = WonLinkedDataUtils.getAtomURIforConnectionURI(senderUri, linkedDataSource);
+                atomUri = WonRelativeUriHelper.stripConnectionSuffix(senderUri);
             }
         }
         return Optional.ofNullable(atomUri);
@@ -87,12 +87,12 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
     @Override
     public Optional<URI> senderNode(WonMessage msg) {
         Optional<URI> atomURI = senderAtom(msg);
-        return atomURI.map(uri -> WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(uri, linkedDataSource));
+        return atomURI.map(uri -> WonRelativeUriHelper.stripAtomSuffix(uri));
     }
 
     @Override
     public Optional<URI> recipientNode(WonMessage msg) {
         Optional<URI> atomURI = recipientAtom(msg);
-        return atomURI.map(uri -> WonLinkedDataUtils.getWonNodeURIForAtomOrConnectionURI(uri, linkedDataSource));
+        return atomURI.map(uri -> WonRelativeUriHelper.stripAtomSuffix(uri));
     }
 }

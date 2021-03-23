@@ -21,9 +21,9 @@ public class SocketLookupFromLinkedData implements SocketLookup {
     @Override
     public Optional<SocketDefinition> getSocketConfig(URI socket) {
         try {
-            return WonLinkedDataUtils.getSocketDefinitionOfSocket(linkedDataSource, socket);
+            return WonLinkedDataUtils.getSocketDefinitionOfSocket(linkedDataSource, socket, null);
         } catch (Exception e) {
-            logger.info("Failed to load configuation for socket type " + socket, e);
+            logger.info("Failed to load configuration for socket type " + socket, e);
         }
         return Optional.empty();
     }
@@ -31,9 +31,9 @@ public class SocketLookupFromLinkedData implements SocketLookup {
     @Override
     public Optional<SocketDefinition> getSocketConfigOfType(URI socketType) {
         try {
-            return WonLinkedDataUtils.getSocketDefinition(linkedDataSource, socketType);
+            return WonLinkedDataUtils.getSocketDefinition(linkedDataSource, socketType, null);
         } catch (Exception e) {
-            logger.info("Failed to load configuation for socket type " + socketType, e);
+            logger.info("Failed to load configuration for socket type " + socketType, e);
         }
         return Optional.empty();
     }

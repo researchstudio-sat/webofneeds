@@ -1,21 +1,17 @@
 package won.owner.web.rest;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Set;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
 import won.protocol.agreement.AgreementProtocolState;
 import won.protocol.agreement.AgreementProtocolUris;
 import won.protocol.agreement.effect.MessageEffect;
@@ -23,10 +19,15 @@ import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.WonConversationUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Set;
+
 @Controller
 @RequestMapping("/rest/agreement")
 public class AgreementProtocolController {
     @Autowired
+    @Qualifier("onBehalfOfAtom")
     private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

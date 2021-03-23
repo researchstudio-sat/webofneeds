@@ -11,6 +11,10 @@ public class WonRelativeUriHelper {
         return URI.create(atomURI.toString() + "/c");
     }
 
+    public static URI createMessageContainerURIForAtom(URI atomURI) {
+        return URI.create(atomURI.toString() + "/msg");
+    }
+
     public static URI createMessageContainerURIForConnection(URI connURI) {
         return URI.create(connURI.toString() + "/msg");
     }
