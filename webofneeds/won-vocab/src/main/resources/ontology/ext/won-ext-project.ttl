@@ -12,6 +12,7 @@
 @prefix dcterms:    <http://purl.org/dc/terms/> .
 @prefix auth:       <https://w3id.org/won/auth#> .
 @prefix wx-hold:    <https://w3id.org/won/ext/hold#> .
+@prefix wx-schema:  <https://w3id.org/won/ext/schema#> .
 @base               <https://w3id.org/won/ext/project> .
 
 <https://w3id.org/won/ext/project>
@@ -122,8 +123,29 @@ wx-hold:holds
     won:compatibleSocketDefinition :ProjectOfSocket ;
     won:derivesAtomProperty        :project ;
     rdfs:comment                   """Compatible with ProjectOfSockets"""@en ;
-    rdfs:label                     "ProjectSocket" .
-### TODO: Define/Add socket Auth: ?
+    rdfs:label                     "ProjectSocket" ;
+    auth:localAuth                  :grantAccessToProjectSocketForMemberAuth, :grantConnectAccessToProjectSocketToAnyone .
+
+:grantConnectAccessToProjectSocketToAnyone
+    a           auth:Authorization ;
+    rdfs:label  "GrantConnectAccessToProjectSocketToAnyone" ;
+    auth:grantee auth:anyone ;
+    auth:grant  [ auth:socket [ auth:socketType  :ProjectSocket ;
+                                auth:operation   auth:opConnectClose ;
+                                auth:connections [ auth:inherit false ] ] ] .
+
+:grantAccessToProjectSocketForMemberAuth
+    a            auth:Authorization ;
+    rdfs:label   "GrantAccessToProjectSocketForMemberAuth" ;
+    auth:grantee [ auth:socket [ auth:socketType wx-schema:MemberSocket ;
+                                 auth:connection [ auth:connectionState won:Connected ;
+                                                   auth:targetAtom      [ ] ] ] ] ;
+    auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   wx-schema:MemberSocket ;
+                                                        auth:expiresAfter 3600 ] ] ;
+                   auth:socket    [ auth:socketType  :ProjectSocket ;
+                                    auth:connections [ auth:operation          auth:opRead ;
+                                                       auth:connectionState    won:Connected ;
+                                                       auth:connectionMessages [ auth:inherit false ] ] ] ] .
 
 ###  https://w3id.org/won/ext/project#ProjectOfSocket
 
@@ -132,8 +154,39 @@ wx-hold:holds
     won:compatibleSocketDefinition :ProjectSocket ;
     won:derivesAtomProperty        :organization ;
     rdfs:comment                   """Compatible with ProjectSockets"""@en ;
-    rdfs:label                     "ProjectOfSocket" .
-### TODO: Define/Add socket Auth: ?
+    rdfs:label                     "ProjectOfSocket" ;
+    auth:localAuth                   :grantReadAccessToGraphAndConnectionsWithMemberSocketAuth, :grantAccessToMemberSocketWithProjectOfSocketAuth, :grantConnectAccessToProjectOfSocketToAnyone .
+
+:grantReadAccessToGraphAndConnectionsWithMemberSocketAuth
+    a           auth:Authorization ;
+    rdfs:label  "GrantReadAccessToGraphAndConnectionsWithMemberSocketAuth" ;
+    auth:bearer [ auth:tokenScope wx-schema:MemberSocket ;
+                  auth:issuer     [ auth:socket [ auth:socketType :ProjectOfSocket ;
+                                                  auth:connection [ auth:targetAtom      [ ] ;
+                                                                    auth:connectionState won:Connected ] ] ] ] ;
+    auth:grant  [ auth:graph  [ auth:graphType auth:contentGraph ;
+                                auth:operation auth:opRead ] ;
+                  auth:socket [ auth:connections [ auth:operation          auth:opRead ;
+                                                   auth:connectionState    won:Connected ;
+                                                   auth:connectionMessages [ auth:inherit false ] ] ] ] .
+
+:grantAccessToMemberSocketWithProjectOfSocketAuth
+    a           auth:Authorization ;
+    rdfs:label  "GrantAccessToMemberSocketWithProjectOfSocketAuth" ;
+    auth:grantee [ auth:socket [ auth:socketType :ProjectOfSocket ;
+                                 auth:connection [ auth:connectionState won:Connected ;
+                                                   auth:targetAtom      [ ] ] ] ] ;
+    auth:grant  [ auth:socket [ auth:socketType  wx-schema:MemberSocket ;
+                                auth:operation   auth:opConnectClose, auth:opRead ;
+                                auth:connections [ auth:connectionMessages [ auth:inherit false ] ] ] ] .
+
+:grantConnectAccessToProjectOfSocketToAnyone
+    a           auth:Authorization ;
+    rdfs:label  "GrantConnectAccessToProjectOfSocketToAnyone" ;
+    auth:grantee auth:anyone ;
+    auth:grant  [ auth:socket [ auth:socketType  :ProjectOfSocket ;
+                                auth:operation   auth:opConnectClose ;
+                                auth:connections [ auth:inherit false ] ] ] .
 
 ###  https://w3id.org/won/ext/project#RelatedProjectSocket
 
@@ -142,5 +195,28 @@ wx-hold:holds
     won:compatibleSocketDefinition :RelatedProjectSocket ;
     won:derivesAtomProperty        :project ;
     rdfs:comment                   """Compatible with other RelatedProjectSocket"""@en ;
-    rdfs:label                     "RelatedProjectSocket" .
-### TODO: Define/Add socket Auth: ?
+    rdfs:label                     "RelatedProjectSocket" ;
+    auth:localAuth                 :grantAccessForRelatedProjects .
+
+:grantAccessForRelatedProjects
+    a            auth:Authorization ;
+    rdfs:label   "GrantAccessForRelatedProjects" ;
+    auth:grantee [ auth:socket [ auth:socketType :RelatedProjectSocket ;
+                                 auth:connection [ auth:connectionState won:Connected ;
+                                                   auth:targetAtom      [ ] ] ] ] ;
+    auth:grant   _:readConnections .
+
+_:readConnections
+    auth:socket [ auth:connections [ auth:operation  auth:opRead ;
+                                     auth:connection [ auth:inherit false ] ;
+                                     auth:connection [ auth:connectionState    won:Connected ;
+                                                       auth:operation          auth:opRead ;
+                                                       auth:connectionMessages [ auth:inherit false ] ] ] ] .
+
+:grantConnectAccessToRelatedProjectSocketToAnyone
+    a           auth:Authorization ;
+    rdfs:label  "GrantConnectAccessToRelatedProjectSocketToAnyone" ;
+    auth:grantee auth:anyone ;
+    auth:grant  [ auth:socket [ auth:socketType  :RelatedProjectSocket ;
+                                auth:operation   auth:opConnectClose ;
+                                auth:connections [ auth:inherit false ] ] ] .
