@@ -1,5 +1,16 @@
 package won.protocol.util;
 
+import org.apache.jena.query.Dataset;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import won.protocol.agreement.AgreementProtocolState;
+import won.protocol.agreement.IncompleteConversationDataException;
+import won.protocol.rest.LinkedDataFetchingException;
+import won.protocol.util.linkeddata.CachingLinkedDataSource;
+import won.protocol.util.linkeddata.LinkedDataSource;
+import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
+
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.util.Arrays;
@@ -9,25 +20,15 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.apache.jena.query.Dataset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import won.protocol.agreement.AgreementProtocolState;
-import won.protocol.agreement.IncompleteConversationDataException;
-import won.protocol.rest.LinkedDataFetchingException;
-import won.protocol.util.linkeddata.CachingLinkedDataSource;
-import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
-
 public class WonConversationUtils {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static <T> T getFirstOrNull(Dataset dataset, Function<Dataset, List<T>> function) {
         // RDFDataMgr.write(System.err, dataset, Lang.TRIG);
         List<T> results = function.apply(dataset);
-        if (results.size() > 0)
+        if (results.size() > 0) {
             return results.get(0);
+        }
         return null;
     }
 
@@ -69,7 +70,7 @@ public class WonConversationUtils {
 
     public static AgreementProtocolState getAgreementProtocolState(URI connectionUri,
                     LinkedDataSource linkedDataSource) {
-        URI atomUri = WonLinkedDataUtils.getAtomURIforConnectionURI(connectionUri, linkedDataSource);
+        URI atomUri = WonRelativeUriHelper.stripConnectionSuffix(connectionUri);
         // allow each resource to be re-crawled once for each reason
         Set<URI> recrawledForIncompleteness = new HashSet<>();
         Set<URI> recrawledForFailedFetch = new HashSet<>();
@@ -111,8 +112,7 @@ public class WonConversationUtils {
             return;
         }
         invalidate(connectionUri, atomUri, linkedDataSource);
-        URI connectionMessageContainerUri = WonLinkedDataUtils.getMessageContainerURIforConnectionURI(connectionUri,
-                        linkedDataSource);
+        URI connectionMessageContainerUri = WonRelativeUriHelper.createMessageContainerURIForConnection(connectionUri);
         invalidate(connectionMessageContainerUri, atomUri, linkedDataSource);
         URI targetConnectionUri = WonLinkedDataUtils.getTargetConnectionURIforConnectionURI(connectionUri,
                         linkedDataSource);
@@ -120,8 +120,8 @@ public class WonConversationUtils {
             return;
         }
         invalidate(targetConnectionUri, atomUri, linkedDataSource);
-        URI targetConnectionMessageContainerUri = WonLinkedDataUtils
-                        .getMessageContainerURIforConnectionURI(targetConnectionUri, linkedDataSource);
+        URI targetConnectionMessageContainerUri = WonRelativeUriHelper
+                        .createMessageContainerURIForConnection(targetConnectionUri);
         invalidate(targetConnectionMessageContainerUri, atomUri, linkedDataSource);
     }
 

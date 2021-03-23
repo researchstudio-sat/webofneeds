@@ -216,7 +216,7 @@ public class RestAtomController {
             List<URI> atomUris = fetchResult.getContent();
             for (URI atomUri : atomUris) {
                 try {
-                    Dataset atomDataset = WonLinkedDataUtils.getDataForResource(atomUri, linkedDataSource);
+                    Dataset atomDataset = WonLinkedDataUtils.getDataForPublicResource(atomUri, linkedDataSource);
                     AtomPojo atom = new AtomPojo(atomDataset);
                     if (atom.getState() != AtomState.ACTIVE) {
                         continue;

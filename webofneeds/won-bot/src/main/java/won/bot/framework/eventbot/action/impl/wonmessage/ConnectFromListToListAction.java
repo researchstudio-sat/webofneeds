@@ -10,16 +10,8 @@
  */
 package won.bot.framework.eventbot.action.impl.wonmessage;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.bot.framework.eventbot.EventListenerContext;
 import won.bot.framework.eventbot.action.BaseEventBotAction;
 import won.bot.framework.eventbot.event.Event;
@@ -28,6 +20,13 @@ import won.protocol.exception.WonMessageBuilderException;
 import won.protocol.message.WonMessage;
 import won.protocol.message.builder.WonMessageBuilder;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * BaseEventBotAction connecting two atoms on the specified sockets. The atom's
@@ -149,14 +148,14 @@ public class ConnectFromListToListAction extends BaseEventBotAction {
 
     private WonMessage createWonMessage(URI fromUri, URI toUri) throws WonMessageBuilderException {
         URI localSocket = fromSocketType.map(socketType -> WonLinkedDataUtils
-                        .getSocketsOfType(fromUri, socketType,
+                        .getSocketsOfType(fromUri, fromUri, socketType,
                                         getEventListenerContext().getLinkedDataSource())
                         .stream().findFirst())
                         .orElseThrow(() -> new IllegalStateException(
                                         "No suitable sockets found for connect on " + fromUri))
                         .get();
         URI targetSocket = toSocketType.map(socketType -> WonLinkedDataUtils
-                        .getSocketsOfType(toUri, socketType,
+                        .getSocketsOfType(toUri, toUri, socketType,
                                         getEventListenerContext().getLinkedDataSource())
                         .stream().findFirst())
                         .orElseThrow(() -> new IllegalStateException(

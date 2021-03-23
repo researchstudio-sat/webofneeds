@@ -1,6 +1,7 @@
 package won.owner.web.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,7 @@ import java.util.Set;
 @RequestMapping("/rest/petrinet")
 public class PetriNetController {
     @Autowired
+    @Qualifier("onBehalfOfAtom")
     private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
 
     public void setLinkedDataSource(LinkedDataSource linkedDataSource) {

@@ -23,7 +23,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import won.protocol.model.ProtocolType;
 import won.protocol.util.RdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
-import won.protocol.util.linkeddata.WonLinkedDataUtils;
+import won.protocol.util.linkeddata.uriresolver.WonRelativeUriHelper;
 import won.protocol.vocabulary.WON;
 
 import java.lang.invoke.MethodHandles;
@@ -78,7 +78,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
                 return activeMQOwnerProtocolQueueName;
             }
             logger.debug("could not to get queue name from resource {}, trying to obtain won node URI", resourceUri);
-            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(resourceUri, resourceDataset);
+            URI wonNodeUri = WonRelativeUriHelper.stripAtomSuffix(resourceUri);
             activeMQOwnerProtocolQueueName = RdfUtils.getStringPropertyForPropertyPath(
                             linkedDataSource.getDataForPublicResource(wonNodeUri), wonNodeUri, path);
             // now, even if it's null, we return the result.
@@ -112,7 +112,7 @@ public class ActiveMQServiceImpl implements ActiveMQService {
             // we didnt't get the queue name. Check if the model contains a triple <baseuri>
             // won:wonNode
             // <wonNode> and get the information from there.
-            URI wonNodeUri = WonLinkedDataUtils.getWonNodeURIForAtomOrConnection(resourceUri, resourceDataset);
+            URI wonNodeUri = WonRelativeUriHelper.stripAtomSuffix(resourceUri);
             logger.debug("wonNodeUri: {}", wonNodeUri);
             resourceDataset = linkedDataSource.getDataForPublicResource(wonNodeUri);
             activeMQEndpoint = RdfUtils.getURIPropertyForPropertyPath(resourceDataset, wonNodeUri, path);
