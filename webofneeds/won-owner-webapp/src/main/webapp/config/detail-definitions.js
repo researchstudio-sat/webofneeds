@@ -248,7 +248,7 @@ export const defaultReactions = {
   },
   [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
     [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
-      useCaseIdentifier: ["persona"],
+      useCaseIdentifiers: ["persona"],
     },
   },
 };
