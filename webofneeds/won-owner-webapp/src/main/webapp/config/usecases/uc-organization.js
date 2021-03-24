@@ -2,13 +2,9 @@
  * Created by fsuda on 18.09.2018.
  */
 import {
-  connectedConnectionsAuthorization,
-  connectToSocketsAuthorization,
-  defaultPublicAtomAuthorization,
   defaultReactions,
   details,
   mergeInEmptyDraft,
-  onlyMembersSeeMembersAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 import ico16_uc_organization from "../../images/won-icons/ico16_uc_organization.svg";
@@ -34,12 +30,6 @@ export const organization = {
           "#sReviewSocket": vocab.WXSCHEMA.ReviewSocketCompacted,
           "#sEventSocket": vocab.WXSCHEMA.EventSocketCompacted,
         },
-        acl: [
-          defaultPublicAtomAuthorization,
-          connectedConnectionsAuthorization,
-          connectToSocketsAuthorization,
-          onlyMembersSeeMembersAuthorization,
-        ],
       },
     }),
   },

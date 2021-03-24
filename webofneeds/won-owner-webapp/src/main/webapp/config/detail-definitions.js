@@ -18,55 +18,15 @@ export const abstractDetails = abstractDetails_; // reexport
 
 // Grant access to connect to all sockets 009
 export const connectToSocketsAuthorization = {
-  [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
-  [vocab.AUTH.grantCompacted]: {
-    [vocab.AUTH.graphCompacted]: {
-      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
+  [vocab.AUTH.grantee]: { "@id": vocab.AUTH.anyone },
+  [vocab.AUTH.grant]: {
+    [vocab.AUTH.graph]: {
+      [vocab.AUTH.operation]: { "@id": vocab.AUTH.opRead },
     },
-    [vocab.AUTH.socketCompacted]: {
-      [vocab.AUTH.operationCompacted]: [
-        { "@id": vocab.AUTH.opConnectCloseCompacted },
-      ],
-      [vocab.AUTH.connectionsCompacted]: {
-        [vocab.AUTH.inheritCompacted]: false,
-      },
-    },
-  },
-};
-
-// See holderSocket connections of atoms buddies
-export const seeHolderSocketConnectionsAuthorization = {
-  [vocab.AUTH.granteeCompacted]: {
-    [vocab.AUTH.socketCompacted]: {
-      [vocab.AUTH.socketTypeCompacted]: {
-        "@id": vocab.BUDDY.BuddySocketCompacted,
-      },
-      [vocab.AUTH.connectionCompacted]: {
-        [vocab.AUTH.targetAtomCompacted]: {},
-        [vocab.AUTH.connectionStateCompacted]: {
-          "@id": vocab.WON.ConnectedCompacted,
-        },
-      },
-    },
-  },
-  [vocab.AUTH.grantCompacted]: {
-    [vocab.AUTH.graphCompacted]: {
-      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
-    },
-    [vocab.AUTH.socketCompacted]: {
-      [vocab.AUTH.socketTypeCompacted]: {
-        "@id": vocab.HOLD.HolderSocketCompacted,
-      },
-      [vocab.AUTH.connectionsCompacted]: {
-        [vocab.AUTH.connectionStateCompacted]: {
-          "@id": vocab.WON.ConnectedCompacted,
-        },
-        [vocab.AUTH.operationCompacted]: [
-          { "@id": vocab.AUTH.opReadCompacted },
-        ],
-        [vocab.AUTH.connectionMessagesCompacted]: {
-          [vocab.AUTH.inheritCompacted]: false,
-        },
+    [vocab.AUTH.socket]: {
+      [vocab.AUTH.operation]: [{ "@id": vocab.AUTH.opConnectClose }],
+      [vocab.AUTH.connections]: {
+        [vocab.AUTH.inherit]: false,
       },
     },
   },
@@ -74,68 +34,30 @@ export const seeHolderSocketConnectionsAuthorization = {
 
 // Atoms that are connected can see their connections to communicate
 export const connectedConnectionsAuthorization = {
-  [vocab.AUTH.granteeCompacted]: {
-    [vocab.AUTH.socketCompacted]: {
-      [vocab.AUTH.connectionCompacted]: {
-        [vocab.AUTH.targetAtomCompacted]: {},
-        [vocab.AUTH.connectionStateCompacted]: {
-          "@id": vocab.WON.ConnectedCompacted,
+  [vocab.AUTH.grantee]: {
+    [vocab.AUTH.socket]: {
+      [vocab.AUTH.connection]: {
+        [vocab.AUTH.targetAtom]: {},
+        [vocab.AUTH.connectionState]: {
+          "@id": vocab.WON.Connected,
         },
       },
     },
   },
-  [vocab.AUTH.grantCompacted]: {
-    [vocab.AUTH.connectionCompacted]: {
-      [vocab.AUTH.targetAtomCompacted]: {
-        [vocab.AUTH.atomCompacted]: {
-          "@id": vocab.AUTH.operationRequestorCompacted,
+  [vocab.AUTH.grant]: {
+    [vocab.AUTH.connection]: {
+      [vocab.AUTH.targetAtom]: {
+        [vocab.AUTH.atom]: {
+          "@id": vocab.AUTH.operationRequestor,
         },
       },
-      [vocab.AUTH.operationCompacted]: [
-        { "@id": vocab.AUTH.opReadCompacted },
-        { "@id": vocab.AUTH.opConnectCloseCompacted },
-        { "@id": vocab.AUTH.opCommunicateCompacted },
+      [vocab.AUTH.operation]: [
+        { "@id": vocab.AUTH.opRead },
+        { "@id": vocab.AUTH.opConnectClose },
+        { "@id": vocab.AUTH.opCommunicate },
       ],
-      [vocab.AUTH.connectionMessagesCompacted]: {
-        [vocab.AUTH.inheritCompacted]: false,
-      },
-    },
-  },
-};
-
-// Only members see members of organizsation 008
-export const onlyMembersSeeMembersAuthorization = {
-  [vocab.AUTH.granteeCompacted]: {
-    [vocab.AUTH.socketCompacted]: {
-      [vocab.AUTH.socketTypeCompacted]: {
-        "@id": vocab.WXSCHEMA.MemberSocketCompacted,
-      },
-      [vocab.AUTH.connectionCompacted]: {
-        [vocab.AUTH.targetAtomCompacted]: {},
-        [vocab.AUTH.connectionStateCompacted]: {
-          "@id": vocab.WON.ConnectedCompacted,
-        },
-      },
-    },
-  },
-  [vocab.AUTH.grantCompacted]: {
-    [vocab.AUTH.graphCompacted]: {
-      [vocab.AUTH.operationCompacted]: { "@id": vocab.AUTH.opReadCompacted },
-    },
-    [vocab.AUTH.socketCompacted]: {
-      [vocab.AUTH.socketTypeCompacted]: {
-        "@id": vocab.WXSCHEMA.MemberSocketCompacted,
-      },
-      [vocab.AUTH.connectionsCompacted]: {
-        [vocab.AUTH.connectionStateCompacted]: {
-          "@id": vocab.WON.ConnectedCompacted,
-        },
-        [vocab.AUTH.operationCompacted]: [
-          { "@id": vocab.AUTH.opReadCompacted },
-        ],
-        [vocab.AUTH.connectionMessagesCompacted]: {
-          [vocab.AUTH.inheritCompacted]: false,
-        },
+      [vocab.AUTH.connectionMessages]: {
+        [vocab.AUTH.inherit]: false,
       },
     },
   },
@@ -143,10 +65,10 @@ export const onlyMembersSeeMembersAuthorization = {
 
 // Atom can be seen by any other atom
 export const defaultPublicAtomAuthorization = {
-  [vocab.AUTH.granteeCompacted]: { "@id": vocab.AUTH.anyoneCompacted },
-  [vocab.AUTH.grantCompacted]: {
-    [vocab.AUTH.graphCompacted]: {
-      [vocab.AUTH.operationCompacted]: [{ "@id": vocab.AUTH.opReadCompacted }],
+  [vocab.AUTH.grantee]: { "@id": vocab.AUTH.anyone },
+  [vocab.AUTH.grant]: {
+    [vocab.AUTH.graph]: {
+      [vocab.AUTH.operation]: [{ "@id": vocab.AUTH.opRead }],
     },
   },
 };

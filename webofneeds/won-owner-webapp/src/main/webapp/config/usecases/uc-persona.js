@@ -1,11 +1,7 @@
 import {
-  connectedConnectionsAuthorization,
-  connectToSocketsAuthorization,
-  defaultPublicAtomAuthorization,
   defaultReactions,
   details,
   mergeInEmptyDraft,
-  seeHolderSocketConnectionsAuthorization,
 } from "../detail-definitions.js";
 import vocab from "../../app/service/vocab.js";
 
@@ -37,12 +33,6 @@ export const persona = {
         },
       },
       seeks: {},
-      acl: [
-        defaultPublicAtomAuthorization,
-        seeHolderSocketConnectionsAuthorization,
-        connectedConnectionsAuthorization,
-        connectToSocketsAuthorization,
-      ],
     }),
   },
   reactions: {
