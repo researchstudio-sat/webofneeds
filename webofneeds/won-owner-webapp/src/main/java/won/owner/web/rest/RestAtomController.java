@@ -10,33 +10,22 @@
  */
 package won.owner.web.rest;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.jena.query.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.bind.annotation.*;
 import won.owner.model.Draft;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
@@ -48,9 +37,18 @@ import won.owner.service.impl.WONUserDetailService;
 import won.protocol.model.AtomState;
 import won.protocol.model.Coordinate;
 import won.protocol.service.WonNodeInformationService;
+import won.protocol.util.AuthenticationThreadLocal;
 import won.protocol.util.linkeddata.LDPContainerPage;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/rest/atoms")
@@ -69,6 +67,9 @@ public class RestAtomController {
     @Autowired
     private LinkedDataSource linkedDataSource;
     @Autowired
+    @Qualifier("onBehalfOfAtom")
+    private LinkedDataSource linkedDataSourceOnBehalfOfAtom;
+    @Autowired
     private WonNodeInformationService wonNodeInformationService;
 
     /**
@@ -81,14 +82,20 @@ public class RestAtomController {
     public Map<URI, AtomPojo> getAllAtomsOfUser(@RequestParam(value = "state", required = false) AtomState state) {
         User user = getCurrentUser();
         Set<UserAtom> userAtoms = user.getUserAtoms();
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return userAtoms.parallelStream().map(userAtom -> {
             try {
-                return new AtomPojo(WonLinkedDataUtils.getDataForResource(userAtom.getUri(), linkedDataSource));
+                AuthenticationThreadLocal.setAuthentication(authentication);
+                return new AtomPojo(linkedDataSourceOnBehalfOfAtom
+                                .getDataForResource(userAtom.getUri(), userAtom.getUri()));
             } catch (Exception e) {
                 // we catch all exceptions here as we want to be more robust against
                 // unforseen error conditions down the stack
                 logger.debug("Could not retrieve atom<" + userAtom.getUri() + "> cause: " + e.getMessage());
                 return null;
+            } finally {
+                // be sure to remove the principal from the threadlocal
+                AuthenticationThreadLocal.remove();
             }
         }).filter(Objects::nonNull).collect(Collectors.toMap(AtomPojo::getUri, atomPojo -> atomPojo));
     }
@@ -100,8 +107,9 @@ public class RestAtomController {
      */
     private User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (username == null)
+        if (username == null) {
             throw new AccessDeniedException("client is not authenticated");
+        }
         return userRepository.findByUsername(username);
     }
 
@@ -217,8 +225,9 @@ public class RestAtomController {
                                     || isNearLocation(nearLocation, atom.getLocation(), maxDistance)
                                     || isNearLocation(nearLocation, atom.getJobLocation(), maxDistance)) {
                         atomMap.put(atom.getUri(), atom);
-                        if (limit != null && limit > 0 && atomMap.size() >= limit)
+                        if (limit != null && limit > 0 && atomMap.size() >= limit) {
                             break OUTER; // break fetching if the limit has been reached
+                        }
                     }
                 } catch (Exception e) {
                     // we catch all exceptions here as we want to be more robust against

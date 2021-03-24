@@ -22,7 +22,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,9 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
-import won.owner.model.User;
-import won.owner.model.UserAtom;
-import won.owner.service.impl.WONUserDetailService;
+import won.owner.web.service.UserAtomService;
 import won.protocol.rest.LinkedDataRestBridge;
 import won.protocol.rest.RDFMediaType;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -61,8 +58,6 @@ import java.util.*;
 public class BridgeForLinkedDataController implements InitializingBean {
     private String filterQuery;
     @Autowired
-    private WONUserDetailService wonUserDetailService;
-    @Autowired
     private LinkedDataRestBridge linkedDataRestBridgeOnBehalfOfAtom;
     @Autowired
     private LinkedDataRestBridge linkedDataRestBridge;
@@ -70,6 +65,8 @@ public class BridgeForLinkedDataController implements InitializingBean {
     private WonMessageUriResolver wonMessageUriResolver;
     @Autowired
     private LinkedDataSource linkedDataSource;
+    @Autowired
+    private UserAtomService userAtomService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -121,7 +118,7 @@ public class BridgeForLinkedDataController implements InitializingBean {
                                 "Parameter 'requester' must be a URI. Actual value was: '" + requesterWebId + "'");
             }
             // check if the currently logged in user owns that webid:
-            if (currentUserHasIdentity(requesterWebId)) {
+            if (userAtomService.currentUserHasIdentity(requesterWebId)) {
                 // yes: let them use it
                 restTemplate = linkedDataRestBridgeOnBehalfOfAtom.getRestTemplate(requesterWebId);
             } else {
@@ -309,31 +306,5 @@ public class BridgeForLinkedDataController implements InitializingBean {
         while (values.hasMoreElements()) {
             toHeaders.add(headerName, values.nextElement());
         }
-    }
-
-    /**
-     * Check if the current user has the claimed identity represented by web-id of
-     * the atom. I.e. if the identity is that of the atom that belongs to the user -
-     * return true, otherwise - false.
-     *
-     * @param requesterWebId
-     * @return
-     */
-    private boolean currentUserHasIdentity(final String requesterWebId) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = (User) wonUserDetailService.loadUserByUsername(username);
-        Set<URI> atomUris = getUserAtomUris(user);
-        if (atomUris.contains(URI.create(requesterWebId))) {
-            return true;
-        }
-        return false;
-    }
-
-    private Set<URI> getUserAtomUris(final User user) {
-        Set<URI> atomUris = new HashSet<>();
-        for (UserAtom userAtom : user.getUserAtoms()) {
-            atomUris.add(userAtom.getUri());
-        }
-        return atomUris;
     }
 }

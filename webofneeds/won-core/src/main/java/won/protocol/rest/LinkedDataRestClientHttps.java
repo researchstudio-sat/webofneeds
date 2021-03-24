@@ -67,7 +67,7 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
         RestTemplate template;
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("creating rest template for webID {} ", webID == null ? "[none provided]" : webID);
+                logger.debug("creating rest template for webID {} ", webID);
             }
             String actualPrivateKeyAlias = keyPairAliasDerivationStrategy.getAliasForAtomUri(webID);
             if (actualPrivateKeyAlias == null) {
@@ -79,7 +79,8 @@ public class LinkedDataRestClientHttps extends LinkedDataRestClient {
                             this.trustStoreService.getUnderlyingKeyStore(), this.trustStrategy, readTimeout,
                             connectionTimeout, true);
             if (logger.isDebugEnabled()) {
-                logger.debug("rest template for webID {} created", webID == null ? "[none provided]" : webID);
+                logger.debug("rest template for webID {} created (privateKeyAlias actually used: {})", webID,
+                                actualPrivateKeyAlias);
             }
             // we add our DatasetConverter before any other converter because the jackson
             // converter feels responsible for "application/*+json" (which matches
