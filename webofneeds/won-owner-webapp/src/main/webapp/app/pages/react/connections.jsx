@@ -6,6 +6,7 @@ import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
 import {
   getUri,
+  generateLink,
   getQueryParams,
   extractAtomUriFromConnectionUri,
 } from "../../utils.js";
@@ -17,6 +18,7 @@ import WonGroupAtomMessages from "../../components/group-atom-messages.jsx";
 import WonConnectionsOverview from "../../components/connections-overview.jsx";
 import WonGenericPage from "~/app/pages/genericPage";
 
+import "~/style/_atom-messages.scss";
 import "~/style/_connections.scss";
 import "~/style/_responsiveness-utils.scss";
 import ico36_message from "~/images/won-icons/ico36_message.svg";
@@ -52,6 +54,19 @@ export default function PageConnections() {
     )
   );
 
+  const isSelectedConnectionGroupChat =
+    selectedConnection &&
+    connectionUtils.hasTargetSocketUri(
+      selectedConnection,
+      atomUtils.getGroupSocket(selectedTargetAtom)
+    );
+  const isSelectedConnectionChat =
+    selectedConnection &&
+    connectionUtils.hasTargetSocketUri(
+      selectedConnection,
+      atomUtils.getChatSocket(selectedTargetAtom)
+    );
+
   useEffect(
     () => {
       if (isAtomFetchNecessary) {
@@ -71,24 +86,33 @@ export default function PageConnections() {
           });
         }
       }
+      //If the request has not a Chat-, or GroupSocket we won't show the messages view
+      if (
+        !isAtomFetchNecessary &&
+        !isSelectedConnectionGroupChat &&
+        !isSelectedConnectionChat &&
+        selectedTargetAtom
+      ) {
+        history.replace(
+          generateLink(
+            history.location,
+            { postUri: getUri(selectedTargetAtom) },
+            "/post"
+          )
+        );
+      }
     },
     [
       selectedConnectionUri,
       atom,
       ownedAtoms,
+      selectedTargetAtom,
       isAtomFetchNecessary,
       atomUriInRoute,
     ]
   );
 
   const ownedAtoms = useSelector(generalSelectors.getOwnedAtoms);
-
-  const isSelectedConnectionGroupChat =
-    selectedConnection &&
-    connectionUtils.hasTargetSocketUri(
-      selectedConnection,
-      atomUtils.getGroupSocket(selectedTargetAtom)
-    );
 
   const activePinnedAtomUri = useSelector(viewSelectors.getActivePinnedAtomUri);
 
