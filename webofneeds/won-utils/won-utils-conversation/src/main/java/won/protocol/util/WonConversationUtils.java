@@ -77,7 +77,8 @@ public class WonConversationUtils {
         while (true) {
             // we leave the loop either with a runtime exception or with the result
             try {
-                Dataset conversationDataset = WonLinkedDataUtils.getConversationAndAtomsDataset(connectionUri,
+                Dataset conversationDataset = WonLinkedDataUtils.getConversationAndAtomsDatasetUsingAtomUriAsWebId(
+                                connectionUri,
                                 linkedDataSource);
                 return AgreementProtocolState.of(conversationDataset);
             } catch (IncompleteConversationDataException e) {

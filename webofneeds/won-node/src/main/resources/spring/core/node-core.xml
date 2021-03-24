@@ -95,7 +95,7 @@
 
     <bean id="ownerManagementService" class="won.node.service.persistence.ActiveMqOwnerManagementServiceImpl"/>
 
-    <bean id="messageRoutingInfoService" class=" won.protocol.service.impl.MessageRoutingInfoServiceImpl"/>
+    <bean id="messageRoutingInfoService" class=" won.node.protocol.impl.MessageRoutingInfoServiceImpl"/>
 
 
 </beans>

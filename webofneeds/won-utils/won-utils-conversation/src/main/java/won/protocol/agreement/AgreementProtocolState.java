@@ -1,22 +1,5 @@
 package won.protocol.agreement;
 
-import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.query.ReadWrite;
@@ -24,7 +7,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import won.protocol.agreement.effect.MessageEffect;
 import won.protocol.agreement.effect.MessageEffectsBuilder;
 import won.protocol.agreement.effect.ProposalType;
@@ -34,6 +16,13 @@ import won.protocol.util.RdfUtils;
 import won.protocol.util.WonRdfUtils;
 import won.protocol.util.linkeddata.LinkedDataSource;
 import won.protocol.util.linkeddata.WonLinkedDataUtils;
+
+import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AgreementProtocolState {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -49,7 +38,14 @@ public class AgreementProtocolState {
     private Set<DeliveryChain> deliveryChains = new HashSet<>();
 
     public static AgreementProtocolState of(URI connectionURI, LinkedDataSource linkedDataSource) {
-        Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndAtomsDataset(connectionURI,
+        Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndAtomsDatasetUsingAtomUriAsWebId(
+                        connectionURI,
+                        linkedDataSource);
+        return AgreementProtocolState.of(fullConversationDataset);
+    }
+
+    public static AgreementProtocolState of(URI connectionURI, URI webId, LinkedDataSource linkedDataSource) {
+        Dataset fullConversationDataset = WonLinkedDataUtils.getConversationAndAtomsDataset(connectionURI, webId,
                         linkedDataSource);
         return AgreementProtocolState.of(fullConversationDataset);
     }
@@ -1124,8 +1120,9 @@ public class AgreementProtocolState {
         AtomicBoolean changedSomething = new AtomicBoolean(false);
         message.getContentGraphs().stream().forEach(uri -> {
             String uriString = uri.toString();
-            if (conversationDataset.containsNamedModel(uriString))
+            if (conversationDataset.containsNamedModel(uriString)) {
                 conversationDataset.removeNamedModel(uriString);
+            }
             changedSomething.set(true);
         });
         return changedSomething.get();

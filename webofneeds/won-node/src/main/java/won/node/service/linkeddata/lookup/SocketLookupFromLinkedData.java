@@ -3,6 +3,7 @@ package won.node.service.linkeddata.lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import won.protocol.model.SocketDefinition;
 import won.protocol.util.linkeddata.LinkedDataSource;
@@ -16,12 +17,14 @@ import java.util.Optional;
 public class SocketLookupFromLinkedData implements SocketLookup {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().getClass());
     @Autowired
-    LinkedDataSource linkedDataSource;
+    private LinkedDataSource linkedDataSource;
+    @Value("${http.client.requesterWebId}")
+    private URI requesterWebId;
 
     @Override
     public Optional<SocketDefinition> getSocketConfig(URI socket) {
         try {
-            return WonLinkedDataUtils.getSocketDefinitionOfSocket(linkedDataSource, socket, null);
+            return WonLinkedDataUtils.getSocketDefinitionOfSocket(linkedDataSource, socket, requesterWebId);
         } catch (Exception e) {
             logger.info("Failed to load configuration for socket type " + socket, e);
         }
@@ -31,7 +34,7 @@ public class SocketLookupFromLinkedData implements SocketLookup {
     @Override
     public Optional<SocketDefinition> getSocketConfigOfType(URI socketType) {
         try {
-            return WonLinkedDataUtils.getSocketDefinition(linkedDataSource, socketType, null);
+            return WonLinkedDataUtils.getSocketDefinition(linkedDataSource, socketType, requesterWebId);
         } catch (Exception e) {
             logger.info("Failed to load configuration for socket type " + socketType, e);
         }
@@ -40,8 +43,7 @@ public class SocketLookupFromLinkedData implements SocketLookup {
 
     @Override
     public Optional<URI> getSocketType(URI socketURI) {
-        return WonLinkedDataUtils.getTypeOfSocket(socketURI,
-                        linkedDataSource);
+        return WonLinkedDataUtils.getTypeOfSocket(socketURI, requesterWebId, linkedDataSource);
     }
 
     @Override

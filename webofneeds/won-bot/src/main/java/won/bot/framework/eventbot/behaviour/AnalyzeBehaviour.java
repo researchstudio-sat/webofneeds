@@ -545,7 +545,7 @@ public class AnalyzeBehaviour extends BotBehaviour {
         // ********* Helper Methods **********
         private Dataset getConversationDatasetLazyInit(Dataset conversationDataset, URI connectionUri) {
             if (conversationDataset == null) {
-                return WonLinkedDataUtils.getConversationDataset(connectionUri,
+                return WonLinkedDataUtils.getConversationDatasetUsingAtomAsWebId(connectionUri,
                                 getEventListenerContext().getLinkedDataSource());
             } else {
                 return conversationDataset;

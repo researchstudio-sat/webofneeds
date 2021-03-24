@@ -68,7 +68,25 @@ public class WonLinkedDataUtils {
         manager.addCache(linkedDataObjectCache);
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#getConnectionStateforConnectionURIUsingAtomAsWebId(URI, LinkedDataSource)}
+     * or
+     * {@link WonLinkedDataUtils#getConnectionStateforConnectionURI(URI, URI, LinkedDataSource)}
+     * instead.
+     * 
+     * @param connectionURI
+     * @param linkedDataSource
+     * @return
+     */
+    @Deprecated
     public static URI getConnectionStateforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+        return getConnectionStateforConnectionURI(connectionURI,
+                        WonRelativeUriHelper.stripConnectionSuffix(connectionURI), linkedDataSource);
+    }
+
+    public static URI getConnectionStateforConnectionURIUsingAtomAsWebId(URI connectionURI,
+                    LinkedDataSource linkedDataSource) {
         return getConnectionStateforConnectionURI(connectionURI,
                         WonRelativeUriHelper.stripConnectionSuffix(connectionURI), linkedDataSource);
     }
@@ -193,7 +211,21 @@ public class WonLinkedDataUtils {
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#getTargetAtomURIforConnectionURIUsingAtomAsWebId(URI, LinkedDataSource)}
+     * or
+     * {@link WonLinkedDataUtils#getTargetAtomURIforConnectionURI(URI, URI, LinkedDataSource)}
+     * instead.
+     */
+    @Deprecated
     public static URI getTargetAtomURIforConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+        return getTargetAtomURIforConnectionURI(connectionURI,
+                        WonRelativeUriHelper.stripConnectionSuffix(connectionURI), linkedDataSource);
+    }
+
+    public static URI getTargetAtomURIforConnectionURIUsingAtomAsWebId(URI connectionURI,
+                    LinkedDataSource linkedDataSource) {
         return getTargetAtomURIforConnectionURI(connectionURI,
                         WonRelativeUriHelper.stripConnectionSuffix(connectionURI), linkedDataSource);
     }
@@ -220,7 +252,21 @@ public class WonLinkedDataUtils {
         return RdfUtils.getURIPropertyForPropertyPath(dataset, connectionURI, propertyPath);
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#getSocketURIForConnectionURIUsingAtomAsWebId(URI, LinkedDataSource)}
+     * or
+     * {@link WonLinkedDataUtils#getSocketURIForConnectionURI(URI, URI, LinkedDataSource)}
+     * instead.
+     */
+    @Deprecated
     public static URI getSocketURIForConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+        return getSocketURIForConnectionURI(connectionURI, WonRelativeUriHelper.stripConnectionSuffix(connectionURI),
+                        linkedDataSource);
+    }
+
+    public static URI getSocketURIForConnectionURIUsingAtomAsWebId(URI connectionURI,
+                    LinkedDataSource linkedDataSource) {
         return getSocketURIForConnectionURI(connectionURI, WonRelativeUriHelper.stripConnectionSuffix(connectionURI),
                         linkedDataSource);
     }
@@ -232,7 +278,21 @@ public class WonLinkedDataUtils {
         return WonRdfUtils.ConnectionUtils.getSocketURIFromConnection(dataset, connectionURI);
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#getTargetSocketURIForConnectionURIUsingAtomAsWebId(URI, LinkedDataSource)}
+     * or
+     * {@link WonLinkedDataUtils#getTargetSocketURIForConnectionURI(URI, URI, LinkedDataSource)}
+     * instead.
+     */
+    @Deprecated
     public static URI getTargetSocketURIForConnectionURI(URI connectionURI, LinkedDataSource linkedDataSource) {
+        return getTargetSocketURIForConnectionURI(connectionURI,
+                        WonRelativeUriHelper.stripConnectionSuffix(connectionURI), linkedDataSource);
+    }
+
+    public static URI getTargetSocketURIForConnectionURIUsingAtomAsWebId(URI connectionURI,
+                    LinkedDataSource linkedDataSource) {
         return getTargetSocketURIForConnectionURI(connectionURI,
                         WonRelativeUriHelper.stripConnectionSuffix(connectionURI), linkedDataSource);
     }
@@ -258,6 +318,7 @@ public class WonLinkedDataUtils {
         return RdfUtils.getURIPropertyForPropertyPath(dataset, atomURI, propertyPath);
     }
 
+    @Deprecated
     public static Dataset getConversationAndAtomsDataset(String connectionURI, LinkedDataSource linkedDataSource) {
         return getConversationAndAtomsDataset(URI.create(connectionURI), linkedDataSource);
     }
@@ -460,8 +521,28 @@ public class WonLinkedDataUtils {
         return linkedDataSource.getDataForResourceWithPropertyPath(atomURI, atomURI, propertyPaths, maxRequests, depth);
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#getConversationAndAtomsDatasetUsingAtomUriAsWebId(URI, LinkedDataSource)}
+     * or
+     * {@link WonLinkedDataUtils#getConversationAndAtomsDataset(URI, URI, LinkedDataSource)}
+     * instead.
+     */
+    @Deprecated
     public static Dataset getConversationAndAtomsDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
-        assert linkedDataSource != null : "linkedDataSource must not be null";
+        return getConversationAndAtomsDataset(connectionURI, linkedDataSource);
+    }
+
+    public static Dataset getConversationAndAtomsDatasetUsingAtomUriAsWebId(URI connectionURI,
+                    LinkedDataSource linkedDataSource) {
+        return getConversationAndAtomsDataset(connectionURI, WonRelativeUriHelper.stripConnectionSuffix(connectionURI),
+                        linkedDataSource);
+    }
+
+    public static Dataset getConversationAndAtomsDataset(URI connectionURI, URI requesterWebId,
+                    LinkedDataSource linkedDataSource) {
+        Objects.requireNonNull(linkedDataSource);
+        Objects.requireNonNull(connectionURI);
         int depth = 5;
         int maxRequests = 1000;
         List<Path> propertyPaths = new ArrayList<>();
@@ -472,7 +553,6 @@ public class WonLinkedDataUtils {
         propertyPaths.add(PathParser.parse("won:messageContainer", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member", pmap));
         propertyPaths.add(PathParser.parse("won:messageContainer/rdfs:member/msg:previousMessage", pmap));
-        URI requesterWebId = WonRelativeUriHelper.stripConnectionSuffix(connectionURI);
         return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths,
                         maxRequests, depth);
     }
@@ -498,11 +578,34 @@ public class WonLinkedDataUtils {
         return Optional.ofNullable(info);
     }
 
+    /**
+     * Use {@link WonLinkedDataUtils#getConversationDataset(URI, LinkedDataSource)}
+     * instead.
+     */
+    @Deprecated
     public static Dataset getConversationDataset(String connectionURI, LinkedDataSource linkedDataSource) {
         return getConversationDataset(URI.create(connectionURI), linkedDataSource);
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#getConversationDataset(URI, URI, LinkedDataSource)}
+     * or
+     * {@link WonLinkedDataUtils#getConversationDatasetUsingAtomAsWebId(URI, LinkedDataSource)}.
+     */
+    @Deprecated
     public static Dataset getConversationDataset(URI connectionURI, LinkedDataSource linkedDataSource) {
+        return getConversationDataset(connectionURI, WonRelativeUriHelper.stripConnectionSuffix(connectionURI),
+                        linkedDataSource);
+    }
+
+    public static Dataset getConversationDatasetUsingAtomAsWebId(URI connectionURI, LinkedDataSource linkedDataSource) {
+        return getConversationDataset(connectionURI, WonRelativeUriHelper.stripConnectionSuffix(connectionURI),
+                        linkedDataSource);
+    }
+
+    public static Dataset getConversationDataset(URI connectionURI, URI requesterWebId,
+                    LinkedDataSource linkedDataSource) {
         assert linkedDataSource != null : "linkedDataSource must not be null";
         int depth = 5; // depth 3 from connection gives us the messages in the conversation
         int maxRequests = 1000;
@@ -516,7 +619,6 @@ public class WonLinkedDataUtils {
         propertyPaths.add(PathParser.parse("won:targetConnection", pmap));
         propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer", pmap));
         propertyPaths.add(PathParser.parse("won:targetConnection/won:messageContainer/rdfs:member", pmap));
-        URI requesterWebId = WonRelativeUriHelper.stripConnectionSuffix(connectionURI);
         return linkedDataSource.getDataForResourceWithPropertyPath(connectionURI, requesterWebId, propertyPaths,
                         maxRequests, depth);
     }
@@ -719,16 +821,10 @@ public class WonLinkedDataUtils {
 
     public static boolean isCompatibleSockets(LinkedDataSource linkedDataSource, URI firstSocket,
                     URI secondSocket) {
-        Optional<URI> firstAtom = getAtomOfSocket(firstSocket, linkedDataSource);
-        Optional<URI> secondAtom = getAtomOfSocket(secondSocket, linkedDataSource);
-        if (!firstAtom.isPresent()) {
-            throw new IllegalStateException("Could not determine atom of socket " + firstSocket);
-        }
-        if (!secondAtom.isPresent()) {
-            throw new IllegalStateException("Could not determine atom of socket " + secondSocket);
-        }
-        Dataset dataset = loadDataForAtomWithSocketDefinitions(linkedDataSource, firstAtom.get());
-        RdfUtils.addDatasetToDataset(dataset, loadDataForAtomWithSocketDefinitions(linkedDataSource, secondAtom.get()));
+        URI firstAtom = WonRelativeUriHelper.stripFragment(firstSocket);
+        URI secondAtom = WonRelativeUriHelper.stripFragment(secondSocket);
+        Dataset dataset = loadDataForAtomWithSocketDefinitions(linkedDataSource, firstAtom);
+        RdfUtils.addDatasetToDataset(dataset, loadDataForAtomWithSocketDefinitions(linkedDataSource, secondAtom));
         return WonRdfUtils.SocketUtils.isSocketsCompatible(dataset, firstSocket, secondSocket);
     }
 
@@ -752,7 +848,22 @@ public class WonLinkedDataUtils {
         return dataset;
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#loadDataForSocketUsingAtomAsWebId(LinkedDataSource, URI)}
+     * or {@link WonLinkedDataUtils#loadDataForSocket(LinkedDataSource, URI, URI)}
+     * instead
+     * 
+     * @param linkedDataSource
+     * @param socket
+     * @return
+     */
+    @Deprecated
     public static Dataset loadDataForSocket(LinkedDataSource linkedDataSource, URI socket) {
+        return loadDataForSocket(linkedDataSource, socket, WonRelativeUriHelper.stripFragment(socket));
+    }
+
+    public static Dataset loadDataForSocketUsingAtomAsWebId(LinkedDataSource linkedDataSource, URI socket) {
         return loadDataForSocket(linkedDataSource, socket, WonRelativeUriHelper.stripFragment(socket));
     }
 
@@ -775,7 +886,25 @@ public class WonLinkedDataUtils {
         return dataset;
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#getSocketDefinitionOfSocketUsingAtomAsWebid(LinkedDataSource, URI)}
+     * or
+     * {@link WonLinkedDataUtils#getSocketDefinitionOfSocket(LinkedDataSource, URI, URI)}
+     * instead.
+     * 
+     * @param linkedDataSource
+     * @param socket
+     * @return
+     */
+    @Deprecated
     public static Optional<SocketDefinition> getSocketDefinitionOfSocket(LinkedDataSource linkedDataSource,
+                    URI socket) {
+        return getSocketDefinitionOfSocket(linkedDataSource, socket, WonRelativeUriHelper.stripFragment(socket));
+    }
+
+    public static Optional<SocketDefinition> getSocketDefinitionOfSocketUsingAtomAsWebid(
+                    LinkedDataSource linkedDataSource,
                     URI socket) {
         return getSocketDefinitionOfSocket(linkedDataSource, socket, WonRelativeUriHelper.stripFragment(socket));
     }
@@ -844,7 +973,24 @@ public class WonLinkedDataUtils {
                         socketURI);
     }
 
+    /**
+     * Use
+     * {@link WonLinkedDataUtils#getTypeOfSocketUsingAtomAsWebId(URI, LinkedDataSource)}
+     * or {@link WonLinkedDataUtils#getTypeOfSocket(URI, URI, LinkedDataSource)}
+     * instead.
+     *
+     * @param socketURI
+     * @param linkedDataSource
+     * @return
+     */
+    @Deprecated
     public static Optional<URI> getTypeOfSocket(URI socketURI, LinkedDataSource linkedDataSource) {
+        return WonRdfUtils.SocketUtils.getTypeOfSocket(
+                        linkedDataSource.getDataForResource(socketURI, WonRelativeUriHelper.stripFragment(socketURI)),
+                        socketURI);
+    }
+
+    public static Optional<URI> getTypeOfSocketUsingAtomAsWebId(URI socketURI, LinkedDataSource linkedDataSource) {
         return WonRdfUtils.SocketUtils.getTypeOfSocket(
                         linkedDataSource.getDataForResource(socketURI, WonRelativeUriHelper.stripFragment(socketURI)),
                         socketURI);
@@ -883,8 +1029,8 @@ public class WonLinkedDataUtils {
     }
 
     public static Optional<URI> getConnectionURIForSocketAndTargetSocket(URI socket,
-                    URI targetSocket, LinkedDataSource linkedDataSource, URI requestorWebId) {
-        Dataset ds = linkedDataSource.getDataForResource(socket, requestorWebId);
+                    URI targetSocket, LinkedDataSource linkedDataSource, URI requesterWebId) {
+        Dataset ds = linkedDataSource.getDataForResource(socket, requesterWebId);
         Optional<URI> atomUri = WonRdfUtils.SocketUtils.getAtomOfSocket(ds, socket);
         if (!atomUri.isPresent()) {
             return Optional.empty();
@@ -900,7 +1046,7 @@ public class WonLinkedDataUtils {
                                             + "?socket=" + URLEncoder.encode(socket.toString(), "UTF-8")
                                             + "&targetSocket="
                                             + URLEncoder.encode(targetSocket.toString(), "UTF-8")),
-                            requestorWebId));
+                            requesterWebId));
         } catch (UnsupportedEncodingException e) {
             throw new LinkedDataFetchingException(connectionContainer.get(),
                             "Error building request for connection by socket " + socket.toString()
