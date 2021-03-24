@@ -631,13 +631,14 @@ export const getPossibleRequestCredentialsForAtom = atomUri =>
           const consideredAtom = get(atoms, atomUri);
           const tokenScopeUris = atomUtils.getTokenScopeUris(consideredAtom);
 
-          tokenScopeUris.forEach(tokenScopeUri => {
-            //FIXME: THIS IS JUST AN ASSUMPTION THAT WE MIGHT BE ABLE TO ACCESS/REQUEST THE ATOM IN QUESTION WITH A TOKEN FROM THE GIVEN ATOM
-            possibleRequestCredentials.push({
-              requestTokenFromAtomUri: atomUri,
-              scope: tokenScopeUri,
+          tokenScopeUris &&
+            tokenScopeUris.forEach(tokenScopeUri => {
+              //FIXME: THIS IS JUST AN ASSUMPTION THAT WE MIGHT BE ABLE TO ACCESS/REQUEST THE ATOM IN QUESTION WITH A TOKEN FROM THE GIVEN ATOM
+              possibleRequestCredentials.push({
+                requestTokenFromAtomUri: atomUri,
+                scope: tokenScopeUri,
+              });
             });
-          });
         });
       }
       return Immutable.fromJS(possibleRequestCredentials);
