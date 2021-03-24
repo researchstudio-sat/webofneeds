@@ -449,19 +449,16 @@ export function isAtomDeleted(process, atomUri) {
 }
 
 export function areAtomRequestsAccessDeniedOnly(process, atomUri) {
-  if (hasAtomFailedToLoad(process, atomUri)) {
-    const atomRequests = getAtomRequests(process, atomUri);
+  const atomRequests = getAtomRequests(process, atomUri);
 
-    if (atomRequests.find(request => get(request, "code") === 200)) {
-      return false;
-    } else {
-      return (
-        atomRequests.size ===
-        atomRequests.filter(request => get(request, "code") === 403)
-      );
-    }
+  if (atomRequests.find(request => get(request, "code") === 200)) {
+    return false;
+  } else {
+    return (
+      atomRequests.size ===
+      atomRequests.filter(request => get(request, "code") === 403).size
+    );
   }
-  return false;
 }
 
 export function areConnectionContainerRequestsAccessDeniedOnly(
@@ -482,7 +479,7 @@ export function areConnectionContainerRequestsAccessDeniedOnly(
       connectionContainerRequests.size ===
       connectionContainerRequests.filter(
         request => get(request, "code") === 403
-      )
+      ).size
     );
   }
 }

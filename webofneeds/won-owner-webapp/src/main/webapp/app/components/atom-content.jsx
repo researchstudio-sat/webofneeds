@@ -64,29 +64,6 @@ export default function WonAtomContent({
   const atomProcessingUpdate =
     atomUri && processUtils.isAtomProcessingUpdate(process, atomUri);
 
-  /*const connectionContainerLoading =
-    !atom || processUtils.isConnectionContainerLoading(process, atomUri);
-  const connectionContainerFailedToLoad =
-    atom && processUtils.areConnectionContainerRequestsFailedOnly(process, atomUri);
-  const connectionContainerProcessStatus = processUtils.getConnectionContainerRequests(
-    process,
-    atomUri
-  );
-  console.debug(
-    "connectionContainerProcessState: ",
-    connectionContainerProcessStatus
-  );*/
-
-  //TODO: Display Access Denied if status is only 403 for atomFailedState
-  //TODO: Display Access Denied if status is only 403 for connectionContainerFailedState
-  //TODO: Do not show any of the socketAddButtons or singleConnect/Expertise stuff if connectionContainer is in Failed State
-
-  function tryReload() {
-    if (atomUri && atomFailedToLoad) {
-      dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
-    }
-  }
-
   if (atomLoading) {
     return (
       <won-atom-content class="won-is-loading">
@@ -108,6 +85,16 @@ export default function WonAtomContent({
     );
   } else if (atomFailedToLoad) {
     const isAtomDeleted = processUtils.isAtomDeleted(process, atomUri);
+    const isAtomAccessDenied = processUtils.areAtomRequestsAccessDeniedOnly(
+      process,
+      atomUri
+    );
+
+    const tryReload = () => {
+      if (atomUri && atomFailedToLoad) {
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+      }
+    };
 
     return (
       <won-atom-content>
@@ -121,19 +108,20 @@ export default function WonAtomContent({
           <span className="atom-failedtoload__label">
             {isAtomDeleted
               ? "Atom has been deleted"
-              : processUtils.areAtomRequestsAccessDeniedOnly(process, atomUri)
+              : isAtomAccessDenied
                 ? "Access Denied"
                 : "Failed To Load"}
           </span>
           <div className="atom-failedtoload__actions">
-            {!isAtomDeleted && (
-              <button
-                className="atom-failedtoload__actions__button secondary won-button--outlined thin"
-                onClick={() => tryReload()}
-              >
-                Try Reload
-              </button>
-            )}
+            {!isAtomDeleted &&
+              !isAtomAccessDenied && (
+                <button
+                  className="atom-failedtoload__actions__button secondary won-button--outlined thin"
+                  onClick={tryReload}
+                >
+                  Try Reload
+                </button>
+              )}
           </div>
         </div>
       </won-atom-content>
