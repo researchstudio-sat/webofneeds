@@ -1,0 +1,19 @@
+@import "won-config";
+@import "animate";
+@import "sizing-utils";
+
+won-atom-acl-editor {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  grid-gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+
+  .aae__item {
+    color: $won-primary-text-color;
+  }
+  .aae__infoText {
+    font-size: $smallFontSize;
+    color: $won-line-gray;
+  }
+}

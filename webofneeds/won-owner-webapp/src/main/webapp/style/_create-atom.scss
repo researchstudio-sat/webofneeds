@@ -161,6 +161,7 @@ won-create-atom {
 
   .cp__footer {
     margin: $gridRowGap;
+    margin-top: 0;
     grid-area: footer;
     display: grid;
 

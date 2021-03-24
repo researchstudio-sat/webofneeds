@@ -26,6 +26,7 @@ import "~/style/_responsiveness-utils.scss";
 import ico36_close from "~/images/won-icons/ico36_close.svg";
 import WonAtomHeaderBig from "~/app/components/atom-header-big";
 import * as wonLabelUtils from "~/app/won-label-utils";
+import WonAtomAclEditor from "~/app/components/atom-editor/atom-acl-editor";
 
 export default function WonCreateAtom({
   fromAtom,
@@ -156,6 +157,9 @@ export default function WonCreateAtom({
   }
   function updateDraftContentImm(updatedDraftBranchImm) {
     updateDraftImm(updatedDraftBranchImm, "content");
+  }
+  function updateDraftAclImm(updatedDraftAclImm) {
+    updateDraftImm(updatedDraftAclImm, "acl");
   }
 
   function updateDraftImm(updatedDraftImm, branch) {
@@ -339,6 +343,10 @@ export default function WonCreateAtom({
               <div className="cp__content__sockets">{socketElements}</div>
             </React.Fragment>
           )}
+          <WonAtomAclEditor
+            initialDraftImm={getIn(useCaseImm, ["draft", "acl"])}
+            onUpdateImm={updateDraftAclImm}
+          />
         </div>
         <div className="cp__footer">
           <WonLabelledHr label="done?" className="cp__footer__labelledhr" />
