@@ -1,14 +1,14 @@
-package won.protocol.service.impl;
-
-import java.net.URI;
-import java.util.Optional;
+package won.node.protocol.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-
 import won.protocol.message.WonMessage;
 import won.protocol.service.MessageRoutingInfoService;
+import won.protocol.service.impl.MessageRoutingInfoServiceWithoutLookup;
+
+import java.net.URI;
+import java.util.Optional;
 
 @Component
 @Primary // prefer this bean when autowiring

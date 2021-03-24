@@ -31,4 +31,8 @@
 
 	<bean id="wonUserDetailService" class="won.owner.service.impl.WONUserDetailService" />
     <bean id="userService" class="won.owner.service.impl.UserService" />
+
+	<bean id="defaultWebId" class="java.net.URI" >
+		<constructor-arg value="${uri.prefix.owner}" />
+	</bean>
 </beans>

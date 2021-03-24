@@ -573,7 +573,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler
     }
 
     private boolean isConnectionInSuggestedState(URI connectionURI) {
-        URI state = WonLinkedDataUtils.getConnectionStateforConnectionURI(connectionURI, linkedDataSource);
+        URI state = WonLinkedDataUtils.getConnectionStateforConnectionURIUsingAtomAsWebId(connectionURI,
+                        linkedDataSource);
         return ConnectionState.SUGGESTED.equals(ConnectionState.fromURI(state));
     }
 

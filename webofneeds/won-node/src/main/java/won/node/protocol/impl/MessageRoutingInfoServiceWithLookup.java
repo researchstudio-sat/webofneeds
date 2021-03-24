@@ -1,6 +1,7 @@
-package won.protocol.service.impl;
+package won.node.protocol.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import won.protocol.message.WonMessage;
 import won.protocol.service.MessageRoutingInfoService;
@@ -20,7 +21,9 @@ import java.util.Optional;
 @Component
 public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoService {
     @Autowired
-    LinkedDataSource linkedDataSource;
+    private LinkedDataSource linkedDataSource;
+    @Value("${http.client.requesterWebId}")
+    private URI requesterWebId;
 
     @Override
     public Optional<URI> senderAtom(WonMessage msg) {
@@ -46,11 +49,12 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
         if (socketURI == null) {
             URI possiblyConnectionURI = msg.getConnectionURI();
             if (possiblyConnectionURI != null) {
-                socketURI = WonLinkedDataUtils.getSocketURIForConnectionURI(possiblyConnectionURI, linkedDataSource);
+                socketURI = WonLinkedDataUtils.getSocketURIForConnectionURI(possiblyConnectionURI, requesterWebId,
+                                linkedDataSource);
             }
         }
         return Optional.ofNullable(socketURI).map(
-                        uri -> WonLinkedDataUtils.getTypeOfSocket(uri, linkedDataSource).orElse(null));
+                        uri -> WonLinkedDataUtils.getTypeOfSocket(uri, requesterWebId, linkedDataSource).orElse(null));
     }
 
     @Override
@@ -59,11 +63,12 @@ public class MessageRoutingInfoServiceWithLookup implements MessageRoutingInfoSe
         if (socketURI == null) {
             URI possiblyConnectionURI = msg.getConnectionURI();
             if (possiblyConnectionURI != null) {
-                socketURI = WonLinkedDataUtils.getSocketURIForConnectionURI(possiblyConnectionURI, linkedDataSource);
+                socketURI = WonLinkedDataUtils.getSocketURIForConnectionURI(possiblyConnectionURI, requesterWebId,
+                                linkedDataSource);
             }
         }
         return Optional.ofNullable(socketURI).map(
-                        uri -> WonLinkedDataUtils.getTypeOfSocket(uri, linkedDataSource).orElse(null));
+                        uri -> WonLinkedDataUtils.getTypeOfSocket(uri, requesterWebId, linkedDataSource).orElse(null));
     }
 
     @Override

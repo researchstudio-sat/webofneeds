@@ -116,7 +116,6 @@
 	<!--  delete message processor -->
 	<bean name="atomDeleter" class="won.node.camel.processor.general.DeleteAtomMessageProcessor"/>
 	<!--  merges the message datasets found the message and original message headers -->
-	<bean name="routingInfo" class="won.protocol.message.processor.camel.CamelMessageRoutingInfoService"/>
 	<bean name="responseRoutingInfoExtractor" class="won.node.camel.processor.general.ResponseRoutingInfoExtractor"/>
 	<bean name="routingInfoExtractor" class="won.node.camel.processor.general.RoutingInfoExtractor"/>
 	<bean name="parentFinder" class="won.node.camel.processor.general.ParentFinder"/>

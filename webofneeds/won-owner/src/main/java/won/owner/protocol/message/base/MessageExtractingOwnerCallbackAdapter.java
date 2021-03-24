@@ -85,19 +85,19 @@ public class MessageExtractingOwnerCallbackAdapter extends OwnerCallbackAdapter 
         if (connectionUri.isPresent()) {
             // fetch the rest of the connection data from the node and make a connection
             // object for use in events.
-            URI requestorWebId = getOurAtomFromIncomingMessage(wonMessage);
+            URI requesterWebId = getOurAtomFromIncomingMessage(wonMessage);
             try {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("fetching connection info for {} with webid {}", connectionUri.get(), requestorWebId);
+                    logger.debug("fetching connection info for {} with webid {}", connectionUri.get(), requesterWebId);
                 }
                 Dataset ds = linkedDataSource
-                                .getDataForResource(connectionUri.get(), requestorWebId);
+                                .getDataForResource(connectionUri.get(), requesterWebId);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Fetched connection data for {} with webid {}", connectionUri.get(), requestorWebId);
+                    logger.debug("Fetched connection data for {} with webid {}", connectionUri.get(), requesterWebId);
                 }
                 return WonRdfUtils.ConnectionUtils.getConnection(ds, connectionUri.get());
             } catch (Exception e) {
-                logger.debug("Error fetching connection data for {} with webid {}", connectionUri.get(), requestorWebId,
+                logger.debug("Error fetching connection data for {} with webid {}", connectionUri.get(), requesterWebId,
                                 e);
             }
         }

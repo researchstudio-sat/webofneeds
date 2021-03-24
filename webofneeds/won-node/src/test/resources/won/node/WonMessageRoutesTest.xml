@@ -17,7 +17,7 @@
 	<context:component-scan base-package="won.node.service.linkeddata.generate" />
 	<context:component-scan base-package="won.node.test" />
 	
-	<bean id="messageRoutingInfoService" class="won.protocol.service.impl.MessageRoutingInfoServiceImpl" />
+	<bean id="messageRoutingInfoService" class="won.node.protocol.impl.MessageRoutingInfoServiceImpl" />
 
 	<!-- needed to simulate owner behaviour -->
     <bean id="keyPairAliasDerivationStrategy" factory-bean="keyPairAliasDerivationStrategyFactory" factory-method="create" />
