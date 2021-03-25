@@ -82,6 +82,7 @@ export const emptyDraftImm = Immutable.fromJS({
     },
   },
   seeks: {},
+  //Default acl's will be overwritten by atom-acl-editor.jsx, so any usecase-specific acl will not be kept for the time being
   acl: [
     defaultPublicAtomAuthorization,
     connectedConnectionsAuthorization,
