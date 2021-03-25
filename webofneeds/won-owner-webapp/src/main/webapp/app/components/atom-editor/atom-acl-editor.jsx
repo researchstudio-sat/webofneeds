@@ -37,8 +37,6 @@ export default function WonAtomAclEditor({ initialDraftImm, onUpdateImm }) {
     }
   };
 
-  console.debug("draftAclImm:", draftAclImm);
-
   return (
     <React.Fragment>
       <div className="cp__content__branchheader">Access Control</div>
