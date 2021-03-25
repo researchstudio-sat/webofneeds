@@ -9,7 +9,6 @@ import java.lang.invoke.MethodHandles;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PredefinedAliasStrategy implements PrivateKeyStrategy {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -21,14 +20,10 @@ public class PredefinedAliasStrategy implements PrivateKeyStrategy {
 
     @Override
     public String chooseAlias(Map<String, PrivateKeyDetails> map, Socket socket) {
-        if (!map.containsKey(alias)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Error choosing private key alias {}, available values are:\n {}", alias,
-                                map.keySet().stream().collect(
-                                                Collectors.joining("\n")));
-            }
-            throw new IllegalStateException("Trying to select private key alias " + alias + " that is not available");
-        }
+        // it is tempting to check if the map actually contains a key for the alias and
+        // throw an exception if it doesn't. However, this will cause an exception where
+        // none is due. This strategy is called for many key types until it's the one
+        // type of our key, so we cannot perform this kind of check here.
         return alias;
     }
 
