@@ -17,7 +17,10 @@ export default function WonAtomAclEditor({ initialDraftImm, onUpdateImm }) {
     connectedConnectionsAuthorization,
     connectToSocketsAuthorization,
   ]);
-  const privateACL = Immutable.fromJS([connectedConnectionsAuthorization]);
+  const privateACL = Immutable.fromJS([
+    connectedConnectionsAuthorization,
+    connectToSocketsAuthorization,
+  ]);
 
   useEffect(
     () => {
