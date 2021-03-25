@@ -19,6 +19,7 @@ import won.protocol.message.WonMessageDirection;
 import won.protocol.message.WonMessageType;
 import won.protocol.model.*;
 import won.protocol.repository.*;
+import won.protocol.rest.LinkedDataFetchingException;
 import won.protocol.service.WonNodeInformationService;
 import won.protocol.util.DataAccessUtils;
 import won.protocol.util.RdfUtils;
@@ -95,7 +96,9 @@ public class ConnectionService {
         URI senderSocketURI = wonMessage.getSenderSocketURIRequired();
         URI recipientSocketURI = wonMessage.getRecipientSocketURIRequired();
         failIfIsNotSocketOfAtom(Optional.of(senderSocketURI), Optional.of(senderAtomURI));
-        failIfIsNotSocketOfAtom(Optional.of(recipientSocketURI), Optional.of(recipientAtomURI));
+        swallowExceptionIfAccessDenied(
+                        () -> failIfIsNotSocketOfAtom(Optional.of(recipientSocketURI), Optional.of(recipientAtomURI)),
+                        "existance of target socket");
         logger.debug("connect from owner: processing message {}", wonMessage.getMessageURI());
         Connection con = connectFromOwner(senderAtomURI, senderSocketURI, senderNodeURI, recipientAtomURI,
                         recipientSocketURI);
@@ -111,7 +114,7 @@ public class ConnectionService {
         Objects.requireNonNull(recipientAtomURI);
         Objects.requireNonNull(senderSocketURI);
         Objects.requireNonNull(recipientSocketURI);
-        Optional<Connection> con;
+        Optional<Connection> conOpt;
         // // lock the atom so we don't make writes that cancel each other out in case
         // we
         // // process an connect from node in parallel
@@ -123,48 +126,67 @@ public class ConnectionService {
         Socket actualSocket = socketService.getSocket(senderAtomURI, Optional.of(senderSocketURI));
         Optional<URI> actualSocketURI = Optional.of(actualSocket.getSocketURI());
         Optional<URI> actualTargetSocketURI = Optional.of(recipientSocketURI);
-        failIfIsNotSocketOfAtom(Optional.of(recipientSocketURI), Optional.of(recipientAtomURI));
+        swallowExceptionIfAccessDenied(
+                        () -> failIfIsNotSocketOfAtom(Optional.of(recipientSocketURI), Optional.of(recipientAtomURI)),
+                        "existance of target socket");
         if (logger.isDebugEnabled()) {
             logger.debug("connect from owner: loading connection {} - {}", actualSocketURI.get(),
                             actualTargetSocketURI.get());
         }
-        con = connectionRepository.findOneBySocketURIAndTargetSocketURIForUpdate(actualSocketURI.get(),
+        conOpt = connectionRepository.findOneBySocketURIAndTargetSocketURIForUpdate(actualSocketURI.get(),
                         actualTargetSocketURI.get());
-        if (!con.isPresent()) {
+        if (!conOpt.isPresent()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("connect from owner: did not find an existing connection");
             }
             // did not find such a connection either. We can safely create a new one
             // create Connection in Database
-            con = Optional.of(createConnection(senderAtomURI, recipientAtomURI,
+            conOpt = Optional.of(createConnection(senderAtomURI, recipientAtomURI,
                             actualSocket.getSocketURI(), actualSocket.getTypeURI(), actualTargetSocketURI.get(),
                             Optional.empty(),
                             ConnectionState.REQUEST_SENT, ConnectionEventType.OWNER_CONNECT));
             if (logger.isDebugEnabled()) {
-                logger.debug("connect from owner: created new connection {}", con.get().getConnectionURI());
+                logger.debug("connect from owner: created new connection {}", conOpt.get().getConnectionURI());
             }
         } else {
-            entityManager.refresh(con.get());
+            entityManager.refresh(conOpt.get());
             if (logger.isDebugEnabled()) {
                 logger.debug("connect from owner: found existing connection {} in state {}",
-                                con.get().getConnectionURI(),
-                                con.get().getState());
+                                conOpt.get().getConnectionURI(),
+                                conOpt.get().getState());
             }
         }
-        failForExceededCapacity(con.get().getSocketURI());
-        failForIncompatibleSockets(con.get().getSocketURI(), con.get().getTargetSocketURI());
+        final Connection con = conOpt.get();
+        failForExceededCapacity(con.getSocketURI());
+        swallowExceptionIfAccessDenied(() -> failForIncompatibleSockets(con.getSocketURI(), con.getTargetSocketURI()),
+                        "socket compatibility");
         // state transiation
-        ConnectionState nextState = con.get().getState().transit(ConnectionEventType.OWNER_CONNECT);
-        con.get().changeStateTo(nextState);
+        ConnectionState nextState = con.getState().transit(ConnectionEventType.OWNER_CONNECT);
+        con.changeStateTo(nextState);
         if (logger.isDebugEnabled()) {
-            logger.debug("connect from owner: set connection {} state to: {}", con.get().getConnectionURI(),
-                            con.get().getState());
+            logger.debug("connect from owner: set connection {} state to: {}", con.getConnectionURI(),
+                            con.getState());
         }
-        dataDerivationService.deriveDataIfNecessary(con.get());
-        if (con.get().getState() == ConnectionState.CONNECTED) {
-            socketAclService.addTargetSocketAcls(con.get());
+        dataDerivationService.deriveDataIfNecessary(con);
+        if (con.getState() == ConnectionState.CONNECTED) {
+            socketAclService.addTargetSocketAcls(con);
         }
-        return connectionRepository.save(con.get());
+        return connectionRepository.save(con);
+    }
+
+    private void swallowExceptionIfAccessDenied(Runnable task, String checkName) {
+        try {
+            task.run();
+        } catch (LinkedDataFetchingException.Forbidden | LinkedDataFetchingException.ForbiddenAuthMethodProvided e) {
+            // swallow this exception and continue. We want to allow this because we think
+            // this only happens
+            // if we (the node) cannot read the target atom (ie., it is not world-readable).
+            logger.info("Could not check {} as we were not allowed to read all necessary data (exception logged on level DEBUG)",
+                            checkName);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Access denied", e);
+            }
+        }
     }
 
     public Connection connectFromNode(WonMessage wonMessage) {
