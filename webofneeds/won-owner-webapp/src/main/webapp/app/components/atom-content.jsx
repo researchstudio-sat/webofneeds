@@ -223,6 +223,7 @@ export default function WonAtomContent({
                 isOwned={isOwned}
               />
             )}
+            <WonAtomFeed atom={atom} />
             {atomUtils.isActive(atom) &&
               filteredReactions &&
               filteredReactions.size > 0 && (
@@ -234,7 +235,6 @@ export default function WonAtomContent({
                   targetAtom={atom}
                 />
               )}
-            <WonAtomFeed atom={atom} />
             <WonAtomContentGeneral atom={atom} />
           </React.Fragment>
         );
