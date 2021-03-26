@@ -626,6 +626,17 @@ export const getPossibleRequestCredentialsForAtom = atomUri =>
             !get(ownedAtoms, extractAtomUriFromConnectionUri(connUri))
         );
 
+        const tokenScopeUris = atomUtils.getTokenScopeUris(get(atoms, atomUri));
+
+        tokenScopeUris &&
+          tokenScopeUris.forEach(tokenScopeUri => {
+            //FIXME: THIS IS JUST AN ASSUMPTION THAT WE MIGHT BE ABLE TO ACCESS/REQUEST THE ATOM IN QUESTION WITH A TOKEN FROM THE GIVEN ATOM
+            possibleRequestCredentials.push({
+              requestTokenFromAtomUri: atomUri,
+              scope: tokenScopeUri,
+            });
+          });
+
         nonOwnedConnectionsToTargetAtom.map((_, connUri) => {
           const atomUri = extractAtomUriFromConnectionUri(connUri);
           const consideredAtom = get(atoms, atomUri);
