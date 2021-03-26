@@ -3,6 +3,26 @@
 @import "animate";
 
 won-atom-feed {
-  background: red;
-  color: white;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+
+  > .af__header {
+    font-weight: 400;
+    font-size: $mediumFontSize;
+    color: $won-primary-color;
+  }
+
+  > .af__datedivider {
+    color: $won-line-gray;
+    &:first-of-type {
+      padding: 0;
+    }
+    padding-top: 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: $thinGrayBorder;
+  }
+
+  > .af__item {
+    padding-top: 0.5rem;
+  }
 }

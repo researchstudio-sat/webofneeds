@@ -14,31 +14,35 @@ export default function WonAtomContentTagSockets({
   isOwned,
 }) {
   const tagViewSocketElements = [];
+  let showsElements = false;
 
   relevantConnectionsMap.map((connections, socketType) => {
     const activeConnections = connections.filterNot(connectionUtils.isClosed);
 
-    const countLabel =
-      activeConnections && activeConnections.size > 0
-        ? "(" + activeConnections.size + ")"
-        : undefined;
-
-    const unread =
-      activeConnections && !!activeConnections.find(connectionUtils.isUnread);
-
-    function generateAtomItemCssClasses(unread = false) {
-      const cssClassNames = ["actsockets__item__header"];
-
-      unread && cssClassNames.push("actsockets__item__header--unread");
-
-      return cssClassNames.join(" ");
-    }
-
-    if (
+    const showSocketElements =
       isOwned ||
       activeConnections.size > 0 ||
-      !vocab.refuseAddToNonOwned[socketType]
-    ) {
+      !vocab.refuseAddToNonOwned[socketType];
+
+    showsElements = showsElements || showSocketElements;
+
+    if (showSocketElements) {
+      const generateAtomItemCssClasses = (unread = false) => {
+        const cssClassNames = ["actsockets__item__header"];
+
+        unread && cssClassNames.push("actsockets__item__header--unread");
+
+        return cssClassNames.join(" ");
+      };
+
+      const countLabel =
+        activeConnections && activeConnections.size > 0
+          ? "(" + activeConnections.size + ")"
+          : undefined;
+
+      const unread =
+        activeConnections && !!activeConnections.find(connectionUtils.isUnread);
+
       tagViewSocketElements.push(
         <div key={socketType} className="actsockets__item">
           <div className={generateAtomItemCssClasses(unread)}>
@@ -66,10 +70,13 @@ export default function WonAtomContentTagSockets({
     }
   });
 
-  return (
+  // If there ar no Elements to show and no option to add sockets we will return an empty fragment
+  return showsElements ? (
     <won-atom-content-tag-sockets>
       {tagViewSocketElements}
     </won-atom-content-tag-sockets>
+  ) : (
+    <React.Fragment />
   );
 }
 WonAtomContentTagSockets.propTypes = {

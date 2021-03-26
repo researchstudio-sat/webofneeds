@@ -223,7 +223,11 @@ export default function WonAtomContent({
                 isOwned={isOwned}
               />
             )}
-            <WonAtomFeed atom={atom} />
+            <WonAtomFeed
+              atom={atom}
+              isOwned={isOwned}
+              storedAtoms={storedAtoms}
+            />
             {atomUtils.isActive(atom) &&
               filteredReactions &&
               filteredReactions.size > 0 && (
