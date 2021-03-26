@@ -46,7 +46,8 @@ export default function WonAtomFeed({ atom, isOwned, storedAtoms }) {
           <WonGenericFeedItem
             key={getUri(conn)}
             connection={conn}
-            atom={atom}
+            hideSenderAtom={atom}
+            senderAtom={atom}
             targetAtom={get(
               storedAtoms,
               connectionUtils.getTargetAtomUri(conn)
