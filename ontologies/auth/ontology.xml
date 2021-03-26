@@ -1487,6 +1487,22 @@
     
 
 
+    <!-- https://w3id.org/won/auth#SharedContextToken -->
+
+
+    <owl:NamedIndividual rdf:about="https://w3id.org/won/auth#SharedContextToken">
+        <rdf:type rdf:resource="https://w3id.org/won/auth#TokenScope"/>
+        <rdfs:comment xml:lang="en">URI reserved for the value of the scope claim of shared context tokens. Such tokens are
+    used to prove that an atom has access to some (randomly defined) context and should be granted operations based on that.
+    For example, an atom representing an organization could issue a shared context token to its members. In this case, the
+    membership in the organization is the context they share. A socket that the organization supports might grant access to clients
+    bearing a shared context token issued by the organization.</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="https://w3id.org/won/auth#"/>
+        <rdfs:label>SharedContextToken</rdfs:label>
+    </owl:NamedIndividual>
+    
+
+
     <!-- https://w3id.org/won/auth#SocketDefinitionShape -->
 
 
@@ -1547,32 +1563,32 @@
         <shacl:path rdf:resource="https://w3id.org/won/auth#decision"/>
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid67">
-        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#authInfoShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#provideAuthInfo"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid68">
-        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#operationRequestShape"/>
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#requestedOperation"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid69">
         <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
         <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
         <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#Literal"/>
         <shacl:path rdf:resource="https://w3id.org/won/auth#insufficientScope"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid70">
-        <shacl:node rdf:resource="https://w3id.org/won/auth#authTokenShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#issueToken"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid71">
+    <rdf:Description rdf:nodeID="genid68">
         <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
         <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
         <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#Literal"/>
         <shacl:path rdf:resource="https://w3id.org/won/auth#invalidToken"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid69">
+        <shacl:node rdf:resource="https://w3id.org/won/auth#authTokenShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#issueToken"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid70">
+        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#authInfoShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#provideAuthInfo"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid71">
+        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#operationRequestShape"/>
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#requestedOperation"/>
     </rdf:Description>
     
 
@@ -2102,26 +2118,26 @@
     </owl:NamedIndividual>
     <rdf:Description rdf:nodeID="genid102">
         <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#operationRequestShape"/>
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#requestedOperation"/>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#authInfoShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#provideAuthInfo"/>
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid103">
+        <shacl:node rdf:resource="https://w3id.org/won/auth#authTokenTestSpecShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#issueToken"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid104">
         <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
         <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
         <shacl:node rdf:resource="https://w3id.org/won/auth#decisionValueShape"/>
         <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
         <shacl:path rdf:resource="https://w3id.org/won/auth#decision"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid104">
-        <shacl:node rdf:resource="https://w3id.org/won/auth#authTokenTestSpecShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#issueToken"/>
-    </rdf:Description>
     <rdf:Description rdf:nodeID="genid105">
         <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#authInfoShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#provideAuthInfo"/>
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#operationRequestShape"/>
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#requestedOperation"/>
     </rdf:Description>
     
 
@@ -3281,14 +3297,14 @@
         <shacl:or>
             <rdf:Description/>
         </shacl:or>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#tokenScope"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#issuer"/>
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid190">
         <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
         <shacl:or>
             <rdf:Description/>
         </shacl:or>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#issuer"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#tokenScope"/>
     </rdf:Description>
     
 
@@ -3333,299 +3349,194 @@
         <shacl:path rdf:resource="https://w3id.org/won/auth#tokenSub"/>
     </owl:NamedIndividual>
     <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#targetAtomPropertyShape"/>
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid193">
+        <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#Literal"/>
+        <shacl:pattern>^[^\s]+$</shacl:pattern>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:nodeID="genid194"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid194">
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#atomExpressionShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#grantee"/>
+        <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagePropertyShape"/>
+        <shacl:property rdf:nodeID="genid196"/>
     </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagesPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid198"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid198">
+    <rdf:Description rdf:nodeID="genid196">
         <shacl:node rdf:resource="https://w3id.org/won/auth#connectionStateShape"/>
         <shacl:path rdf:resource="https://w3id.org/won/auth#connectionState"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid203"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid203">
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#grantee"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid207"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid207">
-        <shacl:node rdf:resource="https://w3id.org/won/auth#connectionMessageExpressionShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#connectionMessage"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#atomExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#BlankNode"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#simpleOperationExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#messageOperationExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#tokenOperationExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#atomMessagePropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#targetAtomPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid224"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid224">
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#graphIri"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid226"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid226">
-        <shacl:node rdf:resource="https://w3id.org/won/auth#graphTypeShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#graphType"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid228"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid228">
-        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#granteeWildcardShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#grantee"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid230"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid230">
-        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#provideAuthInfo"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid232"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid232">
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#grant"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid234"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid234">
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#tokenShapeShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#bearer"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#relativeAtomExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
     </rdf:Description>
     <rdf:Description>
         <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#long"/>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagesPropertyShape"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid243">
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagePropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#atomExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#atomMessagesPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#atomMessagePropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid206"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid206">
+        <shacl:node rdf:resource="https://w3id.org/won/auth#connectionStateShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#connectionState"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#atomStatePropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#graphPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagesPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#targetAtomPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagesPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagePropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionsPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid219">
+        <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#Literal"/>
+        <shacl:pattern>^[^\s]+$</shacl:pattern>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#socketPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#simpleOperationExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#tokenOperationExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#targetAtomPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#messageOperationExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid230"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid230">
         <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#bearsToken"/>
+        <shacl:or>
+            <rdf:Description/>
+        </shacl:or>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#messageTo"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid244">
+    <rdf:Description>
+        <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid234"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid234">
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#socketType"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#messageTypesExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#tokenOperationExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#messageOperationExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#simpleOperationExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#atomMessagePropertyShape"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid241">
         <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
         <shacl:path rdf:resource="https://w3id.org/won/auth#requestor"/>
     </rdf:Description>
     <rdf:Description>
         <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid246">
-        <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#Literal"/>
-        <shacl:pattern>^[^\s]+$</shacl:pattern>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionsPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#socketPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#tokenOperationExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#messageOperationExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#simpleOperationExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid255"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid255">
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#socketType"/>
-    </rdf:Description>
     <rdf:Description>
         <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
     </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#messageTypesExpressionShape"/>
+    <rdf:Description rdf:nodeID="genid244">
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#bearsToken"/>
     </rdf:Description>
     <rdf:Description>
         <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagePropertyShape"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:nodeID="genid260"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid260">
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:or>
-            <rdf:Description/>
-        </shacl:or>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#messageTo"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagesPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#atomStatePropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid265"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid265">
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:or>
-            <rdf:Description/>
-        </shacl:or>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#messageOnBehalf"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionsPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid269"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid269">
-        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
-        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#messageWildcardShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#messageTo"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid271"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid271">
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#socketIri"/>
-    </rdf:Description>
-    <rdf:Description>
         <shacl:node rdf:resource="https://w3id.org/won/auth#messageTypeShape"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#atomMessagePropertyShape"/>
+        <shacl:property rdf:nodeID="genid248"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid248">
+        <shacl:node rdf:resource="https://w3id.org/won/auth#tokenShapeShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#bearer"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#messageTypesExpressionShape"/>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#atomMessagesPropertyShape"/>
+        <shacl:property rdf:nodeID="genid251"/>
     </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagesPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#graphPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionPropertyShape"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid280"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid280">
+    <rdf:Description rdf:nodeID="genid251">
         <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
         <shacl:node rdf:resource="https://w3id.org/won/auth#granteeWildcardShape"/>
         <shacl:path rdf:resource="https://w3id.org/won/auth#grantee"/>
@@ -3634,36 +3545,26 @@
         <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
     </rdf:Description>
     <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
         <shacl:property rdf:resource="https://w3id.org/won/auth#targetAtomPropertyShape"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagePropertyShape"/>
+        <shacl:property rdf:nodeID="genid256"/>
     </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid285"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid285">
+    <rdf:Description rdf:nodeID="genid256">
         <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
         <shacl:path rdf:resource="https://w3id.org/won/auth#grantee"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:nodeID="genid287"/>
+        <shacl:property rdf:nodeID="genid258"/>
     </rdf:Description>
-    <rdf:Description rdf:nodeID="genid287">
+    <rdf:Description rdf:nodeID="genid258">
         <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
         <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
         <shacl:node rdf:resource="https://w3id.org/won/auth#messageWildcardShape"/>
         <shacl:path rdf:resource="https://w3id.org/won/auth#messageOnBehalf"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:property rdf:nodeID="genid289"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid289">
-        <shacl:node rdf:resource="https://w3id.org/won/auth#tokenShapeShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#bearer"/>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:node rdf:resource="https://w3id.org/won/auth#messageTypeShape"/>
     </rdf:Description>
     <rdf:Description>
         <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
@@ -3672,40 +3573,155 @@
         <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
     </rdf:Description>
     <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#messageTypeShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid264"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid264">
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#graphIri"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid266"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid266">
+        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#messageWildcardShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#messageTo"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid268"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid268">
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#socketIri"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#messageTypesExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid272"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid272">
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:or>
+            <rdf:Description/>
+        </shacl:or>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#messageOnBehalf"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionsPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid276"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid276">
+        <shacl:node rdf:resource="https://w3id.org/won/auth#graphTypeShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#graphType"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagesPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid279"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid279">
+        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#granteeWildcardShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#grantee"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid281"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid281">
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#tokenShapeShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#bearer"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid283"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid283">
+        <shacl:maxCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:maxCount>
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#provideAuthInfo"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid285"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid285">
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#grant"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#relativeAtomExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#BlankNode"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#atomExpressionShape"/>
+    </rdf:Description>
+    <rdf:Description>
         <shacl:property rdf:resource="https://w3id.org/won/auth#targetAtomPropertyShape"/>
     </rdf:Description>
     <rdf:Description>
         <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagePropertyShape"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionMessagesPropertyShape"/>
+        <shacl:property rdf:nodeID="genid294"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid294">
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
+        <shacl:node rdf:resource="https://w3id.org/won/auth#aseRootShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#grantee"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#connectionPropertyShape"/>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
     </rdf:Description>
     <rdf:Description>
         <shacl:property rdf:nodeID="genid298"/>
     </rdf:Description>
     <rdf:Description rdf:nodeID="genid298">
-        <shacl:node rdf:resource="https://w3id.org/won/auth#connectionStateShape"/>
-        <shacl:path rdf:resource="https://w3id.org/won/auth#connectionState"/>
-    </rdf:Description>
-    <rdf:Description>
+        <shacl:minCount rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</shacl:minCount>
         <shacl:node rdf:resource="https://w3id.org/won/auth#atomExpressionShape"/>
-    </rdf:Description>
-    <rdf:Description rdf:nodeID="genid300">
-        <shacl:datatype rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#Literal"/>
-        <shacl:pattern>^[^\s]+$</shacl:pattern>
-    </rdf:Description>
-    <rdf:Description>
-        <shacl:nodeKind rdf:resource="http://www.w3.org/ns/shacl#IRI"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#grantee"/>
     </rdf:Description>
     <rdf:Description>
         <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
     </rdf:Description>
     <rdf:Description>
-        <shacl:property rdf:resource="https://w3id.org/won/auth#targetWonNodePropertyShape"/>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#inheritPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:resource="https://w3id.org/won/auth#operationPropertyShape"/>
+    </rdf:Description>
+    <rdf:Description>
+        <shacl:property rdf:nodeID="genid303"/>
+    </rdf:Description>
+    <rdf:Description rdf:nodeID="genid303">
+        <shacl:node rdf:resource="https://w3id.org/won/auth#connectionMessageExpressionShape"/>
+        <shacl:path rdf:resource="https://w3id.org/won/auth#connectionMessage"/>
     </rdf:Description>
     
 

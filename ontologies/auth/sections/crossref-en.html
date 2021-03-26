@@ -1109,6 +1109,7 @@ This section provides details for each class and property defined by Web of Need
          <dt>has members</dt>
          <dd>
             <a href="#OwnerToken" title="https://w3id.org/won/auth#OwnerToken">OwnerToken</a>
+            <sup class="type-ni" title="named individual">ni</sup>, <a href="#SharedContextToken" title="https://w3id.org/won/auth#SharedContextToken">SharedContextToken</a>
             <sup class="type-ni" title="named individual">ni</sup>
          </dd>
       </dl>
@@ -3317,6 +3318,9 @@ This section provides details for each class and property defined by Web of Need
       </li>
       <li>
          <a href="#self" title="https://w3id.org/won/auth#self">self</a>
+      </li>
+      <li>
+         <a href="#SharedContextToken" title="https://w3id.org/won/auth#SharedContextToken">SharedContextToken</a>
       </li>
       <li>
          <a href="#simpleOperationExpressionShape"
@@ -5617,6 +5621,34 @@ This section provides details for each class and property defined by Web of Need
          <dd>
             <a href="#RelativeAtomExpression"
                title="https://w3id.org/won/auth#RelativeAtomExpression">RelativeAtomExpression</a>
+            <sup class="type-c" title="class">c</sup>
+         </dd>
+      </dl>
+   </div>
+   <div class="entity" id="SharedContextToken">
+      <h3>SharedContextToken<sup class="type-ni" title="named individual">ni</sup>
+         <span class="backlink"> back to <a href="#toc">ToC</a> or <a href="#namedindividuals">Named Individual ToC</a>
+         </span>
+      </h3>
+      <p>
+         <strong>IRI:</strong> https://w3id.org/won/auth#SharedContextToken</p>
+      <div class="comment">
+         <span class="markdown">URI reserved for the value of the scope claim of shared context tokens. Such tokens are
+    used to prove that an atom has access to some (randomly defined) context and should be granted operations based on that.
+    For example, an atom representing an organization could issue a shared context token to its members. In this case, the
+    membership in the organization is the context they share. A socket that the organization supports might grant access to clients
+    bearing a shared context token issued by the organization.</span>
+      </div>
+      <dl class="definedBy">
+         <dt>Is defined by</dt>
+         <dd>
+            <a href="https://w3id.org/won/auth#">https://w3id.org/won/auth#</a>
+         </dd>
+      </dl>
+      <dl class="description">
+         <dt>belongs to</dt>
+         <dd>
+            <a href="#TokenScope" title="https://w3id.org/won/auth#TokenScope">TokenScope</a>
             <sup class="type-c" title="class">c</sup>
          </dd>
       </dl>
