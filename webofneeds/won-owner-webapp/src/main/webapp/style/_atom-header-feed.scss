@@ -2,6 +2,7 @@
 @import "sizing-utils";
 @import "square-image";
 @import "animate";
+@import "elevation";
 
 a.won-atom-header-feed,
 won-atom-header-feed {
@@ -31,6 +32,11 @@ won-atom-header-feed {
   grid-template-columns: min-content 1fr;
   grid-column-gap: 0.5rem;
   min-width: 0;
+  padding: 0.25rem 0.5rem 0.25rem 0.25rem;
+  border-radius: 0.5rem;
+  border: 0.0625rem solid var(--won-line-gray);
+  background: var(--won-light-gray);
+  @include defaultItemActionElevation();
 
   @include square-image($postIconSizeMobile);
 
