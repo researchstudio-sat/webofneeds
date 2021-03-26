@@ -7,7 +7,7 @@ import VisibilitySensor from "react-visibility-sensor";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 import WonAtomContextSwipeableView from "../atom-context-swipeable-view";
-import WonAtomHeader from "../atom-header";
+import WonAtomHeaderFeed from "../atom-header-feed";
 import WonGenericSocketActions from "../socket-actions/generic-actions";
 
 import { actionCreators } from "../../actions/actions";
@@ -18,9 +18,10 @@ import "~/style/_feed-item.scss";
 
 export default function WonGenericFeedItem({
   connection,
-  atom,
+  senderAtom,
   isOwned,
   targetAtom,
+  hideSenderAtom,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -61,6 +62,9 @@ export default function WonGenericFeedItem({
       break;
   }
 
+  const targetAtomTypeLabel =
+    targetAtom && atomUtils.generateTypeLabel(targetAtom);
+
   return (
     <VisibilitySensor
       key={getUri(connection)}
@@ -86,43 +90,77 @@ export default function WonGenericFeedItem({
             )
           }
         >
-          <WonAtomHeader
-            atom={atom}
-            hideTimestamp={true}
-            toLink={generateLink(
-              history.location,
-              {
-                postUri: getUri(atom),
-                connectionUri: getUri(connection),
-                tab: undefined,
-              },
-              "/post"
-            )}
-          />
-          <div className="fi__info">
-            {atomUtils.getSocketType(
-              atom,
-              connectionUtils.getSocketUri(connection)
-            ) +
-              " --> " +
-              atomUtils.getSocketType(
-                targetAtom,
-                connectionUtils.getTargetSocketUri(connection)
-              )}
-          </div>
-          <WonAtomHeader
-            atom={targetAtom}
-            hideTimestamp={true}
-            toLink={generateLink(
-              history.location,
-              {
-                postUri: getUri(targetAtom),
-                connectionUri: getUri(connection),
-                tab: undefined,
-              },
-              "/post"
-            )}
-          />
+          {hideSenderAtom ? (
+            <React.Fragment>
+              <div className="fi__info">{targetAtomTypeLabel}</div>
+              <WonAtomHeaderFeed
+                atom={targetAtom}
+                toLink={generateLink(
+                  history.location,
+                  {
+                    postUri: getUri(targetAtom),
+                    connectionUri: getUri(connection),
+                    tab: undefined,
+                  },
+                  "/post"
+                )}
+              />
+              <div className="fi__info">
+                {atomUtils.getSocketType(
+                  senderAtom,
+                  connectionUtils.getSocketUri(connection)
+                ) +
+                  " --> " +
+                  atomUtils.getSocketType(
+                    targetAtom,
+                    connectionUtils.getTargetSocketUri(connection)
+                  ) +
+                  ":" +
+                  connectionUtils.getState(connection)}
+              </div>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <WonAtomHeaderFeed
+                atom={senderAtom}
+                toLink={generateLink(
+                  history.location,
+                  {
+                    postUri: getUri(senderAtom),
+                    connectionUri: getUri(connection),
+                    tab: undefined,
+                  },
+                  "/post"
+                )}
+              />
+              <div className="fi__info">{targetAtomTypeLabel}</div>
+              <WonAtomHeaderFeed
+                atom={targetAtom}
+                toLink={generateLink(
+                  history.location,
+                  {
+                    postUri: getUri(targetAtom),
+                    connectionUri: getUri(connection),
+                    tab: undefined,
+                  },
+                  "/post"
+                )}
+              />
+              <div className="fi__info">
+                {atomUtils.getSocketType(
+                  senderAtom,
+                  connectionUtils.getSocketUri(connection)
+                ) +
+                  " --> " +
+                  atomUtils.getSocketType(
+                    targetAtom,
+                    connectionUtils.getTargetSocketUri(connection)
+                  ) +
+                  ":" +
+                  connectionUtils.getState(connection)}
+              </div>
+            </React.Fragment>
+          )}
         </WonAtomContextSwipeableView>
       </div>
     </VisibilitySensor>
@@ -130,7 +168,8 @@ export default function WonGenericFeedItem({
 }
 WonGenericFeedItem.propTypes = {
   connection: PropTypes.object.isRequired,
-  atom: PropTypes.object.isRequired,
+  senderAtom: PropTypes.object.isRequired,
   isOwned: PropTypes.bool.isRequired,
   targetAtom: PropTypes.object.isRequired,
+  hideSenderAtom: PropTypes.bool,
 };
