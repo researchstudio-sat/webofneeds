@@ -1,6 +1,5 @@
 package won.shacl2java.runtime.model;
 
-import com.github.jsonldjava.utils.Obj;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 
