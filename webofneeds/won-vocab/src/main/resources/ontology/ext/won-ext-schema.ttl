@@ -103,6 +103,8 @@ won:derivesAtomProperty
                                                    auth:targetAtom      [ ] ] ] ] ;
     auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   :MemberSocket ;
                                                         auth:expiresAfter 3600 ] ] ;
+                   auth:operation [ auth:requestToken [ auth:tokenScope   auth:SharedContextToken ;
+                                                        auth:expiresAfter 3600 ] ] ;
                    auth:graph     [ auth:graphType auth:contentGraph, auth:keyGraph, auth:sysinfoGraph ;
                                     auth:operation auth:opRead ] ;
                    auth:socket    [ auth:socketType  :MemberSocket ;
@@ -1063,7 +1065,18 @@ won:derivesAtomProperty
     rdfs:label                     "AssociatedArticleSocket" ;
     rdfs:comment
                                    "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `A schema:associatedArticle B` when a Connection with an Atom B is established. Automatically generated from the [associatedArticle](http://schema.org/associatedArticle) Property of the http://schema.org vocabulary." ;
-    won:compatibleSocketDefinition :AssociatedArticleInverseSocket .
+    won:compatibleSocketDefinition :AssociatedArticleInverseSocket ;
+    auth:localAuth                 :AssociatedArticleSocketAuthorization .
+
+:AssociatedArticleSocketAuthorization
+    a           auth:Authorization ;
+    rdfs:label  "AssociatedArticleSocketAuthorization" ;
+    auth:bearer [ auth:tokenScope auth:SharedContextToken ;
+                  auth:issuer     [ auth:atom auth:self ] ] ;
+    auth:grant  [ auth:socket [ auth:socketType         :AssociatedArticleSocket ;
+                                auth:operation          auth:opRead ;
+                                auth:connectionMessages [ auth:inherit false ] ] ] .
+
 
 :AssociatedArticleInverseSocket
     a                              won:SocketDefinition ;
@@ -1071,7 +1084,21 @@ won:derivesAtomProperty
     rdfs:label                     "AssociatedArticleInverseSocket" ;
     rdfs:comment
                                    "An Atom `A` that specifies a Socket with this SocketDefinition derives triple `B schema:associatedArticle A` when a Connection with an Atom B is established. Automatically generated from the [associatedArticle](http://schema.org/associatedArticle) Property of the http://schema.org vocabulary." ;
-    won:compatibleSocketDefinition :AssociatedArticleSocket .
+    won:compatibleSocketDefinition :AssociatedArticleSocket ;
+    auth:localAuth                 :AssociatedArticleInverseSocketAuthorization .
+
+:AssociatedArticleInverseSocketAuthorization
+    a           auth:Authorization ;
+    rdfs:label  "AssociatedArticleInverseSocketAuthorization" ;
+    auth:bearer [ auth:tokenScope auth:SharedContextToken ;
+                  auth:issuer     [ auth:socket [ auth:socketType :AssociatedArticleInverseSocket ;
+                                                  auth:connection [ auth:connectionState won:Connected ;
+                                                                    auth:targetAtom      [ ] ] ] ] ] ;
+    auth:grant  [ auth:graph  [ auth:graphType auth:contentGraph, auth:sysinfoGraph, auth:keyGraph ;
+                                auth:operation auth:opRead ] ;
+                  auth:socket [ auth:socketType         :AssociatedArticleInverseSocket ;
+                                auth:operation          auth:opRead ;
+                                auth:connectionMessages [ auth:inherit false ] ] ] .
 
 :AuthenticatorSocket
     a                              won:SocketDefinition ;
@@ -3791,12 +3818,9 @@ won:derivesAtomProperty
 :grantAccessToEventSocketForMemberAuth
     a            auth:Authorization ;
     rdfs:label   "GrantAccessToEventSocketForMemberAuth" ;
-    auth:grantee [ auth:socket [ auth:socketType :MemberSocket ;
-                                 auth:connection [ auth:connectionState won:Connected ;
-                                                   auth:targetAtom      [ ] ] ] ] ;
-    auth:grant   [ auth:operation [ auth:requestToken [ auth:tokenScope   :MemberSocket ;
-                                                        auth:expiresAfter 3600 ] ] ;
-                   auth:socket    [ auth:socketType  :EventSocket ;
+    auth:bearer [ auth:tokenScope auth:SharedContextToken ;
+                  auth:issuer     [ auth:atom auth:self ] ] ;
+    auth:grant   [ auth:socket    [ auth:socketType  :EventSocket ;
                                     auth:connections [ auth:operation          auth:opRead ;
                                                        auth:connectionState    won:Connected ;
                                                        auth:connectionMessages [ auth:inherit false ] ] ] ] .
@@ -3815,7 +3839,7 @@ won:derivesAtomProperty
 :grantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth
     a           auth:Authorization ;
     rdfs:label  "GrantAccessToGraphAttendeeSocketAndHoldableSocketWithMemberSocketAuth" ;
-    auth:bearer [ auth:tokenScope :MemberSocket ;
+    auth:bearer [ auth:tokenScope auth:SharedContextToken ;
                   auth:issuer     [ auth:socket [ auth:socketType :EventInverseSocket ;
                                                   auth:connection [ auth:targetAtom      [ ] ;
                                                                     auth:connectionState won:Connected ] ] ] ] ;

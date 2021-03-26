@@ -1525,6 +1525,16 @@ auth:OwnerToken
     rdfs:comment     "URI reserved for the value of the scope claim of owner tokens"@en ;
     rdfs:label       "OwnerToken" .
 
+auth:SharedContextToken
+    rdfs:isDefinedBy auth: ;
+    a                owl:NamedIndividual, auth:TokenScope ;
+    rdfs:comment     """URI reserved for the value of the scope claim of shared context tokens. Such tokens are
+    used to prove that an atom has access to some (randomly defined) context and should be granted operations based on that.
+    For example, an atom representing an organization could issue a shared context token to its members. In this case, the
+    membership in the organization is the context they share. A socket that the organization supports might grant access to clients
+    bearing a shared context token issued by the organization."""@en ;
+    rdfs:label       "SharedContextToken" .
+
 # Implicit authorizations for all atoms:
 
 auth:grantsForOwnerTokenBearer
