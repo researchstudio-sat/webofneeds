@@ -10,10 +10,6 @@
     grid-auto-columns: max-content;
     grid-column-gap: 0.5rem;
     align-items: center;
-
-    &.status--closed {
-      //TODO: Filter grayscale or something
-    }
   }
 
   padding-left: 0.25rem;
