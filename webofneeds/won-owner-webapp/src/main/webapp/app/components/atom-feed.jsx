@@ -3,24 +3,69 @@
  */
 import React from "react";
 import PropTypes from "prop-types";
-import vocab from "~/app/service/vocab";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
+import * as connectionUtils from "~/app/redux/utils/connection-utils";
+import { useSelector } from "react-redux";
+import * as generalSelectors from "~/app/redux/selectors/general-selectors";
+import { relativeTime } from "~/app/won-label-utils";
+import WonGenericFeedItem from "~/app/components/feed-items/generic-feed-item";
+import { get, getUri } from "~/app/utils";
 
 import "~/style/_atom-feed.scss";
-import * as connectionUtils from "~/app/redux/utils/connection-utils";
 
-export default function WonAtomFeed({ atom }) {
-  const connections = atomUtils
-    .getConnections(atom, vocab.WON.ClosedCompacted, true)
+export default function WonAtomFeed({ atom, isOwned, storedAtoms }) {
+  const globalLastUpdateTime = useSelector(
+    generalSelectors.selectLastUpdateTime
+  );
+  const feedElements = [];
+
+  let lastDivider;
+
+  atomUtils
+    .getConnections(atom)
     .toOrderedMap()
     .sortBy(conn => {
       const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
       return lastUpdateDate && lastUpdateDate.getTime();
     })
-    .reverse();
+    .reverse()
+    .map(conn => {
+      const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
+      const friendlyLastUpdateDate =
+        lastUpdateDate && relativeTime(globalLastUpdateTime, lastUpdateDate);
 
-  return <won-atom-feed>TODO: FEED {connections.size}</won-atom-feed>;
+      if (lastDivider !== friendlyLastUpdateDate) {
+        feedElements.push(
+          <div className="af__datedivider">{friendlyLastUpdateDate}</div>
+        );
+      }
+      lastDivider = friendlyLastUpdateDate;
+
+      feedElements.push(
+        <div className="af__item">
+          <WonGenericFeedItem
+            key={getUri(conn)}
+            connection={conn}
+            atom={atom}
+            targetAtom={get(
+              storedAtoms,
+              connectionUtils.getTargetAtomUri(conn)
+            )}
+            isOwned={isOwned}
+          />
+        </div>
+      );
+    });
+
+  return (
+    <won-atom-feed>
+      <div className="af__header">Feed</div>
+      {feedElements}
+    </won-atom-feed>
+  );
 }
 WonAtomFeed.propTypes = {
   atom: PropTypes.object.isRequired,
+  storedAtoms: PropTypes.object.isRequired,
+  isOwned: PropTypes.bool,
 };
