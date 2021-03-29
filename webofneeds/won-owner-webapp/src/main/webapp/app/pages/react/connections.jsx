@@ -54,14 +54,28 @@ export default function PageConnections() {
     )
   );
 
+  const targetAtomUri = selectedTargetAtom && getUri(selectedTargetAtom);
+  const isTargetAtomFetchNecessary = processUtils.isAtomFetchNecessary(
+    processState,
+    targetAtomUri,
+    selectedTargetAtom
+  );
+  const isTargetAtomLoading = processUtils.isAtomLoading(
+    processState,
+    targetAtomUri
+  );
+
   const isSelectedConnectionGroupChat =
     selectedConnection &&
+    selectedTargetAtom &&
     connectionUtils.hasTargetSocketUri(
       selectedConnection,
       atomUtils.getGroupSocket(selectedTargetAtom)
     );
+
   const isSelectedConnectionChat =
     selectedConnection &&
+    selectedTargetAtom &&
     connectionUtils.hasTargetSocketUri(
       selectedConnection,
       atomUtils.getChatSocket(selectedTargetAtom)
@@ -72,6 +86,11 @@ export default function PageConnections() {
       if (isAtomFetchNecessary) {
         console.debug("fetch atomUri, ", atomUri);
         dispatch(actionCreators.atoms__fetchUnloadedAtom(atomUri));
+      }
+
+      if (isTargetAtomFetchNecessary) {
+        console.debug("fetch atomUri, ", targetAtomUri);
+        dispatch(actionCreators.atoms__fetchUnloadedAtom(targetAtomUri));
       }
 
       if (!atomUriInRoute && ownedAtoms) {
@@ -89,9 +108,12 @@ export default function PageConnections() {
       //If the request has not a Chat-, or GroupSocket we won't show the messages view
       if (
         !isAtomFetchNecessary &&
+        !isTargetAtomFetchNecessary &&
+        selectedConnection &&
+        targetAtomUri &&
+        !isTargetAtomLoading &&
         !isSelectedConnectionGroupChat &&
-        !isSelectedConnectionChat &&
-        selectedTargetAtom
+        !isSelectedConnectionChat
       ) {
         history.replace(
           generateLink(
@@ -106,7 +128,10 @@ export default function PageConnections() {
       selectedConnectionUri,
       atom,
       ownedAtoms,
-      selectedTargetAtom,
+      selectedConnection,
+      targetAtomUri,
+      isTargetAtomLoading,
+      isTargetAtomFetchNecessary,
       isAtomFetchNecessary,
       atomUriInRoute,
     ]
