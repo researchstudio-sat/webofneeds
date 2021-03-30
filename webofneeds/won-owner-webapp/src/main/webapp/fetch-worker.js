@@ -305,6 +305,24 @@ export const serverSideConnect = (
 };
 
 /**
+ * Send Subscription for pushNotifications to Server
+ */
+export const sendSubscriptionToServer = subscription => {
+  const url = urljoin(ownerBaseUrl, "/rest/users/subscribeNotifications");
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(subscription.toJSON()),
+  })
+    .then(checkHttpStatus())
+    .then(response => response.json());
+};
+
+/**
  * Returns all stored Atoms including MetaData (e.g. type, creationDate, location, state) as a Map
  * @param state either "ACTIVE" or "INACTIVE"
  * @returns {*}

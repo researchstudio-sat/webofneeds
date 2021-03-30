@@ -13,7 +13,7 @@ import { precacheAndRoute, createHandlerBoundToURL } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
 import { StaleWhileRevalidate } from "workbox-strategies";
 
-import { ownerBaseUrl } from "../config/default";
+import { ownerBaseUrl } from "./config/default";
 
 clientsClaim();
 
