@@ -109,6 +109,12 @@ export const serverSideConnect = (
   );
 
 /**
+ * Send pushNotifications subscription to server
+ */
+export const sendSubscriptionToServer = subsctiption =>
+  fetchWorker.sendSubscriptionToServer(subsctiption);
+
+/**
  * Returns all stored Atoms including MetaData (e.g. type, creationDate, location, state) as a Map
  * @param state either "ACTIVE" or "INACTIVE"
  * @returns {*}
