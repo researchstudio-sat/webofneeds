@@ -1,11 +1,6 @@
 import { ownerBaseUrl } from "../config/default";
-import { base64UrlToUint8Array, compareArrayBuffers } from "./utils";
-import { sendSubscriptionToServer } from "./api/owner-api";
-function getServerKey() {
-  return fetch(`${ownerBaseUrl}/appConfig/getWebPushKey`)
-    .then(resp => resp.json())
-    .then(base64UrlToUint8Array);
-}
+import { compareArrayBuffers } from "./utils";
+import { sendSubscriptionToServer, getServerKey } from "./api/owner-api";
 
 export async function runPushAgent() {
   if (!("serviceWorker" in navigator)) {
@@ -14,7 +9,6 @@ export async function runPushAgent() {
 
   navigator.serviceWorker.register(`${ownerBaseUrl}/sw.js`);
   const serviceWorker = await navigator.serviceWorker.ready;
-
   const serverKey = await getServerKey();
   const permissionState = await serviceWorker.pushManager.permissionState({
     userVisibleOnly: true,

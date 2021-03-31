@@ -115,6 +115,10 @@ export const sendSubscriptionToServer = subsctiption =>
   fetchWorker.sendSubscriptionToServer(subsctiption);
 
 /**
+ * Get ServerKey
+ */
+export const getServerKey = () => fetchWorker.getServerKey();
+/**
  * Returns all stored Atoms including MetaData (e.g. type, creationDate, location, state) as a Map
  * @param state either "ACTIVE" or "INACTIVE"
  * @returns {*}
