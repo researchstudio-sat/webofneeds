@@ -312,14 +312,11 @@ export const sendSubscriptionToServer = subscription => {
   return fetch(url, {
     method: "POST",
     headers: {
-      Accept: "application/json",
       "Content-Type": "application/json",
     },
     credentials: "include",
-    body: JSON.stringify(subscription.toJSON()),
-  })
-    .then(checkHttpStatus())
-    .then(response => response.json());
+    body: JSON.stringify(subscription),
+  }).then(checkHttpStatus());
 };
 
 /**
