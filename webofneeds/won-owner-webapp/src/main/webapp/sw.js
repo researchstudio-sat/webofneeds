@@ -1,13 +1,14 @@
 import "babel-polyfill";
 
 self.addEventListener("push", async event => {
-  console.debug("push event");
+  console.debug("PushEvent");
   const payload = event.data.json();
   const clientWindows = await self.clients.matchAll({ type: "window" });
   const activeWindows = clientWindows.filter(client => {
     return client.focused;
   });
 
+  console.debug("activeWindows: ", activeWindows.length);
   if (activeWindows.length === 0) {
     switch (payload.type) {
       case "CONNECT":
@@ -50,11 +51,12 @@ self.addEventListener("push", async event => {
 });
 
 self.addEventListener("notificationclick", event => {
+  console.debug("Notification Click");
   event.waitUntil(openNotifiedPage(event)); //This is needed so that the browser allows us to open/focus a window
 });
 
 async function openNotifiedPage(event) {
-  console.log(event.notification.data);
+  console.debug("NotificationData: ", event.notification.data);
   const connectionUri = event.notification.data.connectionUri;
   const type = event.notification.data.type;
   const atomUri = event.notification.data.atomUri;

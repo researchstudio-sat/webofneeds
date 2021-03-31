@@ -1,6 +1,7 @@
 import urljoin from "url-join";
 import _ from "lodash";
 import { ownerBaseUrl } from "~/config/default.js";
+import { base64UrlToUint8Array } from "~/app/utils";
 import jsonld from "jsonld";
 import * as N3 from "n3";
 
@@ -317,6 +318,16 @@ export const sendSubscriptionToServer = subscription => {
     credentials: "include",
     body: JSON.stringify(subscription),
   }).then(checkHttpStatus());
+};
+
+/**
+ * Get ServerKey
+ */
+export const getServerKey = () => {
+  const url = urljoin(ownerBaseUrl, "/appConfig/getWebPushKey");
+  return fetch(url)
+    .then(resp => resp.json())
+    .then(base64UrlToUint8Array);
 };
 
 /**

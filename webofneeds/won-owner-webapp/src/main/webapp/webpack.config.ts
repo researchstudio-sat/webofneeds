@@ -192,6 +192,7 @@ function config(env, argv): Configuration {
         NODE_ENV: "development",
         WON_DEPLOY_NODE_ENV: "default",
         WON_OWNER_BASE_URL: "/owner",
+        ENABLE_NOTIFICATIONS: true,
       }),
     ],
     devtool: "source-map",
