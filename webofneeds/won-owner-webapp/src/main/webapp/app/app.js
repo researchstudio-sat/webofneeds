@@ -53,7 +53,7 @@ import Immutable from "immutable";
 import { getQueryParams, generateLink } from "./utils.js";
 import * as accountUtils from "./redux/utils/account-utils.js";
 import * as processUtils from "./redux/utils/process-utils.js";
-import { runPushAgent, initializePushNotifications } from "./push-agent";
+import { runPushAgent } from "./push-agent";
 //import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import WonModalDialog from "~/app/components/modal-dialog";
@@ -91,16 +91,7 @@ runMessagingAgent(store);
 
 if (enableNotifications) {
   console.debug("runPushAgent");
-  initializePushNotifications().then(async consent => {
-    if (consent === "granted") {
-      runPushAgent();
-    }
-  });
-  /**serviceWorkerRegistration.register({
-    nodeEnv: "production", //nodeEnv,
-    ownerBaseUrl: ownerBaseUrl,
-  });*/
-  //runPushAgent(store); // TODO: runPushAgent used to get $ngRedux and ngRedux had a connect method attached -> not sure if that can be applied to the given store though
+  runPushAgent();
 }
 
 // Initiate the initial load

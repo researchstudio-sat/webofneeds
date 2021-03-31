@@ -23,23 +23,23 @@ export async function runPushAgent() {
   console.debug("PermissionState: ", permissionState);
   switch (permissionState) {
     case "granted": {
-      let pushSubscription = await serviceWorker.pushManager.getSubscription();
+      let subscription = await serviceWorker.pushManager.getSubscription();
       if (
-        !pushSubscription ||
+        !subscription ||
         !compareArrayBuffers(
-          pushSubscription.options.applicationServerKey,
+          subscription.options.applicationServerKey,
           serverKey
         )
       ) {
         console.debug("Subscription is stale, trying to generate new one");
-        if (pushSubscription) {
-          await pushSubscription.unsubscribe();
+        if (subscription) {
+          await subscription.unsubscribe();
         }
-        pushSubscription = await serviceWorker.pushManager.subscribe({
+        subscription = await serviceWorker.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: serverKey,
         });
-        await sendSubscriptionToServer(pushSubscription);
+        await sendSubscriptionToServer(subscription.toJSON());
       }
       break;
     }
@@ -51,7 +51,7 @@ export async function runPushAgent() {
         })
         .then(
           subscription => {
-            return sendSubscriptionToServer(subscription);
+            return sendSubscriptionToServer(subscription.toJSON());
           },
           () => {
             console.info("Push subscription denied");
@@ -63,14 +63,4 @@ export async function runPushAgent() {
       console.debug("Push subscription denied");
       break;
   }
-}
-
-/**
- * asks user consent to receive push notifications and returns the response of the user, one of granted, default, denied
- */
-export function initializePushNotifications() {
-  // request user grant to show notification
-  return Notification.requestPermission(function(result) {
-    return result;
-  });
 }
