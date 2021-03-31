@@ -1,7 +1,6 @@
 import urljoin from "url-join";
 import _ from "lodash";
 import { ownerBaseUrl } from "~/config/default.js";
-import { base64UrlToUint8Array } from "~/app/utils";
 import jsonld from "jsonld";
 import * as N3 from "n3";
 
@@ -1315,4 +1314,19 @@ function privateId2Credentials(privateId) {
     password,
     privateId,
   };
+}
+
+function base64UrlToUint8Array(base64UrlData) {
+  const padding = "=".repeat((4 - (base64UrlData.length % 4)) % 4);
+  const base64 = (base64UrlData + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = atob(base64);
+  const buffer = new Uint8Array(rawData.length);
+
+  for (const i of buffer.keys()) {
+    buffer[i] = rawData.charCodeAt(i);
+  }
+  return buffer.buffer;
 }
