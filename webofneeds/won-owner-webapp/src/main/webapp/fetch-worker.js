@@ -305,31 +305,6 @@ export const serverSideConnect = (
 };
 
 /**
- * Send Subscription for pushNotifications to Server
- */
-export const sendSubscriptionToServer = subscription => {
-  const url = urljoin(ownerBaseUrl, "/rest/users/subscribeNotifications");
-  return fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(subscription),
-  }).then(checkHttpStatus());
-};
-
-/**
- * Get ServerKey
- */
-export const getServerKey = () => {
-  const url = urljoin(ownerBaseUrl, "/appConfig/getWebPushKey");
-  return fetch(url)
-    .then(resp => resp.json())
-    .then(base64UrlToUint8Array);
-};
-
-/**
  * Returns all stored Atoms including MetaData (e.g. type, creationDate, location, state) as a Map
  * @param state either "ACTIVE" or "INACTIVE"
  * @returns {*}
@@ -1314,19 +1289,4 @@ function privateId2Credentials(privateId) {
     password,
     privateId,
   };
-}
-
-function base64UrlToUint8Array(base64UrlData) {
-  const padding = "=".repeat((4 - (base64UrlData.length % 4)) % 4);
-  const base64 = (base64UrlData + padding)
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
-
-  const rawData = atob(base64);
-  const buffer = new Uint8Array(rawData.length);
-
-  for (const i of buffer.keys()) {
-    buffer[i] = rawData.charCodeAt(i);
-  }
-  return buffer.buffer;
 }
