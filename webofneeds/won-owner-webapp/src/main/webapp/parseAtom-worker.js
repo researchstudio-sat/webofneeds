@@ -145,25 +145,31 @@ function extractAuthList(authList) {
   return auths ? auths.map(auth => auth.delete("@type")) : Immutable.List();
 }
 
-function extractTokenAuth(authList, vocab) {
-  const auths = extractAuthList(authList);
+const extractTokenAuth = (authList, vocab) =>
+  extractAuthList(authList).filter(auth => {
+    const grants = get(auth, vocab.AUTH.grant);
+    return !!grants.find(grant => {
+      const operations = get(grant, vocab.AUTH.operation);
 
-  return auths
-    ? auths.filter(auth => {
-        const grants = get(auth, vocab.AUTH.grant);
-        return !!grants.find(grant => {
-          const operations = get(grant, vocab.AUTH.operation);
-          return (
-            !!operations &&
-            !is("String", operations) &&
-            operations.find(
-              op => !is("String", op) && !!get(op, vocab.AUTH.requestToken)
-            )
-          );
-        });
-      })
-    : Immutable.List();
-}
+      if (operations) {
+        return (
+          !!operations &&
+          !is("String", operations) &&
+          !!operations.find(
+            op => !is("String", op) && !!get(op, vocab.AUTH.requestToken)
+          )
+        );
+      } else {
+        return (
+          !!grant &&
+          !is("String", grant) &&
+          !!grant.find(
+            g => !is("String", g) && !!get(g, vocab.AUTH.requestToken)
+          )
+        );
+      }
+    });
+  });
 
 function extractTokenScopeUris(authList, vocab) {
   const tokenAuths = extractTokenAuth(authList, vocab);
@@ -184,8 +190,21 @@ function extractTokenScopeUris(authList, vocab) {
       ]);
       tokenScopeUri && tokenScopeUris.push(tokenScopeUri);
     }
-  }
 
+    const authTokenGrants = tokenAuth.get(vocab.AUTH.grant);
+    if (authTokenGrants && !is("String", authTokenGrants)) {
+      authTokenGrants.map(authTokenGrants => {
+        if (!is("String", authTokenGrants)) {
+          authTokenGrants.map(g => {
+            const tokenScopeUri =
+              !is("String", g) &&
+              getIn(g, [vocab.AUTH.requestToken, vocab.AUTH.tokenScope, "@id"]);
+            tokenScopeUri && tokenScopeUris.push(tokenScopeUri);
+          });
+        }
+      });
+    }
+  }
   return tokenScopeUris;
 }
 
