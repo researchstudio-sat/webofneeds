@@ -326,6 +326,18 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 // 2. try to push
                 // 3. email only if push was not successful
                 notifyUserOnDifferentChannel(wonMessage, atomUri, userOpt, user);
+            } else {
+                // TODO: remove redundant calls
+                // Always send possible pushNotifications:
+                // - maybe session is active -> message was send, but Tab is not focused
+                // - Browser is running in brackground -> user needs to get push notification
+                Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
+                                linkedDataSource);
+                if (connectionURI.isPresent()) {
+                    logger.debug("notifying user per web push for message {}", wonMessage.getMessageURI());
+                    notifyPerPush(user, atomUri, wonMessage, connectionURI.get());
+                }
+                logger.debug("cannot notify user: cannot determine connection URI");
             }
             return wonMessage;
         } finally {
