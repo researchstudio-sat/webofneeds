@@ -13,13 +13,20 @@ import { get, getUri } from "~/app/utils";
 
 import "~/style/_atom-feed.scss";
 
-export default function WonAtomFeed({ atom, isOwned, storedAtoms }) {
+export default function WonAtomFeed({
+  atom,
+  isOwned,
+  storedAtoms,
+  showItemCount,
+}) {
   const globalLastUpdateTime = useSelector(
     generalSelectors.selectLastUpdateTime
   );
   const feedElements = [];
 
   let lastDivider;
+
+  console.debug("showItemCount: ", showItemCount);
 
   atomUtils
     .getConnections(atom)
@@ -69,4 +76,5 @@ WonAtomFeed.propTypes = {
   atom: PropTypes.object.isRequired,
   storedAtoms: PropTypes.object.isRequired,
   isOwned: PropTypes.bool,
+  showItemCount: PropTypes.number,
 };
