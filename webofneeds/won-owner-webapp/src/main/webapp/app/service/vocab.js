@@ -30,6 +30,8 @@ vocab.WON.atomState = vocab.WON.baseUri + "atomState";
 vocab.WON.atomStateCompacted = vocab.WON.prefix + ":atomState";
 vocab.WON.socket = vocab.WON.baseUri + "socket";
 vocab.WON.socketCompacted = vocab.WON.prefix + ":socket";
+vocab.WON.socketDefinition = vocab.AUTH.baseUri + "socketDefinition";
+vocab.WON.socketDefinitionCompacted = vocab.AUTH.prefix + ":socketDefinition";
 vocab.WON.targetSocket = vocab.WON.baseUri + "targetSocket";
 vocab.WON.targetSocketCompacted = vocab.WON.prefix + ":targetSocket";
 
@@ -108,6 +110,13 @@ vocab.WONMATCH.UsedForTestingCompacted =
 vocab.WONMATCH.NoHintForMeCompacted = vocab.WONMATCH.prefix + ":NoHintForMe";
 vocab.WONMATCH.flag = vocab.WONMATCH.baseUri + "flag";
 vocab.WONMATCH.flagCompacted = vocab.WONMATCH.prefix + ":flag";
+vocab.WONMATCH.seeks = vocab.WONMATCH.baseUri + "seeks";
+vocab.WONMATCH.seeksCompacted = vocab.WONMATCH.prefix + ":seeks";
+vocab.WONMATCH.doNotMatchAfter = vocab.WONMATCH.baseUri + "doNotMatchAfter";
+vocab.WONMATCH.doNotMatchAfterCompacted =
+  vocab.WONMATCH.prefix + ":doNotMatchAfter";
+vocab.WONMATCH.sparqlQuery = vocab.WONMATCH.baseUri + "sparqlQuery";
+vocab.WONMATCH.sparqlQueryCompacted = vocab.WONMATCH.prefix + ":sparqlQuery";
 
 vocab.AGR = {};
 vocab.AGR.baseUri = "https://w3id.org/won/agreement#";

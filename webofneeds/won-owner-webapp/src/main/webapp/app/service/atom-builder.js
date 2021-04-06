@@ -169,28 +169,32 @@ import { Generator } from "sparqljs";
           ? args.seeks.publishedContentUri
           : undefined,
       "@type": [vocab.WON.AtomCompacted],
-      "match:seeks": seeksContentUri ? { "@id": seeksContentUri } : undefined,
-      "won:socket": !(args.content && args.content.sockets)
+      [vocab.WONMATCH.seeksCompacted]: seeksContentUri
+        ? { "@id": seeksContentUri }
+        : undefined,
+      [vocab.WON.socketCompacted]: !(args.content && args.content.sockets)
         ? [
             {
               "@id": "#chatSocket",
-              "won:socketDefinition": { "@id": vocab.CHAT.ChatSocketCompacted },
+              [vocab.WON.socketDefinitionCompacted]: {
+                "@id": vocab.CHAT.ChatSocketCompacted,
+              },
             },
             {
               "@id": "#holdableSocket",
-              "won:socketDefinition": {
+              [vocab.WON.socketDefinitionCompacted]: {
                 "@id": vocab.HOLD.HoldableSocketCompacted,
               },
             },
           ]
         : undefined,
-      "match:flag": won.debugmode
+      [vocab.WONMATCH.flagCompacted]: won.debugmode
         ? [{ "@id": "match:UsedForTesting" }]
         : undefined, //TODO: refactor this and use a won:flags-Detail in the content instead
-      "match:doNotMatchAfter": doNotMatchAfter
+      [vocab.WONMATCH.doNotMatchAfterCompacted]: doNotMatchAfter
         ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
         : undefined,
-      "match:sparqlQuery": queryString,
+      [vocab.WONMATCH.sparqlQueryCompacted]: queryString,
     };
 
     if (args.content) {
