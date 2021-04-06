@@ -626,30 +626,27 @@ export const getPossibleRequestCredentialsForAtom = atomUri =>
             !get(ownedAtoms, extractAtomUriFromConnectionUri(connUri))
         );
 
-        const tokenScopeUris = atomUtils.getTokenScopeUris(get(atoms, atomUri));
-
-        tokenScopeUris &&
-          tokenScopeUris.forEach(tokenScopeUri => {
-            //FIXME: THIS IS JUST AN ASSUMPTION THAT WE MIGHT BE ABLE TO ACCESS/REQUEST THE ATOM IN QUESTION WITH A TOKEN FROM THE GIVEN ATOM
-            possibleRequestCredentials.push({
-              requestTokenFromAtomUri: atomUri,
-              scope: tokenScopeUri,
-            });
-          });
-
-        nonOwnedConnectionsToTargetAtom.map((_, connUri) => {
-          const atomUri = extractAtomUriFromConnectionUri(connUri);
-          const consideredAtom = get(atoms, atomUri);
+        const addTokenScopeUris = consideredAtom => {
+          const atomUri = getUri(consideredAtom);
           const tokenScopeUris = atomUtils.getTokenScopeUris(consideredAtom);
 
           tokenScopeUris &&
-            tokenScopeUris.forEach(tokenScopeUri => {
+            tokenScopeUris.map(tokenScopeUri => {
               //FIXME: THIS IS JUST AN ASSUMPTION THAT WE MIGHT BE ABLE TO ACCESS/REQUEST THE ATOM IN QUESTION WITH A TOKEN FROM THE GIVEN ATOM
               possibleRequestCredentials.push({
                 requestTokenFromAtomUri: atomUri,
                 scope: tokenScopeUri,
               });
             });
+        };
+
+        //Add TokenScopeUris that might be acquired to get access to the atom itself
+        addTokenScopeUris(get(atoms, atomUri));
+
+        nonOwnedConnectionsToTargetAtom.map((_, connUri) => {
+          const atomUri = extractAtomUriFromConnectionUri(connUri);
+          const consideredAtom = get(atoms, atomUri);
+          addTokenScopeUris(consideredAtom);
         });
       }
       return Immutable.fromJS(possibleRequestCredentials);
