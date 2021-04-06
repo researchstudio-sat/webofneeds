@@ -475,12 +475,15 @@ export const sockets = {
     if (value) {
       let sockets = [];
       Immutable.fromJS(value).map((socket, key) => {
-        sockets.push({ "@id": key, "won:socketDefinition": { "@id": socket } });
+        sockets.push({
+          "@id": key,
+          [vocab.WON.socketDefinitionCompacted]: { "@id": socket },
+        });
       });
 
       if (sockets.length > 0) {
         return {
-          "won:socket": sockets,
+          [vocab.WON.socketCompacted]: sockets,
         };
       }
     }
@@ -488,7 +491,7 @@ export const sockets = {
     return undefined;
   },
   parseFromRDF: function(jsonLDImm) {
-    const wonHasSockets = get(jsonLDImm, "won:socket");
+    const wonHasSockets = get(jsonLDImm, vocab.WON.socketCompacted);
     let sockets = Immutable.Map();
 
     if (wonHasSockets) {
@@ -496,7 +499,7 @@ export const sockets = {
         wonHasSockets.map(socket => {
           sockets = sockets.set(
             get(socket, "@id"),
-            getIn(socket, ["won:socketDefinition", "@id"])
+            getIn(socket, [vocab.WON.socketDefinitionCompacted, "@id"])
           );
         });
         if (sockets.size > 0) {
@@ -505,7 +508,7 @@ export const sockets = {
       } else {
         return sockets.set(
           get(wonHasSockets, "@id"),
-          getIn(wonHasSockets, ["won:socketDefinition", "@id"])
+          getIn(wonHasSockets, [vocab.WON.socketDefinitionCompacted, "@id"])
         );
       }
     }

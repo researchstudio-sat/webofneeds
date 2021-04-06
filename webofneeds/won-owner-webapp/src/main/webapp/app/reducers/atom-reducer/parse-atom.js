@@ -27,7 +27,10 @@ export function parseAtomContent(partiallyParsedAtom) {
         .set(
           "seeks",
           Immutable.fromJS(
-            generateContent(get(jsonldAtomImm, "match:seeks"), detailsToParse)
+            generateContent(
+              get(jsonldAtomImm, vocab.WONMATCH.seeks),
+              detailsToParse
+            )
           )
         );
 
