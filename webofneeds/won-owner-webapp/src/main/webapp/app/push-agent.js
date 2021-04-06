@@ -1,6 +1,6 @@
+import urljoin from "url-join";
 import { ownerBaseUrl } from "../config/default";
 import { compareArrayBuffers } from "./utils";
-import { sendSubscriptionToServer, getServerKey } from "./api/owner-api";
 
 export async function runPushAgent() {
   if (!("serviceWorker" in navigator)) {
@@ -57,4 +57,82 @@ export async function runPushAgent() {
       console.debug("Push subscription denied");
       break;
   }
+}
+
+function getServerKey() {
+  const url = urljoin(ownerBaseUrl, "/appConfig/getWebPushKey");
+  return fetch(url)
+    .then(resp => resp.json())
+    .then(base64UrlToUint8Array);
+}
+
+function sendSubscriptionToServer(subscription) {
+  const url = urljoin(ownerBaseUrl, "/rest/users/subscribeNotifications");
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(subscription),
+  }).then(checkHttpStatus());
+}
+
+/**
+ * Throws an error if this isn't a good http-response
+ * @param response
+ * @returns {*}
+ */
+const checkHttpStatus = (uri, params = {}) => response => {
+  if (
+    (response.status >= 200 && response.status < 300) ||
+    response.status === 304
+  ) {
+    return response;
+  } else {
+    return response
+      .json()
+      .then(jsonResponse => ({
+        response: jsonResponse,
+        status: response.status,
+        params: params,
+        message: `ERROR for request: ${response.status} - ${
+          response.statusText
+        } for request ${uri}`,
+      }))
+      .catch(err => {
+        console.debug(
+          "checkHttpStatus response, does not have json content",
+          response.status,
+          err
+        );
+
+        return {
+          response: {},
+          status: response.status,
+          params: params,
+          message: `ERROR for request: ${response.status} - ${
+            response.statusText
+          } for request ${uri}`,
+        };
+      })
+      .then(errorPayload => {
+        throw new Error(JSON.stringify(errorPayload));
+      });
+  }
+};
+
+function base64UrlToUint8Array(base64UrlData) {
+  const padding = "=".repeat((4 - (base64UrlData.length % 4)) % 4);
+  const base64 = (base64UrlData + padding)
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const rawData = atob(base64);
+  const buffer = new Uint8Array(rawData.length);
+
+  for (const i of buffer.keys()) {
+    buffer[i] = rawData.charCodeAt(i);
+  }
+  return buffer.buffer;
 }
