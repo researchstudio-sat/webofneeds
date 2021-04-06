@@ -2,8 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { generateLink, getUri } from "../../utils";
 
-import vocab from "../../service/vocab";
 import VisibilitySensor from "react-visibility-sensor";
+import * as wonLabelUtils from "~/app/won-label-utils";
 import * as connectionUtils from "../../redux/utils/connection-utils";
 import * as atomUtils from "~/app/redux/utils/atom-utils";
 import WonAtomContextSwipeableView from "../atom-context-swipeable-view";
@@ -41,100 +41,21 @@ export default function WonGenericFeedItem({
     }
   }
 
-  let statusItemLabel;
-  let feedItemLabel;
-
-  const senderSocketType = atomUtils.getSocketType(
-    senderAtom,
-    connectionUtils.getSocketUri(connection)
-  );
-  const targetSocketType = atomUtils.getSocketType(
+  const feedLabels = wonLabelUtils.generateFeedItemLabels(
+    atomUtils.getSocketType(
+      senderAtom,
+      connectionUtils.getSocketUri(connection)
+    ),
+    atomUtils.getSocketType(
+      targetAtom,
+      connectionUtils.getTargetSocketUri(connection)
+    ),
     targetAtom,
-    connectionUtils.getTargetSocketUri(connection)
+    connectionUtils.getState(connection)
   );
-  const connectionState = connectionUtils.getState(connection);
 
-  const targetAtomTypeLabel =
-    targetAtom && atomUtils.generateTypeLabel(targetAtom);
-
-  switch (connectionState) {
-    case vocab.WON.RequestReceived:
-      statusItemLabel = "Received Request from " + targetAtomTypeLabel;
-      feedItemLabel = senderSocketType + " ---> " + targetSocketType;
-      break;
-
-    case vocab.WON.RequestSent:
-      statusItemLabel = "Sent Request to " + targetAtomTypeLabel;
-      feedItemLabel = senderSocketType + " ---> " + targetSocketType;
-      break;
-
-    case vocab.WON.Connected:
-      statusItemLabel = "Added " + targetAtomTypeLabel;
-      switch (senderSocketType) {
-        case vocab.HOLD.HoldableSocketCompacted:
-          feedItemLabel = "to Held Atoms";
-          break;
-        case vocab.PROJECT.ProjectSocketCompacted:
-          feedItemLabel = "to Projects";
-          break;
-        case vocab.PROJECT.RelatedProjectSocketCompacted:
-          feedItemLabel = "to Related Projects";
-          break;
-        case vocab.WXSCHEMA.MemberSocketCompacted:
-          feedItemLabel = "as a Member";
-          break;
-        case vocab.WXSCHEMA.MemberOfSocketCompacted:
-          statusItemLabel = "Joined " + targetAtomTypeLabel;
-          feedItemLabel = "";
-          break;
-        case vocab.HOLD.HolderSocketCompacted:
-          feedItemLabel = "as Holder";
-          break;
-        case vocab.BUDDY.BuddySocketCompacted:
-          feedItemLabel = "as a Buddy";
-          break;
-        default:
-          feedItemLabel = senderSocketType + " ---> " + targetSocketType;
-          break;
-      }
-      break;
-
-    case vocab.WON.Closed:
-      statusItemLabel = "Removed " + targetAtomTypeLabel;
-      switch (senderSocketType) {
-        case vocab.HOLD.HoldableSocketCompacted:
-          feedItemLabel = "from Held Atoms";
-          break;
-        case vocab.WXSCHEMA.MemberSocketCompacted:
-          feedItemLabel = "from Members";
-          break;
-        case vocab.WXSCHEMA.MemberOfSocketCompacted:
-          statusItemLabel = "Left " + targetAtomTypeLabel;
-          feedItemLabel = "";
-          break;
-        case vocab.HOLD.HolderSocketCompacted:
-          statusItemLabel = "Removed Holder " + targetAtomTypeLabel;
-          feedItemLabel = "";
-          break;
-        case vocab.BUDDY.BuddySocketCompacted:
-          feedItemLabel = "from Buddies";
-          break;
-        default:
-          feedItemLabel = senderSocketType + " ---> " + targetSocketType;
-          break;
-      }
-      break;
-
-    case vocab.WON.Suggested:
-      statusItemLabel = "Suggestion to add " + targetAtomTypeLabel;
-      feedItemLabel = senderSocketType + " ---> " + targetSocketType;
-      break;
-
-    default:
-      statusItemLabel = targetAtomTypeLabel;
-      feedItemLabel = senderSocketType + " ---> " + targetSocketType;
-      break;
-  }
+  const preItemLabel = feedLabels.prefix;
+  const postItemLabel = feedLabels.postfix;
 
   return (
     <VisibilitySensor
@@ -163,7 +84,7 @@ export default function WonGenericFeedItem({
         >
           {hideSenderAtom ? (
             <React.Fragment>
-              <div className="fi__info">{statusItemLabel}</div>
+              <div className="fi__info">{preItemLabel}</div>
               <WonAtomHeaderFeed
                 atom={targetAtom}
                 toLink={generateLink(
@@ -176,7 +97,7 @@ export default function WonGenericFeedItem({
                   "/post"
                 )}
               />
-              <div className="fi__info">{feedItemLabel}</div>
+              <div className="fi__info">{postItemLabel}</div>
             </React.Fragment>
           ) : (
             <React.Fragment>
@@ -192,7 +113,7 @@ export default function WonGenericFeedItem({
                   "/post"
                 )}
               />
-              <div className="fi__info">{statusItemLabel}</div>
+              <div className="fi__info">{preItemLabel}</div>
               <WonAtomHeaderFeed
                 atom={targetAtom}
                 toLink={generateLink(
@@ -205,7 +126,7 @@ export default function WonGenericFeedItem({
                   "/post"
                 )}
               />
-              <div className="fi__info">{feedItemLabel}</div>
+              <div className="fi__info">{postItemLabel}</div>
             </React.Fragment>
           )}
         </WonAtomContextSwipeableView>

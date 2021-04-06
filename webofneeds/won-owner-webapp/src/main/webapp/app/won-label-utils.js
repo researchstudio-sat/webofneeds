@@ -1,4 +1,4 @@
-import { deepFreeze, isValidNumber } from "./utils.js";
+import { deepFreeze, isValidNumber, getIn } from "./utils.js";
 import vocab from "./service/vocab.js";
 import * as atomUtils from "./redux/utils/atom-utils.js";
 
@@ -224,7 +224,209 @@ const labels = deepFreeze({
     [vocab.PROJECT.ProjectOfSocketCompacted]: "Organizations",
     [vocab.PROJECT.RelatedProjectSocketCompacted]: "Related Projects",
   },
+  feedItem: {
+    [vocab.WON.RequestReceived]: {
+      default: {
+        prefix: "Received Request from",
+        postfix: undefined,
+      },
+    },
+    [vocab.WON.RequestSent]: {
+      default: {
+        prefix: "Sent Request to",
+        postfix: undefined,
+      },
+    },
+    [vocab.WON.Connected]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        [vocab.CHAT.ChatSocketCompacted]: {
+          prefix: "Started Chat with",
+          postfix: undefined,
+        },
+        [vocab.GROUP.GroupSocketCompacted]: {
+          prefix: "Joined Groupchat",
+          postfix: undefined,
+        },
+        default: {
+          prefix: "Started Chat with",
+          postfix: undefined,
+        },
+      },
+      [vocab.HOLD.HoldableSocketCompacted]: {
+        default: {
+          prefix: "Added",
+          postfix: "to Held Atoms",
+        },
+      },
+      [vocab.PROJECT.ProjectSocketCompacted]: {
+        default: {
+          prefix: "Added",
+          postfix: "to Projects",
+        },
+      },
+      [vocab.PROJECT.RelatedProjectSocketCompacted]: {
+        default: {
+          prefix: "Added",
+          postfix: "to Related Projects",
+        },
+      },
+      [vocab.WXSCHEMA.MemberSocketCompacted]: {
+        default: {
+          prefix: "Added",
+          postfix: "as a Member",
+        },
+      },
+      [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
+        default: {
+          prefix: "Joined",
+          postfix: undefined,
+        },
+      },
+      [vocab.HOLD.HolderSocketCompacted]: {
+        default: {
+          prefix: "Added",
+          postfix: "as Holder",
+        },
+      },
+      [vocab.BUDDY.BuddySocketCompacted]: {
+        default: {
+          prefix: "Added",
+          postfix: "as a Buddy",
+        },
+      },
+      default: {
+        prefix: "Added",
+        postfix: undefined,
+      },
+    },
+    [vocab.WON.Closed]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        [vocab.CHAT.ChatSocketCompacted]: {
+          prefix: "Closed Chat with",
+          postfix: undefined,
+        },
+        [vocab.GROUP.GroupSocketCompacted]: {
+          prefix: "Left Groupchat",
+          postfix: undefined,
+        },
+        default: {
+          prefix: "Closed Chat with",
+          postfix: undefined,
+        },
+      },
+      [vocab.HOLD.HoldableSocketCompacted]: {
+        default: {
+          prefix: "Removed",
+          postfix: "from Held Atoms",
+        },
+      },
+      [vocab.WXSCHEMA.MemberSocketCompacted]: {
+        default: {
+          prefix: "Removed",
+          postfix: "from Members",
+        },
+      },
+      [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
+        default: {
+          prefix: "Left",
+          postfix: undefined,
+        },
+      },
+      [vocab.HOLD.HolderSocketCompacted]: {
+        default: {
+          prefix: "Removed Holder",
+          postfix: undefined,
+        },
+      },
+      [vocab.BUDDY.BuddySocketCompacted]: {
+        default: {
+          prefix: "Removed",
+          postfix: "from Buddies",
+        },
+      },
+      default: {
+        prefix: "Removed",
+        postfix: undefined,
+      },
+    },
+    [vocab.WON.Suggested]: {
+      default: {
+        prefix: "Suggestion to add",
+        postfix: undefined,
+      },
+    },
+  },
 });
+
+export function generateFeedItemLabels(
+  senderSocketType,
+  targetSocketType,
+  targetAtom,
+  connectionState
+) {
+  // const { prefix, postfix } =
+  //   // TODO: Currently we do not have any of those thats why we omit fetching them
+  //   // getIn(labels.feedItem, [
+  //   //   connectionState,
+  //   //   senderSocketType,
+  //   //   targetSocketType,
+  //   // ]) ||
+  //   getIn(labels.feedItem, [connectionState, senderSocketType, "default"]) ||
+  //   getIn(labels.feedItem, [connectionState, "default"]);
+
+  //********* THIS PART IS JUST FOR DEBUG PURPOSES TO FIND FEEDITEMLABELS THAT DO NOT HAVE A SPECIAL HANDLING YET
+  //********* REMOVE THIS PART AND REPLACE WITH THE ABOVE ONCE YOU ARE SURE THAT YOU DONT HAVE ANY SPECIAL CASES
+  //********* LEFT TO HANDLE
+  let prefix;
+  let postfix;
+
+  const labelWithSenderSocket = getIn(labels.feedItem, [
+    connectionState,
+    senderSocketType,
+    "default",
+  ]);
+
+  if (labelWithSenderSocket) {
+    prefix = labelWithSenderSocket.prefix;
+    postfix = labelWithSenderSocket.postfix;
+  } else {
+    const defaultLabelsForConnState = getIn(labels.feedItem, [
+      connectionState,
+      "default",
+    ]);
+
+    if (defaultLabelsForConnState) {
+      console.debug(
+        "LABEL MISSING: generateFeedItemLabel defaults for:",
+        connectionState,
+        senderSocketType,
+        targetSocketType
+      );
+      prefix = defaultLabelsForConnState.prefix;
+      postfix = defaultLabelsForConnState.postfix;
+    }
+  }
+
+  //******************************************************************************
+
+  const targetAtomTypeLabel =
+    targetAtom && atomUtils.generateTypeLabel(targetAtom);
+
+  if (prefix) {
+    return { prefix: prefix + " " + targetAtomTypeLabel, postfix: postfix };
+  } else {
+    console.debug(
+      "LABEL MISSING: generateFeedItemLabel defaults for:",
+      connectionState,
+      senderSocketType,
+      targetSocketType
+    );
+    return {
+      prefix: targetAtomTypeLabel,
+      postfix: senderSocketType + " ---> " + targetSocketType,
+    };
+  }
+}
 
 export function getConnectionStateLabel(connectionState) {
   return labels.connectionState[connectionState] || connectionState;

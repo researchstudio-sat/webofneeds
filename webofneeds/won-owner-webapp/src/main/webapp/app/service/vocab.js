@@ -30,8 +30,8 @@ vocab.WON.atomState = vocab.WON.baseUri + "atomState";
 vocab.WON.atomStateCompacted = vocab.WON.prefix + ":atomState";
 vocab.WON.socket = vocab.WON.baseUri + "socket";
 vocab.WON.socketCompacted = vocab.WON.prefix + ":socket";
-vocab.WON.socketDefinition = vocab.AUTH.baseUri + "socketDefinition";
-vocab.WON.socketDefinitionCompacted = vocab.AUTH.prefix + ":socketDefinition";
+vocab.WON.socketDefinition = vocab.WON.baseUri + "socketDefinition";
+vocab.WON.socketDefinitionCompacted = vocab.WON.prefix + ":socketDefinition";
 vocab.WON.targetSocket = vocab.WON.baseUri + "targetSocket";
 vocab.WON.targetSocketCompacted = vocab.WON.prefix + ":targetSocket";
 
