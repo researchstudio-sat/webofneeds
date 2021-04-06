@@ -238,6 +238,12 @@ const labels = deepFreeze({
       },
     },
     [vocab.WON.Connected]: {
+      [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
+        default: {
+          prefix: "Attends",
+          postfix: undefined,
+        },
+      },
       [vocab.CHAT.ChatSocketCompacted]: {
         [vocab.CHAT.ChatSocketCompacted]: {
           prefix: "Started Chat with",
