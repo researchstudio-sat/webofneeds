@@ -128,6 +128,15 @@ export default function WonAtomContent({
       </won-atom-content>
     );
   } else {
+    const showFeed =
+      !processUtils.areConnectionContainerRequestsFailedOnly(
+        process,
+        atomUri
+      ) &&
+      relevantConnectionsMap.find(
+        connByType => connByType && connByType.size > 0
+      );
+
     const processingUpdateElement = atomProcessingUpdate && (
       <div className="atom-content__updateindicator">
         <svg className="hspinner atom-content__updateindicator__spinner">
@@ -223,11 +232,16 @@ export default function WonAtomContent({
                 isOwned={isOwned}
               />
             )}
-            <WonAtomFeed
-              atom={atom}
-              isOwned={isOwned}
-              storedAtoms={storedAtoms}
-            />
+            {showFeed ? (
+              <WonAtomFeed
+                atom={atom}
+                isOwned={isOwned}
+                storedAtoms={storedAtoms}
+                showItemCount={10}
+              />
+            ) : (
+              undefined
+            )}
             {atomUtils.isActive(atom) &&
               filteredReactions &&
               filteredReactions.size > 0 && (

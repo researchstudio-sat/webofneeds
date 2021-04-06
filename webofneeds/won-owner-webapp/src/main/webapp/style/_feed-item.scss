@@ -5,9 +5,9 @@
 
 .fi {
   div.headerElement {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     grid-auto-flow: column;
-    grid-auto-columns: max-content;
     grid-column-gap: 0.5rem;
     align-items: center;
   }
