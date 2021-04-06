@@ -217,13 +217,6 @@ export default function WonAtomContent({
             {hasContent && (
               <WonAtomContentDetails atom={atom} branch="content" />
             )}
-            {hasContent &&
-              hasSeeksBranch && (
-                <WonLabelledHr label="Search" className="cp__labelledhr" />
-              )}
-            {hasSeeksBranch && (
-              <WonAtomContentDetails atom={atom} branch="seeks" />
-            )}
             {hasTagViewSockets && (
               <WonAtomContentTagSockets
                 atom={atom}
@@ -232,12 +225,19 @@ export default function WonAtomContent({
                 isOwned={isOwned}
               />
             )}
+            {hasContent &&
+              hasSeeksBranch && (
+                <WonLabelledHr label="Search" className="cp__labelledhr" />
+              )}
+            {hasSeeksBranch && (
+              <WonAtomContentDetails atom={atom} branch="seeks" />
+            )}
             {showFeed ? (
               <WonAtomFeed
                 atom={atom}
                 isOwned={isOwned}
                 storedAtoms={storedAtoms}
-                showItemCount={10}
+                showItemCount={15}
               />
             ) : (
               undefined

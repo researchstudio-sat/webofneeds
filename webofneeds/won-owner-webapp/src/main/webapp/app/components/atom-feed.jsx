@@ -26,48 +26,54 @@ export default function WonAtomFeed({
 
   let lastDivider;
 
-  console.debug("showItemCount: ", showItemCount);
-
-  atomUtils
+  let sortedConnections = atomUtils
     .getConnections(atom)
     .toOrderedMap()
     .sortBy(conn => {
       const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
       return lastUpdateDate && lastUpdateDate.getTime();
     })
-    .reverse()
-    .map(conn => {
-      const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
-      const friendlyLastUpdateDate =
-        lastUpdateDate && relativeTime(globalLastUpdateTime, lastUpdateDate);
+    .reverse();
 
-      if (lastDivider !== friendlyLastUpdateDate) {
-        feedElements.push(
-          <div className="af__datedivider">{friendlyLastUpdateDate}</div>
-        );
-      }
-      lastDivider = friendlyLastUpdateDate;
+  console.debug("showItemCount: ", showItemCount);
 
+  let headerLabel;
+
+  if (showItemCount && sortedConnections.size > showItemCount) {
+    headerLabel = "Feed (newest " + showItemCount + " Items)";
+    sortedConnections = sortedConnections.take(showItemCount);
+  } else {
+    headerLabel = "Feed";
+  }
+  sortedConnections.map(conn => {
+    const lastUpdateDate = connectionUtils.getLastUpdateDate(conn);
+    const friendlyLastUpdateDate =
+      lastUpdateDate && relativeTime(globalLastUpdateTime, lastUpdateDate);
+
+    if (lastDivider !== friendlyLastUpdateDate) {
       feedElements.push(
-        <div className="af__item">
-          <WonGenericFeedItem
-            key={getUri(conn)}
-            connection={conn}
-            hideSenderAtom={atom}
-            senderAtom={atom}
-            targetAtom={get(
-              storedAtoms,
-              connectionUtils.getTargetAtomUri(conn)
-            )}
-            isOwned={isOwned}
-          />
-        </div>
+        <div className="af__datedivider">{friendlyLastUpdateDate}</div>
       );
-    });
+    }
+    lastDivider = friendlyLastUpdateDate;
+
+    feedElements.push(
+      <div className="af__item">
+        <WonGenericFeedItem
+          key={getUri(conn)}
+          connection={conn}
+          hideSenderAtom={atom}
+          senderAtom={atom}
+          targetAtom={get(storedAtoms, connectionUtils.getTargetAtomUri(conn))}
+          isOwned={isOwned}
+        />
+      </div>
+    );
+  });
 
   return (
     <won-atom-feed>
-      <div className="af__header">Feed</div>
+      <div className="af__header">{headerLabel}</div>
       {feedElements}
     </won-atom-feed>
   );
