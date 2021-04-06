@@ -91,7 +91,7 @@ runMessagingAgent(store);
 
 if (enableNotifications) {
   console.debug("runPushAgent");
-  runPushAgent();
+  runPushAgent(store);
 }
 
 // Initiate the initial load

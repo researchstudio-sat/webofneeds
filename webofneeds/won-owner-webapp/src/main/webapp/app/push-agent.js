@@ -2,7 +2,7 @@ import urljoin from "url-join";
 import { ownerBaseUrl } from "../config/default";
 import { compareArrayBuffers } from "./utils";
 
-export async function runPushAgent() {
+export async function runPushAgent(store) {
   if (!("serviceWorker" in navigator)) {
     return;
   }
@@ -14,49 +14,59 @@ export async function runPushAgent() {
     userVisibleOnly: true,
     applicationServerKey: serverKey,
   });
-  console.debug("PermissionState: ", permissionState);
-  switch (permissionState) {
-    case "granted": {
-      let subscription = await serviceWorker.pushManager.getSubscription();
-      if (
-        !subscription ||
-        !compareArrayBuffers(
-          subscription.options.applicationServerKey,
-          serverKey
-        )
-      ) {
-        console.debug("Subscription is stale, trying to generate new one");
-        if (subscription) {
-          await subscription.unsubscribe();
-        }
-        subscription = await serviceWorker.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: serverKey,
-        });
-        await sendSubscriptionToServer(subscription.toJSON());
-      }
-      break;
-    }
-    case "prompt": {
-      await serviceWorker.pushManager
-        .subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: serverKey,
-        })
-        .then(
-          subscription => {
-            return sendSubscriptionToServer(subscription.toJSON());
-          },
-          () => {
-            console.info("Push subscription denied");
+
+  let initialized = false;
+  store.subscribe(async () => {
+    const state = store.getState();
+    const ownedAtomUris = state.getIn(["account", "ownedAtomUris"]);
+    if (!initialized && ownedAtomUris && ownedAtomUris.size > 0) {
+      initialized = true;
+      console.debug("numAtoms: ", ownedAtomUris.size);
+      console.debug("PermissionState: ", permissionState);
+      switch (permissionState) {
+        case "granted": {
+          let subscription = await serviceWorker.pushManager.getSubscription();
+          if (
+            !subscription ||
+            !compareArrayBuffers(
+              subscription.options.applicationServerKey,
+              serverKey
+            )
+          ) {
+            console.debug("Subscription is stale, trying to generate new one");
+            if (subscription) {
+              await subscription.unsubscribe();
+            }
+            subscription = await serviceWorker.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: serverKey,
+            });
+            await sendSubscriptionToServer(subscription.toJSON());
           }
-        );
-      break;
+          break;
+        }
+        case "prompt": {
+          await serviceWorker.pushManager
+            .subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: serverKey,
+            })
+            .then(
+              subscription => {
+                return sendSubscriptionToServer(subscription.toJSON());
+              },
+              () => {
+                console.info("Push subscription denied");
+              }
+            );
+          break;
+        }
+        case "denied":
+          console.debug("Push subscription denied");
+          break;
+      }
     }
-    case "denied":
-      console.debug("Push subscription denied");
-      break;
-  }
+  });
 }
 
 function getServerKey() {
