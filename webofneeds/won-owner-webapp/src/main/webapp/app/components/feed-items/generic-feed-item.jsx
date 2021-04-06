@@ -19,14 +19,15 @@ import "~/style/_feed-item.scss";
 export default function WonGenericFeedItem({
   connection,
   senderAtom,
-  isOwned,
+  //isOwned,
   targetAtom,
   hideSenderAtom,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const addActionButtons = isOwned;
+  //Remove actionButtons in feed for now
+  const addActionButtons = false; //isOwned;
   let headerClassName;
 
   function markAsRead(conn) {
@@ -137,7 +138,7 @@ export default function WonGenericFeedItem({
 WonGenericFeedItem.propTypes = {
   connection: PropTypes.object.isRequired,
   senderAtom: PropTypes.object.isRequired,
-  isOwned: PropTypes.bool.isRequired,
+  //isOwned: PropTypes.bool.isRequired,
   targetAtom: PropTypes.object.isRequired,
   hideSenderAtom: PropTypes.bool,
 };
