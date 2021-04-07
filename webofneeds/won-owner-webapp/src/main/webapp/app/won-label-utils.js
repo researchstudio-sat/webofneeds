@@ -226,12 +226,24 @@ const labels = deepFreeze({
   },
   feedItem: {
     [vocab.WON.RequestReceived]: {
+      [vocab.BUDDY.BuddySocketCompacted]: {
+        default: {
+          prefix: "Received Buddy Request from",
+          postfix: undefined,
+        },
+      },
       default: {
         prefix: "Received Request from",
         postfix: undefined,
       },
     },
     [vocab.WON.RequestSent]: {
+      [vocab.BUDDY.BuddySocketCompacted]: {
+        default: {
+          prefix: "Sent Buddy Request to",
+          postfix: undefined,
+        },
+      },
       default: {
         prefix: "Sent Request to",
         postfix: undefined,
