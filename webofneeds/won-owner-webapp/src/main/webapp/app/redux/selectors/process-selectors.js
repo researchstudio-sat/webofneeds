@@ -69,6 +69,11 @@ export const isAtomLoading = atomUri =>
     processUtils.isAtomLoading(processState, atomUri)
   );
 
+export const isConnectionContainerLoading = atomUri =>
+  createSelector(getProcessState, processState =>
+    processUtils.isConnectionContainerLoading(processState, atomUri)
+  );
+
 export const getAtomRequests = atomUri =>
   createSelector(getProcessState, processState =>
     processUtils.getAtomRequests(processState, atomUri)

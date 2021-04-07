@@ -7,9 +7,12 @@ import * as atomUtils from "~/app/redux/utils/atom-utils";
 import * as connectionUtils from "~/app/redux/utils/connection-utils";
 import { useSelector } from "react-redux";
 import * as generalSelectors from "~/app/redux/selectors/general-selectors";
+import * as processSelectors from "~/app/redux/selectors/process-selectors";
 import { relativeTime } from "~/app/won-label-utils";
 import WonGenericFeedItem from "~/app/components/feed-items/generic-feed-item";
 import { get, getUri } from "~/app/utils";
+
+import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 
 import "~/style/_atom-feed.scss";
 
@@ -19,6 +22,10 @@ export default function WonAtomFeed({
   storedAtoms,
   showItemCount,
 }) {
+  const isLoading = useSelector(
+    processSelectors.isConnectionContainerLoading(getUri(atom))
+  );
+
   const globalLastUpdateTime = useSelector(
     generalSelectors.selectLastUpdateTime
   );
@@ -71,7 +78,16 @@ export default function WonAtomFeed({
 
   return (
     <won-atom-feed>
-      <div className="af__header">{headerLabel}</div>
+      <div className="af__header">
+        <div className="af__header__label">{headerLabel}</div>
+        {isLoading && (
+          <div className="af__header__loadspinner">
+            <svg className="hspinner">
+              <use xlinkHref={ico_loading_anim} href={ico_loading_anim} />
+            </svg>
+          </div>
+        )}
+      </div>
       {feedElements}
     </won-atom-feed>
   );

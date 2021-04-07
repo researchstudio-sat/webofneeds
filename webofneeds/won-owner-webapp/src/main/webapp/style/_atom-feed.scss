@@ -7,9 +7,20 @@ won-atom-feed {
   padding-bottom: 1.5rem;
 
   > .af__header {
-    font-weight: 400;
-    font-size: $mediumFontSize;
-    color: $won-primary-color;
+    display: flex;
+    grid-gap: 0.5rem;
+    flex-wrap: wrap;
+
+    > .af__header__label {
+      font-weight: 400;
+      font-size: $mediumFontSize;
+      color: $won-primary-color;
+    }
+    > .af__header__loadspinner > .hspinner {
+      @include fixed-square(2.25rem);
+      --local-primary: #{$won-primary-color};
+      --local-secondary: #{$won-secondary-color};
+    }
   }
 
   > .af__header + .af__datedivider {
