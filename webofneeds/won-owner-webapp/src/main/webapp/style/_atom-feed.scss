@@ -4,7 +4,7 @@
 
 won-atom-feed {
   padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 1.5rem;
 
   > .af__header {
     font-weight: 400;
@@ -12,11 +12,12 @@ won-atom-feed {
     color: $won-primary-color;
   }
 
-  > .af__datedivider {
-    &:first-of-type {
-      padding: 0;
-    }
+  > .af__header + .af__datedivider {
     padding-top: 0.5rem;
+  }
+
+  > .af__datedivider {
+    padding-top: 1.5rem;
     padding-bottom: 0.25rem;
     border-bottom: $thinGrayBorder;
   }
