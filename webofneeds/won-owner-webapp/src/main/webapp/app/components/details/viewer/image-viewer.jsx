@@ -3,8 +3,10 @@ import React, { useState } from "react";
 import { get } from "../../../utils.js";
 import "~/style/_image-viewer.scss";
 import PropTypes from "prop-types";
+import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
 
 export default function WonImageViewer({ detail, content, className }) {
+  const [expanded, toggleExpanded] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const icon = detail.icon && (
@@ -13,8 +15,12 @@ export default function WonImageViewer({ detail, content, className }) {
     </svg>
   );
 
+  const imagesArray = content && content.toArray();
+
   const label = detail.icon && (
-    <span className="imagev__header__label">{detail.label}</span>
+    <span className="imagev__header__label">
+      {detail.label + (imagesArray ? " (" + imagesArray.length + ")" : "")}
+    </span>
   );
 
   function isImage(file) {
@@ -38,8 +44,6 @@ export default function WonImageViewer({ detail, content, className }) {
       w.document.write(image.outerHTML);
     }
   }
-
-  const imagesArray = content && content.toArray();
 
   const thumbNails =
     imagesArray &&
@@ -73,28 +77,45 @@ export default function WonImageViewer({ detail, content, className }) {
 
   return (
     <won-image-viewer class={className}>
-      <div className="imagev__header">
+      <div
+        className="imagev__header clickable"
+        onClick={() => toggleExpanded(!expanded)}
+      >
         {icon}
         {label}
+        <svg
+          className={
+            "imagev__header__carret " +
+            (expanded
+              ? " imagev__header__carret--expanded "
+              : " imagev__header__carret--collapsed ")
+          }
+        >
+          <use xlinkHref={ico16_arrow_down} href={ico16_arrow_down} />
+        </svg>
       </div>
-      <div className="imagev__content">
-        <div className="imagev__content__selected">
-          <img
-            className="imagev__content__selected__image"
-            onClick={() => openImageInNewTab(getSelectedImage())}
-            alt={getSelectedImage().get("name")}
-            src={
-              "data:" +
-              getSelectedImage().get("encodingFormat") +
-              ";base64," +
-              getSelectedImage().get("encoding")
-            }
-          />
+      {expanded ? (
+        <div className="imagev__content">
+          <div className="imagev__content__selected">
+            <img
+              className="imagev__content__selected__image"
+              onClick={() => openImageInNewTab(getSelectedImage())}
+              alt={getSelectedImage().get("name")}
+              src={
+                "data:" +
+                getSelectedImage().get("encodingFormat") +
+                ";base64," +
+                getSelectedImage().get("encoding")
+              }
+            />
+          </div>
+          {content.size > 1 && (
+            <div className="imagev__content__thumbnails">{thumbNails}</div>
+          )}
         </div>
-        {content.size > 1 && (
-          <div className="imagev__content__thumbnails">{thumbNails}</div>
-        )}
-      </div>
+      ) : (
+        undefined
+      )}
     </won-image-viewer>
   );
 }

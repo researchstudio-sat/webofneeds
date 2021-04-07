@@ -5,6 +5,26 @@
 won-image-viewer {
   @include won-detail-viewer("imagev");
 
+  .imagev__header {
+    &:hover {
+      --local-primary: #{$won-primary-color};
+      color: $won-primary-color;
+    }
+
+    &__carret {
+      @include fixed-square(1rem);
+
+      &--expanded {
+        transform: rotate(-180deg);
+        transition: all linear 0.2s;
+      }
+
+      &--collapsed {
+        transition: all linear 0.2s;
+      }
+    }
+  }
+
   .imagev__content {
     .imagev__content__selected {
       background: white;
