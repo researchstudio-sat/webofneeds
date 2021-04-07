@@ -250,6 +250,18 @@ const labels = deepFreeze({
       },
     },
     [vocab.WON.Connected]: {
+      [vocab.WXSCHEMA.AssociatedArticleInverseSocketCompacted]: {
+        default: {
+          prefix: "Published in",
+          postfix: undefined,
+        },
+      },
+      [vocab.WXSCHEMA.AssociatedArticleSocketCompacted]: {
+        default: {
+          prefix: "Published",
+          postfix: undefined,
+        },
+      },
       [vocab.WXSCHEMA.AttendeeInverseSocketCompacted]: {
         default: {
           prefix: "Attends",
