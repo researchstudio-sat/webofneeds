@@ -66,6 +66,53 @@ export const sendAnonymousLinkEmail = (email, privateId) => {
 };
 
 /**
+ * Fetch UserSettings
+ */
+export const fetchUserSettings = () => {
+  const url = urljoin(ownerBaseUrl, `/rest/users/settings`);
+  return fetch(url, {
+    method: "get",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  })
+    .then(checkHttpStatus(url))
+    .then(resp => resp.json());
+};
+
+/**
+ * Update User Settings for specific atom
+ *
+ * @param {*} username
+ * @param {*} email
+ * @param {*} atomUri
+ * @param {*} notifyMatches
+ * @param {*} notifyRequests
+ * @param {*} notifyConversations
+ */
+export const updateAtomUserSettings = updatedSettings => {
+  const url = urljoin(ownerBaseUrl, `/rest/users/settings`);
+  return fetch(url, {
+    method: "post",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: updatedSettings.username,
+      email: updatedSettings.email,
+      atomUri: updatedSettings.atomUri,
+      notifyMatches: updatedSettings.notifyMatches,
+      notifyRequests: updatedSettings.notifyRequests,
+      notifyConversations: updatedSettings.notifyConversations,
+    }),
+    credentials: "include",
+  }).then(checkHttpStatus(url));
+};
+
+/**
  * Change the password of the user currently logged in.
  * @param credentials { email, oldPassword, newPassword }
  * @returns {*}

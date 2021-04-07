@@ -330,6 +330,50 @@ export const sendAnonymousLinkEmail = (email, privateId) => dispatch => {
     });
 };
 
+export const fetchUserSettings = () => dispatch => {
+  dispatch({ type: actionTypes.account.fetchUserSettingsStarted });
+  ownerApi
+    .fetchUserSettings()
+    .then(userSettings => {
+      dispatch({
+        type: actionTypes.account.fetchUserSettingsSuccess,
+        payload: { userSettings: Immutable.fromJS(userSettings) },
+      });
+    })
+    .catch(error => {
+      let errorParsed = parseWorkerError(error);
+
+      dispatch({
+        type: actionTypes.account.fetchUserSettingsFailed,
+        payload: {
+          fetchUserSettingsError: Immutable.fromJS(errorParsed.response),
+        },
+      });
+    });
+};
+
+export const updateAtomUserSettings = atomUserSetting => dispatch => {
+  dispatch({ type: actionTypes.account.updateAtomUserSettingsStarted });
+  ownerApi
+    .updateAtomUserSettings(atomUserSetting)
+    .then(() => {
+      dispatch({
+        type: actionTypes.account.updateAtomUserSettingsSuccess,
+        payload: { atomUserSetting: atomUserSetting },
+      });
+    })
+    .catch(error => {
+      let errorParsed = parseWorkerError(error);
+
+      dispatch({
+        type: actionTypes.account.updateAtomUserSettingsFailed,
+        payload: {
+          updateAtomUserSettings: Immutable.fromJS(errorParsed.response),
+        },
+      });
+    });
+};
+
 export const reconnect = () => (dispatch, getState) => {
   dispatch({ type: actionTypes.reconnect.start });
   return ownerApi

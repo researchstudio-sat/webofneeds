@@ -1,13 +1,27 @@
 import "babel-polyfill";
 
+self.addEventListener("activate", async () => {
+  // This will be called only once when the service worker is activated.
+  console.debug("ServiceWorker for PushNotifications active");
+});
+
 self.addEventListener("push", async event => {
   console.debug("PushEvent");
   event.waitUntil(pushInfoPromise(event.data.json()));
 });
 
-self.addEventListener("notificationclick", async event => {
-  console.debug("Notification Click");
-  event.waitUntil(openNotifiedPage(event)); //This is needed so that the browser allows us to open/focus a window
+self.addEventListener(
+  "notificationclick",
+  async event => {
+    console.debug("Notification Click");
+    event.notification.close();
+    event.waitUntil(openNotifiedPage(event)); //This is needed so that the browser allows us to open/focus a window
+  },
+  true
+);
+
+self.addEventListener("notificationclose", async () => {
+  console.debug("Notification Close");
 });
 
 async function pushInfoPromise(payload) {
