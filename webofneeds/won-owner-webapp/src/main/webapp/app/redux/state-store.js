@@ -192,23 +192,30 @@ export const determineRequestCredentials = (
       for (const priorTokenRequest of priorTokenRequests) {
         const code = get(priorTokenRequest, "code");
         const token = get(priorTokenRequest, "token");
-        const parsedToken = parseJwtToken(token);
 
-        console.debug(
-          code,
-          "FOUND PRIOR TOKEN REQUESTS: parsedToken: ",
-          parsedToken
-        );
+        if (code === 200) {
+          const parsedToken = parseJwtToken(token);
+          if (parsedToken) {
+            if (new Date(parsedToken.exp) < new Date()) {
+              console.debug(
+                code,
+                "FOUND PRIOR TOKEN REQUESTS, token (seemingly) still valid: parsedToken: ",
+                parsedToken
+              );
 
-        if (parsedToken && code === 200) {
-          if (new Date(parsedToken.exp) < new Date()) {
-            return Promise.resolve({
-              token: token,
-              obtainedFrom: tokenCredential.toJS(),
-            });
-          } else {
-            //TODO: FETCH TOKEN FROM SAME CREDENTIALS
-            console.debug("TODO: Fetch token again from same credentials");
+              return Promise.resolve({
+                token: token,
+                obtainedFrom: tokenCredential.toJS(),
+              });
+            } else {
+              //TODO: FETCH TOKEN FROM SAME CREDENTIALS
+              console.debug(
+                code,
+                "FOUND PRIOR TOKEN REQUESTS, token expired: parsedToken: ",
+                parsedToken,
+                "TODO: Fetch token again from same credentials"
+              );
+            }
           }
         }
       }
