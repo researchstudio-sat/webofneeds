@@ -26,9 +26,11 @@ won-connection-selection-item {
     border-left: 0.25rem solid $won-unread-attention;
   }
 
+  transition: background-color 0.25s linear;
   &:hover,
   &.selected {
     background-color: white;
+    transition: background-color 0.25s linear;
   }
   &.selected {
     @include speech-bubble-right(
@@ -54,7 +56,6 @@ won-connection-selection-item {
         padding: 0.5rem;
         margin-left: 0.25rem;
       }
-
       & .csi__senderAtom {
         @include square-image($postIconSize);
         padding-right: 0.5rem;
