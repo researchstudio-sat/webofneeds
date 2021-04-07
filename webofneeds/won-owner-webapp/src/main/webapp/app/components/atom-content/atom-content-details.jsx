@@ -46,12 +46,12 @@ export default function WonAtomContentDetails({ atom, branch }) {
       return undefined;
     });
 
-  const contentDetailsArray = contentDetailsMap
-    ? contentDetailsMap.toArray()
-    : [];
-
-  return (
-    <won-atom-content-details>{contentDetailsArray}</won-atom-content-details>
+  return contentDetailsMap ? (
+    <won-atom-content-details>
+      {contentDetailsMap.toArray()}
+    </won-atom-content-details>
+  ) : (
+    <React.Fragment />
   );
 }
 WonAtomContentDetails.propTypes = {
