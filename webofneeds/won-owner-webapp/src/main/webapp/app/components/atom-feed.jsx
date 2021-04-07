@@ -35,8 +35,6 @@ export default function WonAtomFeed({
     })
     .reverse();
 
-  console.debug("showItemCount: ", showItemCount);
-
   let headerLabel;
 
   if (showItemCount && sortedConnections.size > showItemCount) {

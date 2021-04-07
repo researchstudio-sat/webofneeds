@@ -244,6 +244,18 @@ const labels = deepFreeze({
           postfix: undefined,
         },
       },
+      [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: {
+        default: {
+          prefix: "Review of",
+          postfix: undefined,
+        },
+      },
+      [vocab.WXSCHEMA.ProjectOfSocketCompacted]: {
+        default: {
+          prefix: "Added to Projects of",
+          postfix: undefined,
+        },
+      },
       [vocab.CHAT.ChatSocketCompacted]: {
         [vocab.CHAT.ChatSocketCompacted]: {
           prefix: "Started Chat with",
@@ -261,7 +273,7 @@ const labels = deepFreeze({
       [vocab.HOLD.HoldableSocketCompacted]: {
         default: {
           prefix: "Added",
-          postfix: "to Held Atoms",
+          postfix: "as Holder",
         },
       },
       [vocab.PROJECT.ProjectSocketCompacted]: {
@@ -322,8 +334,7 @@ const labels = deepFreeze({
       },
       [vocab.HOLD.HoldableSocketCompacted]: {
         default: {
-          prefix: "Removed",
-          postfix: "from Held Atoms",
+          prefix: "Removed Holder",
         },
       },
       [vocab.WXSCHEMA.MemberSocketCompacted]: {
@@ -340,7 +351,7 @@ const labels = deepFreeze({
       },
       [vocab.HOLD.HolderSocketCompacted]: {
         default: {
-          prefix: "Removed Holder",
+          prefix: "Removed Held",
           postfix: undefined,
         },
       },
