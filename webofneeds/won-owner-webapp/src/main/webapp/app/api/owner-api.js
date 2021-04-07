@@ -109,6 +109,23 @@ export const serverSideConnect = (
   );
 
 /**
+ * Fetch User Settings for Notifications
+ */
+export const fetchUserSettings = () => fetchWorker.fetchUserSettings();
+
+/**
+ *
+ * @param {*} username
+ * @param {*} email
+ * @param {*} atomUri
+ * @param {*} notifyMatches
+ * @param {*} notifyRequests
+ * @param {*} notifyConversations
+ */
+export const updateAtomUserSettings = updatedSetting =>
+  fetchWorker.updateAtomUserSettings(updatedSetting);
+
+/**
  * Send pushNotifications subscription to server
  */
 export const sendSubscriptionToServer = subsctiption =>

@@ -18,6 +18,8 @@ export const pageLoadAction = () => (dispatch, getState) => {
       })
     )
     .then(() => {
+      //fetch UserSettings
+      dispatch(actionCreators.account__fetchUserSettings());
       // loadingWhileSignedIn reset websocket to make sure it's using the logged-in session
       dispatch(actionCreators.reconnect__start());
       return stateStore.fetchOwnedMetaData(dispatch, getState);

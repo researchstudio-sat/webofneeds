@@ -15,6 +15,7 @@ const initialState = Immutable.fromJS({
   acceptedTermsOfService: false,
   acceptedDisclaimer: isDisclaimerAccepted(),
   ownedAtomUris: Immutable.Set(),
+  userSettings: Immutable.Set(),
 });
 
 export default function(userData = initialState, action = {}) {
@@ -75,6 +76,25 @@ export default function(userData = initialState, action = {}) {
         "emailVerificationError",
         action.payload.emailVerificationError
       );
+    case actionTypes.account.fetchUserSettingsSuccess:
+      return userData.set("userSettings", action.payload.userSettings);
+
+    case actionTypes.account.updateAtomUserSettingsSuccess: {
+      const atomUserSetting = action.payload.atomUserSetting;
+      const userSettings = get(userData, "userSettings");
+      let updated = false;
+      let updatedUserSettings = userSettings.map(setting => {
+        if (get(setting, "atomUri") === atomUserSetting.atomUri) {
+          setting = atomUserSetting;
+          updated = true;
+        }
+        return setting;
+      });
+      if (!updated) {
+        updatedUserSettings = userSettings.concat(atomUserSetting);
+      }
+      return userData.set("userSettings", updatedUserSettings);
+    }
 
     case actionTypes.account.verifyEmailAddressSuccess:
       return userData

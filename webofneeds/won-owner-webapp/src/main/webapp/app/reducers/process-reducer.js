@@ -367,6 +367,20 @@ export default function(processState = initialState, action = {}) {
     case actionTypes.account.sendAnonymousLinkEmailSuccess:
       return processState.set("processingSendAnonymousLinkEmail", false);
 
+    case actionTypes.account.fetchUserSettingsStarted:
+      return processState.set("processingFetchUserSettings", true);
+
+    case actionTypes.account.fetchUserSettingsFailed:
+    case actionTypes.account.fetchUserSettingsSuccess:
+      return processState.set("processingFetchUserSettings", false);
+
+    case actionTypes.account.updateAtomUserSettingsStarted:
+      return processState.set("processingUpdateAtomUserSettings", true);
+
+    case actionTypes.account.updateAtomUserSettingsFailed:
+    case actionTypes.account.updateAtomUserSettingsSuccess:
+      return processState.set("processingUpdateAtomUserSettings", false);
+
     case actionTypes.atoms.fetchToken.failure: {
       const atomUri = getUri(action.payload);
       const tokenScopeUri = get(action.payload, "tokenScopeUri");
