@@ -429,6 +429,18 @@ const labels = deepFreeze({
       },
     },
     [vocab.WON.Suggested]: {
+      [vocab.HOLD.HoldableSocketCompacted]: {
+        default: {
+          prefix: "Suggested",
+          postfix: "as Holder",
+        },
+      },
+      [vocab.HOLD.HolderSocketCompacted]: {
+        default: {
+          prefix: "Suggested",
+          postfix: "to be held",
+        },
+      },
       default: {
         prefix: "Suggestion to add",
         postfix: undefined,
