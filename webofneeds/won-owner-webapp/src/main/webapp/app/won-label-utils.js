@@ -244,15 +244,53 @@ const labels = deepFreeze({
           postfix: undefined,
         },
       },
+      [vocab.WXSCHEMA.EventInverseSocket]: {
+        default: {
+          prefix: "Added",
+          postfix: "to Organizers",
+        },
+      },
+      [vocab.WXSCHEMA.EventSocket]: {
+        default: {
+          prefix: "Organizes",
+          postfix: undefined,
+        },
+      },
+      [vocab.WXSCHEMA.AttendeeSocketCompacted]: {
+        default: {
+          prefix: undefined,
+          postfix: "attends this Event",
+        },
+      },
       [vocab.WXSCHEMA.ReviewInverseSocketCompacted]: {
         default: {
           prefix: "Review of",
           postfix: undefined,
         },
       },
+      [vocab.WXSCHEMA.ReviewSocketCompacted]: {
+        default: {
+          prefix: "Added",
+          postfix: undefined,
+        },
+      },
       [vocab.WXSCHEMA.ProjectOfSocketCompacted]: {
         default: {
           prefix: "Added to Projects of",
+          postfix: undefined,
+        },
+      },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        [vocab.CHAT.ChatSocketCompacted]: {
+          prefix: undefined,
+          postfix: "joined the Groupchat",
+        },
+        [vocab.GROUP.GroupSocketCompacted]: {
+          prefix: "Merged",
+          postfix: "with this Groupchat",
+        },
+        default: {
+          prefix: "Added Group Member",
           postfix: undefined,
         },
       },
@@ -431,6 +469,8 @@ export function generateFeedItemLabels(
 
   if (prefix) {
     return { prefix: prefix + " " + targetAtomTypeLabel, postfix: postfix };
+  } else if (postfix) {
+    return { prefix: targetAtomTypeLabel, postfix: postfix };
   } else {
     console.debug(
       "LABEL MISSING: generateFeedItemLabel defaults for:",
