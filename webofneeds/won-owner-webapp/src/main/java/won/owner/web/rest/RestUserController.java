@@ -316,7 +316,6 @@ public class RestUserController {
         User user = userService.getByUsername(username);
         ArrayList<UserSettingsPojo> userSettings = new ArrayList<UserSettingsPojo>();
         if (uri != null) {
-            UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail());
             URI atomUri = null;
             try {
                 atomUri = new URI(uri);

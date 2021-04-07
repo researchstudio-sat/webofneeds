@@ -32,6 +32,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
+import won.owner.pojo.UserSettingsPojo;
 import won.owner.repository.UserRepository;
 import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.OwnerApplicationService;
@@ -398,12 +399,14 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             logger.debug("not sending notification to user: sender and recipient atoms are controlled by same user.");
             return;
         }
-        // TODO: Check Atom Settings if notifications are enabled
+        UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail(), userAtom.getUri(),
+                        userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations());
+
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         String iconUrl = uriService.getOwnerProtocolOwnerURI().toString() + "/skin/current/images/logo.png";
         switch (wonMessage.getMessageType()) {
             case CONNECTION_MESSAGE:
-                if (userAtom.isConversations()) {
+                if (userAtom.isConversations() && userSettingsPojo.isNotifyConversations()) {
                     ObjectMapper mapper = new ObjectMapper();
                     ObjectNode rootNode = mapper.createObjectNode();
                     rootNode.put("type", "MESSAGE");
@@ -424,7 +427,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 }
                 return;
             case SOCKET_HINT_MESSAGE:
-                if (userAtom.isMatches()) {
+                if (userAtom.isMatches() && userSettingsPojo.isNotifyMatches()) {
                     if (!isConnectionInSuggestedState(connectionUri)) {
                         // we only want to notify if the connection is in state won:Suggested.
                         // otherwise, the owner has already handled another suggestion, or
@@ -447,7 +450,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 }
                 return;
             case CONNECT:
-                if (userAtom.isRequests()) {
+                if (userAtom.isRequests() && userSettingsPojo.isNotifyRequests()) {
                     ObjectMapper mapper = new ObjectMapper();
                     ObjectNode rootNode = mapper.createObjectNode();
                     rootNode.put("type", "CONNECT");
