@@ -151,7 +151,9 @@ won-atom-header-big {
         }
       }
 
+      transition: all 0.25s linear;
       &:hover {
+        transition: all 0.25s linear;
         --local-primary: #{$won-secondary-text-color};
         border-color: $won-secondary-color;
         color: $won-secondary-text-color;
