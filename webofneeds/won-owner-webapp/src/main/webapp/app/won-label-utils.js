@@ -459,30 +459,41 @@ export function generateFeedItemLabels(
   let prefix;
   let postfix;
 
-  const labelWithSenderSocket = getIn(labels.feedItem, [
+  const labelWithBothSockets = getIn(labels.feedItem, [
     connectionState,
     senderSocketType,
-    "default",
+    targetSocketType,
   ]);
 
-  if (labelWithSenderSocket) {
-    prefix = labelWithSenderSocket.prefix;
-    postfix = labelWithSenderSocket.postfix;
+  if (labelWithBothSockets) {
+    prefix = labelWithBothSockets.prefix;
+    postfix = labelWithBothSockets.postfix;
   } else {
-    const defaultLabelsForConnState = getIn(labels.feedItem, [
+    const labelWithSenderSocket = getIn(labels.feedItem, [
       connectionState,
+      senderSocketType,
       "default",
     ]);
 
-    if (defaultLabelsForConnState) {
-      console.debug(
-        "LABEL MISSING: generateFeedItemLabel defaults for:",
+    if (labelWithSenderSocket) {
+      prefix = labelWithSenderSocket.prefix;
+      postfix = labelWithSenderSocket.postfix;
+    } else {
+      const defaultLabelsForConnState = getIn(labels.feedItem, [
         connectionState,
-        senderSocketType,
-        targetSocketType
-      );
-      prefix = defaultLabelsForConnState.prefix;
-      postfix = defaultLabelsForConnState.postfix;
+        "default",
+      ]);
+
+      if (defaultLabelsForConnState) {
+        console.debug(
+          "LABEL MISSING: generateFeedItemLabel defaults for:",
+          connectionState,
+          senderSocketType,
+          targetSocketType
+        );
+        prefix = defaultLabelsForConnState.prefix;
+        postfix = defaultLabelsForConnState.postfix;
+      }
     }
   }
 
