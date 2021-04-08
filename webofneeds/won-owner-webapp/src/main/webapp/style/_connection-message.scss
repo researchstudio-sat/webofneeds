@@ -2,6 +2,7 @@
 @import "speech-bubble";
 @import "square-image";
 @import "animate";
+@import "elevation";
 
 won-connection-message {
   grid-template-columns: min-content minmax(min-content, max-content);
@@ -80,6 +81,8 @@ won-connection-message {
       > .won-cm__center__bubble {
         background: $won-lighter-gray;
 
+        @include defaultChatMessageElevation();
+        border-radius: 0.19rem;
         @include speech-bubble-left(
           $won-lighter-gray,
           $won-line-gray,
@@ -90,6 +93,8 @@ won-connection-message {
       }
     }
     & .won-cm__center__bubble {
+      @include defaultChatMessageElevation();
+      border-radius: 0.19rem;
       @include speech-bubble-left(
         white,
         $won-line-gray,
@@ -99,6 +104,8 @@ won-connection-message {
       );
 
       &.references {
+        @include defaultChatMessageElevation();
+        border-radius: 0.19rem;
         @include speech-bubble-left(
           white,
           $thinDarkBorder,
@@ -118,6 +125,8 @@ won-connection-message {
       > .won-cm__center__bubble {
         background: white;
 
+        @include defaultChatMessageElevation();
+        border-radius: 0.19rem;
         @include speech-bubble-right(
           white,
           $won-line-gray,
@@ -128,6 +137,8 @@ won-connection-message {
       }
     }
     & .won-cm__center__bubble {
+      @include defaultChatMessageElevation();
+      border-radius: 0.19rem;
       @include speech-bubble-right(
         $won-lighter-gray,
         $won-line-gray,
@@ -137,6 +148,8 @@ won-connection-message {
       );
 
       &.references {
+        @include defaultChatMessageElevation();
+        border-radius: 0.19rem;
         @include speech-bubble-right(
           $won-light-gray,
           $thinDarkBorder,

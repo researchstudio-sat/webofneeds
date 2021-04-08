@@ -1,6 +1,7 @@
 @import "won-config";
 @import "sizing-utils";
 @import "speech-bubble";
+@import "elevation";
 
 won-referenced-message-content {
   display: grid;
@@ -64,6 +65,8 @@ won-referenced-message-content {
         border: $thinGrayBorder;
 
         &.won-cm--left {
+          @include defaultChatMessageElevation();
+          border-radius: 0.19rem;
           @include speech-bubble-left(
             $won-light-gray,
             $won-line-gray,
@@ -73,6 +76,8 @@ won-referenced-message-content {
           );
         }
         &.won-cm--right {
+          @include defaultChatMessageElevation();
+          border-radius: 0.19rem;
           @include speech-bubble-right(
             $won-light-gray,
             $won-line-gray,
