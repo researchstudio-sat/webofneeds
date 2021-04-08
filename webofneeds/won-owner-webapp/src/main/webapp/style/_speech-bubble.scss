@@ -1,5 +1,4 @@
 @import "math";
-@import "elevation";
 
 @mixin _speech-bubble(
   $background-color,
@@ -10,6 +9,7 @@
   $whichPseudoElem: "after"
 ) {
   position: relative; // to allow positioning the triangle-parts as absolute
+
   &:#{$whichPseudoElem} {
     content: "";
     display: block; // rly needed?
@@ -28,9 +28,6 @@
     position: absolute;
     /* top | right | bottom | left */
     border-width: $border-width 0 0 $border-width;
-
-    @include defaultSpeechBubbleElevation();
-    border-radius: 0.19rem;
   }
 }
 
@@ -60,8 +57,9 @@
   &:after {
     // shifted so pos is around the tip
     left: calc(#{$pos} - #{sizeOfSquare($triangle-height) / 2});
-    transform: rotate(225deg);
-    /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
+    transform: rotate(
+      225deg
+    ); /* it rotates first with it's left-upper corner starting at (0,0), thus rotating
     around ($size/2, $size/2) -> we need to shift it up by ($size/2) to make
     sure the center's at the bottom edge of the container. */
     bottom: -sizeOfSquare($triangle-height) / 2;
