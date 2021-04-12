@@ -330,7 +330,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             } else {
                 // Always send possible pushNotifications:
                 // - maybe session is active -> message was send, but Tab is not focused
-                // - Browser is running in brackground -> user needs to get push notification
+                // - Browser is running in background -> user needs to get push notification
                 Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
                                 linkedDataSource);
                 if (connectionURI.isPresent()) {
