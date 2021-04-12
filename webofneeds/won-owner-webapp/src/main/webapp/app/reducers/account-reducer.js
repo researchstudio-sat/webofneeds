@@ -15,7 +15,7 @@ const initialState = Immutable.fromJS({
   acceptedTermsOfService: false,
   acceptedDisclaimer: isDisclaimerAccepted(),
   ownedAtomUris: Immutable.Set(),
-  userSettings: Immutable.Set(),
+  atomSettings: Immutable.Map(),
 });
 
 export default function(userData = initialState, action = {}) {
@@ -58,8 +58,10 @@ export default function(userData = initialState, action = {}) {
       const atomUri = getUri(action.payload);
 
       const ownedAtomUris = get(userData, "ownedAtomUris");
-      //TODO: remove settings for atom too
-      return userData.set("ownedAtomUris", ownedAtomUris.remove(atomUri));
+      const atomSettings = get(userData, "atomSettings");
+      return userData
+        .set("ownedAtomUris", ownedAtomUris.remove(atomUri))
+        .set("atomSettings", atomSettings.remove(atomUri));
     }
 
     case actionTypes.atoms.create: //for optimistic additions
@@ -77,27 +79,16 @@ export default function(userData = initialState, action = {}) {
         "emailVerificationError",
         action.payload.emailVerificationError
       );
-    case actionTypes.account.fetchUserSettingsSuccess:
-      return userData.set("userSettings", action.payload.userSettings);
-
+    case actionTypes.account.fetchUserSettingsSuccess: {
+      const userSettings = action.payload.atomUserSettings;
+      userSettings.forEach(setting => {
+        userData = addAtomSettings(userData, setting);
+      });
+      return userData;
+    }
     case actionTypes.account.addAtomUserSetting:
     case actionTypes.account.updateAtomUserSettingsSuccess: {
-      const atomUserSetting = action.payload.atomUserSetting;
-      const userSettings = get(userData, "userSettings");
-      let updated = false;
-      let updatedUserSettings = userSettings.map(setting => {
-        if (get(setting, "atomUri") === atomUserSetting.atomUri) {
-          setting = Immutable.fromJS(atomUserSetting);
-          updated = true;
-        }
-        return setting;
-      });
-      if (!updated) {
-        updatedUserSettings = userSettings.concat(
-          Immutable.fromJS([Immutable.Map(atomUserSetting)])
-        );
-      }
-      return userData.set("userSettings", updatedUserSettings);
+      return addAtomSettings(userData, action.payload.atomUserSetting);
     }
 
     case actionTypes.account.verifyEmailAddressSuccess:
@@ -148,5 +139,19 @@ export default function(userData = initialState, action = {}) {
 
     default:
       return userData;
+  }
+}
+
+function addAtomSettings(userData, atomSettings) {
+  const atomUri = get(atomSettings, "atomUri");
+  if (atomUri) {
+    let settings = get(userData, "atomSettings");
+    return userData.set(
+      "atomSettings",
+      settings.set(atomUri, Immutable.fromJS(atomSettings))
+    );
+  } else {
+    console.error("Tried to add invalid atom-settings-object: ", atomSettings);
+    return userData;
   }
 }
