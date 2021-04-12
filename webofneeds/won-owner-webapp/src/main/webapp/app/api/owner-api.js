@@ -111,7 +111,8 @@ export const serverSideConnect = (
 /**
  * Fetch User Settings for Notifications
  */
-export const fetchUserSettings = () => fetchWorker.fetchUserSettings();
+export const fetchUserSettings = atomUri =>
+  fetchWorker.fetchUserSettings(atomUri);
 
 /**
  *

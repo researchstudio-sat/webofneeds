@@ -73,6 +73,7 @@ import won.owner.web.events.OnRegistrationCompleteEvent;
 import won.owner.web.validator.PasswordChangeValidator;
 import won.owner.web.validator.ResetPasswordValidator;
 import won.owner.web.validator.UserRegisterValidator;
+import won.protocol.model.AtomState;
 
 /**
  * User: t.kozel Date: 11/12/13
@@ -333,8 +334,10 @@ public class RestUserController {
         } else {
             // No specific uri requested => all userSettings
             for (UserAtom userAtom : user.getUserAtoms()) {
-                userSettings.add(new UserSettingsPojo(user.getUsername(), user.getEmail(), userAtom.getUri(),
-                                userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations()));
+                if(userAtom.getState() != AtomState.DELETED) {
+                    userSettings.add(new UserSettingsPojo(user.getUsername(), user.getEmail(), userAtom.getUri(),
+                            userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations()));
+                }
             }
         }
         return userSettings;
@@ -351,15 +354,15 @@ public class RestUserController {
         // this session atom,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
-        if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
+        if (!userSettingsPojo.getUsername().isEmpty() && !user.getUsername().equals(userSettingsPojo.getUsername())) {
             return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
         }
-        if (user.getEmail() == null) {
+        if (!userSettingsPojo.getEmail().isEmpty() && user.getEmail() == null) {
             // TODO validate email server-side?
             // set email:
             user.setEmail(userSettingsPojo.getEmail());
             userService.save(user);
-        } else if (!user.getEmail().equals(userSettingsPojo.getEmail())) {
+        } else if (!userSettingsPojo.getEmail().isEmpty() && !user.getEmail().equals(userSettingsPojo.getEmail())) {
             // TODO validate email server-side?
             // change email:
             user.setEmail(userSettingsPojo.getEmail());

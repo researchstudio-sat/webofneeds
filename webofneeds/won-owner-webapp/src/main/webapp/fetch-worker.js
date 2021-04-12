@@ -68,8 +68,10 @@ export const sendAnonymousLinkEmail = (email, privateId) => {
 /**
  * Fetch UserSettings
  */
-export const fetchUserSettings = () => {
-  const url = urljoin(ownerBaseUrl, `/rest/users/settings`);
+export const fetchUserSettings = uri => {
+  const url = uri
+    ? urljoin(ownerBaseUrl, `/rest/users/settings?uri=${uri}`)
+    : urljoin(ownerBaseUrl, `/rest/users/settings`);
   return fetch(url, {
     method: "get",
     headers: {
@@ -85,12 +87,8 @@ export const fetchUserSettings = () => {
 /**
  * Update User Settings for specific atom
  *
- * @param {*} username
- * @param {*} email
- * @param {*} atomUri
- * @param {*} notifyMatches
- * @param {*} notifyRequests
- * @param {*} notifyConversations
+ * @param updatedSettings = {username, email, atomUri, notifyMatches, notifyRequests, notifyConversations}
+ *
  */
 export const updateAtomUserSettings = updatedSettings => {
   const url = urljoin(ownerBaseUrl, `/rest/users/settings`);
@@ -101,15 +99,18 @@ export const updateAtomUserSettings = updatedSettings => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      username: updatedSettings.username,
-      email: updatedSettings.email,
+      username: updatedSettings.username ? updatedSettings.username : "",
+      email: updatedSettings.email ? updatedSettings.email : "",
       atomUri: updatedSettings.atomUri,
       notifyMatches: updatedSettings.notifyMatches,
       notifyRequests: updatedSettings.notifyRequests,
       notifyConversations: updatedSettings.notifyConversations,
     }),
     credentials: "include",
-  }).then(checkHttpStatus(url));
+  })
+    .then(checkHttpStatus(url))
+    .then(resp => resp.json())
+    .catch(error => error.json());
 };
 
 /**

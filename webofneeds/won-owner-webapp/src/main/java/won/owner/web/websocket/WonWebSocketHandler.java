@@ -328,7 +328,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 // 3. email only if push was not successful
                 notifyUserOnDifferentChannel(wonMessage, atomUri, user);
             } else {
-                // TODO: remove redundant calls
                 // Always send possible pushNotifications:
                 // - maybe session is active -> message was send, but Tab is not focused
                 // - Browser is running in brackground -> user needs to get push notification
@@ -336,7 +335,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                                 linkedDataSource);
                 if (connectionURI.isPresent()) {
                     logger.debug("notifying user per web push for message {}", wonMessage.getMessageURI());
-                    // TODO: check if notifications active for user & atom
                     UserAtom userAtom = getAtomOfUser(user, atomUri);
                     if (userAtom == null) {
                         userOpt = Optional.ofNullable(userRepository.findByAtomUri(atomUri));
@@ -399,14 +397,11 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             logger.debug("not sending notification to user: sender and recipient atoms are controlled by same user.");
             return;
         }
-        UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail(), userAtom.getUri(),
-                        userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations());
-
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         String iconUrl = uriService.getOwnerProtocolOwnerURI().toString() + "/skin/current/images/logo.png";
         switch (wonMessage.getMessageType()) {
             case CONNECTION_MESSAGE:
-                if (userAtom.isConversations() && userSettingsPojo.isNotifyConversations()) {
+                if (userAtom.isConversations()) {
                     ObjectMapper mapper = new ObjectMapper();
                     ObjectNode rootNode = mapper.createObjectNode();
                     rootNode.put("type", "MESSAGE");
@@ -427,7 +422,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 }
                 return;
             case SOCKET_HINT_MESSAGE:
-                if (userAtom.isMatches() && userSettingsPojo.isNotifyMatches()) {
+                if (userAtom.isMatches()) {
                     if (!isConnectionInSuggestedState(connectionUri)) {
                         // we only want to notify if the connection is in state won:Suggested.
                         // otherwise, the owner has already handled another suggestion, or
@@ -450,7 +445,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 }
                 return;
             case CONNECT:
-                if (userAtom.isRequests() && userSettingsPojo.isNotifyRequests()) {
+                if (userAtom.isRequests()) {
                     ObjectMapper mapper = new ObjectMapper();
                     ObjectNode rootNode = mapper.createObjectNode();
                     rootNode.put("type", "CONNECT");

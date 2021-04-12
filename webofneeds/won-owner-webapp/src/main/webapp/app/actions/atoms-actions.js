@@ -171,15 +171,31 @@ export const createAtomFromDraftAndDispatch = (
   return ownerApi
     .sendMessage(message)
     .then(jsonResp => {
-      dispatch({
-        type: actionTypes.atoms.create,
-        payload: {
-          messageUri: jsonResp.messageUri,
-          message: jsonResp.message,
-          atomUri: atomUri,
-          atom: atomDraft,
+      dispatch(
+        {
+          //Dispatch notifications entry in state
+          type: actionTypes.account.addAtomUserSetting,
+          payload: {
+            atomUserSetting: {
+              username: "",
+              email: "",
+              atomUri: atomUri,
+              notifyMatches: true,
+              notifyRequests: true,
+              notifyConversations: true,
+            },
+          },
         },
-      });
+        {
+          type: actionTypes.atoms.create,
+          payload: {
+            messageUri: jsonResp.messageUri,
+            message: jsonResp.message,
+            atomUri: atomUri,
+            atom: atomDraft,
+          },
+        }
+      );
     })
     .then(() => atomUri);
 };
