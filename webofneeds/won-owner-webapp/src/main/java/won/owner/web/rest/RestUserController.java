@@ -334,9 +334,9 @@ public class RestUserController {
         } else {
             // No specific uri requested => all userSettings
             for (UserAtom userAtom : user.getUserAtoms()) {
-                if(userAtom.getState() != AtomState.DELETED) {
+                if (userAtom.getState() != AtomState.DELETED) {
                     userSettings.add(new UserSettingsPojo(user.getUsername(), user.getEmail(), userAtom.getUri(),
-                            userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations()));
+                                    userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations()));
                 }
             }
         }
