@@ -334,10 +334,10 @@ export const fetchUserSettings = () => dispatch => {
   dispatch({ type: actionTypes.account.fetchUserSettingsStarted });
   ownerApi
     .fetchUserSettings()
-    .then(userSettings => {
+    .then(atomUserSettings => {
       dispatch({
         type: actionTypes.account.fetchUserSettingsSuccess,
-        payload: { userSettings: Immutable.fromJS(userSettings) },
+        payload: { atomUserSettings: atomUserSettings },
       });
     })
     .catch(error => {

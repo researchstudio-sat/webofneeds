@@ -12,39 +12,34 @@ import { get } from "../utils.js";
 export default function WonAtomNotification({ atomUri, className }) {
   const dispatch = useDispatch();
   const accountState = useSelector(generalSelectors.getAccountState);
-  const userSettings = accountState && get(accountState, "userSettings");
-  const settings =
-    userSettings &&
-    userSettings.filter(element => {
-      return get(element, "atomUri") === atomUri;
-    });
-  let setting = settings && settings.size > 0 ? settings.get(0) : undefined;
+  const atomSettings =
+    accountState && accountState.getIn(["atomSettings", atomUri]);
   const isActive =
-    setting &&
-    (get(setting, "notifyMatches") ||
-      get(setting, "notifyRequests") ||
-      get(setting, "notifyConversations"));
+    atomSettings &&
+    (get(atomSettings, "notifyMatches") ||
+      get(atomSettings, "notifyRequests") ||
+      get(atomSettings, "notifyConversations"));
 
-  const [atomNoticication, setAtomNoticication] = useState(isActive);
+  const [atomNotification, setAtomNotification] = useState(isActive);
 
   function toggleAtomNotification() {
     const updatedSetting = {
-      username: setting && get(setting, "username"),
+      username: atomSettings && get(atomSettings, "username"),
       email: get(accountState, "email"),
       atomUri: atomUri,
-      notifyMatches: !atomNoticication,
-      notifyRequests: !atomNoticication,
-      notifyConversations: !atomNoticication,
+      notifyMatches: !atomNotification,
+      notifyRequests: !atomNotification,
+      notifyConversations: !atomNotification,
     };
     dispatch(actionCreators.account__updateAtomUserSettings(updatedSetting));
-    setAtomNoticication(!atomNoticication);
+    setAtomNotification(!atomNotification);
   }
 
   return (
     <won-atom-notification class={className ? className : ""}>
       <svg
         className={
-          atomNoticication
+          atomNotification
             ? "an__icon__small--selected clickable"
             : "an__icon__small clickable"
         }
