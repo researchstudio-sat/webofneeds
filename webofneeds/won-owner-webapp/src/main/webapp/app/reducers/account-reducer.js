@@ -58,6 +58,7 @@ export default function(userData = initialState, action = {}) {
       const atomUri = getUri(action.payload);
 
       const ownedAtomUris = get(userData, "ownedAtomUris");
+      //TODO: remove settings for atom too
       return userData.set("ownedAtomUris", ownedAtomUris.remove(atomUri));
     }
 
@@ -79,19 +80,22 @@ export default function(userData = initialState, action = {}) {
     case actionTypes.account.fetchUserSettingsSuccess:
       return userData.set("userSettings", action.payload.userSettings);
 
+    case actionTypes.account.addAtomUserSetting:
     case actionTypes.account.updateAtomUserSettingsSuccess: {
       const atomUserSetting = action.payload.atomUserSetting;
       const userSettings = get(userData, "userSettings");
       let updated = false;
       let updatedUserSettings = userSettings.map(setting => {
         if (get(setting, "atomUri") === atomUserSetting.atomUri) {
-          setting = atomUserSetting;
+          setting = Immutable.fromJS(atomUserSetting);
           updated = true;
         }
         return setting;
       });
       if (!updated) {
-        updatedUserSettings = userSettings.concat(atomUserSetting);
+        updatedUserSettings = userSettings.concat(
+          Immutable.fromJS([Immutable.Map(atomUserSetting)])
+        );
       }
       return userData.set("userSettings", updatedUserSettings);
     }

@@ -283,6 +283,7 @@ const actionHierarchy = {
     updateAtomUserSettingsStarted: INJ_DEFAULT,
     updateAtomUserSettingsSuccess: INJ_DEFAULT,
     updateAtomUserSettingsFailed: INJ_DEFAULT,
+    addAtomUserSetting: INJ_DEFAULT,
   },
 
   geoLocationDenied: INJ_DEFAULT,
