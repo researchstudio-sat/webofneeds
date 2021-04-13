@@ -10,6 +10,7 @@
  */
 package won.owner.web.websocket;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
@@ -410,7 +411,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     rootNode.put("icon", iconUrl);
                     if (textMsg != null) {
                         rootNode.put("message",
-                                        textMsg.length() < 50 ? textMsg : textMsg.substring(0, 46).concat(" ..."));
+                                        StringUtils.abbreviate(textMsg, 50));
                     }
                     String stringifiedJson;
                     try {
@@ -454,7 +455,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     rootNode.put("icon", iconUrl);
                     if (textMsg != null) {
                         rootNode.put("message",
-                                        textMsg.length() < 50 ? textMsg : textMsg.substring(0, 46).concat(" ..."));
+                                        StringUtils.abbreviate(textMsg, 50));
                     }
                     String stringifiedJson;
                     try {

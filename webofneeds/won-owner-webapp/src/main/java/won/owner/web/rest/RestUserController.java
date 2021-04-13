@@ -308,14 +308,14 @@ public class RestUserController {
 
     @ResponseBody
     @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public ArrayList<UserSettingsPojo> getUserSettings(@RequestParam(name = "uri", required = false) String uri) {
+    public List<UserSettingsPojo> getUserSettings(@RequestParam(name = "uri", required = false) String uri) {
         logger.debug("processing request to /settings");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
         // this session atom,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
-        ArrayList<UserSettingsPojo> userSettings = new ArrayList<UserSettingsPojo>();
+        List<UserSettingsPojo> userSettings = new ArrayList<UserSettingsPojo>();
         if (uri != null) {
             URI atomUri = null;
             try {
