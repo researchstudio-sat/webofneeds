@@ -33,7 +33,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import won.owner.model.User;
 import won.owner.model.UserAtom;
-import won.owner.pojo.UserSettingsPojo;
 import won.owner.repository.UserRepository;
 import won.owner.service.impl.KeystoreEnabledUserDetails;
 import won.owner.service.impl.OwnerApplicationService;
@@ -65,10 +64,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.time.Duration;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -394,7 +390,14 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             return;
         }
         UserAtom senderAtom = getAtomOfUser(user, wonMessage.getSenderAtomURI());
-        if (senderAtom != null) {
+        boolean allSendersOwned = wonMessage
+                        .getHeadAndForwarded(true)
+                        .getAllMessages()
+                        .stream()
+                        .map(m -> m.getSenderAtomURI())
+                        .filter(Objects::nonNull)
+                        .allMatch(uri -> getAtomOfUser(user, uri) != null);
+        if (allSendersOwned) {
             logger.debug("not sending notification to user: sender and recipient atoms are controlled by same user.");
             return;
         }
