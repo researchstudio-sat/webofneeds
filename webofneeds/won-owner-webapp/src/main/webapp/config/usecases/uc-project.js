@@ -19,6 +19,7 @@ export const project = {
         type: ["s:Project"],
         sockets: {
           "#memberSocket": vocab.WXSCHEMA.MemberSocketCompacted,
+          "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#associatedArticleSocket":
             vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
           "#projectOfSocket": vocab.PROJECT.ProjectOfSocketCompacted,

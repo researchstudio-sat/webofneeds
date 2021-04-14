@@ -78,7 +78,7 @@ export const event = {
   },
   details: {
     title: { ...details.title, mandatory: true },
-    eventObjectAboutUris: { ...details.eventObjectAboutUris, mandatory: true },
+    eventObjectAboutUris: { ...details.eventObjectAboutUris },
     description: { ...details.description },
     location: { ...details.location },
     tags: { ...details.tags },
