@@ -64,7 +64,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.time.Duration;
-import java.util.*;
+import java.util.Base64;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -387,18 +390,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         UserAtom userAtom = getAtomOfUser(user, atomUri);
         if (userAtom == null) {
             logger.debug("not sending notification to user: atom uri not specified");
-            return;
-        }
-        UserAtom senderAtom = getAtomOfUser(user, wonMessage.getSenderAtomURI());
-        boolean allSendersOwned = wonMessage
-                        .getHeadAndForwarded(true)
-                        .getAllMessages()
-                        .stream()
-                        .map(m -> m.getSenderAtomURI())
-                        .filter(Objects::nonNull)
-                        .allMatch(uri -> getAtomOfUser(user, uri) != null);
-        if (allSendersOwned) {
-            logger.debug("not sending notification to user: sender and recipient atoms are controlled by same user.");
             return;
         }
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
