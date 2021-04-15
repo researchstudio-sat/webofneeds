@@ -26,7 +26,6 @@ export default function WonSelectPicker({ initialValue, detail, onUpdate }) {
 
   useEffect(
     () => {
-      console.debug("changed selectedValuesImm", selectedValuesImm);
       onUpdate({
         value:
           selectedValuesImm && selectedValuesImm.size > 0
