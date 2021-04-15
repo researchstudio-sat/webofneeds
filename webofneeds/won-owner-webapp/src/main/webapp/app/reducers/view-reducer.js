@@ -87,7 +87,7 @@ export default function(viewState = initialState, action = {}) {
         .set("showMainMenu", false);
 
     case actionTypes.view.toggleDebugMode:
-      return viewState.set("debugMode", action.payload);
+      return viewState.set("debugMode", !viewState.get("debugMode"));
 
     case actionTypes.view.toggleClosedAtoms:
       return viewState.set(
