@@ -15,10 +15,10 @@ won-atom-header-big {
   }
 
   grid-template-areas:
-    "icon title . buddy calendar share context"
-    "icon title . . . . ."
-    "icon info actiontoggle actiontoggle actiontoggle actiontoggle actiontoggle";
-  grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content;
+    "icon title . buddy calendar share bell context"
+    "icon title . . . . . ."
+    "icon info actiontoggle actiontoggle actiontoggle actiontoggle actiontoggle actiontoggle";
+  grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content min-content;
 
   @media (max-width: $responsivenessBreakPoint) {
     padding: 0.5rem 0.5rem 0 0.5rem;
@@ -36,10 +36,10 @@ won-atom-header-big {
     grid-row-gap: 0.5rem;
     @include square-image(4.7rem, 0 1rem 1rem 0);
     grid-template-areas:
-      "icon title . buddy calendar share context"
-      "icon title . . . . ."
-      "icon info actiontoggle actiontoggle actiontoggle actiontoggle actiontoggle";
-    grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content;
+      "icon title . buddy calendar share bell context"
+      "icon title . . . . . ."
+      "icon info actiontoggle actiontoggle actiontoggle actiontoggle actiontoggle actiontoggle";
+    grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content min-content;
   }
 
   &.won-failed-to-load,
@@ -169,6 +169,11 @@ won-atom-header-big {
 
   > won-share-dropdown {
     grid-area: share;
+    margin-right: 1rem;
+  }
+
+  > won-atom-notification {
+    grid-area: bell;
     margin-right: 1rem;
   }
 

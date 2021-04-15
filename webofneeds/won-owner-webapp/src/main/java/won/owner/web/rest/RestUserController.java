@@ -7,11 +7,7 @@ package won.owner.web.rest;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
+import java.util.*;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,6 +73,7 @@ import won.owner.web.events.OnRegistrationCompleteEvent;
 import won.owner.web.validator.PasswordChangeValidator;
 import won.owner.web.validator.ResetPasswordValidator;
 import won.owner.web.validator.UserRegisterValidator;
+import won.protocol.model.AtomState;
 
 /**
  * User: t.kozel Date: 11/12/13
@@ -311,30 +308,39 @@ public class RestUserController {
 
     @ResponseBody
     @RequestMapping(value = "/settings", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public UserSettingsPojo getUserSettings(@RequestParam("uri") String uri) {
+    public List<UserSettingsPojo> getUserSettings(@RequestParam(name = "uri", required = false) String uri) {
         logger.debug("processing request to /settings");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // cannot use user object from context since hw doesn't know about created in
         // this session atom,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
-        UserSettingsPojo userSettingsPojo = new UserSettingsPojo(user.getUsername(), user.getEmail());
-        URI atomUri = null;
-        try {
-            atomUri = new URI(uri);
-            userSettingsPojo.setAtomUri(uri);
+        List<UserSettingsPojo> userSettings = new ArrayList<UserSettingsPojo>();
+        if (uri != null) {
+            URI atomUri = null;
+            try {
+                atomUri = new URI(uri);
+                for (UserAtom userAtom : user.getUserAtoms()) {
+                    if (userAtom.getUri().equals(atomUri)) {
+                        userSettings.add(new UserSettingsPojo(user.getUsername(), user.getEmail(), userAtom.getUri(),
+                                        userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations()));
+                        break;
+                    }
+                }
+            } catch (URISyntaxException e) {
+                // TODO error response
+                logger.warn(uri + " atom uri problem", e);
+            }
+        } else {
+            // No specific uri requested => all userSettings
             for (UserAtom userAtom : user.getUserAtoms()) {
-                if (userAtom.getUri().equals(atomUri)) {
-                    userSettingsPojo.setNotify(userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations());
-                    // userSettingsPojo.setEmail(user.getEmail());
-                    break;
+                if (userAtom.getState() != AtomState.DELETED) {
+                    userSettings.add(new UserSettingsPojo(user.getUsername(), user.getEmail(), userAtom.getUri(),
+                                    userAtom.isMatches(), userAtom.isRequests(), userAtom.isConversations()));
                 }
             }
-        } catch (URISyntaxException e) {
-            // TODO error response
-            logger.warn(uri + " atom uri problem", e);
         }
-        return userSettingsPojo;
+        return userSettings;
     }
 
     @ResponseBody
@@ -348,15 +354,15 @@ public class RestUserController {
         // this session atom,
         // therefore, we have to retrieve the user object from the user repository
         User user = userService.getByUsername(username);
-        if (!user.getUsername().equals(userSettingsPojo.getUsername())) {
+        if (!userSettingsPojo.getUsername().isEmpty() && !user.getUsername().equals(userSettingsPojo.getUsername())) {
             return generateStatusResponse(RestStatusResponse.USERNAME_MISMATCH);
         }
-        if (user.getEmail() == null) {
+        if (!userSettingsPojo.getEmail().isEmpty() && user.getEmail() == null) {
             // TODO validate email server-side?
             // set email:
             user.setEmail(userSettingsPojo.getEmail());
             userService.save(user);
-        } else if (!user.getEmail().equals(userSettingsPojo.getEmail())) {
+        } else if (!userSettingsPojo.getEmail().isEmpty() && !user.getEmail().equals(userSettingsPojo.getEmail())) {
             // TODO validate email server-side?
             // change email:
             user.setEmail(userSettingsPojo.getEmail());
@@ -364,22 +370,14 @@ public class RestUserController {
             logger.info("change email requested - email changed");
         }
         // retrieve UserAtom
-        URI atomUri = null;
-        try {
-            atomUri = new URI(userSettingsPojo.getAtomUri());
-            for (UserAtom userAtom : user.getUserAtoms()) {
-                if (userAtom.getUri().equals(atomUri)) {
-                    userAtom.setMatches(userSettingsPojo.isNotifyMatches());
-                    userAtom.setRequests(userSettingsPojo.isNotifyRequests());
-                    userAtom.setConversations(userSettingsPojo.isNotifyConversations());
-                    userAtomRepository.save(userAtom);
-                    break;
-                }
+        for (UserAtom userAtom : user.getUserAtoms()) {
+            if (userAtom.getUri().equals(userSettingsPojo.getAtomUri())) {
+                userAtom.setMatches(userSettingsPojo.isNotifyMatches());
+                userAtom.setRequests(userSettingsPojo.isNotifyRequests());
+                userAtom.setConversations(userSettingsPojo.isNotifyConversations());
+                userAtomRepository.save(userAtom);
+                break;
             }
-        } catch (URISyntaxException e) {
-            logger.warn(userSettingsPojo.getAtomUri() + " atom uri problem.", e);
-            return new ResponseEntity("\"" + userSettingsPojo.getAtomUri() + " atom uri problem.\"",
-                            HttpStatus.BAD_REQUEST);
         }
         return generateStatusResponse(RestStatusResponse.SETTINGS_CREATED);
     }

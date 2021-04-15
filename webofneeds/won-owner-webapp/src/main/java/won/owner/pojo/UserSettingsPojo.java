@@ -1,11 +1,13 @@
 package won.owner.pojo;
 
+import java.net.URI;
+
 /**
  * User: ypanchenko Date: 23.02.2015
  */
 public class UserSettingsPojo extends UsernamePojo {
     private String email;
-    private String atomUri;
+    private URI atomUri;
     private boolean notifyMatches;
     private boolean notifyRequests;
     private boolean notifyConversations;
@@ -16,6 +18,16 @@ public class UserSettingsPojo extends UsernamePojo {
     public UserSettingsPojo(String username, String email) {
         this.setUsername(username);
         this.email = email;
+    }
+
+    public UserSettingsPojo(String username, String email, URI atomUri, boolean notifyMatches, boolean notifyRequests,
+                    boolean notifyConversation) {
+        this.setUsername(username);
+        this.email = email;
+        this.atomUri = atomUri;
+        this.notifyMatches = notifyMatches;
+        this.notifyRequests = notifyRequests;
+        this.notifyConversations = notifyConversation;
     }
 
     public String getEmail() {
@@ -50,11 +62,11 @@ public class UserSettingsPojo extends UsernamePojo {
         this.notifyConversations = notifyConversations;
     }
 
-    public String getAtomUri() {
+    public URI getAtomUri() {
         return atomUri;
     }
 
-    public void setAtomUri(final String atomUri) {
+    public void setAtomUri(URI atomUri) {
         this.atomUri = atomUri;
     }
 

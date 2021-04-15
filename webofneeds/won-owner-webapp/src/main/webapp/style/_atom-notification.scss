@@ -1,0 +1,18 @@
+@import "sizing-utils";
+@import "won-config";
+@import "animate";
+
+won-atom-notification {
+  .an__icon__small {
+    --local-primary: #{$won-secondary-color};
+    @include fixed-square($postIconSizeMobile);
+    padding-left: 0.5rem;
+    padding-right: 0.25rem;
+  }
+  .an__icon__small--selected {
+    --local-primary: #{$won-primary-color};
+    @include fixed-square($postIconSizeMobile);
+    padding-left: 0.5rem;
+    padding-right: 0.25rem;
+  }
+}

@@ -109,6 +109,34 @@ export const serverSideConnect = (
   );
 
 /**
+ * Fetch User Settings for Notifications
+ */
+export const fetchUserSettings = atomUri =>
+  fetchWorker.fetchUserSettings(atomUri);
+
+/**
+ *
+ * @param {*} username
+ * @param {*} email
+ * @param {*} atomUri
+ * @param {*} notifyMatches
+ * @param {*} notifyRequests
+ * @param {*} notifyConversations
+ */
+export const updateAtomUserSettings = updatedSetting =>
+  fetchWorker.updateAtomUserSettings(updatedSetting);
+
+/**
+ * Send pushNotifications subscription to server
+ */
+export const sendSubscriptionToServer = subsctiption =>
+  fetchWorker.sendSubscriptionToServer(subsctiption);
+
+/**
+ * Get ServerKey
+ */
+export const getServerKey = () => fetchWorker.getServerKey();
+/**
  * Returns all stored Atoms including MetaData (e.g. type, creationDate, location, state) as a Map
  * @param state either "ACTIVE" or "INACTIVE"
  * @returns {*}

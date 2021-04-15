@@ -54,6 +54,7 @@ import { getQueryParams, generateLink } from "./utils.js";
 import * as accountUtils from "./redux/utils/account-utils.js";
 import * as processUtils from "./redux/utils/process-utils.js";
 import { runPushAgent } from "./push-agent";
+//import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import ico_loading_anim from "~/images/won-icons/ico_loading_anim.svg";
 import WonModalDialog from "~/app/components/modal-dialog";
 import * as viewSelectors from "~/app/redux/selectors/view-selectors";
@@ -90,7 +91,7 @@ runMessagingAgent(store);
 
 if (enableNotifications) {
   console.debug("runPushAgent");
-  runPushAgent(store); // TODO: runPushAgent used to get $ngRedux and ngRedux had a connect method attached -> not sure if that can be applied to the given store though
+  runPushAgent(store);
 }
 
 // Initiate the initial load

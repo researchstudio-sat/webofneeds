@@ -10,6 +10,7 @@
  */
 package won.owner.web.websocket;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.slf4j.Logger;
@@ -302,7 +303,7 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     logger.debug("cannot deliver message {}: no websocket session found. Trying to send message by email.",
                                     wonMessage.toShortStringForDebug());
                 }
-                notifyUserOnDifferentChannel(wonMessage, atomUri, userOpt, user);
+                notifyUserOnDifferentChannel(wonMessage, atomUri, user);
                 return wonMessage;
             }
             // we can send it - pre-cache the delivery chain:
@@ -325,7 +326,23 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                 // 1. collect multiple events occurring in close succession
                 // 2. try to push
                 // 3. email only if push was not successful
-                notifyUserOnDifferentChannel(wonMessage, atomUri, userOpt, user);
+                notifyUserOnDifferentChannel(wonMessage, atomUri, user);
+            } else {
+                // Always send possible pushNotifications:
+                // - maybe session is active -> message was send, but Tab is not focused
+                // - Browser is running in background -> user needs to get push notification
+                Optional<URI> connectionURI = WonLinkedDataUtils.getConnectionURIForIncomingMessage(wonMessage,
+                                linkedDataSource);
+                if (connectionURI.isPresent()) {
+                    logger.debug("notifying user per web push for message {}", wonMessage.getMessageURI());
+                    UserAtom userAtom = getAtomOfUser(user, atomUri);
+                    if (userAtom == null) {
+                        userOpt = Optional.ofNullable(userRepository.findByAtomUri(atomUri));
+                        user = userOpt.orElse(null);
+                    }
+                    notifyPerPush(user, atomUri, wonMessage, connectionURI.get());
+                }
+                logger.debug("cannot notify user: cannot determine connection URI");
             }
             return wonMessage;
         } finally {
@@ -337,10 +354,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler
         }
     }
 
-    public void notifyUserOnDifferentChannel(final WonMessage wonMessage, URI atomUri, Optional<User> userOpt,
+    public void notifyUserOnDifferentChannel(final WonMessage wonMessage, URI atomUri,
                     User user) {
         logger.debug("possibly send push notification for message {} , user has been found:{}",
-                        wonMessage.getMessageURI(), userOpt.isPresent());
+                        wonMessage.getMessageURI(), user != null);
         // TODO: obtaining connectionURI can be expensive depending on WoN node load. It
         // is not strictly required
         // for sending emails, but it is for linking into the conversation. If we drop
@@ -375,11 +392,6 @@ public class WonWebSocketHandler extends TextWebSocketHandler
             logger.debug("not sending notification to user: atom uri not specified");
             return;
         }
-        UserAtom senderAtom = getAtomOfUser(user, wonMessage.getSenderAtomURI());
-        if (senderAtom != null) {
-            logger.debug("not sending notification to user: sender and recipient atoms are controlled by same user.");
-            return;
-        }
         String textMsg = WonRdfUtils.MessageUtils.getTextMessage(wonMessage);
         String iconUrl = uriService.getOwnerProtocolOwnerURI().toString() + "/skin/current/images/logo.png";
         switch (wonMessage.getMessageType()) {
@@ -391,6 +403,10 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     rootNode.put("atomUri", userAtom.getUri().toString());
                     rootNode.put("connectionUri", connectionUri.toString());
                     rootNode.put("icon", iconUrl);
+                    if (textMsg != null) {
+                        rootNode.put("message",
+                                        StringUtils.abbreviate(textMsg, 50));
+                    }
                     String stringifiedJson;
                     try {
                         stringifiedJson = mapper.writer().writeValueAsString(rootNode);
@@ -432,7 +448,8 @@ public class WonWebSocketHandler extends TextWebSocketHandler
                     rootNode.put("connectionUri", connectionUri.toString());
                     rootNode.put("icon", iconUrl);
                     if (textMsg != null) {
-                        rootNode.put("message", textMsg);
+                        rootNode.put("message",
+                                        StringUtils.abbreviate(textMsg, 50));
                     }
                     String stringifiedJson;
                     try {

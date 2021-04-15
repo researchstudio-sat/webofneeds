@@ -17,6 +17,8 @@ import { get, getUri, extractAtomUriFromConnectionUri } from "../utils.js";
 import WonAtomContextDropdown from "../components/atom-context-dropdown.jsx";
 import WonAtomIcon from "../components/atom-icon.jsx";
 import WonShareDropdown from "../components/share-dropdown.jsx";
+import WonAtomNotification from "../components/atom-notification.jsx";
+
 import WonAddBuddy from "../components/add-buddy.jsx";
 
 import ico16_arrow_down from "~/images/won-icons/ico16_arrow_down.svg";
@@ -332,6 +334,7 @@ export default function WonAtomHeaderBig({
         {!disableActions && (
           <React.Fragment>
             <WonShareDropdown atom={atom} />
+            <WonAtomNotification atomUri={atomUri} />
             <WonAtomContextDropdown atom={atom} />
           </React.Fragment>
         )}

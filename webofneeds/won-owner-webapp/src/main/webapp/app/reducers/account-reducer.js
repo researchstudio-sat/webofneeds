@@ -15,6 +15,7 @@ const initialState = Immutable.fromJS({
   acceptedTermsOfService: false,
   acceptedDisclaimer: isDisclaimerAccepted(),
   ownedAtomUris: Immutable.Set(),
+  atomSettings: Immutable.Map(),
 });
 
 export default function(userData = initialState, action = {}) {
@@ -57,7 +58,10 @@ export default function(userData = initialState, action = {}) {
       const atomUri = getUri(action.payload);
 
       const ownedAtomUris = get(userData, "ownedAtomUris");
-      return userData.set("ownedAtomUris", ownedAtomUris.remove(atomUri));
+      const atomSettings = get(userData, "atomSettings");
+      return userData
+        .set("ownedAtomUris", ownedAtomUris.remove(atomUri))
+        .set("atomSettings", atomSettings.remove(atomUri));
     }
 
     case actionTypes.atoms.create: //for optimistic additions
@@ -75,6 +79,17 @@ export default function(userData = initialState, action = {}) {
         "emailVerificationError",
         action.payload.emailVerificationError
       );
+    case actionTypes.account.fetchUserSettingsSuccess: {
+      const userSettings = action.payload.atomUserSettings;
+      userSettings.forEach(setting => {
+        userData = addAtomSettings(userData, setting);
+      });
+      return userData;
+    }
+    case actionTypes.account.addAtomUserSetting:
+    case actionTypes.account.updateAtomUserSettingsSuccess: {
+      return addAtomSettings(userData, action.payload.atomUserSetting);
+    }
 
     case actionTypes.account.verifyEmailAddressSuccess:
       return userData
@@ -124,5 +139,19 @@ export default function(userData = initialState, action = {}) {
 
     default:
       return userData;
+  }
+}
+
+function addAtomSettings(userData, atomSettings) {
+  const atomUri = get(atomSettings, "atomUri");
+  if (atomUri) {
+    let settings = get(userData, "atomSettings");
+    return userData.set(
+      "atomSettings",
+      settings.set(atomUri, Immutable.fromJS(atomSettings))
+    );
+  } else {
+    console.error("Tried to add invalid atom-settings-object: ", atomSettings);
+    return userData;
   }
 }

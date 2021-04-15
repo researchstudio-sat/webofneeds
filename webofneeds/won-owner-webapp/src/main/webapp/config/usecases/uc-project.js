@@ -19,6 +19,7 @@ export const project = {
         type: ["s:Project"],
         sockets: {
           "#memberSocket": vocab.WXSCHEMA.MemberSocketCompacted,
+          "#groupSocket": vocab.GROUP.GroupSocketCompacted,
           "#associatedArticleSocket":
             vocab.WXSCHEMA.AssociatedArticleSocketCompacted,
           "#projectOfSocket": vocab.PROJECT.ProjectOfSocketCompacted,
@@ -31,6 +32,14 @@ export const project = {
   },
   reactions: {
     ...defaultReactions,
+    [vocab.GROUP.GroupSocketCompacted]: {
+      [vocab.CHAT.ChatSocketCompacted]: {
+        useCaseIdentifiers: ["*"],
+      },
+      [vocab.GROUP.GroupSocketCompacted]: {
+        useCaseIdentifiers: ["*"],
+      },
+    },
     [vocab.WXSCHEMA.MemberSocketCompacted]: {
       [vocab.WXSCHEMA.MemberOfSocketCompacted]: {
         useCaseIdentifiers: ["persona"],

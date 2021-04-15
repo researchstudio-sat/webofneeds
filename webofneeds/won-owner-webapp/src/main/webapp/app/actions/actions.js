@@ -273,6 +273,17 @@ const actionHierarchy = {
     sendAnonymousLinkEmailFailed: INJ_DEFAULT,
 
     copiedAnonymousLinkSuccess: INJ_DEFAULT,
+
+    fetchUserSettings: accountActions.fetchUserSettings,
+    fetchUserSettingsStarted: INJ_DEFAULT,
+    fetchUserSettingsSuccess: INJ_DEFAULT,
+    fetchUserSettingsFailed: INJ_DEFAULT,
+
+    updateAtomUserSettings: accountActions.updateAtomUserSettings,
+    updateAtomUserSettingsStarted: INJ_DEFAULT,
+    updateAtomUserSettingsSuccess: INJ_DEFAULT,
+    updateAtomUserSettingsFailed: INJ_DEFAULT,
+    addAtomUserSetting: INJ_DEFAULT,
   },
 
   geoLocationDenied: INJ_DEFAULT,
