@@ -13,6 +13,7 @@ import WonImageUrlViewer from "../../app/components/details/viewer/imageurl-view
 import WikiDataViewer from "~/app/components/details/viewer/wikidata-viewer";
 import WikiDataPicker from "~/app/components/details/picker/wikidata-picker";
 import WonLinkViewer from "~/app/components/details/viewer/link-viewer";
+import WonSelectPicker from "~/app/components/details/picker/select-picker";
 
 import WonTitlePicker from "../../app/components/details/picker/title-picker.jsx";
 import WonDescriptionPicker from "../../app/components/details/picker/description-picker.jsx";
@@ -360,18 +361,18 @@ export const responseToUri = {
   },
 };
 
-export const flags = {
+export const debugFlags = {
   ...select,
-  identifier: "flags",
-  label: "Flags",
+  identifier: "debugFlags",
+  label: "Debug Flags",
   icon: ico36_detail_tags,
   viewerComponent: WonTagsViewer,
-  component: undefined, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
+  component: WonSelectPicker, //this is so we do not display the component as a detail-picker, but are still able to use the parseToRDF, parseFromRDF functions
   multiSelect: true,
   options: [
-    { value: "match:NoHintForMe", label: "Silent" },
-    { value: "match:NoHintForCounterpart", label: "Invisible" },
-    { value: "match:UsedForTesting", label: "UsedForTesting" },
+    { value: vocab.WONMATCH.NoHintForMeCompacted, label: "Silent" },
+    { value: vocab.WONMATCH.NoHintForCounterpartCompacted, label: "Invisible" },
+    { value: vocab.WONMATCH.UsedForTestingCompacted, label: "UsedForTesting" },
   ],
   parseToRDF: function({ value }) {
     if (!value) {
@@ -389,9 +390,14 @@ export const flags = {
     return jsonLdUtils.parseListFrom(jsonLDImm, ["match:flag"], "xsd:ID");
   },
   generateHumanReadable: function({ value, includeLabel }) {
-    //TODO: Implement this so that the label shows instead of the value
     if (value && is("Array", value) && value.length > 0) {
       const prefix = includeLabel ? this.label + ": " : "";
+      value = value.map(entry => {
+        const optionEntry = this.options.find(option => option.value === entry);
+
+        return (optionEntry && optionEntry.label) || entry;
+      });
+
       return prefix + value.join(", ");
     } else {
       return undefined;

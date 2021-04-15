@@ -3,7 +3,7 @@
  */
 
 import * as useCaseDefinitions from "../config/usecase-definitions.js";
-import { messageDetails } from "../config/detail-definitions.js";
+import { messageDetails, details } from "../config/detail-definitions.js";
 import { get, getIn, getUri } from "./utils.js";
 import vocab from "./service/vocab.js";
 
@@ -73,7 +73,7 @@ const useCaseGroupsImm = Immutable.fromJS(
     (useCaseGroup, useCaseGroupIdentifier) =>
       useCaseGroupIdentifier === "otherGroup" ? "_" : get(useCaseGroup, "label")
   );
-const allDetails = initializeAllDetails();
+const allDetails = initializeAllDetails(); //allDetails used within usecases
 const allDetailsImm = Immutable.fromJS(allDetails);
 const allMessageDetailsImm = Immutable.fromJS(initializeAllMessageDetails());
 
@@ -86,6 +86,10 @@ window.useCasesImm4dbg = useCasesImm;
 window.useCaseGroupsImm4dbg = useCaseGroupsImm;
 window.allDetailsImm4dbg = allDetailsImm;
 window.allMessageDetailsImm4dbg = allMessageDetailsImm;
+
+const detailsImm = Immutable.fromJS(details); //These are the details defined within detail-definitions
+
+export const getDebugFlagsDetailImm = () => get(detailsImm, "debugFlags");
 
 /**
  * Returns all the details that are defined in any useCase Defined in the useCaseDefinitions
@@ -731,6 +735,10 @@ export function isValidDraftImm(draftObjectImm, useCaseImm) {
     }
   }
   return false;
+}
+
+export function hasDebugFlags(useCaseObjImm) {
+  return !!getIn(useCaseObjImm, ["draft", "content", "debugFlags"]);
 }
 
 /**
