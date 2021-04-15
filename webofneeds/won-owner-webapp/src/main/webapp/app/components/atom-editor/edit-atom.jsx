@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { get, getIn, getUri } from "../../utils.js";
+import Immutable from "immutable";
 
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as atomUtils from "../../redux/utils/atom-utils.js";
@@ -94,7 +95,7 @@ export default function WonEditAtom({ fromAtom }) {
       <span className="cp__header__title">Edit Atom</span>
     );
 
-    let contentDetailsImm = get(useCaseImm, "details");
+    let contentDetailsImm = get(useCaseImm, "details") || Immutable.Map();
 
     if (debugModeEnabled || useCaseUtils.hasDebugFlags(useCaseImm)) {
       const debugFlagsDetailImm = useCaseUtils.getDebugFlagsDetailImm();
@@ -104,14 +105,13 @@ export default function WonEditAtom({ fromAtom }) {
       );
     }
 
-    const createContentFragment = contentDetailsImm &&
-      contentDetailsImm.size > 0 && (
-        <WonBranchDetailInput
-          detailListImm={contentDetailsImm}
-          initialDraftImm={getIn(useCaseImm, ["draft", "content"])}
-          onUpdateImm={updateDraftContentImm}
-        />
-      );
+    const createContentFragment = contentDetailsImm.size > 0 && (
+      <WonBranchDetailInput
+        detailListImm={contentDetailsImm}
+        initialDraftImm={getIn(useCaseImm, ["draft", "content"])}
+        onUpdateImm={updateDraftContentImm}
+      />
+    );
 
     const seeksDetailsImm = get(useCaseImm, "seeksDetails");
 

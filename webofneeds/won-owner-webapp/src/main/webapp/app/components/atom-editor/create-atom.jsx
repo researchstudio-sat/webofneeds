@@ -8,6 +8,7 @@ import PropTypes from "prop-types";
 import { get, getIn, getUri, generateLink } from "../../utils.js";
 import { isTagViewSocket } from "../../won-utils.js";
 import vocab from "../../service/vocab";
+import Immutable from "immutable";
 
 import * as generalSelectors from "../../redux/selectors/general-selectors.js";
 import * as viewSelectors from "../../redux/selectors/view-selectors.js";
@@ -267,7 +268,7 @@ export default function WonCreateAtom({
       );
     }
 
-    let contentDetailsImm = get(useCaseImm, "details");
+    let contentDetailsImm = get(useCaseImm, "details") || Immutable.Map();
 
     if (debugModeEnabled || useCaseUtils.hasDebugFlags(useCaseImm)) {
       const debugFlagsDetailImm = useCaseUtils.getDebugFlagsDetailImm();
@@ -277,14 +278,13 @@ export default function WonCreateAtom({
       );
     }
 
-    const createContentFragment = contentDetailsImm &&
-      contentDetailsImm.size > 0 && (
-        <WonBranchDetailInput
-          detailListImm={contentDetailsImm}
-          initialDraftImm={getIn(useCaseImm, ["draft", "content"])}
-          onUpdateImm={updateDraftContentImm}
-        />
-      );
+    const createContentFragment = contentDetailsImm.size > 0 && (
+      <WonBranchDetailInput
+        detailListImm={contentDetailsImm}
+        initialDraftImm={getIn(useCaseImm, ["draft", "content"])}
+        onUpdateImm={updateDraftContentImm}
+      />
+    );
 
     const seeksDetailsImm = get(useCaseImm, "seeksDetails");
 
