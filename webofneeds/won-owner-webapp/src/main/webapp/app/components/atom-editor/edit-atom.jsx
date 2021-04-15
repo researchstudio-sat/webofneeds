@@ -94,7 +94,15 @@ export default function WonEditAtom({ fromAtom }) {
       <span className="cp__header__title">Edit Atom</span>
     );
 
-    const contentDetailsImm = get(useCaseImm, "details");
+    let contentDetailsImm = get(useCaseImm, "details");
+
+    if (debugModeEnabled || useCaseUtils.hasDebugFlags(useCaseImm)) {
+      const debugFlagsDetailImm = useCaseUtils.getDebugFlagsDetailImm();
+      contentDetailsImm = contentDetailsImm.set(
+        get(debugFlagsDetailImm, "identifier"),
+        debugFlagsDetailImm
+      );
+    }
 
     const createContentFragment = contentDetailsImm &&
       contentDetailsImm.size > 0 && (

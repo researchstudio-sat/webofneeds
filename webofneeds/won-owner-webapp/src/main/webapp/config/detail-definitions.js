@@ -226,7 +226,7 @@ export const details = {
   reviewRating: reviewDetails.reviewRating,
   responseToUri: basicDetails.responseToUri,
   website: basicDetails.website,
-  flags: basicDetails.flags,
+  debugFlags: basicDetails.debugFlags,
   eventObjectAboutUris: basicDetails.eventObjectAboutUris,
   sockets: basicDetails.sockets,
   type: basicDetails.type,
