@@ -44,7 +44,6 @@ import * as configActions from "./config-actions.js";
 import * as loadActions from "./load-action.js";
 
 import { deepFreeze } from "../utils.js";
-import won from "../won-es6";
 import * as stateStore from "~/app/redux/state-store";
 
 /**
@@ -299,13 +298,7 @@ const actionHierarchy = {
 
   view: {
     toggleRdf: INJ_DEFAULT,
-    toggleDebugMode: () => dispatch => {
-      won.debugmode = !won.debugmode;
-      dispatch({
-        type: actionTypes.view.toggleDebugMode,
-        payload: won.debugmode,
-      });
-    },
+    toggleDebugMode: INJ_DEFAULT,
 
     toggleClosedAtoms: INJ_DEFAULT,
 

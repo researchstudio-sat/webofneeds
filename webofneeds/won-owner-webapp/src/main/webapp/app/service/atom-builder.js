@@ -188,9 +188,6 @@ import { Generator } from "sparqljs";
             },
           ]
         : undefined,
-      [vocab.WONMATCH.flagCompacted]: won.debugmode
-        ? [{ "@id": "match:UsedForTesting" }]
-        : undefined, //TODO: refactor this and use a won:flags-Detail in the content instead
       [vocab.WONMATCH.doNotMatchAfterCompacted]: doNotMatchAfter
         ? { "@value": doNotMatchAfter, "@type": "xsd:dateTime" }
         : undefined,
