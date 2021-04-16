@@ -195,10 +195,12 @@ export default function WonAtomHeaderBig({
         .filter(atomUtils.isActive)
         .filter(atom => getUri(atom) !== atomUri).size > 0;
 
+    const isOwned = accountUtils.isAtomOwned(accountState, atomUri);
+
     const showAddBuddyElement =
       atomUtils.hasBuddySocket(atom) &&
       hasOwnedAtomsWithBuddySocket &&
-      !accountUtils.isAtomOwned(accountState, atomUri);
+      !isOwned;
 
     const generateAtomActionButton = () => {
       const isInactive = atomUtils.isInactive(atom);
@@ -334,7 +336,7 @@ export default function WonAtomHeaderBig({
         {!disableActions && (
           <React.Fragment>
             <WonShareDropdown atom={atom} />
-            <WonAtomNotification atomUri={atomUri} />
+            {isOwned && <WonAtomNotification atomUri={atomUri} />}
             <WonAtomContextDropdown atom={atom} />
           </React.Fragment>
         )}
