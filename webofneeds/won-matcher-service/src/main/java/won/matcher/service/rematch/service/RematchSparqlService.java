@@ -7,6 +7,7 @@ import org.apache.jena.update.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import won.matcher.service.common.event.AtomEvent;
@@ -221,6 +222,9 @@ public class RematchSparqlService extends SparqlService {
                 QuerySolution qs = results.nextSolution();
                 String atomUri = qs.get("atomUri").asResource().getURI();
                 try {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Rematching {}, fetching its data...", atomUri);
+                    }
                     Dataset ds = linkedDataSource.getDataForPublicResource(URI.create(atomUri));
                     if (AtomModelWrapper.isAAtom(ds)) {
                         StringWriter sw = new StringWriter();
@@ -235,15 +239,27 @@ public class RematchSparqlService extends SparqlService {
                         }
                     }
                 } catch (LinkedDataFetchingException e) {
-                    if (e.getStatusCode().isPresent() && e.getStatusCode().get().equals(410)) {
-                        // atom was deleted. Remove it from index
-                        deleteRematchEntry(atomUri);
-                    }
+                    deleteRematchEntryIfNecessary(atomUri, e);
                 }
             }
         }
         logger.debug("atomEvents for rematching: " + bulkAtomEvent.getAtomEvents().size());
         return bulks;
+    }
+
+    private void deleteRematchEntryIfNecessary(String atomUri, LinkedDataFetchingException e) {
+        if (e.getStatusCode().isPresent()) {
+            HttpStatus status = HttpStatus.valueOf(e.getStatusCode().get());
+            if (status.is4xxClientError() || status.is5xxServerError()) {
+                // Some problem with the atom.
+                // Remove it from index
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Rematching {}: got response {}, removing resource from rematching index", atomUri,
+                                    status);
+                }
+                deleteRematchEntry(atomUri);
+            }
+        }
     }
 
     public void setLinkedDataSource(LinkedDataSource linkedDataSource) {
