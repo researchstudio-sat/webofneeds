@@ -36,26 +36,26 @@ public class LDRequestForbiddenWwwAuthenticateException extends LinkedDataFetchi
 
     public LDRequestForbiddenWwwAuthenticateException(String message, URI resourceUri, int statusCode,
                     String wwwAuthenticateHeaderValue) {
-        super(message, resourceUri, statusCode);
+        super(resourceUri, message, statusCode);
         this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
     }
 
     public LDRequestForbiddenWwwAuthenticateException(String message, Throwable cause, URI resourceUri,
                     int statusCode, String wwwAuthenticateHeaderValue) {
-        super(message, cause, resourceUri, statusCode);
+        super(resourceUri, message, cause, statusCode);
         this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
     }
 
     public LDRequestForbiddenWwwAuthenticateException(Throwable cause, URI resourceUri, int statusCode,
                     String wwwAuthenticateHeaderValue) {
-        super(cause, resourceUri, statusCode);
+        super(resourceUri, cause, statusCode);
         this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
     }
 
     public LDRequestForbiddenWwwAuthenticateException(String message, Throwable cause, boolean enableSuppression,
                     boolean writableStackTrace, URI resourceUri, int statusCode,
                     String wwwAuthenticateHeaderValue) {
-        super(message, cause, enableSuppression, writableStackTrace, resourceUri, statusCode);
+        super(message, resourceUri, cause, enableSuppression, writableStackTrace, statusCode);
         this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
     }
 }

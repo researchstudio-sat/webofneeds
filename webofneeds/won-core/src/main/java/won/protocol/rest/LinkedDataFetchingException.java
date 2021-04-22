@@ -1,13 +1,25 @@
 package won.protocol.rest;
 
+import org.springframework.http.HttpStatus;
+
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Exception thrown by methods trying to access a specific linked data resource.
+ * The resource is always present in the exception, optionally, the http status
+ * code is provided as well.
+ * <p>
+ * Some Subclasses are available for specific cases such as Forbidden and
+ * Unauthorized.
+ * </p>
+ */
 public class LinkedDataFetchingException extends RuntimeException {
     // The URI of the resource that could not be fetched
     private URI resourceUri;
-    private Optional<Integer> statusCode = Optional.empty();
+    private Integer statusCode = null;
 
     public LinkedDataFetchingException(URI resourceUri) {
         this(resourceUri, MessageFormat.format("Error fetching linked data for {0}", resourceUri), null);
@@ -15,6 +27,7 @@ public class LinkedDataFetchingException extends RuntimeException {
 
     public LinkedDataFetchingException(URI resourceUri, String message, Throwable cause) {
         super(message, cause);
+        Objects.requireNonNull(resourceUri);
         this.resourceUri = resourceUri;
     }
 
@@ -28,33 +41,38 @@ public class LinkedDataFetchingException extends RuntimeException {
 
     public LinkedDataFetchingException(URI resourceUri, int statusCode) {
         this.resourceUri = resourceUri;
-        this.statusCode = Optional.of(statusCode);
+        this.statusCode = statusCode;
+        Objects.requireNonNull(resourceUri);
     }
 
-    public LinkedDataFetchingException(String message, URI resourceUri, int statusCode) {
+    public LinkedDataFetchingException(URI resourceUri, String message, int statusCode) {
         super(message);
+        Objects.requireNonNull(resourceUri);
         this.resourceUri = resourceUri;
-        this.statusCode = Optional.of(statusCode);
+        this.statusCode = statusCode;
     }
 
-    public LinkedDataFetchingException(String message, Throwable cause, URI resourceUri,
+    public LinkedDataFetchingException(URI resourceUri, String message, Throwable cause,
                     int statusCode) {
         super(message, cause);
+        Objects.requireNonNull(resourceUri);
         this.resourceUri = resourceUri;
-        this.statusCode = Optional.of(statusCode);
+        this.statusCode = statusCode;
     }
 
-    public LinkedDataFetchingException(Throwable cause, URI resourceUri, int statusCode) {
+    public LinkedDataFetchingException(URI resourceUri, Throwable cause, int statusCode) {
         super(cause);
+        Objects.requireNonNull(resourceUri);
         this.resourceUri = resourceUri;
-        this.statusCode = Optional.of(statusCode);
+        this.statusCode = statusCode;
     }
 
-    public LinkedDataFetchingException(String message, Throwable cause, boolean enableSuppression,
-                    boolean writableStackTrace, URI resourceUri, int statusCode) {
+    public LinkedDataFetchingException(String message, URI resourceUri, Throwable cause, boolean enableSuppression,
+                    boolean writableStackTrace, int statusCode) {
         super(message, cause, enableSuppression, writableStackTrace);
+        Objects.requireNonNull(resourceUri);
         this.resourceUri = resourceUri;
-        this.statusCode = Optional.of(statusCode);
+        this.statusCode = statusCode;
     }
 
     public URI getResourceUri() {
@@ -62,76 +80,71 @@ public class LinkedDataFetchingException extends RuntimeException {
     }
 
     public Optional<Integer> getStatusCode() {
-        return statusCode;
+        return Optional.ofNullable(statusCode);
     }
 
     public static class ForbiddenAuthMethodProvided extends LinkedDataFetchingException {
         private String wwwAuthenticateHeaderValue;
 
         public ForbiddenAuthMethodProvided(URI resourceUri, String wwwAuthenticateHeaderValue) {
-            super(resourceUri);
+            super(resourceUri, HttpStatus.FORBIDDEN.value());
+            Objects.requireNonNull(wwwAuthenticateHeaderValue);
             this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
         }
 
         public ForbiddenAuthMethodProvided(URI resourceUri, String message, Throwable cause,
                         String wwwAuthenticateHeaderValue) {
-            super(resourceUri, message, cause);
+            super(resourceUri, message, cause, HttpStatus.FORBIDDEN.value());
+            Objects.requireNonNull(wwwAuthenticateHeaderValue);
             this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
         }
 
         public ForbiddenAuthMethodProvided(URI resourceUri, String message, String wwwAuthenticateHeaderValue) {
-            super(resourceUri, message);
+            super(resourceUri, message, HttpStatus.FORBIDDEN.value());
+            Objects.requireNonNull(wwwAuthenticateHeaderValue);
             this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
         }
 
         public ForbiddenAuthMethodProvided(URI resourceUri, Throwable cause, String wwwAuthenticateHeaderValue) {
-            super(resourceUri, cause);
-            this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
-        }
-
-        public ForbiddenAuthMethodProvided(URI resourceUri, int statusCode, String wwwAuthenticateHeaderValue) {
-            super(resourceUri, statusCode);
+            super(resourceUri, cause, HttpStatus.FORBIDDEN.value());
+            Objects.requireNonNull(wwwAuthenticateHeaderValue);
             this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
         }
     }
 
     public static class Forbidden extends LinkedDataFetchingException {
         public Forbidden(URI resourceUri) {
-            super(resourceUri);
+            super(resourceUri, HttpStatus.FORBIDDEN.value());
         }
 
         public Forbidden(URI resourceUri, String message, Throwable cause) {
-            super(resourceUri, message, cause);
+            super(resourceUri, message, cause, HttpStatus.FORBIDDEN.value());
         }
 
         public Forbidden(URI resourceUri, String message) {
-            super(resourceUri, message);
+            super(resourceUri, message, HttpStatus.FORBIDDEN.value());
         }
 
         public Forbidden(URI resourceUri, Throwable cause) {
-            super(resourceUri, cause);
-        }
-
-        public Forbidden(URI resourceUri, int statusCode) {
-            super(resourceUri, statusCode);
+            super(resourceUri, cause, HttpStatus.FORBIDDEN.value());
         }
     }
 
     public static class Unauthorized extends LinkedDataFetchingException {
         public Unauthorized(URI resourceUri) {
-            super(resourceUri);
+            super(resourceUri, HttpStatus.UNAUTHORIZED.value());
         }
 
         public Unauthorized(URI resourceUri, String message, Throwable cause) {
-            super(resourceUri, message, cause);
+            super(resourceUri, message, cause, HttpStatus.UNAUTHORIZED.value());
         }
 
         public Unauthorized(URI resourceUri, String message) {
-            super(resourceUri, message);
+            super(resourceUri, message, HttpStatus.UNAUTHORIZED.value());
         }
 
         public Unauthorized(URI resourceUri, Throwable cause) {
-            super(resourceUri, cause);
+            super(resourceUri, cause, HttpStatus.UNAUTHORIZED.value());
         }
 
         public Unauthorized(URI resourceUri, int statusCode) {
@@ -143,28 +156,27 @@ public class LinkedDataFetchingException extends RuntimeException {
         private String wwwAuthenticateHeaderValue;
 
         public UnauthorizedAuthMethodProvided(URI resourceUri, String wwwAuthenticateHeaderValue) {
-            super(resourceUri);
+            super(resourceUri, HttpStatus.UNAUTHORIZED.value());
+            Objects.requireNonNull(wwwAuthenticateHeaderValue);
             this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
         }
 
         public UnauthorizedAuthMethodProvided(URI resourceUri, String message, Throwable cause,
                         String wwwAuthenticateHeaderValue) {
-            super(resourceUri, message, cause);
+            super(resourceUri, message, cause, HttpStatus.UNAUTHORIZED.value());
+            Objects.requireNonNull(wwwAuthenticateHeaderValue);
             this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
         }
 
         public UnauthorizedAuthMethodProvided(URI resourceUri, String message, String wwwAuthenticateHeaderValue) {
-            super(resourceUri, message);
+            super(resourceUri, message, HttpStatus.UNAUTHORIZED.value());
+            Objects.requireNonNull(wwwAuthenticateHeaderValue);
             this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
         }
 
         public UnauthorizedAuthMethodProvided(URI resourceUri, Throwable cause, String wwwAuthenticateHeaderValue) {
-            super(resourceUri, cause);
-            this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
-        }
-
-        public UnauthorizedAuthMethodProvided(URI resourceUri, int statusCode, String wwwAuthenticateHeaderValue) {
-            super(resourceUri, statusCode);
+            super(resourceUri, cause, HttpStatus.UNAUTHORIZED.value());
+            Objects.requireNonNull(wwwAuthenticateHeaderValue);
             this.wwwAuthenticateHeaderValue = wwwAuthenticateHeaderValue;
         }
     }
