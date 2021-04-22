@@ -270,7 +270,7 @@ public class RematchSparqlService extends SparqlService {
     private void handleLinkedDataFetchingException(String atomUri, LinkedDataFetchingException e) {
         if (e.getStatusCode().isPresent()) {
             HttpStatus status = HttpStatus.valueOf(e.getStatusCode().get());
-            if (status == HttpStatus.GONE || status == HttpStatus.FORBIDDEN) {
+            if (status == HttpStatus.GONE) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Rematching {}: got response status {}, removing resource from index",
                                     atomUri,
