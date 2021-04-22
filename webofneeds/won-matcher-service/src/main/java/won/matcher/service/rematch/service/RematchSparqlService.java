@@ -57,7 +57,20 @@ public class RematchSparqlService extends SparqlService {
      * @param msg message that describe crawling meta data to update
      */
     public void registerMatchingAttempt(AtomEvent msg) {
-        createMatchAttemptUpdate(msg).ifPresent(updateString -> executeUpdateQuery(updateString));
+        createMatchAttemptUpdate(msg.getEventType(), msg.getUri(), msg.getCause())
+                        .ifPresent(updateString -> executeUpdateQuery(updateString));
+    }
+
+    /**
+     * Update the message meta data about the crawling process using a separate
+     * graph, without requiring an AtomEvent.
+     *
+     * @param type
+     * @param resourceUri
+     * @param cause
+     */
+    private void registerMatchingAttempt(AtomEvent.TYPE type, String resourceUri, Cause cause) {
+        createMatchAttemptUpdate(type, resourceUri, cause).ifPresent(updateString -> executeUpdateQuery(updateString));
     }
 
     /**
@@ -115,14 +128,21 @@ public class RematchSparqlService extends SparqlService {
     }
 
     private Optional<String> createMatchAttemptUpdate(AtomEvent msg) {
-        if (msg.getEventType() == TYPE.INACTIVE) {
+        AtomEvent.TYPE eventType = msg.getEventType();
+        String uri = msg.getUri();
+        Cause cause = msg.getCause();
+        return createMatchAttemptUpdate(eventType, uri, cause);
+    }
+
+    private Optional<String> createMatchAttemptUpdate(TYPE eventType, String uri, Cause cause) {
+        if (eventType == TYPE.INACTIVE) {
             return Optional.empty();
         }
         // insert a new entry,
         StringBuilder builder = new StringBuilder();
         // in case of a new push from the WoN node, remove the reference
         // date for this atom - it will be added by the subsequent insert
-        if (msg.getCause() == Cause.PUSHED) {
+        if (cause == Cause.PUSHED) {
             builder.append(" DELETE {  \n");
             builder.append("  graph won:rematchMetadata {  \n");
             builder.append("    ?atomUri won:referenceDate ?refDate ; \n");
@@ -173,7 +193,7 @@ public class RematchSparqlService extends SparqlService {
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setCommandText(builder.toString());
         pss.setNsPrefix("won", "https://w3id.org/won/core#");
-        pss.setIri("atomUri", msg.getUri());
+        pss.setIri("atomUri", uri);
         long now = System.currentTimeMillis();
         pss.setLiteral("matchAttemptDate", now);
         pss.setLiteral("referenceDate", now);
@@ -239,7 +259,7 @@ public class RematchSparqlService extends SparqlService {
                         }
                     }
                 } catch (LinkedDataFetchingException e) {
-                    deleteRematchEntryIfNecessary(atomUri, e);
+                    handleLinkedDataFetchingException(atomUri, e);
                 }
             }
         }
@@ -247,17 +267,23 @@ public class RematchSparqlService extends SparqlService {
         return bulks;
     }
 
-    private void deleteRematchEntryIfNecessary(String atomUri, LinkedDataFetchingException e) {
+    private void handleLinkedDataFetchingException(String atomUri, LinkedDataFetchingException e) {
         if (e.getStatusCode().isPresent()) {
             HttpStatus status = HttpStatus.valueOf(e.getStatusCode().get());
-            if (status.is4xxClientError() || status.is5xxServerError()) {
-                // Some problem with the atom.
-                // Remove it from index
+            if (status == HttpStatus.GONE || status == HttpStatus.FORBIDDEN) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Rematching {}: got response {}, removing resource from rematching index", atomUri,
+                    logger.debug("Rematching {}: got response status {}, removing resource from index",
+                                    atomUri,
                                     status);
                 }
                 deleteRematchEntry(atomUri);
+            } else if (status.isError()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Rematching {}: got response status {} - not rematching at this time, will try again later",
+                                    atomUri,
+                                    status);
+                }
+                registerMatchingAttempt(TYPE.ACTIVE, atomUri, Cause.SCHEDULED_FOR_REMATCH);
             }
         }
     }
