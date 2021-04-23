@@ -43,6 +43,7 @@ public class AtomConsumerProtocolActor extends UntypedConsumerActor {
     private static final String MSG_HEADER_METHODNAME_ATOMMODIFIED = "atomModified";
     private static final String MSG_HEADER_METHODNAME_ATOMACTIVATED = "atomActivated";
     private static final String MSG_HEADER_METHODNAME_ATOMDEACTIVATED = "atomDeactivated";
+    private static final String MSG_HEADER_METHODNAME_ATOMDELETED = "atomDeleted";
     private static final String MSG_HEADER_WON_NODE_URI = "wonNodeURI";
     private static final String MSG_HEADER_ATOM_URI = "atomURI";
     private final String endpoint;
@@ -83,38 +84,49 @@ public class AtomConsumerProtocolActor extends UntypedConsumerActor {
                         // publish an atom event to all the (distributed) matchers
                         AtomEvent event = null;
                         long crawlDate = System.currentTimeMillis();
-                        Dataset ds = linkedDataSource.getDataForPublicResource(URI.create(atomUri));
-                        if (AtomModelWrapper.isAAtom(ds)) {
-                            if (methodName.equals(MSG_HEADER_METHODNAME_ATOMCREATED)) {
-                                event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                                Cause.PUSHED);
-                                pubSubMediator.tell(
-                                                new DistributedPubSubMediator.Publish(event.getClass().getName(),
-                                                                event),
-                                                getSelf());
-                            } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMMODIFIED)) {
-                                event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                                Cause.PUSHED);
-                                pubSubMediator.tell(
-                                                new DistributedPubSubMediator.Publish(event.getClass().getName(),
-                                                                event),
-                                                getSelf());
-                            } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMACTIVATED)) {
-                                event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
-                                                Cause.PUSHED);
-                                pubSubMediator.tell(
-                                                new DistributedPubSubMediator.Publish(event.getClass().getName(),
-                                                                event),
-                                                getSelf());
-                            } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMDEACTIVATED)) {
-                                event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.INACTIVE, crawlDate, ds,
-                                                Cause.PUSHED);
-                                pubSubMediator.tell(
-                                                new DistributedPubSubMediator.Publish(event.getClass().getName(),
-                                                                event),
-                                                getSelf());
-                            } else {
-                                unhandled(message);
+                        // check for deletion before fetching as we won't be able to fetch anything
+                        if (methodName.equals(MSG_HEADER_METHODNAME_ATOMDELETED)) {
+                            event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.DELETED, crawlDate, null,
+                                            Cause.PUSHED);
+                            pubSubMediator.tell(
+                                            new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                            event),
+                                            getSelf());
+                        } else {
+                            // not a delete message: fetch the data and generate event
+                            Dataset ds = linkedDataSource.getDataForPublicResource(URI.create(atomUri));
+                            if (AtomModelWrapper.isAAtom(ds)) {
+                                if (methodName.equals(MSG_HEADER_METHODNAME_ATOMCREATED)) {
+                                    event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
+                                                    Cause.PUSHED);
+                                    pubSubMediator.tell(
+                                                    new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                                    event),
+                                                    getSelf());
+                                } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMMODIFIED)) {
+                                    event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
+                                                    Cause.PUSHED);
+                                    pubSubMediator.tell(
+                                                    new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                                    event),
+                                                    getSelf());
+                                } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMACTIVATED)) {
+                                    event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.ACTIVE, crawlDate, ds,
+                                                    Cause.PUSHED);
+                                    pubSubMediator.tell(
+                                                    new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                                    event),
+                                                    getSelf());
+                                } else if (methodName.equals(MSG_HEADER_METHODNAME_ATOMDEACTIVATED)) {
+                                    event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.INACTIVE, crawlDate, ds,
+                                                    Cause.PUSHED);
+                                    pubSubMediator.tell(
+                                                    new DistributedPubSubMediator.Publish(event.getClass().getName(),
+                                                                    event),
+                                                    getSelf());
+                                } else {
+                                    unhandled(message);
+                                }
                             }
                             // let the crawler save the data of this event too
                             ResourceCrawlUriMessage resMsg = new ResourceCrawlUriMessage(atomUri, atomUri, wonNodeUri,

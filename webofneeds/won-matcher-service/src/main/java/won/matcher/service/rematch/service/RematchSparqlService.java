@@ -51,7 +51,7 @@ public class RematchSparqlService extends SparqlService {
     /**
      * Update the message meta data about the crawling process using a separate
      * graph.
-     * 
+     *
      * @param msg message that describe crawling meta data to update
      */
     public void registerMatchingAttempt(AtomEvent msg) {
@@ -74,7 +74,7 @@ public class RematchSparqlService extends SparqlService {
     /**
      * Bulk update of several meta data messages about the crawling process using a
      * separate graph.
-     * 
+     *
      * @param msg multiple messages that describe crawling meta data to update
      */
     public void registerMatchingAttempts(BulkAtomEvent msg) {
@@ -219,7 +219,26 @@ public class RematchSparqlService extends SparqlService {
                         }
                     }
                 } catch (LinkedDataFetchingException e) {
-                    handleLinkedDataFetchingException(atomUri, e);
+                    if (e.getStatusCode().isPresent()) {
+                        HttpStatus status = HttpStatus.valueOf(e.getStatusCode().get());
+                        if (status == HttpStatus.GONE) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Rematching {}: got response status {}, removing resource from index",
+                                                atomUri,
+                                                status);
+                            }
+                            // add the event indicating that the atom was deleted
+                            bulkAtomEvent.addAtomEvent(
+                                            new AtomEvent(atomUri, null, TYPE.DELETED, System.currentTimeMillis(), null,
+                                                            Cause.SCHEDULED_FOR_REMATCH));
+                        }
+                    }
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Rematching {}: error retrieving linked data - not rematching at this time, will try again later",
+                                        atomUri);
+                    }
+                    // do not add event, just directly register a matching attempt
+                    registerMatchingAttempt(TYPE.ACTIVE, atomUri, Cause.SCHEDULED_FOR_REMATCH);
                 }
             }
         }
@@ -230,8 +249,9 @@ public class RematchSparqlService extends SparqlService {
     /**
      * Circumvents sending an AtomEvent (which triggers the matchers), and instead
      * updates the metadata or deletes the atom from the store, depending on the
-     * type of exception.
-     * 
+     * type of exception. We have to do this because, from within this service, we
+     * cannot send the required akka message
+     *
      * @param atomUri
      * @param e
      */

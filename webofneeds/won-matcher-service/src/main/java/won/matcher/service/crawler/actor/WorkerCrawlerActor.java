@@ -187,7 +187,7 @@ public class WorkerCrawlerActor extends UntypedActor {
             if (cause instanceof HttpClientErrorException
                             && Objects.equals(((HttpClientErrorException) cause).getStatusCode(), HttpStatus.GONE)) {
                 log.debug("Uri used to exist, but has been deleted, deleting from rdf store.");
-                sparqlService.deleteAtom(uriMsg.getUri());
+                sendDeletedAtomMessage(uriMsg.getUri(), uriMsg.getWonNodeUri());
                 sendDeletedUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
             } else if (cause instanceof HttpClientErrorException
                             && Objects.equals(((HttpClientErrorException) cause).getStatusCode(),
@@ -243,6 +243,12 @@ public class WorkerCrawlerActor extends UntypedActor {
         log.debug("Crawling done for URI {} with ETag Header Values {} (If-None-Match request value: {})",
                         uriDoneMsg.getUri(), responseETags, ifNoneMatch);
         getSender().tell(uriDoneMsg, getSelf());
+    }
+
+    private void sendDeletedAtomMessage(String atomUri, String wonNodeUri) {
+        AtomEvent event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.DELETED, System.currentTimeMillis(),
+                        null, Cause.CRAWLED);
+        getSender().tell(event, getSelf());
     }
 
     public void setSparqlService(final CrawlSparqlService sparqlService) {
