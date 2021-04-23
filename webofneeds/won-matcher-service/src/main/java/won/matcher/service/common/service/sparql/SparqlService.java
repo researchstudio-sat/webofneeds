@@ -191,7 +191,7 @@ public class SparqlService {
         for (String graphUri : graphUris) {
             builder
                             .append("DELETE WHERE {\n")
-                            .append("  GRAPH <\n").append(graphUri).append("> {\n")
+                            .append("  GRAPH <").append(graphUri).append("> {\n")
                             .append("    ?s ?p ?o .\n")
                             .append("  }\n")
                             .append("};\n");
