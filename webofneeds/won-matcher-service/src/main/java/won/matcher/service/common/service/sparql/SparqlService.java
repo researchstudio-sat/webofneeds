@@ -190,15 +190,11 @@ public class SparqlService {
         StringBuilder builder = new StringBuilder();
         for (String graphUri : graphUris) {
             builder
-                            .append("DELETE {")
-                            .append("  GRAPH <").append(graphUri).append("> {")
-                            .append("    ?s ?p ?o ")
-                            .append("  }")
-                            .append("} WHERE {")
-                            .append("  GRAPH <").append(graphUri).append("> {")
-                            .append("    ?s ?p ?o ")
-                            .append("  }")
-                            .append("};");
+                            .append("DELETE WHERE {\n")
+                            .append("  GRAPH <\n").append(graphUri).append("> {\n")
+                            .append("    ?s ?p ?o .\n")
+                            .append("  }\n")
+                            .append("};\n");
         }
         return builder.toString();
     }
@@ -250,29 +246,27 @@ public class SparqlService {
     private Set<String> getGetAtomAndMessagesNamedGraphUris(String atomUri) {
         StringBuilder builder = new StringBuilder();
         builder
-                        .append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>")
-                        .append("PREFIX won: <https://w3id.org/won/core#>")
-                        .append("SELECT DISTINCT ?graph")
-                        .append("WHERE")
-                        .append("{")
-                        .append("  {")
-                        .append("    VALUES ?s { ?atomUri }")
-                        .append("           ?s ?p ?g .")
-                        .append("           ?s a won:Atom .")
-                        .append("           GRAPH ?g {")
-                        .append("             ?x ?y ?z")
-                        .append("           }")
-                        .append("           BIND (?g as ?graph)")
-                        .append("  } UNION {")
-                        .append("    VALUES ?s { ?atomUri }")
-                        .append("           ?s ?p ?g")
-                        .append("           ?s a won:Atom .")
-                        .append("           GRAPH ?g {")
-                        .append("             ?s won:messageContainer/rdfs:member ?m")
-                        .append("           }")
-                        .append("           BIND (?m as ?graph)")
-                        .append("  }")
-                        .append("}");
+                        .append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n")
+                        .append("PREFIX won: <https://w3id.org/won/core#>\n")
+                        .append("SELECT DISTINCT ?graph\n")
+                        .append("WHERE\n")
+                        .append("{\n")
+                        .append("  {\n")
+                        .append("           ?atomUri ?p ?g .\n")
+                        .append("           ?atomUri a won:Atom .\n")
+                        .append("           GRAPH ?g {\n")
+                        .append("             ?x ?y ?z\n")
+                        .append("           }\n")
+                        .append("           BIND (?g as ?graph)\n")
+                        .append("  } UNION {\n")
+                        .append("           ?atomUri ?p ?g\n")
+                        .append("           ?atomUri a won:Atom .\n")
+                        .append("           GRAPH ?g {\n")
+                        .append("             ?atomUri won:messageContainer/rdfs:member ?m\n")
+                        .append("           }\n")
+                        .append("           BIND (?m as ?graph)\n")
+                        .append("  }\n")
+                        .append("}\n");
         ParameterizedSparqlString pss = new ParameterizedSparqlString(builder.toString());
         pss.setIri("atomUri", atomUri);
         Query query = QueryFactory.create(pss.toString());
