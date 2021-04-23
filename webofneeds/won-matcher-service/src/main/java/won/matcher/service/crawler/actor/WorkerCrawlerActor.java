@@ -186,8 +186,9 @@ public class WorkerCrawlerActor extends UntypedActor {
             Throwable cause = e.getCause();
             if (cause instanceof HttpClientErrorException
                             && Objects.equals(((HttpClientErrorException) cause).getStatusCode(), HttpStatus.GONE)) {
-                log.debug("Uri used to exist, but has been deleted, marking uri as done");
-                sendDoneUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
+                log.debug("Uri used to exist, but has been deleted, deleting from rdf store.");
+                sparqlService.deleteAtom(uriMsg.getUri());
+                sendDeletedUriMessage(uriMsg, uriMsg.getWonNodeUri(), etags);
             } else if (cause instanceof HttpClientErrorException
                             && Objects.equals(((HttpClientErrorException) cause).getStatusCode(),
                                             HttpStatus.FORBIDDEN)) {
@@ -223,9 +224,18 @@ public class WorkerCrawlerActor extends UntypedActor {
     }
 
     private void sendDoneUriMessage(CrawlUriMessage sourceUriMessage, String wonNodeUri, Collection<String> etags) {
+        sendUriMessage(sourceUriMessage, wonNodeUri, etags, CrawlUriMessage.STATUS.DONE);
+    }
+
+    private void sendDeletedUriMessage(CrawlUriMessage sourceUriMessage, String wonNodeUri, Collection<String> etags) {
+        sendUriMessage(sourceUriMessage, wonNodeUri, etags, CrawlUriMessage.STATUS.DELETED);
+    }
+
+    private void sendUriMessage(CrawlUriMessage sourceUriMessage, String wonNodeUri, Collection<String> etags,
+                    CrawlUriMessage.STATUS status) {
         long crawlDate = System.currentTimeMillis();
         CrawlUriMessage uriDoneMsg = new CrawlUriMessage(sourceUriMessage.getUri(), sourceUriMessage.getBaseUri(),
-                        wonNodeUri, CrawlUriMessage.STATUS.DONE, crawlDate, etags);
+                        wonNodeUri, status, crawlDate, etags);
         String ifNoneMatch = sourceUriMessage.getResourceETagHeaderValues() != null
                         ? String.join(", ", sourceUriMessage.getResourceETagHeaderValues())
                         : "<None>";

@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.event.AtomEvent.TYPE;
 import won.matcher.service.common.event.BulkAtomEvent;
@@ -23,7 +22,6 @@ import won.protocol.util.linkeddata.LinkedDataSource;
 import java.io.StringWriter;
 import java.lang.invoke.MethodHandles;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -105,28 +103,6 @@ public class RematchSparqlService extends SparqlService {
                         });
     }
 
-    private void deleteRematchEntry(String atomUri) {
-        StringBuilder builder = new StringBuilder();
-        // in case of a new push from the WoN node, remove the reference
-        // date for this atom - it will be added by the subsequent insert
-        builder.append(" DELETE {  \n");
-        builder.append("  graph won:rematchMetadata {  \n");
-        builder.append("    ?atomUri ?p ?o ; \n");
-        builder.append("  } \n");
-        builder.append(" } \n");
-        builder.append(" WHERE {  \n");
-        builder.append("  graph won:rematchMetadata {  \n");
-        builder.append("    ?atomUri ?p ?o . \n");
-        builder.append("  } \n");
-        builder.append(" }; \n");
-        ParameterizedSparqlString pss = new ParameterizedSparqlString();
-        pss.setCommandText(builder.toString());
-        pss.setNsPrefix("won", "https://w3id.org/won/core#");
-        pss.setIri("atomUri", atomUri);
-        long now = System.currentTimeMillis();
-        this.executeUpdateQuery(pss.toString());
-    }
-
     private Optional<String> createMatchAttemptUpdate(AtomEvent msg) {
         AtomEvent.TYPE eventType = msg.getEventType();
         String uri = msg.getUri();
@@ -143,12 +119,7 @@ public class RematchSparqlService extends SparqlService {
         // in case of a new push from the WoN node, remove the reference
         // date for this atom - it will be added by the subsequent insert
         if (cause == Cause.PUSHED) {
-            builder.append(" DELETE {  \n");
-            builder.append("  graph won:rematchMetadata {  \n");
-            builder.append("    ?atomUri won:referenceDate ?refDate ; \n");
-            builder.append("  } \n");
-            builder.append(" } \n");
-            builder.append(" WHERE {  \n");
+            builder.append(" DELETE WHERE {  \n");
             builder.append("  graph won:rematchMetadata {  \n");
             builder.append("    ?atomUri won:referenceDate ?refDate . \n");
             builder.append("  } \n");
@@ -198,17 +169,6 @@ public class RematchSparqlService extends SparqlService {
         pss.setLiteral("matchAttemptDate", now);
         pss.setLiteral("referenceDate", now);
         return Optional.of(pss.toString());
-    }
-
-    private Set<String> commaConcatenatedStringToSet(String contatenatedString) {
-        if (contatenatedString == null || contatenatedString.isEmpty()) {
-            return null;
-        }
-        String[] splitValues = StringUtils.split(contatenatedString, HTTP_HEADER_SEPARATOR);
-        if (splitValues == null) {
-            return new HashSet<>(Arrays.asList(contatenatedString));
-        }
-        return new HashSet(Arrays.asList(splitValues));
     }
 
     public Set<BulkAtomEvent> findAtomsForRematching() {
@@ -267,6 +227,14 @@ public class RematchSparqlService extends SparqlService {
         return bulks;
     }
 
+    /**
+     * Circumvents sending an AtomEvent (which triggers the matchers), and instead
+     * updates the metadata or deletes the atom from the store, depending on the
+     * type of exception.
+     * 
+     * @param atomUri
+     * @param e
+     */
     private void handleLinkedDataFetchingException(String atomUri, LinkedDataFetchingException e) {
         if (e.getStatusCode().isPresent()) {
             HttpStatus status = HttpStatus.valueOf(e.getStatusCode().get());
@@ -276,7 +244,11 @@ public class RematchSparqlService extends SparqlService {
                                     atomUri,
                                     status);
                 }
-                deleteRematchEntry(atomUri);
+                deleteAtom(atomUri);
+                // deleting the metadata here instead of in the UpdateMetaDataWorker as this is
+                // not
+                // part of the normal crawling process.
+                deleteAtomMetadata(atomUri);
             } else if (status.isError()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Rematching {}: got response status {} - not rematching at this time, will try again later",

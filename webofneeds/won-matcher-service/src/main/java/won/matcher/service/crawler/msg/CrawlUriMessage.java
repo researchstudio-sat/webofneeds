@@ -22,6 +22,8 @@ public class CrawlUriMessage implements Serializable {
         // is set if the resource
         // was received by event subscription from the wonnode and not via the crawling
         // process.
+        DELETED // the actual resource has been deleted and its copy and all crawling metadata
+                // has been removed from the rdf store
     }
 
     private String uri;
