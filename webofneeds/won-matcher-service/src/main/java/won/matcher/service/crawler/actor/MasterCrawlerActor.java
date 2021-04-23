@@ -1,15 +1,5 @@
 package won.matcher.service.crawler.actor;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
@@ -19,6 +9,9 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import won.matcher.service.common.event.WonNodeEvent;
@@ -30,6 +23,12 @@ import won.matcher.service.crawler.msg.ResourceCrawlUriMessage;
 import won.matcher.service.crawler.service.CrawlSparqlService;
 import won.protocol.model.AtomState;
 import won.protocol.service.WonNodeInfo;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Coordinates recursive crawling of linked data resources by assigning
@@ -215,6 +214,15 @@ public class MasterCrawlerActor extends UntypedActor {
         } else if (msg.getStatus().equals(CrawlUriMessage.STATUS.DONE)) {
             // URI crawled successfully
             log.debug("Successfully processed URI: {}", msg.getUri());
+            updateMetaDataWorker.tell(msg, getSelf());
+            pendingMessages.remove(msg.getUri());
+            if (doneMessages.put(msg.getUri(), msg) != null) {
+                log.warning("URI message received twice: {}", msg.getUri());
+            }
+            logStatus();
+        } else if (msg.getStatus().equals(CrawlUriMessage.STATUS.DELETED)) {
+            // resource was deleted
+            log.debug("Successfuly processed deleted URI: {}", msg.getUri());
             updateMetaDataWorker.tell(msg, getSelf());
             pendingMessages.remove(msg.getUri());
             if (doneMessages.put(msg.getUri(), msg) != null) {

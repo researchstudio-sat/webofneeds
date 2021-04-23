@@ -65,20 +65,25 @@ public class CrawlSparqlService extends SparqlService {
         // delete the old entry
         StringBuilder builder = new StringBuilder();
         builder.append("DELETE WHERE { GRAPH won:crawlMetadata { ?msgUri ?y ?z}};\n");
-        // insert new entry
-        builder.append("\nINSERT DATA { GRAPH won:crawlMetadata {\n");
-        builder.append("?msgUri won:crawlDate ?crawlDate.\n");
-        builder.append("?msgUri won:crawlStatus ?crawlStatus.\n");
-        builder.append("?msgUri won:crawlBaseUri ?crawlBaseUri.\n");
-        if (msg.getWonNodeUri() != null) {
-            builder.append("?msgUri won:wonNodeUri ?wonNodeUri.\n");
-        }
-        if (msg.getResourceETagHeaderValues() != null && !msg.getResourceETagHeaderValues().isEmpty()) {
-            for (int i = 0; i < msg.getResourceETagHeaderValues().size(); i++) {
-                builder.append("?msgUri won:resourceETagValue ? .\n");
+        // if the resource was deleted, also remove rematch metadata, otherwise insert
+        // new metadata entry
+        if (msg.getStatus() == CrawlUriMessage.STATUS.DELETED) {
+            builder.append("DELETE WHERE { GRAPH won:rematchMetadata { ?msgUri ?p ?o }};\n");
+        } else {
+            builder.append("\nINSERT DATA { GRAPH won:crawlMetadata {\n");
+            builder.append("?msgUri won:crawlDate ?crawlDate.\n");
+            builder.append("?msgUri won:crawlStatus ?crawlStatus.\n");
+            builder.append("?msgUri won:crawlBaseUri ?crawlBaseUri.\n");
+            if (msg.getWonNodeUri() != null) {
+                builder.append("?msgUri won:wonNodeUri ?wonNodeUri.\n");
             }
+            if (msg.getResourceETagHeaderValues() != null && !msg.getResourceETagHeaderValues().isEmpty()) {
+                for (int i = 0; i < msg.getResourceETagHeaderValues().size(); i++) {
+                    builder.append("?msgUri won:resourceETagValue ? .\n");
+                }
+            }
+            builder.append("}};\n");
         }
-        builder.append("}};\n");
         ParameterizedSparqlString pss = new ParameterizedSparqlString();
         pss.setCommandText(builder.toString());
         pss.setNsPrefix("won", "https://w3id.org/won/core#");

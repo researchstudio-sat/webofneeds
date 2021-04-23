@@ -1,10 +1,5 @@
 package won.matcher.service.nodemanager.actor;
 
-import org.apache.jena.query.Dataset;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
 import akka.actor.SupervisorStrategy;
@@ -14,6 +9,10 @@ import akka.cluster.pubsub.DistributedPubSubMediator;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Function;
+import org.apache.jena.query.Dataset;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import scala.concurrent.duration.Duration;
 import won.matcher.service.common.event.AtomEvent;
 import won.matcher.service.common.service.sparql.SparqlService;
@@ -42,10 +41,16 @@ public class SaveAtomEventActor extends UntypedActor {
     public void onReceive(final Object o) throws Exception {
         if (o instanceof AtomEvent) {
             AtomEvent atomEvent = (AtomEvent) o;
-            // save the atom
-            log.debug("Save atom event {} to sparql endpoint {}", atomEvent, sparqlService.getSparqlEndpoint());
-            Dataset ds = atomEvent.deserializeAtomDataset();
-            sparqlService.updateNamedGraphsOfDataset(ds);
+            if (((AtomEvent) o).getEventType() == AtomEvent.TYPE.DELETED) {
+                // delete the atom
+                sparqlService.deleteAtom(atomEvent.getUri());
+                sparqlService.deleteAtomMetadata(atomEvent.getUri());
+            } else {
+                // save the atom
+                log.debug("Save atom event {} to sparql endpoint {}", atomEvent, sparqlService.getSparqlEndpoint());
+                Dataset ds = atomEvent.deserializeAtomDataset();
+                sparqlService.updateNamedGraphsOfDataset(ds);
+            }
         } else {
             unhandled(o);
         }

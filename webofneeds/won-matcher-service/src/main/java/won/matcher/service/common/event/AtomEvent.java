@@ -13,8 +13,8 @@ import java.io.StringWriter;
 
 /**
  * This event is used in the matching service to indicate that a new atom has
- * been found. It includes the URIs of the atom and the won node and optionally
- * the serialized resource User: hfriedrich Date: 04.06.2015
+ * been found, its status has changed, or it has been deleted. It includes the
+ * URIs of the atom and the won node and optionally the serialized resource
  */
 public class AtomEvent implements Serializable {
     private String uri;
@@ -48,6 +48,14 @@ public class AtomEvent implements Serializable {
         serializedAtomResource = sw.toString();
         serializationLangName = RDFFormat.TRIG.getLang().getName();
         serializationLangContentType = RDFFormat.TRIG.getLang().getContentType().getContentTypeStr();
+        this.cause = cause;
+    }
+
+    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Cause cause) {
+        this.uri = uri;
+        this.wonNodeUri = wonNodeUri;
+        this.eventType = eventType;
+        this.crawlDate = crawlDate;
         this.cause = cause;
     }
 
@@ -97,6 +105,6 @@ public class AtomEvent implements Serializable {
     }
 
     public static enum TYPE {
-        ACTIVE, INACTIVE
+        ACTIVE, INACTIVE, DELETED
     }
 }

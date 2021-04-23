@@ -2,6 +2,7 @@ package won.matcher.service.common.service.sparql;
 
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
@@ -21,10 +22,7 @@ import won.protocol.util.RdfUtils;
 import java.io.*;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -151,12 +149,12 @@ public class SparqlService {
         return ds;
     }
 
-    public Dataset retrieveAtomDataset(String uri) {
+    public Dataset retrieveAtomDataset(String atomUri) {
         String queryString = "prefix won: <https://w3id.org/won/core#> select distinct ?g where { "
                         + "GRAPH ?g { ?uri a won:Atom. ?a ?b ?c. } }";
         ParameterizedSparqlString pps = new ParameterizedSparqlString();
         pps.setCommandText(queryString);
-        pps.setIri("uri", uri);
+        pps.setIri("uri", atomUri);
         Query query = QueryFactory.create(pps.toString());
         try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)) {
             ResultSet results = qexec.execSelect();
@@ -169,6 +167,36 @@ public class SparqlService {
             }
             return ds;
         }
+    }
+
+    public void deleteAtom(String atomUri) {
+        Set<String> graphsToDelete = getGetAtomAndMessagesNamedGraphUris(atomUri);
+        if (graphsToDelete.isEmpty()) {
+            // nothing found, nothing to do
+            return;
+        }
+        deleteNamedGraphs(graphsToDelete);
+    }
+
+    public void deleteAtomMetadata(String atomUri) {
+        executeUpdateQuery(getDeleteAtomMetadataUpdate(atomUri));
+    }
+
+    public void deleteNamedGraphs(Set<String> graphUris) {
+        executeUpdateQuery(getDeleteGraphsUpdate(graphUris));
+    }
+
+    private String getDeleteGraphsUpdate(Set<String> graphUris) {
+        StringBuilder builder = new StringBuilder();
+        for (String graphUri : graphUris) {
+            builder
+                            .append("DELETE WHERE {\n")
+                            .append("  GRAPH <").append(graphUri).append("> {\n")
+                            .append("    ?s ?p ?o .\n")
+                            .append("  }\n")
+                            .append("};\n");
+        }
+        return builder.toString();
     }
 
     /**
@@ -213,6 +241,73 @@ public class SparqlService {
         } catch (Exception e) {
             logger.warn("Error sending update request: {} ", updateRequest, e);
         }
+    }
+
+    private Set<String> getGetAtomAndMessagesNamedGraphUris(String atomUri) {
+        StringBuilder builder = new StringBuilder();
+        builder
+                        .append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n")
+                        .append("PREFIX won: <https://w3id.org/won/core#>\n")
+                        .append("SELECT DISTINCT ?graph\n")
+                        .append("WHERE\n")
+                        .append("{\n")
+                        .append("  {\n")
+                        .append("           ?atomUri ?p ?g ;\n")
+                        .append("                    a won:Atom .\n")
+                        .append("           GRAPH ?g {\n")
+                        .append("             ?x ?y ?z\n")
+                        .append("           }\n")
+                        .append("           BIND (?g as ?graph)\n")
+                        .append("  } UNION {\n")
+                        .append("           ?atomUri ?p ?g ;\n")
+                        .append("                    a won:Atom .\n")
+                        .append("           GRAPH ?g {\n")
+                        .append("             ?atomUri won:messageContainer/rdfs:member ?m\n")
+                        .append("           }\n")
+                        .append("           BIND (?m as ?graph)\n")
+                        .append("  }\n")
+                        .append("}\n");
+        ParameterizedSparqlString pss = new ParameterizedSparqlString(builder.toString());
+        pss.setIri("atomUri", atomUri);
+        Query query = QueryFactory.create(pss.toString());
+        Set<String> ret = new HashSet<>();
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService(sparqlEndpoint, query)) {
+            ResultSet rs = qexec.execSelect();
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                RDFNode graphUri = qs.get("graph");
+                if (graphUri.isURIResource()) {
+                    ret.add(graphUri.asResource().getURI());
+                }
+            }
+        }
+        return ret;
+    }
+
+    private String getDeleteAtomMetadataUpdate(String atomUri) {
+        // insert a new entry,
+        StringBuilder builder = new StringBuilder();
+        // delete rematch data
+        builder
+                        .append(" DELETE WHERE {  \n")
+                        .append("  graph won:rematchMetadata {  \n")
+                        .append("    ?atomUri ?p ?o . \n")
+                        .append("  } \n")
+                        .append(" }; \n")
+                        // delete crawling data
+                        .append(" DELETE WHERE {  \n")
+                        .append("  graph won:crawlMetadata {  \n")
+                        .append("    ?atomUri ?p ?o . \n")
+                        .append("  } \n")
+                        .append(" }; \n");
+        ParameterizedSparqlString pss = new ParameterizedSparqlString();
+        pss.setCommandText(builder.toString());
+        pss.setNsPrefix("won", "https://w3id.org/won/core#");
+        pss.setIri("atomUri", atomUri);
+        long now = System.currentTimeMillis();
+        pss.setLiteral("matchAttemptDate", now);
+        pss.setLiteral("referenceDate", now);
+        return pss.toString();
     }
 
     private List<String> readInChunks(final PipedInputStream pr, final int chunkSize) throws IOException {
