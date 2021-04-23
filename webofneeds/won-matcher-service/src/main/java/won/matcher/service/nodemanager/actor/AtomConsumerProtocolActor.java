@@ -86,8 +86,7 @@ public class AtomConsumerProtocolActor extends UntypedConsumerActor {
                         long crawlDate = System.currentTimeMillis();
                         // check for deletion before fetching as we won't be able to fetch anything
                         if (methodName.equals(MSG_HEADER_METHODNAME_ATOMDELETED)) {
-                            event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.DELETED, crawlDate, null,
-                                            Cause.PUSHED);
+                            event = new AtomEvent(atomUri, wonNodeUri, AtomEvent.TYPE.DELETED, crawlDate, Cause.PUSHED);
                             pubSubMediator.tell(
                                             new DistributedPubSubMediator.Publish(event.getClass().getName(),
                                                             event),

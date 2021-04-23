@@ -228,9 +228,8 @@ public class RematchSparqlService extends SparqlService {
                                                 status);
                             }
                             // add the event indicating that the atom was deleted
-                            bulkAtomEvent.addAtomEvent(
-                                            new AtomEvent(atomUri, null, TYPE.DELETED, System.currentTimeMillis(), null,
-                                                            Cause.SCHEDULED_FOR_REMATCH));
+                            bulkAtomEvent.addAtomEvent(new AtomEvent(atomUri, null, TYPE.DELETED,
+                                            System.currentTimeMillis(), Cause.SCHEDULED_FOR_REMATCH));
                         }
                     }
                     if (logger.isDebugEnabled()) {
@@ -244,40 +243,6 @@ public class RematchSparqlService extends SparqlService {
         }
         logger.debug("atomEvents for rematching: " + bulkAtomEvent.getAtomEvents().size());
         return bulks;
-    }
-
-    /**
-     * Circumvents sending an AtomEvent (which triggers the matchers), and instead
-     * updates the metadata or deletes the atom from the store, depending on the
-     * type of exception. We have to do this because, from within this service, we
-     * cannot send the required akka message
-     *
-     * @param atomUri
-     * @param e
-     */
-    private void handleLinkedDataFetchingException(String atomUri, LinkedDataFetchingException e) {
-        if (e.getStatusCode().isPresent()) {
-            HttpStatus status = HttpStatus.valueOf(e.getStatusCode().get());
-            if (status == HttpStatus.GONE) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Rematching {}: got response status {}, removing resource from index",
-                                    atomUri,
-                                    status);
-                }
-                deleteAtom(atomUri);
-                // deleting the metadata here instead of in the UpdateMetaDataWorker as this is
-                // not
-                // part of the normal crawling process.
-                deleteAtomMetadata(atomUri);
-            } else if (status.isError()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Rematching {}: got response status {} - not rematching at this time, will try again later",
-                                    atomUri,
-                                    status);
-                }
-                registerMatchingAttempt(TYPE.ACTIVE, atomUri, Cause.SCHEDULED_FOR_REMATCH);
-            }
-        }
     }
 
     public void setLinkedDataSource(LinkedDataSource linkedDataSource) {

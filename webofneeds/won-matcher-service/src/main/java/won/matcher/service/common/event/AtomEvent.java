@@ -51,6 +51,14 @@ public class AtomEvent implements Serializable {
         this.cause = cause;
     }
 
+    public AtomEvent(String uri, String wonNodeUri, TYPE eventType, long crawlDate, Cause cause) {
+        this.uri = uri;
+        this.wonNodeUri = wonNodeUri;
+        this.eventType = eventType;
+        this.crawlDate = crawlDate;
+        this.cause = cause;
+    }
+
     public String getUri() {
         return uri;
     }
