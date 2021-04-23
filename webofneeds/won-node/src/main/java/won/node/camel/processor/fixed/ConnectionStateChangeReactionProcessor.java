@@ -1,14 +1,9 @@
 package won.node.camel.processor.fixed;
 
-import static won.node.camel.service.WonCamelHelper.*;
-
-import java.util.Optional;
-
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import won.node.camel.processor.AbstractCamelProcessor;
 import won.node.camel.processor.annotation.FixedMessageReactionProcessor;
 import won.node.camel.processor.general.ConnectionStateChangeBuilder;
@@ -16,7 +11,12 @@ import won.node.service.nodebehaviour.ConnectionStateChange;
 import won.protocol.message.WonMessage;
 import won.protocol.message.processor.camel.WonCamelConstants;
 import won.protocol.model.Atom;
+import won.protocol.model.AtomState;
 import won.protocol.model.Connection;
+
+import java.util.Optional;
+
+import static won.node.camel.service.WonCamelHelper.getConnection;
 
 /**
  * Configured to react to any message, checking whether the message caused a
@@ -59,7 +59,8 @@ public class ConnectionStateChangeReactionProcessor extends AbstractCamelProcess
         if (stateChangeBuilder.canBuild()) {
             ConnectionStateChange connectionStateChange = stateChangeBuilder.build();
             Atom atom = atomService.getAtomRequired(con.get().getAtomURI());
-            if (connectionStateChange.isConnect() || connectionStateChange.isDisconnect()) {
+            if ((connectionStateChange.isConnect() || connectionStateChange.isDisconnect())
+                            && atom.getState() == AtomState.ACTIVE) {
                 // trigger rematch
                 matcherProtocolMatcherClient.atomModified(atom.getAtomURI(), null);
                 logger.debug("matchers notified of connection state change {}", msgTypeDir);
