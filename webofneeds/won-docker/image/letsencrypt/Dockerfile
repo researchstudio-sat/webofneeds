@@ -6,6 +6,7 @@ RUN echo "deb [check-valid-until=no] http://cdn-fastly.deb.debian.org/debian jes
 RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list
 RUN sed -i '/deb http:\/\/deb.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list
 RUN apt-get -o Acquire::Check-Valid-Until=false update && apt-get -o Acquire::Check-Valid-Until=false install -y certbot -t jessie-backports dos2unix
+RUN certbot --version
 
 # main directory where the certificates are generated. This directory should be mounted to the host since other
 # directories inside (e.g. "live") use symlinks which should not be broken by mounting
