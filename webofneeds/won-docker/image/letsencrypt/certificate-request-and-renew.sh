@@ -1,4 +1,6 @@
-echo renew letsencrypt certificate
+echo "============================="
+echo "  letsencrypt check: $(date)"
+echo "============================="
 certbot certonly --webroot -w /usr/share/nginx/html --email $certificate_email --text --non-interactive --agree-tos \
 --cert-name $domain_params
 
