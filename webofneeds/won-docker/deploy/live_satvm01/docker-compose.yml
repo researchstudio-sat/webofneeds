@@ -146,7 +146,7 @@ services:
       - "JMX_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:62919,server=y,suspend=n"
     ports:
       - "8082:8443"
-      - "62918:62918"
+      - "62919:62919"
     volumes:
       - $base_folder/custom_owner_skin:/usr/local/tomcat/webapps/owner/skin/current/
       - $base_folder/won-server-certs:/usr/local/tomcat/conf/ssl/
