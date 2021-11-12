@@ -111,9 +111,14 @@ public class ReverseProxyCompatibleX509AuthenticationFilter extends AbstractPreA
         if (lastWarning == null || lastWarning
                         .isBefore(Instant.from(warningInterval.subtractFrom(Instant.now())))) {
             logger.warn(
-                            "Client certificate attribute is null. This is ok for many requests but it may indicate that you are behind a proxy server that terminates TLS and your system is misconfigured."
-                                            + " If this is the case, you never receive requests that include client certificates. If so, set the property 'client.authentication.behind.proxy' to true and "
-                                            + "make sure the proxy sets the HTTP header 'X-Client-Certificate' appropriately, passing the client certificate on to you. This warning is not generated more than once per hour.");
+                            "Client certificate attribute is null. This is ok for many requests but it may indicate that you are \n"
+                                            + "behind a proxy server that terminates TLS and your system is misconfigured.\n"
+                                            + "If this is the case, you never receive requests that include client certificates. \n"
+                                            + "If so, set the property 'client.authentication.behind.proxy' to true (current setting: "
+                                            + behindProxy + ") \n"
+                                            + "and make sure the proxy sets the HTTP header 'X-Client-Certificate' appropriately, passing the \n"
+                                            + "client certificate on to you. \n"
+                                            + "This warning is not generated more than once per hour.");
             lastWarning = Instant.now();
         }
     }
